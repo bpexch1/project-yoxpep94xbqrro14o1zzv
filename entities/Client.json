@@ -14,6 +14,10 @@
       "type": "string",
       "description": "The role of the client (superadmin, admin, agent, client)"
     },
+    "mobile_number": {
+      "type": "string",
+      "description": "The mobile number of the client"
+    },
     "credit_received": {
       "type": "number",
       "description": "Total credit received by the client"
