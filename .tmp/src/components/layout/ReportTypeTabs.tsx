@@ -1,5 +1,5 @@
-import React from "react";
 import { Filter } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -15,37 +15,38 @@ const tabs = [
 
 interface ReportTypeTabsProps {
   activeTab: string;
-  onTabChange?: (id: string) => void;
+  onTabChange: (id: string) => void;
 }
 
 export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) {
   const navigate = useNavigate();
 
   const handleTabClick = (tab: typeof tabs[0]) => {
-    if (onTabChange) onTabChange(tab.id);
+    onTabChange(tab.id);
     navigate(tab.path);
   };
 
   return (
-    <div className="bg-white rounded border border-slate-200 shadow-sm overflow-hidden mb-4">
-      <div className="bg-gray-50 px-4 py-2 border-b border-slate-200 flex items-center gap-2 text-sm font-bold text-slate-700">
-        <Filter className="w-3.5 h-3.5 text-emerald-500" />
+    <div className="bg-white rounded shadow-sm overflow-hidden mb-4 border">
+      <div className="bg-slate-50 px-4 py-2 border-b flex items-center gap-2 text-sm font-bold text-slate-700">
+        <Filter className="w-4 h-4 text-slate-900 fill-slate-900" />
         Report Type
       </div>
-      <div className="p-3 flex flex-wrap gap-2">
+      <div className="p-4 flex flex-wrap gap-2">
         {tabs.map((tab) => (
-          <button
+          <motion.button
             key={tab.id}
+            whileTap={{ scale: 0.95 }}
             onClick={() => handleTabClick(tab)}
             className={cn(
-              "px-3 py-1 rounded text-xs font-medium border transition-all duration-150",
+              "px-4 py-1.5 rounded text-xs font-bold border transition-all shadow-sm",
               activeTab === tab.id
-                ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                ? "bg-emerald-500 text-white border-emerald-500"
                 : "bg-white text-emerald-600 border-emerald-500 hover:bg-emerald-50"
             )}
           >
             {tab.label}
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
