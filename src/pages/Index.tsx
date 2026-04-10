@@ -1,7 +1,16 @@
-import { Navigate } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
+import { SearchUsers } from "@/components/dashboard/SearchUsers";
+import { SportHighlights } from "@/components/dashboard/SportHighlights";
 
 const Index = () => {
-  return <Navigate to="/accounts" replace />;
+  return (
+    <Layout>
+      <div className="p-3 max-w-5xl mx-auto space-y-4">
+        <SearchUsers />
+        <SportHighlights />
+      </div>
+    </Layout>
+  );
 };
 
 export default Index;

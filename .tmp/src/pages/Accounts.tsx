@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { Header } from "@/components/layout/Header";
+import { useState } from "react";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
-import { Search, Plus, BookOpen, Pencil, CheckCircle, XCircle } from "lucide-react";
+import { BookOpen, Pencil, CheckCircle, XCircle } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { Layout } from "@/components/layout/Layout";
+import { SearchUsers } from "@/components/dashboard/SearchUsers";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
@@ -31,32 +32,14 @@ export default function Accounts() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100 pb-10">
-      <Header />
+    <Layout>
       <main className="p-4 max-w-6xl mx-auto space-y-4">
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Search Users Section */}
-        <section className="bg-white rounded shadow-sm overflow-hidden">
-          <div className="bg-slate-50 px-4 py-2 border-b flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Search className="w-4 h-4 text-slate-900 fill-slate-900" />
-            Search-Users
-          </div>
-          <div className="p-4 flex gap-2">
-            <input
-              type="text"
-              placeholder="Username"
-              className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-            <button className="bg-emerald-600 text-white px-4 py-2 rounded text-sm font-semibold flex items-center gap-1">
-              <Search className="w-4 h-4" />
-              Search
-            </button>
-          </div>
-        </section>
+        <SearchUsers />
 
         {/* Clients List Section */}
-        <section className="bg-white rounded shadow-sm overflow-hidden">
+        <section className="bg-white rounded border shadow-sm overflow-hidden">
           <div className="bg-slate-50 px-4 py-2 border-b text-sm font-bold text-slate-800">
             NomanSA8592 - Clients List
           </div>
@@ -198,6 +181,6 @@ export default function Accounts() {
           </div>
         </section>
       </main>
-    </div>
+    </Layout>
   );
 }
