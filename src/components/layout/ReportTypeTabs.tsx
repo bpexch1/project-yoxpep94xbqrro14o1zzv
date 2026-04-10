@@ -1,23 +1,31 @@
 import { Filter } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const tabs = [
-  { id: "Book Detail", label: "Book Detail" },
-  { id: "Book Detail 2", label: "Book Detail 2" },
-  { id: "Daily PL", label: "Daily PL" },
-  { id: "Daily Report", label: "Daily Report" },
-  { id: "Final Sheet", label: "Final Sheet" },
-  { id: "Accounts", label: "Accounts" },
-  { id: "Commission Report", label: "Commission Report" },
+  { id: "Book Detail", label: "Book Detail", path: "/reports/book-detail" },
+  { id: "Book Detail 2", label: "Book Detail 2", path: "/reports/book-detail" },
+  { id: "Daily PL", label: "Daily PL", path: "/reports/daily-pl" },
+  { id: "Daily Report", label: "Daily Report", path: "/reports/daily" },
+  { id: "Final Sheet", label: "Final Sheet", path: "/reports/final-sheet" },
+  { id: "Accounts", label: "Accounts", path: "/accounts" },
+  { id: "Commission Report", label: "Commission Report", path: "/reports/commission" },
 ];
 
 interface ReportTypeTabsProps {
   activeTab: string;
-  onTabChange: (id: string) => void;
+  onTabChange?: (id: string) => void;
 }
 
 export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) {
+  const navigate = useNavigate();
+
+  const handleTabClick = (tab: typeof tabs[0]) => {
+    if (onTabChange) onTabChange(tab.id);
+    navigate(tab.path);
+  };
+
   return (
     <div className="bg-white rounded shadow-sm overflow-hidden mb-4">
       <div className="bg-slate-50 px-4 py-2 border-b flex items-center gap-2 text-sm font-semibold text-slate-700">
@@ -29,7 +37,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
           <motion.button
             key={tab.id}
             whileTap={{ scale: 0.95 }}
-            onClick={() => onTabChange(tab.id)}
+            onClick={() => handleTabClick(tab)}
             className={cn(
               "px-4 py-1.5 rounded text-xs font-medium border transition-all",
               activeTab === tab.id
