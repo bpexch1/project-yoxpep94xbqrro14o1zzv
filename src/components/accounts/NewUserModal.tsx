@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -83,38 +83,40 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-800">New User</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-slate-800 uppercase tracking-tight">New User Registration</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username" className="text-xs font-bold uppercase text-slate-500">Username</Label>
             <Input
               id="username"
               required
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="Enter username"
+              className="rounded-lg"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="full_name">Full Name</Label>
+            <Label htmlFor="full_name" className="text-xs font-bold uppercase text-slate-500">Full Name</Label>
             <Input
               id="full_name"
               required
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               placeholder="Enter full name"
+              className="rounded-lg"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role" className="text-xs font-bold uppercase text-slate-500">Role</Label>
             <Select
               value={formData.role}
               onValueChange={(value) => setFormData({ ...formData, role: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="rounded-lg">
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
@@ -125,7 +127,7 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="credit_limit">Credit Limit</Label>
+            <Label htmlFor="credit_limit" className="text-xs font-bold uppercase text-slate-500">Credit Limit</Label>
             <Input
               id="credit_limit"
               type="number"
@@ -133,10 +135,11 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
               value={formData.credit_limit}
               onChange={(e) => setFormData({ ...formData, credit_limit: e.target.value })}
               placeholder="0"
+              className="rounded-lg"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-xs font-bold uppercase text-slate-500">Password</Label>
             <Input
               id="password"
               type="password"
@@ -144,13 +147,14 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Enter password"
+              className="rounded-lg"
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+            <Button type="button" variant="outline" onClick={onClose} className="rounded-lg px-6">
               Cancel
             </Button>
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" disabled={isSubmitting}>
+            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 rounded-lg px-6 font-bold" disabled={isSubmitting}>
               {isSubmitting ? "Creating..." : "Create User"}
             </Button>
           </div>
