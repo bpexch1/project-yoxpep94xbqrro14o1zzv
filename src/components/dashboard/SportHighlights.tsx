@@ -94,10 +94,13 @@ export function SportHighlights() {
                   <td className="px-4 py-3 border-r border-slate-100 text-emerald-600 font-bold cursor-pointer hover:underline text-[13px] flex items-center gap-2">
                     {event.match}
                     {event.live && (
-                      <span className="flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                      </span>
+                      <div className="flex items-center gap-1.5 ml-1">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1 rounded font-black uppercase">live</span>
+                      </div>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right font-bold text-slate-700 text-[13px]">

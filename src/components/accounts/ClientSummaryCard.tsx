@@ -30,7 +30,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
   };
 
   const totals = useMemo(() => {
-    if (!showRealBalances || !clients) {
+    if (!showRealBalances || !clients || clients.length === 0) {
       return {
         credit_received: 0,
         credit_remaining: 0,
@@ -68,7 +68,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
   return (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-6">
       <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 text-xs font-bold text-slate-800 flex justify-between items-center uppercase tracking-wider">
-        <span>NomanSA8592 - Clients List</span>
+        <span>NomanSA8592 - Clients List | Default</span>
         <button 
           onClick={handleLoadBalance}
           disabled={isLoadBalanceLoading}
@@ -102,7 +102,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                   {formatNumber(totals.pl_downline)}
                 </td>
                 <td className="p-3 border-r border-slate-200 text-emerald-600">{formatNumber(totals.balance_upline)}</td>
-                <td className="p-3 text-emerald-600">{totals.users}</td>
+                <td className="p-3 text-emerald-600">{totals.users || 0}</td>
               </tr>
             </tbody>
           </table>
@@ -126,7 +126,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
         {/* Legend */}
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-4 uppercase tracking-wider">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center text-white font-black">C</div>
+            <div className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center text-white font-black text-[11px] leading-none">C</div>
             <span>Cash / Credit</span>
           </div>
           <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
             <span>Edit</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-sky-500 rounded-md flex items-center justify-center text-white font-black text-[8px]">L</div>
+            <div className="w-5 h-5 bg-sky-500 rounded-md flex items-center justify-center text-white font-black text-[8px] leading-none">L</div>
             <span>Ledger</span>
           </div>
           <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                 ) : (
                   <tr>
                     <td colSpan={7} className="p-12 text-center text-slate-400 font-bold uppercase tracking-widest text-[10px]">
-                      No clients found
+                      No clients found. Click 'New User' to add one.
                     </td>
                   </tr>
                 )}
