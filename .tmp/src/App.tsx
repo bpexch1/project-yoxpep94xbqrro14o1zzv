@@ -6,6 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Accounts from "./pages/Accounts";
+import CreateUser from "./pages/CreateUser";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
 
@@ -21,6 +22,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/accounts" element={<Accounts />} />
+            <Route path="/accounts/create" element={<CreateUser />} />
             <Route path="/reports/daily-pl" element={<Accounts />} />
             <Route path="/reports/daily" element={<Accounts />} />
             <Route path="/reports/book-detail" element={<Accounts />} />

@@ -1,5 +1,4 @@
 import { Filter } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -18,28 +17,40 @@ interface ReportTypeTabsProps {
 }
 
 export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) {
+  const TabButton = ({ id, label }: { id: string; label: string }) => (
+    <button
+      onClick={() => onTabChange(id)}
+      className={cn(
+        "px-4 py-1.5 rounded text-xs font-medium border transition-colors",
+        activeTab === id
+          ? "bg-emerald-500 text-white border-emerald-500"
+          : "border border-teal-500 text-teal-500 bg-white hover:bg-teal-50"
+      )}
+    >
+      {label}
+    </button>
+  );
+
   return (
-    <div className="bg-white rounded shadow-sm overflow-hidden mb-4">
-      <div className="bg-slate-50 px-4 py-2 border-b flex items-center gap-2 text-sm font-semibold text-slate-700">
-        <Filter className="w-4 h-4" />
+    <div className="bg-white rounded shadow-sm overflow-hidden mb-4 border border-gray-200">
+      <div className="bg-gray-100 px-4 py-2.5 border-b border-gray-200 flex items-center gap-2 text-sm font-bold text-gray-900">
+        <Filter className="w-4 h-4 fill-black text-black" />
         Report Type
       </div>
-      <div className="p-4 flex flex-wrap gap-2">
-        {tabs.map((tab) => (
-          <motion.button
-            key={tab.id}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onTabChange(tab.id)}
-            className={cn(
-              "px-4 py-1.5 rounded text-xs font-medium border transition-all",
-              activeTab === tab.id
-                ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                : "bg-white text-emerald-600 border-emerald-500 hover:bg-emerald-50"
-            )}
-          >
-            {tab.label}
-          </motion.button>
-        ))}
+      <div className="p-3 space-y-2">
+        <div className="flex flex-wrap gap-2">
+          <TabButton id="Book Detail" label="Book Detail" />
+          <TabButton id="Book Detail 2" label="Book Detail 2" />
+          <TabButton id="Daily PL" label="Daily PL" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <TabButton id="Daily Report" label="Daily Report" />
+          <TabButton id="Final Sheet" label="Final Sheet" />
+          <TabButton id="Accounts" label="Accounts" />
+        </div>
+        <div className="flex justify-center">
+          <TabButton id="Commission Report" label="Commission Report" />
+        </div>
       </div>
     </div>
   );

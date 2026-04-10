@@ -41,6 +41,22 @@
     "parent_username": {
       "type": "string",
       "description": "The username of the parent admin/agent"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number of the client"
+    },
+    "downline_share": {
+      "type": "number",
+      "description": "Downline share percentage (0-85)"
+    },
+    "reference": {
+      "type": "string",
+      "description": "Reference note for the client"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes about the client"
     }
   }
 }
