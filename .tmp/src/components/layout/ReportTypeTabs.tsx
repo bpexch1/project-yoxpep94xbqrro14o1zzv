@@ -1,5 +1,4 @@
 import { Filter } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -26,19 +25,18 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       </div>
       <div className="p-4 flex flex-wrap gap-2">
         {tabs.map((tab) => (
-          <motion.button
+          <button
             key={tab.id}
-            whileTap={{ scale: 0.95 }}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "px-4 py-1.5 rounded text-xs font-medium border transition-all",
+              "px-4 py-1.5 rounded text-xs font-medium border transition-all active:scale-95",
               activeTab === tab.id
                 ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
                 : "bg-white text-emerald-600 border-emerald-500 hover:bg-emerald-50"
             )}
           >
             {tab.label}
-          </motion.button>
+          </button>
         ))}
       </div>
     </div>
