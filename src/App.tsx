@@ -11,6 +11,7 @@ import DailyReport from "./pages/DailyReport";
 import BookDetail from "./pages/BookDetail";
 import FinalSheet from "./pages/FinalSheet";
 import CommissionReport from "./pages/CommissionReport";
+import CurrentPosition from "./pages/CurrentPosition";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
 
@@ -26,6 +27,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/accounts" element={<Accounts />} />
+            <Route path="/reports/current-position" element={<CurrentPosition />} />
             <Route path="/reports/daily-pl" element={<DailyPL />} />
             <Route path="/reports/daily" element={<DailyReport />} />
             <Route path="/reports/book-detail" element={<BookDetail />} />

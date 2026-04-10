@@ -29,7 +29,7 @@ interface SidebarProps {
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
   { label: "Users", icon: Users, path: "/accounts" },
-  { label: "Current Position", icon: Filter, path: "/reports/current-position" },
+  { label: "Current Position", icon: Target, path: "/reports/current-position" },
   { label: "Reports", icon: FileText, path: "/reports/daily-pl" },
   { label: "Bet Lock", icon: Lock, path: "/reports/bet-lock" },
   { label: "Star Casino", icon: Star, path: "/casino/star" },

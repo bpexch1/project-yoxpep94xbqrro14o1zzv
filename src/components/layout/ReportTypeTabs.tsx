@@ -10,6 +10,7 @@ const tabs = [
   { id: "Daily Report", label: "Daily Report", path: "/reports/daily" },
   { id: "Final Sheet", label: "Final Sheet", path: "/reports/final-sheet" },
   { id: "Accounts", label: "Accounts", path: "/accounts" },
+  { id: "Current Position", label: "Current Position", path: "/reports/current-position" },
   { id: "Commission Report", label: "Commission Report", path: "/reports/commission" },
 ];
 
