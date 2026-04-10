@@ -6,6 +6,11 @@ import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Accounts from "./pages/Accounts";
+import DailyPL from "./pages/DailyPL";
+import DailyReport from "./pages/DailyReport";
+import BookDetail from "./pages/BookDetail";
+import FinalSheet from "./pages/FinalSheet";
+import CommissionReport from "./pages/CommissionReport";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
 
@@ -21,11 +26,11 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/accounts" element={<Accounts />} />
-            <Route path="/reports/daily-pl" element={<Accounts />} />
-            <Route path="/reports/daily" element={<Accounts />} />
-            <Route path="/reports/book-detail" element={<Accounts />} />
-            <Route path="/reports/final-sheet" element={<Accounts />} />
-            <Route path="/reports/commission" element={<Accounts />} />
+            <Route path="/reports/daily-pl" element={<DailyPL />} />
+            <Route path="/reports/daily" element={<DailyReport />} />
+            <Route path="/reports/book-detail" element={<BookDetail />} />
+            <Route path="/reports/final-sheet" element={<FinalSheet />} />
+            <Route path="/reports/commission" element={<CommissionReport />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
