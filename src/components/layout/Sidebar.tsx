@@ -17,9 +17,11 @@ import {
   Target,
   Zap,
   Wind,
-  SlidersHorizontal
+  SlidersHorizontal,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { superdevClient } from "@/lib/superdev/client";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -153,6 +155,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             ))}
           </div>
         </nav>
+
+        <div className="p-4 border-t border-slate-800">
+          <button
+            onClick={() => superdevClient.auth.logout()}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-rose-400 hover:bg-slate-800 rounded-lg transition-colors group"
+          >
+            <LogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+            Logout
+          </button>
+        </div>
       </motion.aside>
     </>
   );
