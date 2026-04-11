@@ -73,9 +73,6 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
     return role || "Bettor";
   };
 
-  const total_credit = showRealBalances ? totals.credit_remaining.toLocaleString() : "0";
-  const total_balance = showRealBalances ? totals.balance_upline.toLocaleString() : "0";
-
   return (
     <section className="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
       {/* Card title */}
@@ -206,13 +203,6 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse min-w-[340px]">
           <thead>
-            {/* Green Total row */}
-            <tr className="bg-emerald-500 text-white font-bold">
-              <td className="px-3 py-2 border-r border-emerald-400">Total</td>
-              <td className="px-3 py-2 border-r border-emerald-400 text-center">-</td>
-              <td className="px-3 py-2 border-r border-emerald-400">{total_credit}</td>
-              <td className="px-3 py-2">{total_balance}</td>
-            </tr>
             {/* Column header row */}
             <tr className="bg-gray-100 border-b border-gray-200 text-gray-700">
               <th className="px-3 py-2 border-r border-gray-200 font-bold">Username</th>
