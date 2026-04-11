@@ -1,18 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Trophy, Eye, EyeOff, Loader2 } from "lucide-react";
+import { User, Lock, Loader2 } from "lucide-react";
 import { Client } from "@/entities";
 import { setClientSession } from "@/hooks/useClientAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -23,16 +18,14 @@ export default function Login() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please enter both username and password.",
+        description: "Please enter username and password.",
       });
       return;
     }
-
     setLoading(true);
     try {
       const clients = await Client.filter({ username });
       const client = clients[0];
-
       if (client && client.password === password) {
         setClientSession({
           id: client.id,
@@ -52,12 +45,12 @@ export default function Login() {
           description: "Invalid username or password.",
         });
       }
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (err) {
+      console.error(err);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "Something went wrong. Try again.",
       });
     } finally {
       setLoading(false);
@@ -65,88 +58,66 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1419] text-white flex flex-col items-center justify-center p-4">
-      {/* Background Decorative Element */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 blur-[100px] rounded-full" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-sm z-10"
+    <div className="min-h-screen flex items-start justify-center pt-24 px-6" style={{ backgroundColor: '#2a2a2a' }}>
+      <div
+        className="w-full max-w-sm rounded-2xl shadow-2xl px-8 py-10"
+        style={{ background: 'linear-gradient(180deg, #2d7d9a 0%, #1a3a5c 55%, #0d2137 100%)' }}
       >
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-4 border border-emerald-500/20">
-            <Trophy className="w-10 h-10 text-emerald-500" />
+        {/* BP Logo Circle */}
+        <div className="flex justify-center mb-8">
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center shadow-lg"
+            style={{ backgroundColor: '#3de0c8' }}
+          >
+            <span style={{ fontSize: '2.5rem', fontWeight: 900, fontStyle: 'italic', color: '#0d1f2d', fontFamily: 'Georgia, serif', lineHeight: 1 }}>
+              BP
+            </span>
           </div>
-          <h1 className="text-3xl font-black tracking-tighter">
-            <span className="text-emerald-500">BETPRO</span>
-            <span className="text-white">EXCHANGE</span>
-          </h1>
-          <p className="text-gray-400 text-sm mt-2">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4 bg-[#1A1D24] p-6 rounded-2xl border border-gray-800 shadow-2xl">
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
+        <form onSubmit={handleLogin}>
+          {/* Username Field */}
+          <div className="flex items-center gap-3 mb-6 border-b border-white/30 pb-2">
+            <User size={20} color="rgba(255,255,255,0.7)" />
+            <input
               type="text"
-              placeholder="Enter your username"
+              placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="bg-[#0F1419] border-gray-800 focus:border-emerald-500 focus:ring-emerald-500/20"
+              onChange={e => setUsername(e.target.value)}
+              className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-base"
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-[#0F1419] border-gray-800 focus:border-emerald-500 focus:ring-emerald-500/20 pr-10"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+          {/* Password Field */}
+          <div className="flex items-center gap-3 mb-10 border-b border-white/30 pb-2">
+            <Lock size={20} color="rgba(255,255,255,0.7)" />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-base"
+              required
+            />
           </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full h-12 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-lg mt-4 transition-all"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              "SIGN IN"
-            )}
-          </Button>
-
-          <div className="pt-2 text-center">
-            <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold">
-              Secure Admin Access
-            </p>
+          {/* Login Button */}
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-3/4 h-12 rounded-full text-white font-semibold text-lg transition-all active:scale-95 flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(180deg, #5aaec8 0%, #2d6b8a 100%)',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.25)',
+              }}
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Login'}
+            </button>
           </div>
         </form>
-
-        <p className="text-center text-gray-500 text-xs mt-8">
-          © 2024 BetPro Exchange. All rights reserved.
-        </p>
-      </motion.div>
+      </div>
     </div>
   );
 }
