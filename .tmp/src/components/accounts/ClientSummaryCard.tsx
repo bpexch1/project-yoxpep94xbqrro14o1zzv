@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Plus, BookOpen, Pencil, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
+import { CashCreditModal } from "./CashCreditModal";
 import { useNavigate } from "react-router-dom";
 
 interface ClientSummaryCardProps {
@@ -13,6 +14,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
+  const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
   const [showRealBalances, setShowRealBalances] = useState(false);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -273,17 +275,22 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                             <li>• Available Balance {(client.credit_remaining || 0).toLocaleString()}</li>
                             <li className="flex items-center gap-1 pt-2">
                               <span>• Options</span>
-                              <button className="w-7 h-7 bg-amber-400 rounded text-white font-bold text-xs flex items-center justify-center">C</button>
+                              <button 
+                                onClick={() => setCashCreditClient(client)}
+                                className="w-7 h-7 bg-amber-400 rounded text-white font-bold text-xs flex items-center justify-center active:scale-95 transition-transform"
+                              >
+                                C
+                              </button>
                               <button
                                 onClick={() => setEditingClient(client)}
-                                className="w-7 h-7 bg-emerald-500 rounded text-white flex items-center justify-center"
+                                className="w-7 h-7 bg-emerald-500 rounded text-white flex items-center justify-center active:scale-95 transition-transform"
                               >
                                 <Pencil className="w-3.5 h-3.5" />
                               </button>
-                              <button className="w-7 h-7 bg-sky-400 rounded text-white font-bold text-xs flex items-center justify-center">L</button>
+                              <button className="w-7 h-7 bg-sky-400 rounded text-white font-bold text-xs flex items-center justify-center active:scale-95 transition-transform">L</button>
                               <button
                                 className={cn(
-                                  "w-7 h-7 rounded font-bold text-xs flex items-center justify-center",
+                                  "w-7 h-7 rounded font-bold text-xs flex items-center justify-center active:scale-95 transition-transform",
                                   client.status === "active" ? "bg-emerald-500 text-white" : "border-2 border-red-400 text-red-400 bg-white"
                                 )}
                               >
@@ -310,6 +317,12 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
         isOpen={!!editingClient}
         onClose={() => setEditingClient(null)}
         client={editingClient}
+      />
+
+      <CashCreditModal
+        isOpen={!!cashCreditClient}
+        onClose={() => setCashCreditClient(null)}
+        client={cashCreditClient}
       />
     </section>
   );
