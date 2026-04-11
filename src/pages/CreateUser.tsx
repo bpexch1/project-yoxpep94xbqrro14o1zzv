@@ -14,7 +14,7 @@ export default function CreateUser() {
   const [password, setPassword] = useState("");
   const [type, setType] = useState<"supermaster" | "bettor">("supermaster");
   const [downlineShare, setDownlineShare] = useState(0);
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [phone, setPhone] = useState("");
   const [reference, setReference] = useState("");
   const [notes, setNotes] = useState("");
@@ -83,7 +83,7 @@ export default function CreateUser() {
           
           {/* Gray title bar */}
           <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">
-            <h1 className="text-sm font-bold text-gray-900 italic">
+            <h1 className="text-sm font-bold text-gray-900">
               Create New User under <span className="italic">NomanSA8592</span>
             </h1>
           </div>

@@ -19,26 +19,27 @@ export function Header() {
   return (
     <>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <header className="sticky top-0 z-50 bg-[#F3F4F6] text-[#1F2937] h-12 flex items-center justify-between px-4 border-b border-gray-300 shadow-sm font-sans">
-        <div className="flex items-center gap-3">
-          {/* BORDERED hamburger */}
-          <button 
-            onClick={() => setSidebarOpen(true)}
-            className="border border-gray-400 rounded p-1.5 hover:bg-gray-200 transition-colors"
-          >
-            <Menu className="w-4 h-4 text-gray-700" />
-          </button>
+      <header className="sticky top-0 z-50 bg-[#F3F4F6] text-[#1F2937] h-12 flex items-center px-3 border-b border-gray-300 shadow-sm font-sans">
+        
+        {/* LEFT: Bordered hamburger */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="border border-gray-400 rounded p-1.5 hover:bg-gray-200 transition-colors flex-shrink-0"
+        >
+          <Menu className="w-4 h-4 text-gray-700" />
+        </button>
 
-          {/* Username dropdown */}
+        {/* CENTER: Username dropdown */}
+        <div className="flex-1 flex justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-0.5 cursor-pointer hover:bg-gray-200 px-1 py-1 rounded transition-colors">
+              <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-200 px-2 py-1 rounded transition-colors">
                 <span className="text-[13px] font-bold text-gray-800">NomanSA8592 (Admin)</span>
                 <ChevronDown className="w-3.5 h-3.5 text-gray-600" />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg rounded w-40 mt-1">
-              <DropdownMenuItem 
+            <DropdownMenuContent align="center" className="bg-white border border-gray-200 shadow-lg rounded w-40 mt-1">
+              <DropdownMenuItem
                 onClick={handleLogout}
                 className="text-red-600 hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-red-600 focus:bg-red-50"
               >
@@ -47,18 +48,13 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        
-        {/* B: / Exp: */}
-        <div className="flex items-center gap-4 text-[13px] font-bold">
-          <div className="flex items-center gap-1">
-            <span className="text-gray-500 font-normal">B:</span>
-            <span className="text-emerald-600">0</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-gray-500 font-normal">Exp:</span>
-            <span className="text-red-500">0</span>
-          </div>
+
+        {/* RIGHT: B: and Exp: */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span className="text-[13px] font-bold text-gray-800">B: <span className="text-emerald-600">0</span></span>
+          <span className="text-[13px] font-bold text-gray-800">Exp: <span className="text-red-500">0</span></span>
         </div>
+
       </header>
     </>
   );

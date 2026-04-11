@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
-import { Sidebar } from "@/components/layout/Sidebar";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
-import { Search } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { data: clients, isLoading } = useQuery({
     queryKey: ["clients"],
@@ -18,16 +16,15 @@ export default function Accounts() {
 
   return (
     <div className="min-h-screen bg-slate-100 pb-10">
-      <Header onMenuClick={() => setIsSidebarOpen(true)} />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Header />
       
       <main className="p-4 max-w-4xl mx-auto space-y-4">
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Search Users Section */}
-        <section className="bg-white rounded shadow-sm overflow-hidden border">
-          <div className="bg-slate-50 px-4 py-2 border-b flex items-center gap-2 text-sm font-bold text-slate-700">
-            <Search className="w-4 h-4 text-slate-900 fill-slate-900" />
+        <section className="bg-white rounded shadow-sm overflow-hidden border border-gray-200">
+          <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center gap-2 text-sm font-bold text-gray-800">
+            <Filter className="w-4 h-4 text-gray-900 fill-gray-900" />
             Search-Users
           </div>
           <div className="p-4 flex gap-2">
@@ -36,7 +33,7 @@ export default function Accounts() {
               placeholder="Username"
               className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
-            <button className="bg-emerald-500 text-white px-6 py-2 rounded text-sm font-bold flex items-center gap-1 shadow-sm">
+            <button className="bg-emerald-500 text-white px-6 py-2 rounded text-sm font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-600 transition-colors">
               <Search className="w-4 h-4" />
               Search
             </button>
