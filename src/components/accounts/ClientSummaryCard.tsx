@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, BookOpen, Pencil, Loader2 } from "lucide-react";
+import { Plus, BookOpen, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +13,6 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
-  const [showRealBalances, setShowRealBalances] = useState(false);
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
   const filteredClients = useMemo(() => {
     if (!clients) return [];
@@ -37,14 +35,6 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
       { credit_received: 0, credit_remaining: 0, cash: 0, pl_downline: 0, balance_upline: 0 }
     );
   }, [filteredClients]);
-
-  const handleLoadBalance = () => {
-    setIsLoadingBalance(true);
-    setTimeout(() => {
-      setIsLoadingBalance(false);
-      setShowRealBalances(true);
-    }, 800);
-  };
 
   const getTypeLabel = (role: string) => {
     if (role === "supermaster" || role === "admin") return "SuperMaster";
@@ -70,48 +60,26 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="bg-white border-b border-gray-200">
-                {!showRealBalances ? (
-                  <>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Remaining</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Cash</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">P/L Downline</th>
-                    <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Users</th>
-                  </>
-                ) : (
-                  <>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Received</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Remaining</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Cash</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">P/L Downline</th>
-                    <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Balance Upline</th>
-                  </>
-                )}
+                <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Received</th>
+                <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Remaining</th>
+                <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Cash</th>
+                <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">P/L Downline</th>
+                <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Balance Upline</th>
               </tr>
             </thead>
             <tbody>
               <tr className="bg-white">
-                {!showRealBalances ? (
-                  <>
-                    <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">0</td>
-                    <td className="p-2 border-r border-gray-200 text-emerald-600 font-bold">0</td>
-                    <td className="p-2 border-r border-gray-200 text-emerald-600 font-bold">0</td>
-                    <td className="p-2 text-emerald-600 font-bold">{clients.length}</td>
-                  </>
-                ) : (
-                  <>
-                    <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_received.toLocaleString()}</td>
-                    <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_remaining.toLocaleString()}</td>
-                    <td className={cn("p-2 border-r border-gray-200 font-bold", totals.cash < 0 ? "text-red-500" : "text-emerald-600")}>
-                      {totals.cash.toLocaleString()}
-                    </td>
-                    <td className={cn("p-2 border-r border-gray-200 font-bold", totals.pl_downline < 0 ? "text-red-500" : "text-emerald-600")}>
-                      {totals.pl_downline.toLocaleString()}
-                    </td>
-                    <td className={cn("p-2 font-bold", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
-                      {totals.balance_upline.toLocaleString()}
-                    </td>
-                  </>
-                )}
+                <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_received.toLocaleString()}</td>
+                <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_remaining.toLocaleString()}</td>
+                <td className={cn("p-2 border-r border-gray-200 font-bold", totals.cash < 0 ? "text-red-500" : "text-emerald-600")}>
+                  {totals.cash.toLocaleString()}
+                </td>
+                <td className={cn("p-2 border-r border-gray-200 font-bold", totals.pl_downline < 0 ? "text-red-500" : "text-emerald-600")}>
+                  {totals.pl_downline.toLocaleString()}
+                </td>
+                <td className={cn("p-2 font-bold", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
+                  {totals.balance_upline.toLocaleString()}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -173,20 +141,6 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
         </div>
       </div>
 
-      {/* Load Balance Section */}
-      {!showRealBalances && (
-        <div className="bg-emerald-500 px-4 py-3 flex items-center">
-          <button
-            onClick={handleLoadBalance}
-            disabled={isLoadingBalance}
-            className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold text-sm px-5 py-2 rounded flex items-center gap-2 transition-colors disabled:opacity-70 shadow-sm"
-          >
-            {isLoadingBalance && <Loader2 className="w-4 h-4 animate-spin" />}
-            {isLoadingBalance ? "Loading..." : "Load Balance"}
-          </button>
-        </div>
-      )}
-
       {/* Client Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
@@ -237,7 +191,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                       </button>
                     </div>
                   </td>
-                  <td className="px-3 py-2 border-r border-gray-100 text-gray-700 uppercase">{getTypeLabel(client.role)}</td>
+                  <td className="px-3 py-2 border-r border-gray-100 text-gray-700">{getTypeLabel(client.role)}</td>
                   <td className="px-3 py-2 border-r border-gray-100 text-gray-700">{(client.credit_remaining || 0).toLocaleString()}</td>
                   <td className="px-3 py-2 text-emerald-600 font-bold">{(client.balance_upline || 0).toLocaleString()}</td>
                 </tr>

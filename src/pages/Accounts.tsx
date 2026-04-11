@@ -23,8 +23,8 @@ export default function Accounts() {
 
         {/* Search Users Section */}
         <section className="bg-white rounded shadow-sm overflow-hidden border border-gray-200">
-          <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center gap-2 text-sm font-bold text-gray-800">
-            <Filter className="w-4 h-4 text-gray-900 fill-gray-900" />
+          <div className="bg-slate-50 px-4 py-2 border-b flex items-center gap-2 text-sm font-bold text-slate-700">
+            <Filter className="w-4 h-4 text-black fill-black" />
             Search-Users
           </div>
           <div className="p-4 flex gap-2">

@@ -37,11 +37,22 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter className="w-4 h-4 text-gray-900 fill-gray-900" />
         Report Type
       </div>
-      <div className="p-3">
-        <div className="flex flex-wrap gap-2 justify-start">
-          {tabs.map((tab) => (
-            <TabButton key={tab.id} id={tab.id} label={tab.label} />
-          ))}
+      <div className="p-3 space-y-2">
+        {/* Row 1 */}
+        <div className="flex gap-2">
+          <TabButton id="Book Detail" label="Book Detail" />
+          <TabButton id="Book Detail 2" label="Book Detail 2" />
+          <TabButton id="Daily PL" label="Daily PL" />
+        </div>
+        {/* Row 2 */}
+        <div className="flex gap-2">
+          <TabButton id="Daily Report" label="Daily Report" />
+          <TabButton id="Final Sheet" label="Final Sheet" />
+          <TabButton id="Accounts" label="Accounts" />
+        </div>
+        {/* Row 3 */}
+        <div className="flex gap-2">
+          <TabButton id="Commission Report" label="Commission Report" />
         </div>
       </div>
     </div>
