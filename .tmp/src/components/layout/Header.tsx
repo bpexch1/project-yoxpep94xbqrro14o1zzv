@@ -24,7 +24,7 @@ export function Header() {
         {/* LEFT: Bordered hamburger */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="border border-gray-400 rounded p-1.5 hover:bg-gray-200 transition-colors flex-shrink-0"
+          className="p-1.5 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
         >
           <Menu className="w-4 h-4 text-gray-700" />
         </button>
@@ -51,8 +51,8 @@ export function Header() {
 
         {/* RIGHT: B: and Exp: */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <span className="text-[13px] font-bold text-gray-800">B: <span className="text-emerald-600">0</span></span>
-          <span className="text-[13px] font-bold text-gray-800">Exp: <span className="text-red-500">0</span></span>
+          <span className="text-[13px] font-bold text-gray-800">B: 0</span>
+          <span className="text-[13px] font-bold text-gray-800">Exp: 0</span>
         </div>
 
       </header>

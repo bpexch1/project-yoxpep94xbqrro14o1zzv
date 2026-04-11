@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Plus, BookOpen, Pencil } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { Plus, BookOpen, Pencil, Info, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,9 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
+  const [showRealBalances, setShowRealBalances] = useState(false);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
 
   const filteredClients = useMemo(() => {
     if (!clients) return [];
@@ -35,6 +38,31 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
       { credit_received: 0, credit_remaining: 0, cash: 0, pl_downline: 0, balance_upline: 0 }
     );
   }, [filteredClients]);
+
+  const handleLoadBalance = () => {
+    setIsLoadingBalance(true);
+    setTimeout(() => {
+      setIsLoadingBalance(false);
+      setShowRealBalances(true);
+      // Auto-expand ALL clients
+      const allIds = new Set<string>(filteredClients.map((c: any) => c.id));
+      setExpandedClients(allIds);
+    }, 800);
+  };
+
+  const toggleClient = (id: string) => {
+    setExpandedClients(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const getUsernameClass = (role: string) => {
+    if (role === "supermaster" || role === "admin") return "font-bold text-emerald-600 cursor-pointer";
+    return "font-bold text-gray-900"; // Bettor = bold black
+  };
 
   const getTypeLabel = (role: string) => {
     if (role === "supermaster" || role === "admin") return "SuperMaster";
@@ -60,26 +88,47 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="bg-white border-b border-gray-200">
-                <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Received</th>
+                {showRealBalances && (
+                  <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Received</th>
+                )}
                 <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Remaining</th>
                 <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Cash</th>
                 <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">P/L Downline</th>
-                <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Balance Upline</th>
+                {!showRealBalances && (
+                  <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Users</th>
+                )}
+                {showRealBalances && (
+                  <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Balance Upline</th>
+                )}
               </tr>
             </thead>
             <tbody>
               <tr className="bg-white">
-                <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_received.toLocaleString()}</td>
-                <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_remaining.toLocaleString()}</td>
+                {showRealBalances && (
+                  <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_received.toLocaleString()}</td>
+                )}
+                <td className={cn(
+                  "p-2 border-r border-gray-200 font-bold",
+                  showRealBalances ? "text-emerald-600 underline" : (totals.credit_remaining < 0 ? "text-red-500" : "text-emerald-600")
+                )}>
+                  {totals.credit_remaining.toLocaleString()}
+                </td>
                 <td className={cn("p-2 border-r border-gray-200 font-bold", totals.cash < 0 ? "text-red-500" : "text-emerald-600")}>
                   {totals.cash.toLocaleString()}
                 </td>
                 <td className={cn("p-2 border-r border-gray-200 font-bold", totals.pl_downline < 0 ? "text-red-500" : "text-emerald-600")}>
                   {totals.pl_downline.toLocaleString()}
                 </td>
-                <td className={cn("p-2 font-bold", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
-                  {totals.balance_upline.toLocaleString()}
-                </td>
+                {!showRealBalances && (
+                  <td className="p-2 font-bold text-gray-800">
+                    {filteredClients.length}
+                  </td>
+                )}
+                {showRealBalances && (
+                  <td className={cn("p-2 font-bold", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
+                    {totals.balance_upline.toLocaleString()}
+                  </td>
+                )}
               </tr>
             </tbody>
           </table>
@@ -92,11 +141,11 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => navigate("/accounts/create")}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded flex items-center gap-1 transition-colors"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" /> New User
+            New User
           </button>
-          <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded flex items-center gap-1 transition-colors">
+          <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 transition-colors">
             <BookOpen className="w-3.5 h-3.5" /> Account Ledger
           </button>
         </div>
@@ -105,7 +154,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <div className="flex items-center gap-1">
-              <div className="w-6 h-6 bg-orange-400 rounded flex items-center justify-center text-white font-bold text-[11px]">C</div>
+              <div className="w-6 h-6 bg-amber-400 rounded flex items-center justify-center text-white font-bold text-[11px]">C</div>
               <span className="text-xs text-gray-700">Cash / Credit</span>
             </div>
             <div className="flex items-center gap-1">
@@ -124,7 +173,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-6 h-6 border-2 border-red-400 rounded flex items-center justify-center text-red-400 font-bold text-[11px]">D</div>
+            <div className="w-6 h-6 bg-white border border-red-400 rounded flex items-center justify-center text-red-400 font-bold text-[11px]">D</div>
             <span className="text-xs text-gray-700">InActive</span>
           </div>
         </div>
@@ -136,10 +185,24 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm w-64 focus:outline-none focus:ring-1 focus:ring-teal-500 text-center"
+            className="border border-gray-300 rounded px-3 py-1.5 text-sm w-full max-w-xs focus:outline-none focus:ring-1 focus:ring-teal-500 text-center"
           />
         </div>
       </div>
+
+      {/* Load Balance Bar */}
+      {!showRealBalances && (
+        <div className="bg-emerald-500 px-4 py-3 flex items-center">
+          <button
+            onClick={handleLoadBalance}
+            disabled={isLoadingBalance}
+            className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold text-sm px-6 py-2 rounded flex items-center gap-2 transition-colors disabled:opacity-70"
+          >
+            {isLoadingBalance && <Loader2 className="w-4 h-4 animate-spin" />}
+            {isLoadingBalance ? "Loading..." : "Load Balance"}
+          </button>
+        </div>
+      )}
 
       {/* Client Table */}
       <div className="overflow-x-auto">
@@ -151,7 +214,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
               <td className="px-3 py-2 border-r border-emerald-400">{total_credit}</td>
               <td className="px-3 py-2">{total_balance}</td>
             </tr>
-            <tr className="bg-white border-b border-gray-200 font-bold text-gray-800">
+            <tr className="bg-white border-b border-gray-200 font-bold text-gray-900">
               <th className="px-3 py-2 border-r border-gray-200">Username</th>
               <th className="px-3 py-2 border-r border-gray-200">Type</th>
               <th className="px-3 py-2 border-r border-gray-200">Credit</th>
@@ -161,40 +224,94 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={4} className="px-3 py-6 text-center text-gray-500 text-xs">Loading clients...</td>
+                <td colSpan={4} className="px-3 py-6 text-center text-gray-500">Loading clients...</td>
               </tr>
             ) : filteredClients.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-3 py-6 text-center text-gray-500 text-xs">No data available in table</td>
+                <td colSpan={4} className="px-3 py-6 text-center text-gray-500">No data available in table</td>
               </tr>
             ) : (
               filteredClients.map((client, idx) => (
-                <tr key={client.id} className={cn("border-b border-gray-100", idx % 2 === 0 ? "bg-white" : "bg-gray-50")}>
-                  <td className="px-3 py-2 border-r border-gray-100 font-medium flex items-center gap-1">
-                    <span className="text-emerald-600 underline cursor-pointer hover:text-emerald-700">{client.username}</span>
-                    <div className="flex gap-0.5 ml-1">
-                      <button className="w-4 h-4 bg-orange-400 rounded text-white font-bold text-[8px] flex items-center justify-center">C</button>
-                      <button
-                        onClick={() => setEditingClient(client)}
-                        className="w-4 h-4 bg-emerald-500 rounded text-white flex items-center justify-center"
-                      >
-                        <Pencil className="w-2.5 h-2.5" />
-                      </button>
-                      <button className="w-4 h-4 bg-sky-400 rounded text-white font-bold text-[8px] flex items-center justify-center">L</button>
-                      <button
-                        className={cn(
-                          "w-4 h-4 rounded font-bold text-[8px] flex items-center justify-center",
-                          client.status === "active" ? "bg-emerald-500 text-white" : "border border-red-400 text-red-400"
-                        )}
-                      >
-                        {client.status === "active" ? "A" : "D"}
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 border-r border-gray-100 text-gray-700">{getTypeLabel(client.role)}</td>
-                  <td className="px-3 py-2 border-r border-gray-100 text-gray-700">{(client.credit_remaining || 0).toLocaleString()}</td>
-                  <td className="px-3 py-2 text-emerald-600 font-bold">{(client.balance_upline || 0).toLocaleString()}</td>
-                </tr>
+                <React.Fragment key={client.id}>
+                  <tr className={cn("border-b border-gray-100", idx % 2 === 0 ? "bg-white" : "bg-gray-50")}>
+                    <td className="px-3 py-2 border-r border-gray-100">
+                      <div className={getUsernameClass(client.role)}>{client.username}</div>
+                      {!showRealBalances && (
+                        <button
+                          onClick={() => toggleClient(client.id)}
+                          className={cn(
+                            "mt-1 w-7 h-7 rounded-full flex items-center justify-center transition-colors",
+                            expandedClients.has(client.id)
+                              ? "bg-blue-100 border border-blue-300"
+                              : "bg-gray-200 hover:bg-gray-300"
+                          )}
+                        >
+                          <Info className="w-4 h-4 text-gray-700" />
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 border-r border-gray-100 text-gray-700">{getTypeLabel(client.role)}</td>
+                    <td className="px-3 py-2 border-r border-gray-100 text-gray-700">
+                      {showRealBalances ? (client.credit_remaining || 0).toLocaleString() : "-"}
+                    </td>
+                    <td className={cn("px-3 py-2 font-bold",
+                      !showRealBalances ? "text-gray-700" :
+                      (client.balance_upline || 0) < 0 ? "text-red-500" : "text-emerald-600"
+                    )}>
+                      {showRealBalances ? (client.balance_upline || 0).toLocaleString() : "-"}
+                    </td>
+                  </tr>
+                  
+                  {(showRealBalances || expandedClients.has(client.id)) && (
+                    <tr className={cn("border-b border-gray-200", idx % 2 === 0 ? "bg-white" : "bg-gray-50")}>
+                      <td colSpan={4} className="px-4 py-3">
+                        <ul className="space-y-1 text-xs text-gray-800">
+                          <li>• Balance {showRealBalances 
+                            ? (client.balance_upline || 0).toLocaleString() 
+                            : `= ${(client.balance_upline || 0).toLocaleString()}`}
+                          </li>
+                          <li>• Client (P/L) {showRealBalances
+                            ? (client.pl_downline || 0).toLocaleString()
+                            : `= ${(client.pl_downline || 0).toLocaleString()}`}
+                          </li>
+                          <li>• Share {showRealBalances
+                            ? (client.downline_share || 0)
+                            : `= ${(client.downline_share || 0).toFixed(2)}`}
+                          </li>
+                          <li>• Exposure 0</li>
+                          <li>• Available Balance {showRealBalances
+                            ? (client.balance_upline || 0).toLocaleString()
+                            : `= ${(client.balance_upline || 0).toLocaleString()}`}
+                          </li>
+                          <li className="flex items-center gap-2 flex-wrap pt-1">
+                            {showRealBalances && <span>• Options</span>}
+                            {!showRealBalances && <span>•</span>}
+                            {/* C button */}
+                            <button className="w-8 h-8 bg-amber-400 rounded text-white font-bold text-xs flex items-center justify-center">C</button>
+                            {/* Edit/pencil button */}
+                            <button 
+                              onClick={() => setEditingClient(client)} 
+                              className="w-8 h-8 bg-emerald-500 rounded text-white flex items-center justify-center"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            {/* L button */}
+                            <button className="w-8 h-8 bg-sky-400 rounded text-white font-bold text-xs flex items-center justify-center">L</button>
+                            {/* A/D button */}
+                            <button className={cn(
+                              "w-8 h-8 rounded font-bold text-xs flex items-center justify-center",
+                              client.status === "active" 
+                                ? "bg-emerald-500 text-white"
+                                : "bg-white border-2 border-red-400 text-red-400"
+                            )}>
+                              {client.status === "active" ? "A" : "D"}
+                            </button>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>
