@@ -18,7 +18,7 @@ export default function Accounts() {
     <div className="min-h-screen bg-slate-100 pb-16">
       <Header />
       
-      <main className="p-2 sm:p-4 space-y-3">
+      <main className="p-4 space-y-3">
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Search Users Section */}
@@ -27,13 +27,13 @@ export default function Accounts() {
             <Filter className="w-3.5 h-3.5 text-black fill-black" />
             Search-Users
           </div>
-          <div className="p-3 flex flex-col sm:flex-row gap-2">
+          <div className="p-3 flex gap-2">
             <input
               type="text"
               placeholder="Username"
               className="flex-1 border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
-            <button className="bg-emerald-500 text-white px-6 py-2.5 rounded text-sm font-bold flex items-center justify-center gap-1.5 shadow-sm hover:bg-emerald-600 transition-colors">
+            <button className="bg-emerald-500 text-white px-6 py-2.5 rounded text-sm font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-600 transition-colors">
               <Search className="w-4 h-4" />
               Search
             </button>

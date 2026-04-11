@@ -35,8 +35,6 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    -webkit-text-size-adjust: 100%;
-    touch-action: manipulation;
   }
 }
 

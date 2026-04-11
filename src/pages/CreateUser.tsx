@@ -78,9 +78,9 @@ export default function CreateUser() {
     <div className="min-h-screen bg-gray-100 pb-10">
       <Header />
       
-      <main className="max-w-2xl mx-auto px-2 sm:px-4 py-3">
+      <main className="max-w-2xl mx-auto px-4 py-4">
         {/* Card */}
-        <div className="bg-white rounded-none sm:rounded shadow-sm overflow-hidden border border-gray-200">
+        <div className="bg-white rounded shadow-sm overflow-hidden border border-gray-200">
           
           {/* Gray title bar */}
           <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-3">
@@ -96,7 +96,7 @@ export default function CreateUser() {
           </div>
 
           {/* Form body */}
-          <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+          <div className="p-6 space-y-5">
             
             {/* Username */}
             <div>
@@ -215,7 +215,7 @@ export default function CreateUser() {
           </div>
 
           {/* Footer with Submit button */}
-          <div className="bg-gray-100 border-t border-gray-200 px-4 py-4 sm:px-6">
+          <div className="bg-gray-100 border-t border-gray-200 px-6 py-4">
             <button
               type="button"
               onClick={handleSubmit}
