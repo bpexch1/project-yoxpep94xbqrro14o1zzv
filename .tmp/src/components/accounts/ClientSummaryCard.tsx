@@ -79,11 +79,11 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
   return (
     <section className="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
       {/* Card title */}
-      <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
-        <span className="font-bold text-xs text-gray-900 uppercase tracking-tight">NomanSA8592 - Clients List</span>
+      <div className="px-4 py-3 border-b border-gray-200">
+        <span className="font-bold text-sm text-gray-900 tracking-tight">NomanSA8592 - Clients List</span>
       </div>
 
-      <div className="p-3 space-y-3">
+      <div className="p-4 space-y-4">
         {/* Summary Table */}
         <div className="overflow-x-auto border border-gray-200 rounded">
           <table className="w-full text-left text-[11px] min-w-[360px]">
@@ -91,18 +91,18 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
               <tr className="bg-gray-50 border-b border-gray-200">
                 {!showRealBalances ? (
                   <>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800">Credit Remaining</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800">Cash</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800">P/L Downline</th>
-                    <th className="p-2 font-bold text-gray-800 text-center">Users</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Remaining</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Cash</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">P/L Downline</th>
+                    <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Users</th>
                   </>
                 ) : (
                   <>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800">Credit Received</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800">Credit Remaining</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 text-center">Cash</th>
-                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 text-center">P/L Downline</th>
-                    <th className="p-2 font-bold text-gray-800 text-center">Balance Upline</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Received</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Credit Remaining</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">Cash</th>
+                    <th className="p-2 border-r border-gray-200 font-bold text-gray-800 whitespace-nowrap">P/L Downline</th>
+                    <th className="p-2 font-bold text-gray-800 whitespace-nowrap">Balance Upline</th>
                   </>
                 )}
               </tr>
@@ -114,19 +114,19 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                     <td className="p-2 border-r border-gray-200 text-emerald-600 font-bold">{totals.credit_remaining.toLocaleString()}</td>
                     <td className="p-2 border-r border-gray-200 font-bold">{totals.cash.toLocaleString()}</td>
                     <td className="p-2 border-r border-gray-200 font-bold">{totals.pl_downline.toLocaleString()}</td>
-                    <td className="p-2 font-bold text-gray-700 text-center">{filteredClients.length}</td>
+                    <td className="p-2 font-bold text-gray-700">{filteredClients.length}</td>
                   </>
                 ) : (
                   <>
                     <td className="p-2 border-r border-gray-200 text-emerald-600 font-bold underline">{totals.credit_received.toLocaleString()}</td>
                     <td className="p-2 border-r border-gray-200 text-emerald-600 font-bold underline">{totals.credit_remaining.toLocaleString()}</td>
-                    <td className={cn("p-2 border-r border-gray-200 font-bold text-center", totals.cash < 0 ? "text-red-500" : "text-emerald-600")}>
+                    <td className={cn("p-2 border-r border-gray-200 font-bold", totals.cash < 0 ? "text-red-500" : "text-emerald-600")}>
                       {totals.cash.toLocaleString()}
                     </td>
-                    <td className={cn("p-2 border-r border-gray-200 font-bold text-center", totals.pl_downline < 0 ? "text-red-500" : "text-emerald-600")}>
+                    <td className={cn("p-2 border-r border-gray-200 font-bold", totals.pl_downline < 0 ? "text-red-500" : "text-emerald-600")}>
                       {totals.pl_downline.toLocaleString()}
                     </td>
-                    <td className={cn("p-2 font-bold text-center", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
+                    <td className={cn("p-2 font-bold", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
                       {totals.balance_upline.toLocaleString()}
                     </td>
                   </>
@@ -150,39 +150,39 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
         </div>
 
         {/* Legend */}
-        <div className="text-[10px] text-gray-600 flex flex-wrap items-center gap-x-3 gap-y-1 bg-gray-50 p-2 rounded border border-gray-100">
+        <div className="text-xs text-gray-700 flex flex-wrap items-center gap-x-3 gap-y-1 p-2">
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-amber-400 rounded text-white font-bold flex items-center justify-center">C</div>
+            <div className="w-6 h-6 bg-amber-400 rounded text-white font-bold flex items-center justify-center">C</div>
             <span>Cash / Credit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-emerald-500 rounded text-white flex items-center justify-center">
-              <Pencil className="w-3 h-3" />
+            <div className="w-6 h-6 bg-emerald-500 rounded text-white flex items-center justify-center">
+              <Pencil className="w-3.5 h-3.5" />
             </div>
             <span>Edit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-sky-400 rounded text-white font-bold flex items-center justify-center">L</div>
+            <div className="w-6 h-6 bg-sky-400 rounded text-white font-bold flex items-center justify-center">L</div>
             <span>Ledger</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-emerald-500 rounded text-white font-bold flex items-center justify-center">A</div>
+            <div className="w-6 h-6 bg-emerald-500 rounded text-white font-bold flex items-center justify-center">A</div>
             <span>Active</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 border border-red-400 rounded text-red-400 font-bold flex items-center justify-center">D</div>
+            <div className="w-6 h-6 border border-red-400 rounded text-red-400 font-bold flex items-center justify-center">D</div>
             <span>InActive</span>
           </div>
         </div>
 
-        {/* Search row - full width on mobile */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-bold text-gray-700 ml-1">Search:</span>
+        {/* Search row */}
+        <div className="flex items-center justify-center gap-1.5">
+          <span className="text-sm font-bold text-gray-700">Search:</span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2.5 text-sm w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-inner"
+            className="border border-gray-300 rounded px-3 py-2 text-sm w-72 focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-inner"
             placeholder="Search username or name..."
           />
         </div>
@@ -293,20 +293,20 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                               <span className="text-[10px] text-gray-500 mr-1 uppercase font-bold">Options:</span>
                               <button 
                                 onClick={() => setCashCreditClient(client)}
-                                className="w-8 h-8 bg-amber-400 rounded text-white font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm"
+                                className="w-7 h-7 bg-amber-400 rounded text-white font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm"
                               >
                                 C
                               </button>
                               <button
                                 onClick={() => setEditingClient(client)}
-                                className="w-8 h-8 bg-emerald-500 rounded text-white flex items-center justify-center active:scale-90 transition-transform shadow-sm"
+                                className="w-7 h-7 bg-emerald-500 rounded text-white flex items-center justify-center active:scale-90 transition-transform shadow-sm"
                               >
-                                <Pencil className="w-4 h-4" />
+                                <Pencil className="w-3.5 h-3.5" />
                               </button>
-                              <button className="w-8 h-8 bg-sky-400 rounded text-white font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm">L</button>
+                              <button className="w-7 h-7 bg-sky-400 rounded text-white font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm">L</button>
                               <button
                                 className={cn(
-                                  "w-8 h-8 rounded font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm",
+                                  "w-7 h-7 rounded font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm",
                                   client.status === "active" ? "bg-emerald-500 text-white" : "border-2 border-red-400 text-red-400 bg-white"
                                 )}
                               >
