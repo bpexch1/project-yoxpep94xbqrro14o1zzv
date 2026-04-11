@@ -5,6 +5,7 @@ import { Filter, Search } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
+import { SuperAdminSummary } from "@/components/accounts/SuperAdminSummary";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
@@ -20,6 +21,8 @@ export default function Accounts() {
       
       <main className="p-4 space-y-3">
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+        <SuperAdminSummary clients={clients || []} isLoading={isLoading} />
 
         {/* Search Users Section */}
         <section className="bg-white rounded shadow-sm overflow-hidden border border-gray-200">
