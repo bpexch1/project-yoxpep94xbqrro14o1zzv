@@ -135,13 +135,15 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="p-0 max-w-sm overflow-hidden border-0 shadow-2xl [&>button]:hidden">
-        {/* HEADER / TABS */}
-        <div className="flex bg-white relative">
+        {/* TABS */}
+        <div className="flex relative bg-white">
           <button
             onClick={() => setActiveTab('cash')}
             className={cn(
-              "flex-1 py-4 text-base font-semibold transition-colors border-b-4",
-              activeTab === 'cash' ? "bg-white text-blue-500 border-blue-500" : "bg-white text-emerald-500 border-transparent"
+              "flex-1 py-3.5 text-base font-semibold transition-colors",
+              activeTab === 'cash'
+                ? "bg-blue-500 text-white"
+                : "bg-white text-emerald-500"
             )}
           >
             Cash
@@ -149,20 +151,23 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
           <button
             onClick={() => setActiveTab('credit')}
             className={cn(
-              "flex-1 py-4 text-base font-semibold transition-colors border-b-4",
-              activeTab === 'credit' ? "bg-blue-500 text-white border-blue-500" : "bg-white text-emerald-500 border-transparent"
+              "flex-1 py-3.5 text-base font-semibold transition-colors",
+              activeTab === 'credit'
+                ? "bg-blue-500 text-white"
+                : "bg-white text-emerald-500"
             )}
           >
             Credit
           </button>
-          {/* Close button inside tab area as per reference feel */}
-          <button 
+          {/* Close button */}
+          <button
             onClick={onClose}
-            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600"
+            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 z-10"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+        <div className="h-px bg-gray-200" />
         
         {/* CONTENT - scrollable */}
         <div className="bg-gray-100 max-h-[85vh] overflow-y-auto">
