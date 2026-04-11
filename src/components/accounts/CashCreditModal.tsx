@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Client, Transaction } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, X } from "lucide-react";
+import { ChevronLeft, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CashCreditModalProps {
@@ -321,6 +321,16 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                 </div>
               </div>
             </div>
+          </div>
+          {/* BACK BUTTON */}
+          <div className="px-3 pb-5">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-5 py-2.5 rounded transition-colors active:scale-95"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back
+            </button>
           </div>
           
         </div>
