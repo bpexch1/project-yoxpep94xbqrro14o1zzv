@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, ChevronDown } from "lucide-react";
 import { superdevClient } from "@/lib/superdev/client";
 import {
@@ -10,7 +10,20 @@ import {
 import { Sidebar } from "./Sidebar";
 
 export function Header() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [username, setUsername] = useState("NomanSA8592");
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const user = await superdevClient.auth.me();
+        if (user?.full_name) setUsername(user.full_name);
+      } catch (e) {
+        // use default
+      }
+    }
+    loadUser();
+  }, []);
 
   const handleLogout = async () => {
     await superdevClient.auth.logout();
@@ -18,27 +31,25 @@ export function Header() {
 
   return (
     <>
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <header className="sticky top-0 z-50 bg-[#F3F4F6] text-[#1F2937] h-12 flex items-center px-3 border-b border-gray-300 shadow-sm font-sans">
-        
-        {/* LEFT: Plain hamburger */}
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="p-1.5 hover:bg-gray-200 transition-colors rounded flex-shrink-0"
+      <header className="sticky top-0 z-40 bg-white flex items-center justify-between px-4 h-12 border-b border-gray-200 shadow-sm">
+        {/* LEFT: Hamburger */}
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-1 hover:bg-gray-100 rounded transition-colors"
         >
-          <Menu className="w-5 h-5 text-gray-600" />
+          <Menu className="w-6 h-6 text-gray-600" />
         </button>
 
-        {/* CENTER: Username */}
-        <div className="flex-1 flex justify-center">
+        {/* RIGHT: User info and Balance */}
+        <div className="flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-200 px-2 py-1 rounded transition-colors">
-                <span className="text-sm text-gray-500">NomanSA8592 (Admin)</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-colors">
+                <span className="text-gray-600 text-sm">{username} <span className="text-gray-500">(Admin)</span></span>
+                <ChevronDown className="w-3 h-3 text-gray-500" />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="bg-white border border-gray-200 shadow-lg rounded w-40 mt-1">
+            <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg rounded w-40 mt-1">
               <DropdownMenuItem
                 onClick={handleLogout}
                 className="text-red-600 hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-red-600 focus:bg-red-50"
@@ -47,15 +58,15 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
 
-        {/* RIGHT: B: and Exp: */}
-        <div className="flex items-center gap-2 flex-shrink-0 text-sm">
-          <span className="text-gray-500">B: <span className="text-gray-800 font-bold">0</span></span>
-          <span className="text-gray-500">Exp: <span className="text-gray-800 font-bold">0</span></span>
+          <div className="flex items-center gap-2 text-sm whitespace-nowrap">
+            <span className="text-gray-800"><span className="font-bold">B:</span> 0</span>
+            <span className="text-gray-800"><span className="font-bold">Exp:</span> 0</span>
+          </div>
         </div>
-
       </header>
+
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </>
   );
 }
