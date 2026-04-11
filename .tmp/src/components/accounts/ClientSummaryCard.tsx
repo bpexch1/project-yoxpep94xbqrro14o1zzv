@@ -190,11 +190,11 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
 
       {/* Load Balance Section */}
       {!showRealBalances && (
-        <div className="bg-emerald-500 px-3 py-2 flex items-center">
+        <div className="bg-emerald-500 px-4 py-3 flex items-center">
           <button
             onClick={handleLoadBalance}
             disabled={isLoadingBalance}
-            className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold text-xs px-5 py-2.5 rounded flex items-center justify-center gap-2 transition-colors disabled:opacity-70 shadow-md active:scale-95"
+            className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold text-sm px-6 py-2 rounded flex items-center gap-2 transition-colors disabled:opacity-70 shadow-sm active:scale-95"
           >
             {isLoadingBalance && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoadingBalance ? "Loading..." : "Load Balance"}
