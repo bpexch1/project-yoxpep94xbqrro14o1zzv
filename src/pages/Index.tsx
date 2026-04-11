@@ -1,38 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User } from "@/entities";
-import Landing from "./Landing";
+import { getClientSession } from "@/hooks/useClientAuth";
 
 export default function Index() {
   const navigate = useNavigate();
-  const [checking, setChecking] = useState(true);
-  const [showLanding, setShowLanding] = useState(false);
 
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        const user = await User.me();
-        if (user.role === "administrator") {
-          navigate("/accounts", { replace: true });
-        } else {
-          setShowLanding(true);
-        }
-      } catch (error) {
-        // Not logged in → show landing
-        setShowLanding(true);
-      } finally {
-        setChecking(false);
-      }
+    const session = getClientSession();
+    if (session) {
+      navigate("/accounts", { replace: true });
+    } else {
+      navigate("/login", { replace: true });
     }
-    checkAuth();
   }, [navigate]);
 
-  if (checking) return (
-    <div className="min-h-screen bg-[#0a0f1e] flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+  return (
+    <div className="min-h-screen bg-[#0F1419] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
     </div>
   );
-
-  if (showLanding) return <Landing />;
-  return null;
 }
