@@ -206,7 +206,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
             {showRealBalances && (
               <tr className="bg-emerald-500 text-white font-bold text-xs">
                 <td className="px-3 py-2 border-r border-emerald-400 font-bold">Total</td>
-                <td className="px-3 py-2 border-r border-emerald-400 text-center">-</td>
+                <td className="px-3 py-2 border-r border-emerald-400"></td>
                 <td className="px-3 py-2 border-r border-emerald-400">{totals.credit_remaining.toLocaleString()}</td>
                 <td className="px-3 py-2">{totals.balance_upline.toLocaleString()}</td>
               </tr>
@@ -229,12 +229,12 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                 <td colSpan={4} className="px-3 py-6 text-center text-gray-500 text-xs">No data available in table</td>
               </tr>
             ) : (
-              filteredClients.map((client, idx) => {
+              filteredClients.map((client) => {
                 const isExpanded = expandedRows.has(client.id);
                 return (
                   <React.Fragment key={client.id}>
                     {/* MAIN ROW */}
-                    <tr className={cn("border-b border-gray-100 active:bg-emerald-50 transition-colors", idx % 2 === 0 ? "bg-white" : "bg-gray-50")}>
+                    <tr className={cn("bg-white active:bg-emerald-50 transition-colors", !isExpanded && "border-b border-gray-100")}>
                       <td className="px-3 py-2.5 border-r border-gray-100">
                         <div className="flex items-center gap-2">
                           <span className={cn(getUsernameClass(client.role), "max-w-[110px] truncate")}>{client.username}</span>
@@ -266,7 +266,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
 
                     {/* EXPANDED DETAIL ROW */}
                     {isExpanded && (
-                      <tr className="border-b border-gray-100">
+                      <tr className="border-b border-gray-200">
                         <td colSpan={4} className="px-4 py-3 bg-white">
                           <ul className="text-sm text-gray-800 space-y-1 list-disc list-inside">
                             <li>Balance {(client.balance_upline || 0).toLocaleString()}</li>
