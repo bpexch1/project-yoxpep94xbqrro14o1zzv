@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Client } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
 
 export default function CreateUser() {
   const navigate = useNavigate();
@@ -74,72 +75,78 @@ export default function CreateUser() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 pb-10">
       <Header />
       
-      <main className="max-w-2xl mx-auto px-4 py-4">
+      <main className="max-w-2xl mx-auto px-2 sm:px-4 py-3">
         {/* Card */}
-        <div className="bg-white rounded shadow-sm overflow-hidden border border-gray-200">
+        <div className="bg-white rounded-none sm:rounded shadow-sm overflow-hidden border border-gray-200">
           
           {/* Gray title bar */}
-          <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">
+          <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-3">
+            <button 
+              onClick={() => navigate(-1)}
+              className="p-1 hover:bg-gray-200 rounded transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-700" />
+            </button>
             <h1 className="text-sm font-bold text-gray-900">
               Create New User under <span className="italic">NomanSA8592</span>
             </h1>
           </div>
 
           {/* Form body */}
-          <div className="p-6 space-y-5">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
             
             {/* Username */}
             <div>
-              <label className="block text-sm text-gray-800 mb-1">Username</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 shadow-inner"
               />
-              {errors.username && <p className="text-xs text-red-500 mt-1">{errors.username}</p>}
+              {errors.username && <p className="text-[10px] text-red-500 mt-1 font-bold">{errors.username}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm text-gray-800 mb-1">Password</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 shadow-inner"
               />
-              {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-[10px] text-red-500 mt-1 font-bold">{errors.password}</p>}
             </div>
 
             {/* Type — Radio: SuperMaster | Bettor */}
             <div>
-              <label className="block text-sm text-gray-800 mb-2">Type</label>
+              <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Type</label>
               <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="radio"
                     name="type"
                     value="supermaster"
                     checked={type === "supermaster"}
                     onChange={() => setType("supermaster")}
-                    className="w-4 h-4 accent-blue-500"
+                    className="w-5 h-5 accent-blue-500"
                   />
-                  <span className="text-sm font-medium">SuperMaster</span>
+                  <span className="text-sm font-bold text-gray-800">SuperMaster</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="radio"
                     name="type"
                     value="bettor"
                     checked={type === "bettor"}
                     onChange={() => setType("bettor")}
-                    className="w-4 h-4 accent-blue-500"
+                    className="w-5 h-5 accent-blue-500"
                   />
-                  <span className="text-sm font-medium">Bettor</span>
+                  <span className="text-sm font-bold text-gray-800">Bettor</span>
                 </label>
               </div>
             </div>
@@ -147,74 +154,75 @@ export default function CreateUser() {
             {/* Downline Share — ONLY visible when type === "supermaster" */}
             {type === "supermaster" && (
               <div>
-                <label className="block text-sm text-gray-800 mb-1">Downline Share</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Downline Share</label>
                 <input
                   type="number"
                   value={downlineShare}
                   min={0}
                   max={85}
                   onChange={(e) => setDownlineShare(Number(e.target.value))}
-                  className="border border-gray-300 rounded px-3 py-2 text-sm w-32 focus:outline-none focus:border-teal-500"
+                  className="border border-gray-300 rounded px-3 py-2.5 text-sm w-32 focus:outline-none focus:border-teal-500 shadow-inner"
                 />
-                <p className="text-xs text-gray-500 mt-1">Max allowed downline share is 0 - 85</p>
-                {errors.downlineShare && <p className="text-xs text-red-500 mt-1">{errors.downlineShare}</p>}
+                <p className="text-[10px] text-gray-500 mt-1 font-medium">Max allowed downline share is 0 - 85</p>
+                {errors.downlineShare && <p className="text-[10px] text-red-500 mt-1 font-bold">{errors.downlineShare}</p>}
               </div>
             )}
 
             {/* IsActive */}
-            <div>
-              <label className="block text-sm text-gray-800 mb-1 font-medium">IsActive</label>
+            <div className="flex items-center gap-3 bg-gray-50 p-3 rounded border border-gray-200">
               <input
                 type="checkbox"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
-                className="w-5 h-5 accent-teal-500 cursor-pointer"
+                className="w-6 h-6 accent-teal-500 cursor-pointer"
+                id="isActive"
               />
+              <label htmlFor="isActive" className="text-sm font-bold text-gray-800 cursor-pointer">Is Active</label>
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm text-gray-800 mb-1">Phone</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Phone</label>
               <input
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 shadow-inner"
               />
             </div>
 
             {/* Reference */}
             <div>
-              <label className="block text-sm text-gray-800 mb-1">Reference</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Reference</label>
               <input
                 type="text"
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 shadow-inner"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-sm text-gray-800 mb-1">Notes</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Notes</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 shadow-inner"
               />
             </div>
           </div>
 
           {/* Footer with Submit button */}
-          <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
+          <div className="bg-gray-100 border-t border-gray-200 px-4 py-4 sm:px-6">
             <button
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-2 rounded text-sm transition-colors disabled:opacity-70"
+              className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-3 rounded text-sm transition-all shadow-md active:scale-95 disabled:opacity-70"
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isSubmitting ? "Submitting..." : "Submit User"}
             </button>
           </div>
 

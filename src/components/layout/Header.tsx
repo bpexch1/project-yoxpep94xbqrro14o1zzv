@@ -19,23 +19,23 @@ export function Header() {
   return (
     <>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <header className="sticky top-0 z-50 bg-[#F3F4F6] text-[#1F2937] h-12 flex items-center px-3 border-b border-gray-300 shadow-sm font-sans">
+      <header className="sticky top-0 z-50 bg-[#1e3a5f] text-white h-12 flex items-center px-3 border-b border-white/10 shadow-sm font-sans">
         
-        {/* LEFT: Plain hamburger - NO border box */}
+        {/* LEFT: Plain hamburger */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-1.5 hover:bg-gray-200 transition-colors rounded flex-shrink-0"
+          className="p-2 hover:bg-white/10 transition-colors rounded flex-shrink-0"
         >
-          <Menu className="w-5 h-5 text-gray-600" />
+          <Menu className="w-5 h-5 text-white" />
         </button>
 
-        {/* CENTER: Username - gray text */}
+        {/* CENTER: Username - white text */}
         <div className="flex-1 flex justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-200 px-2 py-1 rounded transition-colors">
-                <span className="text-sm text-gray-500">NomanSA8592 (Admin)</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              <div className="flex items-center gap-1 cursor-pointer hover:bg-white/10 px-2 py-1 rounded transition-colors">
+                <span className="text-sm font-medium">NomanSA8592 (Admin)</span>
+                <ChevronDown className="w-3.5 h-3.5 text-white/70" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="bg-white border border-gray-200 shadow-lg rounded w-40 mt-1">
@@ -50,9 +50,11 @@ export function Header() {
         </div>
 
         {/* RIGHT: B: and Exp: */}
-        <div className="flex items-center gap-2 flex-shrink-0 text-sm">
-          <span className="text-gray-500">B: <span className="text-gray-800 font-bold">0</span></span>
-          <span className="text-gray-500">Exp: <span className="text-gray-800 font-bold">0</span></span>
+        <div className="flex items-center gap-2 flex-shrink-0 text-[11px] sm:text-xs">
+          <div className="flex flex-col sm:flex-row sm:gap-2 leading-tight">
+            <span>B: <span className="font-bold">0</span></span>
+            <span>Exp: <span className="font-bold">0</span></span>
+          </div>
         </div>
 
       </header>
