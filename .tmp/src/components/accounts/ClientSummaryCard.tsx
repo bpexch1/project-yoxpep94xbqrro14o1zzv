@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Plus, BookOpen, Pencil, Loader2 } from "lucide-react";
+import { Plus, BookOpen, Pencil, Loader2, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
 import { CashCreditModal } from "./CashCreditModal";
@@ -140,6 +140,12 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
             className="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" /> New User
+          </button>
+          <button
+            onClick={() => navigate("/accounts/create-company")}
+            className="bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm active:scale-95"
+          >
+            <Shield className="w-3.5 h-3.5" /> Company Account
           </button>
           <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm active:scale-95">
             <BookOpen className="w-3.5 h-3.5" /> Account Ledger
