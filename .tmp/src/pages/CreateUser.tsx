@@ -19,6 +19,7 @@ export default function CreateUser() {
   const [phone, setPhone] = useState("");
   const [reference, setReference] = useState("");
   const [notes, setNotes] = useState("");
+  const [downlineShare, setDownlineShare] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -58,6 +59,7 @@ export default function CreateUser() {
         status: isActive ? "active" : "inactive",
         parent_username: "NomanSA8592",
         phone,
+        downline_share: downlineShare,
         reference,
         notes,
       });
@@ -125,16 +127,6 @@ export default function CreateUser() {
             {/* Type */}
             <div>
               <label className={labelClasses}>Type</label>
-              {type && (
-                <p className="text-sm font-semibold text-[#26A69A] mb-1">
-                  {type === 'superadmin' ? 'Superadmin'
-                    : type === 'admin' ? 'Admin'
-                    : type === 'supermaster' ? 'Super Master'
-                    : type === 'master' ? 'Master'
-                    : type === 'bettor' ? 'Bettor'
-                    : ''}
-                </p>
-              )}
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as UserType)}
@@ -148,6 +140,22 @@ export default function CreateUser() {
                 <option value="bettor">Bettor</option>
               </select>
               {errors.type && <p className="text-xs text-red-500 mt-1 font-semibold">{errors.type}</p>}
+            </div>
+
+            {/* Share */}
+            <div>
+              <label className={labelClasses}>Share</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={downlineShare}
+                  onChange={(e) => setDownlineShare(Math.min(100, Math.max(0, Number(e.target.value))))}
+                  className="border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#26A69A] bg-white w-24 text-center"
+                />
+                <span className="text-sm text-gray-700 font-medium">/ 100</span>
+              </div>
             </div>
 
             {/* IsActive */}
