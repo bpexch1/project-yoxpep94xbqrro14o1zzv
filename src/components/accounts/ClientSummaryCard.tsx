@@ -46,15 +46,21 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
     }, 800);
   };
 
+  const getTypeLabel = (role: string) => {
+    if (role === "supermaster" || role === "admin") return "SuperMaster";
+    if (role === "client" || role === "bettor") return "Bettor";
+    return role || "Bettor";
+  };
+
   const total_credit = totals.credit_remaining.toLocaleString();
-  const total_balance = totals.cash.toLocaleString();
+  const total_balance = totals.balance_upline.toLocaleString();
 
   return (
     <section className="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
       {/* Card title */}
       <div className="px-4 py-3 border-b border-gray-200">
         <span className="font-bold text-sm text-gray-900">
-          NomanSA8592 - Clients List {showRealBalances ? "" : "| Default"}
+          NomanSA8592 - Clients List
         </span>
       </div>
 
@@ -95,11 +101,15 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                   <>
                     <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_received.toLocaleString()}</td>
                     <td className="p-2 border-r border-gray-200 text-emerald-600 underline font-bold">{totals.credit_remaining.toLocaleString()}</td>
-                    <td className="p-2 border-r border-gray-200 text-emerald-600 font-bold">{totals.cash.toLocaleString()}</td>
+                    <td className={cn("p-2 border-r border-gray-200 font-bold", totals.cash < 0 ? "text-red-500" : "text-emerald-600")}>
+                      {totals.cash.toLocaleString()}
+                    </td>
                     <td className={cn("p-2 border-r border-gray-200 font-bold", totals.pl_downline < 0 ? "text-red-500" : "text-emerald-600")}>
                       {totals.pl_downline.toLocaleString()}
                     </td>
-                    <td className="p-2 text-emerald-600 font-bold">{totals.balance_upline.toLocaleString()}</td>
+                    <td className={cn("p-2 font-bold", totals.balance_upline < 0 ? "text-red-500" : "text-emerald-600")}>
+                      {totals.balance_upline.toLocaleString()}
+                    </td>
                   </>
                 )}
               </tr>
@@ -206,8 +216,8 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
             ) : (
               filteredClients.map((client, idx) => (
                 <tr key={client.id} className={cn("border-b border-gray-100", idx % 2 === 0 ? "bg-white" : "bg-gray-50")}>
-                  <td className="px-3 py-2 border-r border-gray-100 font-medium text-gray-800 flex items-center gap-1">
-                    {client.username}
+                  <td className="px-3 py-2 border-r border-gray-100 font-medium flex items-center gap-1">
+                    <span className="text-emerald-600 underline cursor-pointer hover:text-emerald-700">{client.username}</span>
                     <div className="flex gap-0.5 ml-1">
                       <button className="w-4 h-4 bg-orange-400 rounded text-white font-bold text-[8px] flex items-center justify-center">C</button>
                       <button
@@ -227,9 +237,9 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                       </button>
                     </div>
                   </td>
-                  <td className="px-3 py-2 border-r border-gray-100 text-gray-700 uppercase">{client.role || "client"}</td>
+                  <td className="px-3 py-2 border-r border-gray-100 text-gray-700 uppercase">{getTypeLabel(client.role)}</td>
                   <td className="px-3 py-2 border-r border-gray-100 text-gray-700">{(client.credit_remaining || 0).toLocaleString()}</td>
-                  <td className="px-3 py-2 text-gray-700">{(client.cash || 0).toLocaleString()}</td>
+                  <td className="px-3 py-2 text-emerald-600 font-bold">{(client.balance_upline || 0).toLocaleString()}</td>
                 </tr>
               ))
             )}
