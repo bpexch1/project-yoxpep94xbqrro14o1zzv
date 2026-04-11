@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Search } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
@@ -8,6 +9,7 @@ import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { data: clients, isLoading } = useQuery({
     queryKey: ["clients"],
@@ -16,7 +18,9 @@ export default function Accounts() {
 
   return (
     <div className="min-h-screen bg-slate-100 pb-10">
-      <Header />
+      <Header onMenuClick={() => setIsSidebarOpen(true)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
       <main className="p-4 max-w-4xl mx-auto space-y-4">
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { Client } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -12,13 +13,14 @@ export default function CreateUser() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [type, setType] = useState<"admin" | "bettor">("bettor");
+  const [type, setType] = useState<"supermaster" | "bettor">("bettor");
   const [downlineShare, setDownlineShare] = useState(0);
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [phone, setPhone] = useState("");
   const [reference, setReference] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -39,7 +41,7 @@ export default function CreateUser() {
     try {
       await Client.create({
         username,
-        role: type === "admin" ? "admin" : "client",
+        role: type === "bettor" ? "client" : "supermaster",
         credit_received: 0,
         credit_remaining: 0,
         cash: 0,
@@ -73,7 +75,9 @@ export default function CreateUser() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <Header onMenuClick={() => setIsSidebarOpen(true)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
       <main className="max-w-2xl mx-auto px-4 py-6">
         {/* Title */}
         <h1 className="text-lg font-bold text-gray-900 mb-6 italic">
@@ -83,7 +87,7 @@ export default function CreateUser() {
         <div className="space-y-5">
           {/* Username */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">Username</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">Username</label>
             <input
               type="text"
               value={username}
@@ -95,7 +99,7 @@ export default function CreateUser() {
 
           {/* Password */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">Password</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">Password</label>
             <input
               type="password"
               value={password}
@@ -107,18 +111,18 @@ export default function CreateUser() {
 
           {/* Type — Radio */}
           <div>
-            <label className="block text-sm text-gray-800 mb-2">Type</label>
+            <label className="block text-sm text-gray-800 mb-2 font-medium">Type</label>
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   name="type"
-                  value="admin"
-                  checked={type === "admin"}
-                  onChange={() => setType("admin")}
+                  value="supermaster"
+                  checked={type === "supermaster"}
+                  onChange={() => setType("supermaster")}
                   className="w-4 h-4 accent-teal-500"
                 />
-                <span className="text-sm">Admin</span>
+                <span className="text-sm">SuperMaster</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -136,7 +140,7 @@ export default function CreateUser() {
 
           {/* Downline Share */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">Downline Share</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">Downline Share</label>
             <input
               type="number"
               value={downlineShare}
@@ -151,7 +155,7 @@ export default function CreateUser() {
 
           {/* IsActive checkbox */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">IsActive</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">IsActive</label>
             <input
               type="checkbox"
               checked={isActive}
@@ -162,7 +166,7 @@ export default function CreateUser() {
 
           {/* Phone */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">Phone</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">Phone</label>
             <input
               type="text"
               value={phone}
@@ -173,7 +177,7 @@ export default function CreateUser() {
 
           {/* Reference */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">Reference</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">Reference</label>
             <input
               type="text"
               value={reference}
@@ -184,7 +188,7 @@ export default function CreateUser() {
 
           {/* Notes */}
           <div>
-            <label className="block text-sm text-gray-800 mb-1">Notes</label>
+            <label className="block text-sm text-gray-800 mb-1 font-medium">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
