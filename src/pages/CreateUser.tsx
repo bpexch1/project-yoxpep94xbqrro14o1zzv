@@ -125,6 +125,16 @@ export default function CreateUser() {
             {/* Type */}
             <div>
               <label className={labelClasses}>Type</label>
+              {type && (
+                <p className="text-sm font-semibold text-[#26A69A] mb-1">
+                  {type === 'superadmin' ? 'Superadmin'
+                    : type === 'admin' ? 'Admin'
+                    : type === 'supermaster' ? 'Super Master'
+                    : type === 'master' ? 'Master'
+                    : type === 'bettor' ? 'Bettor'
+                    : ''}
+                </p>
+              )}
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as UserType)}
