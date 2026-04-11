@@ -1,0 +1,15 @@
+{
+  "name": "Bet",
+  "description": "A bet placed by a user on a match",
+  "properties": {
+    "user_email": { "type": "string", "description": "Email of the user who placed the bet" },
+    "match_id": { "type": "string", "description": "ID of the match being bet on" },
+    "match_title": { "type": "string", "description": "Match title for display" },
+    "selection": { "type": "string", "description": "What was selected to bet on (team1 name, team2 name)" },
+    "bet_type": { "type": "string", "description": "back or lay" },
+    "stake": { "type": "number", "description": "Amount staked in Rs." },
+    "odds": { "type": "number", "description": "Odds at which bet was placed" },
+    "potential_win": { "type": "number", "description": "Potential winnings" },
+    "status": { "type": "string", "description": "pending, won, lost, cancelled" }
+  }
+}
