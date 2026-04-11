@@ -53,6 +53,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				'bg-primary': 'var(--bg-primary)',
+				'bg-card': 'var(--bg-card)',
+				'accent-green': 'var(--accent-green)',
+				'accent-blue': 'var(--accent-blue)',
+				'accent-pink': 'var(--accent-pink)',
 			},
 			borderRadius: {
 				xl: 'calc(var(--radius) + 4px)',

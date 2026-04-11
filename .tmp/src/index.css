@@ -2,31 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 210 20% 98%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 160 84% 95%;
-    --secondary-foreground: 160 84% 20%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 210 20% 40%;
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 358 75% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 160 84% 39%;
-    --radius: 0.5rem;
-    
-    --teal: 160 84% 39%;
-  }
+:root {
+  --bg-primary: #0F1419;
+  --bg-card: #1A1D24;
+  --accent-green: #10B981;
+  --accent-blue: #3B82F6;
+  --accent-pink: #EC4899;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+  --border-color: #374151;
+
+  /* Shadcn/Tailwind CSS variable mappings */
+  --background: 220 22% 8%;
+  --foreground: 0 0% 100%;
+  --card: 225 16% 12%;
+  --card-foreground: 0 0% 100%;
+  --popover: 225 16% 12%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 160 84% 39%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 225 16% 18%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 225 16% 16%;
+  --muted-foreground: 220 9% 62%;
+  --accent: 160 84% 39%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 13% 23%;
+  --input: 220 13% 23%;
+  --ring: 160 84% 39%;
+  --radius: 0.5rem;
+  --teal: 160 84% 39%;
 }
 
 @layer base {
@@ -35,6 +42,10 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg-primary);
+    color: var(--text-primary);
   }
 }
 
