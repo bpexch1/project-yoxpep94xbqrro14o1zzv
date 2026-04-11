@@ -110,7 +110,6 @@ export default function Login() {
               className="w-3/4 h-12 rounded-full text-white font-semibold text-lg transition-all active:scale-95 flex items-center justify-center"
               style={{
                 background: 'linear-gradient(180deg, #5aaec8 0%, #2d6b8a 100%)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.25)',
               }}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Login'}
