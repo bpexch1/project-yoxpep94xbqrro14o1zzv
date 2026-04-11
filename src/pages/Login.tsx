@@ -107,7 +107,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-3/4 h-12 rounded-full text-white font-semibold text-lg transition-all active:scale-95 flex items-center justify-center"
+              className="px-16 py-3 rounded-full text-white font-semibold text-base transition-all active:scale-95 flex items-center justify-center"
               style={{
                 background: 'linear-gradient(180deg, #5aaec8 0%, #2d6b8a 100%)',
               }}
