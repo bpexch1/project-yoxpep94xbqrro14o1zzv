@@ -21,7 +21,7 @@ export default function CreateUser() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const inputClass = "w-full border border-[#E0E0E0] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#26A69A] bg-white";
+  const inputClass = "w-full border border-[#E0E0E0] rounded px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#26A69A] bg-white";
   const labelClass = "block text-sm text-gray-800 mb-2";
 
   const validate = () => {
@@ -141,7 +141,7 @@ export default function CreateUser() {
                 max={85}
                 value={downlineShare}
                 onChange={(e) => setDownlineShare(Number(e.target.value))}
-                className="w-24 border border-[#E0E0E0] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#26A69A] bg-white"
+                className="w-24 border border-[#E0E0E0] rounded px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#26A69A] bg-white"
               />
               <p className="text-sm text-gray-700 mt-1">Max allowed downline share is 0 - 85</p>
               {errors.downlineShare && <p className="text-xs text-red-500 mt-1">{errors.downlineShare}</p>}
