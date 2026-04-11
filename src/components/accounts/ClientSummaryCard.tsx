@@ -229,15 +229,19 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                 <td colSpan={4} className="px-3 py-6 text-center text-gray-500 text-xs">No data available in table</td>
               </tr>
             ) : (
-              filteredClients.map((client) => {
+              filteredClients.map((client, idx) => {
                 const isExpanded = expandedRows.has(client.id);
                 return (
                   <React.Fragment key={client.id}>
                     {/* MAIN ROW */}
-                    <tr className={cn("bg-white active:bg-emerald-50 transition-colors", !isExpanded && "border-b border-gray-100")}>
+                    <tr className={cn(
+                      "transition-colors", 
+                      isExpanded ? "border-b-0" : "border-b border-gray-100",
+                      idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    )}>
                       <td className="px-3 py-2.5 border-r border-gray-100">
                         <div className="flex items-center gap-2">
-                          <span className={cn(getUsernameClass(client.role), "max-w-[110px] truncate")}>{client.username}</span>
+                          <span className={cn(getUsernameClass(client.role), "max-w-[160px] truncate")}>{client.username}</span>
                           {!showRealBalances && (
                             <button
                               onClick={() => toggleRow(client.id)}
@@ -267,15 +271,30 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                     {/* EXPANDED DETAIL ROW */}
                     {isExpanded && (
                       <tr className="border-b border-gray-200">
-                        <td colSpan={4} className="px-4 py-3 bg-white">
-                          <ul className="text-sm text-gray-800 space-y-1 list-disc list-inside">
-                            <li>Balance {(client.balance_upline || 0).toLocaleString()}</li>
-                            <li>Client (P/L) {(client.pl_downline || 0).toLocaleString()}</li>
-                            <li>Share {client.downline_share || 0}</li>
-                            <li>Exposure 0</li>
-                            <li>Available Balance {(client.credit_remaining || 0).toLocaleString()}</li>
-                            <li className="flex items-center gap-2 list-none">
-                              <span className="mr-1">•</span>
+                        <td colSpan={4} className={cn("px-4 py-3", idx % 2 === 0 ? "bg-white" : "bg-gray-50")}>
+                          <ul className="text-sm text-gray-800 space-y-1">
+                            <li className="flex items-start gap-2">
+                              <span className="text-gray-600 mt-0.5">•</span>
+                              <span>Balance {(client.balance_upline || 0).toLocaleString()}</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-gray-600 mt-0.5">•</span>
+                              <span>Client (P/L) {(client.pl_downline || 0).toLocaleString()}</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-gray-600 mt-0.5">•</span>
+                              <span>Share {client.downline_share || 0}</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-gray-600 mt-0.5">•</span>
+                              <span>Exposure 0</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-gray-600 mt-0.5">•</span>
+                              <span>Available Balance {(client.credit_remaining || 0).toLocaleString()}</span>
+                            </li>
+                            <li className="flex items-center gap-2 mt-2">
+                              <span className="text-gray-600">•</span>
                               <span className="mr-2">Options</span>
                               <button
                                 onClick={() => setCashCreditClient(client)}
