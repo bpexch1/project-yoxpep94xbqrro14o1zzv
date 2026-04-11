@@ -205,7 +205,7 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
           <thead>
             {showRealBalances && (
               <tr className="bg-emerald-500 text-white font-bold text-xs">
-                <td className="px-3 py-2 border-r border-emerald-400"></td>
+                <td className="px-3 py-2 border-r border-emerald-400 font-bold">Total</td>
                 <td className="px-3 py-2 border-r border-emerald-400 text-center">-</td>
                 <td className="px-3 py-2 border-r border-emerald-400">{totals.credit_remaining.toLocaleString()}</td>
                 <td className="px-3 py-2">{totals.balance_upline.toLocaleString()}</td>
@@ -238,15 +238,17 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
                       <td className="px-3 py-2.5 border-r border-gray-100">
                         <div className="flex items-center gap-2">
                           <span className={cn(getUsernameClass(client.role), "max-w-[110px] truncate")}>{client.username}</span>
-                          <button
-                            onClick={() => toggleRow(client.id)}
-                            className={cn(
-                              "w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-colors bg-white shadow-sm",
-                              isExpanded ? "border-emerald-400 text-emerald-500 bg-emerald-50" : "border-gray-300 text-gray-400"
-                            )}
-                          >
-                            i
-                          </button>
+                          {!showRealBalances && (
+                            <button
+                              onClick={() => toggleRow(client.id)}
+                              className={cn(
+                                "w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-colors bg-white shadow-sm",
+                                isExpanded ? "border-emerald-400 text-emerald-500 bg-emerald-50" : "border-gray-300 text-gray-400"
+                              )}
+                            >
+                              i
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="px-3 py-2.5 border-r border-gray-100 text-gray-700 text-center">{getTypeLabel(client.role)}</td>
@@ -264,47 +266,35 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
 
                     {/* EXPANDED DETAIL ROW */}
                     {isExpanded && (
-                      <tr className="border-b border-gray-200">
-                        <td colSpan={4} className="px-4 py-3 bg-slate-50 border-x-4 border-l-emerald-500 border-r-transparent">
-                          <ul className="text-xs text-gray-800 space-y-1.5 font-medium">
-                            <li className="flex justify-between items-center border-b border-gray-200 pb-1">
-                              <span>Balance</span>
-                              <span className="font-bold">{(client.balance_upline || 0).toLocaleString()}</span>
-                            </li>
-                            <li className="flex justify-between items-center border-b border-gray-200 pb-1">
-                              <span>Client (P/L)</span>
-                              <span className="font-bold">{(client.pl_downline || 0).toLocaleString()}</span>
-                            </li>
-                            <li className="flex justify-between items-center border-b border-gray-200 pb-1">
-                              <span>Share</span>
-                              <span className="font-bold">{client.downline_share || 0}%</span>
-                            </li>
-                            <li className="flex justify-between items-center border-b border-gray-200 pb-1">
-                              <span>Exposure</span>
-                              <span className="font-bold">0</span>
-                            </li>
-                            <li className="flex justify-between items-center border-b border-gray-200 pb-1">
-                              <span>Available Balance</span>
-                              <span className="font-bold">{(client.credit_remaining || 0).toLocaleString()}</span>
-                            </li>
-                            <li className="flex items-center gap-2 pt-3">
-                              <span className="text-[10px] text-gray-500 mr-1 uppercase font-bold">Options:</span>
-                              <button 
+                      <tr className="border-b border-gray-100">
+                        <td colSpan={4} className="px-4 py-3 bg-white">
+                          <ul className="text-sm text-gray-800 space-y-1 list-disc list-inside">
+                            <li>Balance {(client.balance_upline || 0).toLocaleString()}</li>
+                            <li>Client (P/L) {(client.pl_downline || 0).toLocaleString()}</li>
+                            <li>Share {client.downline_share || 0}</li>
+                            <li>Exposure 0</li>
+                            <li>Available Balance {(client.credit_remaining || 0).toLocaleString()}</li>
+                            <li className="flex items-center gap-2 list-none">
+                              <span className="mr-1">•</span>
+                              <span className="mr-2">Options</span>
+                              <button
                                 onClick={() => setCashCreditClient(client)}
-                                className="w-7 h-7 bg-amber-400 rounded text-white font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm"
+                                className="w-9 h-9 bg-amber-400 rounded text-white font-bold text-base flex items-center justify-center active:scale-90 shadow-sm"
                               >
                                 C
                               </button>
                               <button
                                 onClick={() => setEditingClient(client)}
-                                className="w-7 h-7 bg-emerald-500 rounded text-white flex items-center justify-center active:scale-90 transition-transform shadow-sm"
+                                className="w-9 h-9 bg-emerald-500 rounded text-white flex items-center justify-center active:scale-90 shadow-sm"
                               >
-                                <Pencil className="w-3.5 h-3.5" />
+                                <Pencil className="w-4 h-4" />
                               </button>
-                              <button className="w-7 h-7 bg-sky-400 rounded text-white font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm">L</button>
+                              <button className="w-9 h-9 bg-sky-400 rounded text-white font-bold text-base flex items-center justify-center active:scale-90 shadow-sm">
+                                L
+                              </button>
                               <button
                                 className={cn(
-                                  "w-7 h-7 rounded font-bold text-sm flex items-center justify-center active:scale-90 transition-transform shadow-sm",
+                                  "w-9 h-9 rounded font-bold text-base flex items-center justify-center active:scale-90 shadow-sm",
                                   client.status === "active" ? "bg-emerald-500 text-white" : "border-2 border-red-400 text-red-400 bg-white"
                                 )}
                               >
