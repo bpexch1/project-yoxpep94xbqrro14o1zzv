@@ -21,21 +21,21 @@ export function Header() {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <header className="sticky top-0 z-50 bg-[#F3F4F6] text-[#1F2937] h-12 flex items-center px-3 border-b border-gray-300 shadow-sm font-sans">
         
-        {/* LEFT: Bordered hamburger */}
+        {/* LEFT: Plain hamburger - NO border box */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-1.5 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+          className="p-1.5 hover:bg-gray-200 transition-colors rounded flex-shrink-0"
         >
-          <Menu className="w-4 h-4 text-gray-700" />
+          <Menu className="w-5 h-5 text-gray-600" />
         </button>
 
-        {/* CENTER: Username dropdown */}
+        {/* CENTER: Username - gray text */}
         <div className="flex-1 flex justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-200 px-2 py-1 rounded transition-colors">
-                <span className="text-[13px] font-bold text-gray-800">NomanSA8592 (Admin)</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-600" />
+                <span className="text-sm text-gray-500">NomanSA8592 (Admin)</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="bg-white border border-gray-200 shadow-lg rounded w-40 mt-1">
@@ -50,9 +50,9 @@ export function Header() {
         </div>
 
         {/* RIGHT: B: and Exp: */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <span className="text-[13px] font-bold text-gray-800">B: 0</span>
-          <span className="text-[13px] font-bold text-gray-800">Exp: 0</span>
+        <div className="flex items-center gap-2 flex-shrink-0 text-sm">
+          <span className="text-gray-500">B: <span className="text-gray-800 font-bold">0</span></span>
+          <span className="text-gray-500">Exp: <span className="text-gray-800 font-bold">0</span></span>
         </div>
 
       </header>
