@@ -203,6 +203,14 @@ export function ClientSummaryCard({ clients, isLoading }: ClientSummaryCardProps
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse min-w-[340px]">
           <thead>
+            {showRealBalances && (
+              <tr className="bg-emerald-500 text-white font-bold text-xs">
+                <td className="px-3 py-2 border-r border-emerald-400"></td>
+                <td className="px-3 py-2 border-r border-emerald-400 text-center">-</td>
+                <td className="px-3 py-2 border-r border-emerald-400">{totals.credit_remaining.toLocaleString()}</td>
+                <td className="px-3 py-2">{totals.balance_upline.toLocaleString()}</td>
+              </tr>
+            )}
             {/* Column header row */}
             <tr className="bg-gray-100 border-b border-gray-200 text-gray-700">
               <th className="px-3 py-2 border-r border-gray-200 font-bold">Username</th>
