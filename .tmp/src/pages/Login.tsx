@@ -26,10 +26,10 @@ export default function Login() {
     try {
       const allClients = await Client.list();
       console.log('All clients:', allClients);
-      const client = allClients.find((c: any) => c.username === username);
+      const client = allClients.find((c: any) => c.username === username && c.password === password);
       console.log('Found client:', client);
       
-      if (client && client.password === password) {
+      if (client) {
         setClientSession({
           id: client.id,
           username: client.username,
