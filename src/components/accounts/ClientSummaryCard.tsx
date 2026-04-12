@@ -152,7 +152,11 @@ export function ClientSummaryCard({ clients, isLoading, username = "Admin", sear
             {/* Green Total header row */}
             <tr className="bg-[#26A69A]">
               <td className="px-3 py-2.5 font-bold text-white border-r border-[#229587]">Total</td>
-              <td className="px-3 py-2.5 border-r border-[#229587]"></td>
+              <td className="px-3 py-2.5 border-r border-[#229587]">
+                <button className="bg-[#F59E0B] hover:bg-amber-500 text-black font-bold text-xs px-4 py-2 rounded transition-colors">
+                  Load Balance
+                </button>
+              </td>
               <td className="px-3 py-2.5 font-bold text-white text-right">
                 {totals.credit_remaining.toLocaleString()}
               </td>
