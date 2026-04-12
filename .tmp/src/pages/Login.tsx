@@ -40,7 +40,7 @@ export default function Login() {
           title: "Success",
           description: "Logged in successfully!",
         });
-        navigate("/accounts");
+        navigate("/dashboard");
       } else {
         toast({
           variant: "destructive",

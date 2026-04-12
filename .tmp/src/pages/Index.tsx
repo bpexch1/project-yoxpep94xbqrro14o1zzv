@@ -8,7 +8,7 @@ export default function Index() {
   useEffect(() => {
     const session = getClientSession();
     if (session) {
-      navigate("/accounts", { replace: true });
+      navigate("/dashboard", { replace: true });
     } else {
       navigate("/login", { replace: true });
     }
