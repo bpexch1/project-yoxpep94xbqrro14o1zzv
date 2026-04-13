@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, ChevronDown, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
-import { Client } from "@/entities";
+import { Client, Bet } from "@/entities";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,20 +17,29 @@ interface HeaderProps {
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const [clientData, setClientData] = useState<any>(null);
+  const [totalExposure, setTotalExposure] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     const s = getClientSession();
     setSession(s);
-    if (s?.username) {
-      // Fetch live client data for real balance
-      Client.filter({ username: s.username }, '-created_at', 1)
+    if (s?.id) {
+      // Fetch live client data for real balance using ID
+      Client.filter({ id: s.id }, '-created_at', 1)
         .then((results: any[]) => {
           if (results && results.length > 0) {
             setClientData(results[0]);
           }
         })
         .catch(console.error);
+
+      // Fetch all pending bets exposure
+      Bet.filter({ status: 'pending' }, '-created_at', 500)
+        .then((pendingBets: any[]) => {
+          const total = pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
+          setTotalExposure(total);
+        })
+        .catch((e) => console.error('Exp fetch error:', e));
     }
   }, []);
 
@@ -92,11 +101,14 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           <div className="flex flex-col lg:flex-row lg:gap-3">
             <span className="text-white font-bold text-xs lg:text-sm">
               <span className="text-[#a8c8e8]">B: </span>
-              {(clientData?.credit_remaining ?? session?.credit_remaining ?? 0).toLocaleString('en-IN')}
+              {(clientData 
+                ? (clientData.credit_remaining > 0 ? clientData.credit_remaining : clientData.cash) 
+                : (session?.credit_remaining ?? 0)
+              ).toLocaleString('en-IN')}
             </span>
             <span className="text-white font-bold text-xs lg:text-sm">
               <span className="text-[#a8c8e8]">Exp: </span>
-              0
+              {totalExposure.toLocaleString('en-IN')}
             </span>
           </div>
         </div>
