@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Filter, Search } from "lucide-react";
@@ -12,10 +13,24 @@ export default function Accounts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
   const session = getClientSession();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!session) {
+      navigate("/login");
+    }
+  }, [session, navigate]);
 
   const { data: clients, isLoading, refetch } = useQuery({
-    queryKey: ["clients"],
-    queryFn: () => ClientEntity.list("-created_at"),
+    queryKey: ["clients", session?.username],
+    queryFn: () => {
+      if (!session) return [];
+      if (session.role === 'superadmin') {
+        return ClientEntity.list("-created_at");
+      }
+      return ClientEntity.filter({ parent_username: session.username }, "-created_at");
+    },
+    enabled: !!session,
   });
 
   const handleSearch = () => {
