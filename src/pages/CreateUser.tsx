@@ -43,7 +43,7 @@ export default function CreateUser() {
     try {
       await Client.create({
         username,
-        role: type === "company" ? "supermaster" : "client",
+        role: type === "company" ? "superadmin" : "client",
         credit_received: 0,
         credit_remaining: 0,
         cash: 0,
@@ -119,7 +119,7 @@ export default function CreateUser() {
                   onChange={() => setType("company")}
                   className="w-5 h-5 accent-[#16a085] cursor-pointer"
                 />
-                <span className="text-sm text-[#2c3e50]">SuperMaster</span>
+                <span className="text-sm text-[#2c3e50]">SuperAdmin</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
