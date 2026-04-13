@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, ChevronDown, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
-import { Client, Bet } from "@/entities";
+import { Bet } from "@/entities";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,6 @@ interface HeaderProps {
 
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
-  const [clientData, setClientData] = useState<any>(null);
   const [totalExposure, setTotalExposure] = useState(0);
   const navigate = useNavigate();
 
@@ -24,15 +23,6 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     const s = getClientSession();
     setSession(s);
     if (s?.id) {
-      // Fetch live client data for real balance using ID
-      Client.filter({ id: s.id }, '-created_at', 1)
-        .then((results: any[]) => {
-          if (results && results.length > 0) {
-            setClientData(results[0]);
-          }
-        })
-        .catch(console.error);
-
       // Fetch all pending bets exposure
       Bet.filter({ status: 'pending' }, '-created_at', 500)
         .then((pendingBets: any[]) => {
@@ -101,10 +91,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           <div className="flex flex-col lg:flex-row lg:gap-3">
             <span className="text-white font-bold text-xs lg:text-sm">
               <span className="text-[#a8c8e8]">B: </span>
-              {(clientData 
-                ? (clientData.credit_remaining > 0 ? clientData.credit_remaining : clientData.cash) 
-                : (session?.credit_remaining ?? 0)
-              ).toLocaleString('en-IN')}
+              0
             </span>
             <span className="text-white font-bold text-xs lg:text-sm">
               <span className="text-[#a8c8e8]">Exp: </span>
