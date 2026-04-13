@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, CreditCard, Lock, Eye, EyeOff, Loader2, AlertCircle, ShieldCheck } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Client } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { Loader2, X } from "lucide-react";
 
 interface EditClientModalProps {
   isOpen: boolean;
@@ -20,72 +19,59 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    username: "",
-    fullName: "",
-    role: "client",
-    creditLimit: "",
-    status: "active",
-    newPassword: "",
-    confirmPassword: "",
+    password: "",
+    isActive: true,
+    bettingAllowed: true,
+    canSettlePL: false,
+    phone: "",
+    reference: "",
+    notes: "",
+    commission: "2.00",
   });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (client) {
       setFormData({
-        username: client.username || "",
-        fullName: client.full_name || "",
-        role: client.role || "client",
-        creditLimit: (client.credit_received || 0).toString(),
-        status: client.status || "active",
-        newPassword: "",
-        confirmPassword: "",
+        password: "",
+        isActive: client.status === "active",
+        bettingAllowed: client.betting_allowed !== false, // default true if undefined
+        canSettlePL: client.can_settle_pl === true,
+        phone: client.phone || "",
+        reference: client.reference || "",
+        notes: client.notes || "",
+        commission: (client.commission ?? 2.00).toString(),
       });
-      setErrors({});
     }
   }, [client]);
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.username) newErrors.username = "Username is required";
-    if (!formData.fullName) newErrors.fullName = "Full name is required";
-    if (!formData.creditLimit) newErrors.creditLimit = "Credit limit is required";
-    else if (isNaN(Number(formData.creditLimit))) newErrors.creditLimit = "Must be a number";
-
-    if (formData.newPassword) {
-      if (formData.newPassword.length < 6) newErrors.newPassword = "Min 6 characters";
-      if (formData.confirmPassword !== formData.newPassword)
-        newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate() || !client) return;
+    if (!client) return;
 
     setIsSubmitting(true);
     try {
-      await Client.update(client.id, {
-        username: formData.username,
-        full_name: formData.fullName,
-        role: formData.role,
-        credit_received: Number(formData.creditLimit),
-        credit_remaining: Number(formData.creditLimit), // Resetting remaining to new received for simplicity in this system
-        status: formData.status,
-      });
+      const updateData: any = {
+        status: formData.isActive ? "active" : "inactive",
+        betting_allowed: formData.bettingAllowed,
+        can_settle_pl: formData.canSettlePL,
+        phone: formData.phone,
+        reference: formData.reference,
+        notes: formData.notes,
+        commission: Number(formData.commission),
+      };
+
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+
+      await Client.update(client.id, updateData);
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({
-        title: "Client Updated!",
-        description: `Account for ${formData.username} has been updated.`,
+        title: "Success",
+        description: `Account for ${client.username} has been updated.`,
       });
       onClose();
     } catch (error) {
@@ -100,155 +86,163 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
     }
   };
 
+  if (!client) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl">
-        <DialogHeader className="bg-[#1E2936] text-white px-6 py-5 space-y-1">
-          <div className="flex items-center gap-2">
-            <DialogTitle className="text-xl font-bold">Edit Client</DialogTitle>
-            {client && (
-              <span className="px-2 py-0.5 bg-[#16a085]/20 text-[#16a085] border border-[#16a085]/30 rounded text-[10px] font-bold">
-                @{client.username}
-              </span>
-            )}
-          </div>
-          <DialogDescription className="text-slate-400 text-xs">
-            Modify account details and permissions
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="p-0 max-w-sm w-[90vw] h-[90vh] overflow-hidden flex flex-col border-0 shadow-2xl [&>button]:hidden bg-white rounded-none sm:rounded-none">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <span className="text-gray-400 text-sm font-medium">Edit: @{client.username}</span>
+          <button 
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="bg-white px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-wider">Username</Label>
-                <Input
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="h-11 bg-slate-50 border-[#d5d8dc] text-sm text-[#2c3e50]"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-wider">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(val) => setFormData({ ...formData, status: val })}
-                >
-                  <SelectTrigger className="h-11 bg-slate-50 border-[#d5d8dc] text-sm text-[#2c3e50]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">InActive</SelectItem>
-                  </SelectContent>
-                </Select>
+        {/* Content */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto flex flex-col">
+          <div className="flex-1 px-4 py-2 space-y-0">
+            {/* Type Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Type</label>
+              <div className="flex-1 text-sm font-semibold text-gray-900 capitalize">
+                {client.role || "Client"}
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-wider">Full Name</Label>
+            {/* Currency Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Currency</label>
+              <div className="flex-1 text-sm font-semibold text-gray-900">Rs.</div>
+            </div>
+
+            {/* Password Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Password</label>
               <Input
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className="h-11 bg-slate-50 border-[#d5d8dc] text-sm text-[#2c3e50]"
+                type="text"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="flex-1 h-9 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-wider">Role</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(val) => setFormData({ ...formData, role: val })}
-                >
-                  <SelectTrigger className="h-11 bg-slate-50 border-[#d5d8dc] text-sm text-[#2c3e50]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="client">Client</SelectItem>
-                    <SelectItem value="agent">Agent</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-wider">Credit Limit</Label>
-                <Input
-                  value={formData.creditLimit}
-                  onChange={(e) => setFormData({ ...formData, creditLimit: e.target.value })}
-                  className="h-11 bg-slate-50 border-[#d5d8dc] text-sm text-[#2c3e50]"
+            {/* IsActive Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">IsActive</label>
+              <div className="flex-1 flex items-center">
+                <Checkbox
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked === true })}
+                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
                 />
               </div>
             </div>
 
-            <div className="border-t border-dashed border-[#d5d8dc] pt-4">
-              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-wider mb-3">Change Password (optional)</p>
-              <div className="space-y-3">
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f8c8d]" />
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={formData.newPassword}
-                    onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-                    placeholder="New password"
-                    className="pl-9 pr-10 h-11 text-sm bg-slate-50 border-[#d5d8dc] text-[#2c3e50]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7f8c8d]"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                
-                {formData.newPassword && (
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f8c8d]" />
-                    <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      placeholder="Confirm new password"
-                      className="pl-9 pr-10 h-11 text-sm bg-slate-50 border-[#d5d8dc] text-[#2c3e50]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7f8c8d]"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                )}
+            {/* Betting Allowed Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Betting Allowed</label>
+              <div className="flex-1 flex items-center">
+                <Checkbox
+                  checked={formData.bettingAllowed}
+                  onCheckedChange={(checked) => setFormData({ ...formData, bettingAllowed: checked === true })}
+                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
+                />
+              </div>
+            </div>
+
+            {/* Can Settle PL Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Can Settle PL</label>
+              <div className="flex-1 flex items-center gap-2">
+                <Checkbox
+                  checked={formData.canSettlePL}
+                  onCheckedChange={(checked) => setFormData({ ...formData, canSettlePL: checked === true })}
+                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
+                />
+                <span className="text-sm text-gray-600 italic">Enable S button</span>
+              </div>
+            </div>
+
+            {/* Phone Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Phone</label>
+              <Input
+                type="text"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="flex-1 h-9 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
+              />
+            </div>
+
+            {/* Reference Row */}
+            <div className="flex items-center py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">Reference</label>
+              <Input
+                type="text"
+                value={formData.reference}
+                onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                className="flex-1 h-9 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
+              />
+            </div>
+
+            {/* Notes Row */}
+            <div className="flex items-start py-4 border-b border-gray-100">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0 pt-1">Notes</label>
+              <Textarea
+                rows={3}
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="flex-1 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085] resize-none"
+              />
+            </div>
+
+            {/* Commission Row */}
+            <div className="flex flex-col border-b border-gray-100">
+              <div className="flex items-center py-4">
+                <label className="w-32 text-sm text-gray-700 flex-shrink-0">Commission</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.commission}
+                  onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
+                  className="flex-1 h-9 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
+                />
+              </div>
+              <div className="pl-32 pb-4">
+                <p className="text-[10px] text-gray-500 italic">Min commission is 2.00 %</p>
+              </div>
+            </div>
+
+            {/* UserDomain Row */}
+            <div className="flex items-center py-4">
+              <label className="w-32 text-sm text-gray-700 flex-shrink-0">UserDomain</label>
+              <div className="flex-1 text-sm text-gray-600 font-medium">
+                1 ( betproexch.com )
               </div>
             </div>
           </div>
 
-          <DialogFooter className="px-6 py-4 bg-slate-50 border-t flex flex-row justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="h-10 text-xs font-bold uppercase tracking-wider border-[#d5d8dc] text-[#2c3e50]"
-            >
-              Cancel
-            </Button>
+          {/* Footer */}
+          <div className="px-4 py-4 border-t flex justify-end">
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="h-10 bg-[#16a085] hover:bg-[#138d75] text-white text-xs font-bold uppercase tracking-wider px-6"
+              className="bg-[#16a085] hover:bg-[#138d75] text-white px-10 py-2 h-auto rounded font-bold transition-all shadow-sm"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Saving...
+                  Updating...
                 </>
               ) : (
-                "Save Changes"
+                "Submit"
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

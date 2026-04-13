@@ -58,6 +58,18 @@
       "type": "string",
       "description": "Reference note for the client"
     },
+    "betting_allowed": {
+      "type": "boolean",
+      "description": "Whether betting is allowed for this client"
+    },
+    "can_settle_pl": {
+      "type": "boolean",
+      "description": "Whether client can settle P/L (Enable S button)"
+    },
+    "commission": {
+      "type": "number",
+      "description": "Commission percentage for this client"
+    },
     "notes": {
       "type": "string",
       "description": "Additional notes about the client"
