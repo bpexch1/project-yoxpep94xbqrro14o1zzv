@@ -77,15 +77,15 @@ export default function Dashboard() {
   const isLoading = isLoadingMatches || isLoadingBets;
 
   return (
-    <div className="min-h-screen bg-[#ECEFF1] pb-16">
+    <div className="min-h-screen bg-[#0F1419] pb-16">
       <Header />
       
       <main className="px-2 pt-2 pb-8 max-w-[480px] mx-auto">
         {/* Search Users Section */}
-        <section className="bg-white border border-[#E0E0E0] rounded-none shadow-none mb-2">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E0E0E0]">
-            <Filter className="w-4 h-4 fill-black text-black" />
-            <span className="font-bold text-black text-sm uppercase">Search-Users</span>
+        <section className="bg-[#1A1D24] border border-[#2D3748] rounded-none shadow-none mb-2">
+          <div className="bg-[#252B3B] px-4 py-3 border-b border-[#2D3748] flex items-center gap-2">
+            <Filter className="w-4 h-4 fill-white text-white" />
+            <span className="font-bold text-white text-sm uppercase">Search-Users</span>
           </div>
           <div className="p-4 flex gap-2">
             <input
@@ -94,7 +94,7 @@ export default function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#26A69A]"
+              className="bg-[#0F1419] border border-[#374151] text-white placeholder-gray-500 rounded px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#10B981]"
             />
             <button 
               onClick={handleSearch}
@@ -107,12 +107,12 @@ export default function Dashboard() {
         </section>
 
         {/* Sport Highlights Card */}
-        <section className="bg-white border border-[#E0E0E0] rounded-none shadow-none">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
-            <span className="font-bold text-black text-sm uppercase">Sport Highlights</span>
+        <section className="bg-[#1A1D24] border border-[#2D3748] rounded-none shadow-none">
+          <div className="bg-[#252B3B] px-4 py-3 border-b border-[#2D3748] flex items-center justify-between">
+            <span className="font-bold text-white text-sm uppercase">Sport Highlights</span>
             <button 
               onClick={handleRefresh}
-              className="bg-[#26A69A] text-white text-xs px-3 py-1 rounded hover:bg-[#219387] transition-colors"
+              className="bg-[#10B981] text-white text-xs px-3 py-1 rounded hover:bg-emerald-600 transition-colors"
             >
               Refresh
             </button>
@@ -121,10 +121,10 @@ export default function Dashboard() {
           <div className="p-0 overflow-x-auto">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-[#26A69A] animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#10B981] animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
-              <div className="py-8 text-center text-gray-500 text-sm">
+              <div className="py-8 text-center text-gray-400 text-sm">
                 No matches found.
               </div>
             ) : (
@@ -132,9 +132,9 @@ export default function Dashboard() {
                 <tbody>
                   {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                     <Fragment key={sport}>
-                      {/* Sport Sub-header */}
-                      <tr className="bg-white border-b border-[#E0E0E0]">
-                        <td className="px-4 py-2 font-bold text-black border-r border-[#E0E0E0]">{sport}</td>
+                      {/* Sport Sub-header (Amber/Orange) */}
+                      <tr className="bg-[#F59E0B]">
+                        <td className="px-4 py-2 font-bold text-black border-r border-[#2D3748]/20">{sport}</td>
                         <td className="px-4 py-2 font-bold text-black text-right w-32">Amount</td>
                       </tr>
                       
@@ -144,18 +144,18 @@ export default function Dashboard() {
                         return (
                           <tr 
                             key={match.id} 
-                            className={`${idx % 2 === 1 ? 'bg-[#F5F5F5]' : 'bg-white'} border-b border-[#E0E0E0]`}
+                            className={`${idx % 2 === 1 ? 'bg-[#252B3B]' : 'bg-[#1A1D24]'} border-b border-[#2D3748]`}
                           >
-                            <td className="px-4 py-2 border-r border-[#E0E0E0]">
+                            <td className="px-4 py-2 border-r border-[#2D3748]">
                               <a 
                                 href="#" 
                                 onClick={(e) => e.preventDefault()}
-                                className="text-[#26A69A] font-medium hover:underline"
+                                className="text-[#10B981] font-medium hover:underline"
                               >
                                 {match.title} / Match Odds
                               </a>
                             </td>
-                            <td className="px-4 py-2 text-right font-medium text-black">
+                            <td className="px-4 py-2 text-right font-medium text-white">
                               {formatAmount(amount)}
                             </td>
                           </tr>

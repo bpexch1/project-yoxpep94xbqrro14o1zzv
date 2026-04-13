@@ -10,9 +10,16 @@ interface ClientSummaryCardProps {
   isLoading: boolean;
   username?: string;
   searchFilter?: string;
+  onRefresh?: () => void;
 }
 
-export function ClientSummaryCard({ clients, isLoading, username = "Admin", searchFilter = "" }: ClientSummaryCardProps) {
+export function ClientSummaryCard({ 
+  clients, 
+  isLoading, 
+  username = "Admin", 
+  searchFilter = "",
+  onRefresh
+}: ClientSummaryCardProps) {
   const navigate = useNavigate();
   const [localSearch, setLocalSearch] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
@@ -153,7 +160,10 @@ export function ClientSummaryCard({ clients, isLoading, username = "Admin", sear
             <tr className="bg-[#26A69A]">
               <td className="px-3 py-2.5 font-bold text-white border-r border-[#229587]">Total</td>
               <td className="px-3 py-2.5 border-r border-[#229587]">
-                <button className="bg-[#F59E0B] hover:bg-amber-500 text-black font-bold text-xs px-4 py-2 rounded transition-colors">
+                <button 
+                  onClick={onRefresh}
+                  className="bg-[#F59E0B] hover:bg-amber-500 text-black font-bold text-xs px-4 py-2 rounded transition-colors"
+                >
                   Load Balance
                 </button>
               </td>

@@ -13,7 +13,7 @@ export default function Accounts() {
   const [searchFilter, setSearchFilter] = useState("");
   const session = getClientSession();
 
-  const { data: clients, isLoading } = useQuery({
+  const { data: clients, isLoading, refetch } = useQuery({
     queryKey: ["clients"],
     queryFn: () => ClientEntity.list("-created_at"),
   });
@@ -68,6 +68,7 @@ export default function Accounts() {
             isLoading={isLoading} 
             username={session?.username || 'Admin'}
             searchFilter={searchFilter}
+            onRefresh={refetch}
           />
         </div>
       </main>
