@@ -1,5 +1,5 @@
 import { 
-  LayoutDashboard, Users, CircleDollarSign, FileBarChart2, Lock, Star, Globe, ChevronLeft, Menu, Activity, CircleDot, Trophy, Zap, Rabbit 
+  LayoutDashboard, Users, CircleDollarSign, FileBarChart2, Lock, Star, Globe, Menu, Activity, CircleDot, Trophy, Zap, Rabbit 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -87,7 +87,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 >
                   <item.icon className="w-5 h-5 text-gray-400 mr-3" />
                   <span>{item.label}</span>
-                  <ChevronLeft className="w-4 h-4 ml-auto text-gray-400" />
                 </button>
               ))}
             </nav>
