@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
 import { CashCreditModal } from "./CashCreditModal";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface ClientSummaryCardProps {
   clients: any[];
@@ -21,6 +22,7 @@ export function ClientSummaryCard({
   onRefresh
 }: ClientSummaryCardProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
   const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
@@ -159,6 +161,10 @@ export function ClientSummaryCard({
             <div className="w-7 h-7 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-xs flex items-center justify-center rounded-sm">D</div>
             <span>InActive</span>
           </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-7 h-7 bg-[#e84393] text-white font-bold text-xs flex items-center justify-center rounded-sm">S</div>
+            <span>Settle Account</span>
+          </div>
         </div>
 
         {/* Local Search Field */}
@@ -288,7 +294,7 @@ export function ClientSummaryCard({
                               
                               <li className="flex items-center gap-3 mt-4 pt-3 border-t border-[#d5d8dc]">
                                 <span className="font-medium text-[#7f8c8d]">• Options</span>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <button 
                                     onClick={() => setCashCreditClient(client)}
                                     className="w-9 h-9 bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
@@ -320,6 +326,20 @@ export function ClientSummaryCard({
                                   >
                                     {client.status === "active" ? "A" : "D"}
                                   </button>
+                                  {client.can_settle_pl && (
+                                    <button 
+                                      className="w-9 h-9 bg-[#e84393] hover:bg-pink-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                      title="Settle Account"
+                                      onClick={() => {
+                                        toast({
+                                          title: "Account Settlement",
+                                          description: `Settling account for ${client.username}...`,
+                                        });
+                                      }}
+                                    >
+                                      S
+                                    </button>
+                                  )}
                                 </div>
                               </li>
                             </ul>
