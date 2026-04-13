@@ -43,8 +43,6 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    max-width: 480px;
-    margin: 0 auto;
     background: var(--bg-primary);
     color: var(--text-primary);
     font-family: Arial, sans-serif;

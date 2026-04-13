@@ -17,6 +17,7 @@ import DailyReport from "./pages/reports/DailyReport";
 import FinalSheet from "./pages/reports/FinalSheet";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
+import { AppLayout } from "./components/layout/AppLayout";
 
 const queryClient = new QueryClient();
 
@@ -30,16 +31,19 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/accounts" element={<Accounts />} />
-            <Route path="/accounts/create" element={<CreateUser />} />
-            <Route path="/accounts/create-company" element={<CreateCompanyAccount />} />
-            <Route path="/reports/book-detail" element={<BookDetail />} />
-            <Route path="/reports/book-detail-2" element={<BookDetail2 />} />
-            <Route path="/reports/daily-pl" element={<DailyPL />} />
-            <Route path="/reports/daily" element={<DailyReport />} />
-            <Route path="/reports/final-sheet" element={<FinalSheet />} />
-            <Route path="/reports/commission" element={<Accounts />} />
+            
+            {/* Protected Admin Routes */}
+            <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
+            <Route path="/accounts" element={<AppLayout><Accounts /></AppLayout>} />
+            <Route path="/accounts/create" element={<AppLayout><CreateUser /></AppLayout>} />
+            <Route path="/accounts/create-company" element={<AppLayout><CreateCompanyAccount /></AppLayout>} />
+            <Route path="/reports/book-detail" element={<AppLayout><BookDetail /></AppLayout>} />
+            <Route path="/reports/book-detail-2" element={<AppLayout><BookDetail2 /></AppLayout>} />
+            <Route path="/reports/daily-pl" element={<AppLayout><DailyPL /></AppLayout>} />
+            <Route path="/reports/daily" element={<AppLayout><DailyReport /></AppLayout>} />
+            <Route path="/reports/final-sheet" element={<AppLayout><FinalSheet /></AppLayout>} />
+            <Route path="/reports/commission" element={<AppLayout><Accounts /></AppLayout>} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

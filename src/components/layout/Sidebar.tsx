@@ -1,17 +1,17 @@
 import { 
-  LayoutDashboard, Users, CircleDollarSign, FileBarChart2, Lock, Star, Globe, Menu, Activity, CircleDot, Trophy, Zap, Rabbit 
+  LayoutDashboard, Users, CircleDollarSign, FileBarChart2, Lock, Star, Globe, Menu, Activity, CircleDot, Trophy, Zap, Rabbit, X 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentUser?: any;
+  isMobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
 const mainMenuItems = [
-  { label: "Dashboard", icon: LayoutDashboard, link: "/" },
+  { label: "Dashboard", icon: LayoutDashboard, link: "/dashboard" },
   { label: "Users", icon: Users, link: "/accounts" },
   { label: "Current Position", icon: CircleDollarSign, link: "/current-position" },
   { label: "Reports", icon: FileBarChart2, link: "/reports/daily-pl" },
@@ -29,70 +29,104 @@ const sportsItems = [
   { label: "Greyhound", icon: Rabbit, link: "/sports/greyhound" },
 ];
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+function SidebarNavItems({ onNavigate }: { onNavigate: () => void }) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavigate = (link: string) => {
+    navigate(link);
+    onNavigate();
+  };
+
+  const NavItem = ({ item }: { item: typeof mainMenuItems[0] }) => {
+    const isActive = location.pathname === item.link || (item.link !== "/" && location.pathname.startsWith(item.link));
+    
+    return (
+      <button
+        onClick={() => handleNavigate(item.link)}
+        className={cn(
+          "flex items-center gap-3 px-5 py-2.5 text-white text-[14px] transition-colors text-left",
+          isActive ? "bg-[#3d6b8b] border-l-4 border-[#00b181]" : "hover:bg-[#3d6b8b]/50"
+        )}
+      >
+        <item.icon className={cn("w-4 h-4", isActive ? "text-white" : "text-[#a8c8e8]")} />
+        <span>{item.label}</span>
+      </button>
+    );
+  };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-40"
-          />
-          
-          {/* Sidebar Panel */}
-          <motion.div
-            initial={{ x: -260 }}
-            animate={{ x: 0 }}
-            exit={{ x: -260 }}
-            transition={{ type: "tween", duration: 0.2 }}
-            className="fixed left-0 top-0 h-full w-[260px] z-50 bg-[#254465] flex flex-col overflow-y-auto"
-          >
-            {/* Header row with hamburger */}
-            <div className="p-4 border-b border-[#1a3550]">
-              <button
-                onClick={onClose}
-                className="border border-gray-500 p-1.5 rounded hover:bg-[#3d6b8b] transition-colors"
-              >
-                <Menu className="w-5 h-5 text-gray-300" />
-              </button>
-            </div>
+    <nav className="flex flex-col py-4 gap-1">
+      <div className="px-5 mb-2">
+        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Main Menu</span>
+      </div>
+      {mainMenuItems.map((item) => (
+        <NavItem key={item.label} item={item} />
+      ))}
 
-            <nav className="flex flex-col py-2">
-              {/* Main Menu */}
-              {mainMenuItems.map((item) => (
+      <div className="h-px bg-[#3d6b8b]/30 my-4 mx-5" />
+
+      <div className="px-5 mb-2">
+        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sports</span>
+      </div>
+      {sportsItems.map((item) => (
+        <NavItem key={item.label} item={item} />
+      ))}
+    </nav>
+  );
+}
+
+export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
+  return (
+    <>
+      {/* DESKTOP SIDEBAR: fixed left, always visible on lg+ */}
+      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-[240px] z-30 bg-[#254465] flex-col overflow-y-auto">
+        {/* Logo area */}
+        <div className="flex items-center justify-center h-14 border-b border-[#1a3550]">
+          <span className="text-white font-black italic text-2xl" style={{fontFamily:'Georgia,serif'}}>BP</span>
+          <span className="text-[#00b181] font-bold text-sm ml-2">Exchange</span>
+        </div>
+        <SidebarNavItems onNavigate={() => {}} />
+      </aside>
+
+      {/* MOBILE SIDEBAR: AnimatePresence overlay */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onMobileClose}
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            />
+            
+            {/* Sidebar Panel */}
+            <motion.div
+              initial={{ x: -260 }}
+              animate={{ x: 0 }}
+              exit={{ x: -260 }}
+              transition={{ type: "tween", duration: 0.2 }}
+              className="fixed left-0 top-0 h-full w-[260px] z-50 bg-[#254465] flex flex-col overflow-y-auto lg:hidden"
+            >
+              <div className="p-4 border-b border-[#1a3550] flex items-center justify-between">
+                <div className="flex items-center">
+                  <span className="text-white font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>BP</span>
+                  <span className="text-[#00b181] font-bold text-xs ml-2">Exchange</span>
+                </div>
                 <button
-                  key={item.label}
-                  onClick={() => { navigate(item.link); onClose(); }}
-                  className="flex items-center gap-3 px-5 py-3 text-white text-[15px] hover:bg-[#3d6b8b] transition-colors text-left"
+                  onClick={onMobileClose}
+                  className="p-1.5 rounded hover:bg-[#3d6b8b] transition-colors"
                 >
-                  <item.icon className="w-5 h-5 text-[#a8c8e8]" />
-                  <span>{item.label}</span>
+                  <X className="w-5 h-5 text-white" />
                 </button>
-              ))}
-
-              <div className="h-px bg-[#3d6b8b] my-2 mx-5" />
-
-              {/* Sports Menu */}
-              {sportsItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => { navigate(item.link); onClose(); }}
-                  className="flex items-center px-5 py-3 text-white text-[15px] hover:bg-[#3d6b8b] transition-colors text-left"
-                >
-                  <item.icon className="w-5 h-5 text-[#a8c8e8] mr-3" />
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </nav>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+              </div>
+              <SidebarNavItems onNavigate={onMobileClose} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
