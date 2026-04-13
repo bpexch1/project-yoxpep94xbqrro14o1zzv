@@ -3,6 +3,7 @@ import { Pencil, UserPlus, BookOpen, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
 import { CashCreditModal } from "./CashCreditModal";
+import { SettlePLModal } from "./SettlePLModal";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,6 +27,7 @@ export function ClientSummaryCard({
   const [localSearch, setLocalSearch] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
   const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
+  const [settlePLClient, setSettlePLClient] = useState<any | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
 
@@ -330,12 +332,7 @@ export function ClientSummaryCard({
                                     <button 
                                       className="w-9 h-9 bg-[#e74c3c] hover:bg-red-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                       title="Settle Account"
-                                      onClick={() => {
-                                        toast({
-                                          title: "Account Settlement",
-                                          description: `Settling account for ${client.username}...`,
-                                        });
-                                      }}
+                                      onClick={() => setSettlePLClient(client)}
                                     >
                                       S
                                     </button>
@@ -360,6 +357,7 @@ export function ClientSummaryCard({
 
       <EditClientModal isOpen={!!editingClient} onClose={() => setEditingClient(null)} client={editingClient} />
       <CashCreditModal isOpen={!!cashCreditClient} onClose={() => setCashCreditClient(null)} client={cashCreditClient} />
+      <SettlePLModal isOpen={!!settlePLClient} onClose={() => setSettlePLClient(null)} client={settlePLClient} />
     </section>
   );
 }
