@@ -19,13 +19,30 @@ export default function Accounts() {
     if (!session) {
       navigate("/login");
     }
+
+    // One-time fix: update Book account role to "company"
+    async function fixBookRole() {
+      try {
+        const results = await ClientEntity.filter({ username: "Book" }, "-created_at", 1);
+        if (results && results.length > 0) {
+          const book = results[0];
+          if (book.role === "superadmin") {
+            console.log("Updating Book role to company...");
+            await ClientEntity.update(book.id, { role: "company" });
+          }
+        }
+      } catch (e) {
+        console.error("Book role fix error:", e);
+      }
+    }
+    fixBookRole();
   }, [session, navigate]);
 
   const { data: clients, isLoading, refetch } = useQuery({
     queryKey: ["clients", session?.username],
     queryFn: () => {
       if (!session) return [];
-      if (session.role === 'superadmin') {
+      if (session.role === 'superadmin' || session.role === 'company') {
         return ClientEntity.list("-created_at");
       }
       return ClientEntity.filter({ parent_username: session.username }, "-created_at");

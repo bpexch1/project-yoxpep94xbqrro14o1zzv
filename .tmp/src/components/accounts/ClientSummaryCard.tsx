@@ -41,6 +41,7 @@ export function ClientSummaryCard({
 
   const getTypeLabel = (role: string) => {
     switch(role?.toLowerCase()) {
+      case 'company': return 'Company';
       case 'superadmin': return 'SuperAdmin';
       case 'supermaster': return 'SuperMaster';
       case 'admin': return 'Admin';
@@ -232,7 +233,7 @@ export function ClientSummaryCard({
             ) : (
               filteredClients.map((client, idx) => {
                 const roleLower = client.role?.toLowerCase();
-                const isAdminType = roleLower === "admin" || roleLower === "supermaster" || roleLower === "superadmin";
+                const isAdminType = roleLower === "admin" || roleLower === "supermaster" || roleLower === "superadmin" || roleLower === "company";
                 const isExpanded = expandedIds.has(client.id);
 
                 return (
