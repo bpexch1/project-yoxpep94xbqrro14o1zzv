@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Filter, Search, Loader2 } from "lucide-react";
 import { Transaction as TransactionEntity } from "@/entities";
@@ -78,18 +77,16 @@ export default function BookDetail() {
   const totalCr = processedTransactions?.reduce((acc, t) => acc + t.cr, 0) || 0;
 
   return (
-    <div className="min-h-screen bg-[#f4f6f7] pb-16">
-      <Header />
-      
-      <main className="px-0 pt-0 pb-8 max-w-[480px] mx-auto font-sans">
+    <div className="bg-[#f4f6f7] pb-16">
+      <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
         <div className="h-2" />
         
-        <div className="mx-2 mb-2">
+        <div className="mx-4 mb-3">
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* Date Filter Card */}
-        <div className="mx-2 mb-2">
+        <div className="mx-4 mb-3">
           <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#ecf0f1]">
               <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
@@ -128,7 +125,7 @@ export default function BookDetail() {
         </div>
 
         {/* Report Table */}
-        <div className="mx-2">
+        <div className="mx-4">
           <section className="bg-white border border-[#d5d8dc] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">

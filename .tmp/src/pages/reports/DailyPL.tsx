@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Filter, Search, Loader2 } from "lucide-react";
 import { Bet as BetEntity } from "@/entities";
@@ -89,10 +88,8 @@ export default function DailyPL() {
   }), { totalBets: 0, totalStake: 0, totalWon: 0, totalLost: 0, netPL: 0, commission: 0 });
 
   return (
-    <div className="min-h-screen bg-[#f4f6f7] pb-16">
-      <Header />
-      
-      <main className="px-0 pt-0 pb-8 max-w-[480px] mx-auto font-sans">
+    <div className="bg-[#f4f6f7] pb-16">
+      <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
         <div className="h-2" />
         
         <div className="mx-2 mb-2">

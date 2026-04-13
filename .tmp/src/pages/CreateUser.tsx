@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { Client } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -68,10 +67,8 @@ export default function CreateUser() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6f7]">
-      <Header />
-
-      <main className="max-w-[480px] mx-auto">
+    <div className="bg-[#f4f6f7] pb-10">
+      <main className="max-w-2xl mx-auto">
         {/* Title bar */}
         <div className="bg-[#ecf0f1] px-4 py-3 border-b border-[#d5d8dc]">
           <h1 className="text-base font-bold text-[#2c3e50]">

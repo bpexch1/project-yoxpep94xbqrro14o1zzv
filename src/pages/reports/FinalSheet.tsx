@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Filter, Search, Loader2 } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
@@ -55,10 +54,8 @@ export default function FinalSheet() {
   }), { creditReceived: 0, creditRemaining: 0, cash: 0, plDownline: 0, balanceUpline: 0, netSettlement: 0 });
 
   return (
-    <div className="min-h-screen bg-[#f4f6f7] pb-16">
-      <Header />
-      
-      <main className="px-0 pt-0 pb-8 max-w-[480px] mx-auto font-sans">
+    <div className="bg-[#f4f6f7] pb-16">
+      <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
         <div className="h-2" />
         
         <div className="mx-2 mb-2">
