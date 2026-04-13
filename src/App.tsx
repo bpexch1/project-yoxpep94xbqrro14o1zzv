@@ -15,6 +15,7 @@ import BookDetail2 from "./pages/reports/BookDetail2";
 import DailyPL from "./pages/reports/DailyPL";
 import DailyReport from "./pages/reports/DailyReport";
 import FinalSheet from "./pages/reports/FinalSheet";
+import CurrentPosition from "./pages/CurrentPosition";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
 import { AppLayout } from "./components/layout/AppLayout";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/reports/daily" element={<AppLayout><DailyReport /></AppLayout>} />
             <Route path="/reports/final-sheet" element={<AppLayout><FinalSheet /></AppLayout>} />
             <Route path="/reports/commission" element={<AppLayout><Accounts /></AppLayout>} />
+            <Route path="/current-position" element={<AppLayout><CurrentPosition /></AppLayout>} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
