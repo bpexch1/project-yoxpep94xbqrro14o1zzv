@@ -162,7 +162,7 @@ export function ClientSummaryCard({
             <span>InActive</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-7 h-7 bg-[#e84393] text-white font-bold text-xs flex items-center justify-center rounded-sm">S</div>
+            <div className="w-7 h-7 bg-[#e74c3c] text-white font-bold text-xs flex items-center justify-center rounded-sm">S</div>
             <span>Settle Account</span>
           </div>
         </div>
@@ -328,7 +328,7 @@ export function ClientSummaryCard({
                                   </button>
                                   {client.can_settle_pl && (
                                     <button 
-                                      className="w-9 h-9 bg-[#e84393] hover:bg-pink-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                      className="w-9 h-9 bg-[#e74c3c] hover:bg-red-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                       title="Settle Account"
                                       onClick={() => {
                                         toast({
