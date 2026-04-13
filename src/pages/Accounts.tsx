@@ -41,9 +41,17 @@ export default function Accounts() {
     queryKey: ["clients", session?.username],
     queryFn: () => {
       if (!session) return [];
-      if (session.role === 'superadmin' || session.role === 'company') {
+      const role = session.role?.toLowerCase();
+      
+      if (role === 'superadmin' || role === 'company') {
+        // Show all clients
         return ClientEntity.list("-created_at");
       }
+      if (role === 'admin' || role === 'supermaster' || role === 'agent') {
+        // Show only their direct downline
+        return ClientEntity.filter({ parent_username: session.username }, "-created_at");
+      }
+      // Regular clients see nobody (or only their own record)
       return ClientEntity.filter({ parent_username: session.username }, "-created_at");
     },
     enabled: !!session,

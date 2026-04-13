@@ -32,7 +32,13 @@ export default function Login() {
           id: client.id,
           username: client.username,
           full_name: client.full_name || client.username,
-          role: client.role,
+          role: client.role || 'client',
+          credit_received: client.credit_received || 0,
+          credit_remaining: client.credit_remaining || 0,
+          cash: client.cash || 0,
+          pl_downline: client.pl_downline || 0,
+          balance_upline: client.balance_upline || 0,
+          status: client.status || 'active',
         });
         toast({
           title: "Success",

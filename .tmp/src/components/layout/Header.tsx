@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Menu, ChevronDown, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
+import { Client } from "@/entities";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,15 +17,35 @@ interface HeaderProps {
 
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
+  const [clientData, setClientData] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setSession(getClientSession());
+    const s = getClientSession();
+    setSession(s);
+    if (s?.username) {
+      // Fetch live client data for real balance
+      Client.filter({ username: s.username }, '-created_at', 1)
+        .then((results: any[]) => {
+          if (results && results.length > 0) {
+            setClientData(results[0]);
+          }
+        })
+        .catch(console.error);
+    }
   }, []);
 
   const handleLogout = () => {
     clearClientSession();
     navigate("/login");
+  };
+
+  const getRoleBadgeColor = (role: string) => {
+    const r = role?.toLowerCase();
+    if (r === 'superadmin' || r === 'company') return 'bg-[#00b181]';
+    if (r === 'admin' || r === 'supermaster') return 'bg-[#3498db]';
+    if (r === 'agent') return 'bg-[#e67e22]';
+    return 'bg-[#7f8c8d]';
   };
 
   return (
@@ -46,10 +68,18 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         {session ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-1 cursor-pointer hover:bg-[#3d6b8b] px-2 py-1 rounded transition-colors">
-                <span className="text-white text-sm font-medium">
-                  {session.full_name} <span className="text-[#a8c8e8] text-xs">({session.role})</span>
-                </span>
+              <div className="flex items-center gap-2 cursor-pointer hover:bg-[#3d6b8b] px-2 py-1 rounded transition-colors">
+                <div className="flex flex-col items-end">
+                  <span className="text-white text-sm font-medium leading-tight">
+                    {session.full_name}
+                  </span>
+                  <span className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded text-white uppercase leading-none mt-0.5",
+                    getRoleBadgeColor(session.role)
+                  )}>
+                    {session.role}
+                  </span>
+                </div>
                 <ChevronDown className="w-3 h-3 text-[#a8c8e8]" />
               </div>
             </DropdownMenuTrigger>
@@ -77,8 +107,14 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
 
         <div className="flex items-center gap-2 text-sm whitespace-nowrap border-l border-[#3d6b8b] pl-3">
           <div className="flex flex-col lg:flex-row lg:gap-3">
-            <span className="text-white font-bold text-xs lg:text-sm"><span className="text-[#a8c8e8]">B:</span> 0.00</span>
-            <span className="text-white font-bold text-xs lg:text-sm"><span className="text-[#a8c8e8]">Exp:</span> 0.00</span>
+            <span className="text-white font-bold text-xs lg:text-sm">
+              <span className="text-[#a8c8e8]">Bal: </span>
+              {(clientData?.credit_remaining ?? session?.credit_remaining ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="text-white font-bold text-xs lg:text-sm">
+              <span className="text-[#a8c8e8]">Exp: </span>
+              0
+            </span>
           </div>
         </div>
       </div>
