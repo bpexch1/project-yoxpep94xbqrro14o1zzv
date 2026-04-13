@@ -50,17 +50,19 @@ export function ClientSummaryCard({
   const totals = useMemo(() =>
     filteredClients.reduce(
       (acc, c) => ({
+        credit_received: acc.credit_received + (c.credit_received || 0),
         credit_remaining: acc.credit_remaining + (c.credit_remaining || 0),
         cash: acc.cash + (c.cash || 0),
         pl_downline: acc.pl_downline + (c.pl_downline || 0),
+        balance_upline: acc.balance_upline + (c.balance_upline || 0),
       }),
-      { credit_remaining: 0, cash: 0, pl_downline: 0 }
+      { credit_received: 0, credit_remaining: 0, cash: 0, pl_downline: 0, balance_upline: 0 }
     ),
     [filteredClients]
   );
 
-  const formatNum = (val: number, isTotal = false) => (
-    <span className={cn("font-bold", val < 0 ? "text-red-500" : "text-[#26A69A]", isTotal && val >= 0 ? "text-white" : "")}>
+  const formatNum = (val: number) => (
+    <span className={cn("font-bold", val < 0 ? "text-red-500" : "text-[#26A69A]")}>
       {val.toLocaleString()}
     </span>
   );
@@ -74,28 +76,30 @@ export function ClientSummaryCard({
       {/* Card title */}
       <div className="px-4 py-2.5 bg-[#F5F5F5] border-b border-[#E0E0E0]">
         <span className="font-bold text-sm text-black">
-          {username} - Clients List | Default
+          {username} - Clients List
         </span>
       </div>
 
       <div className="p-3 space-y-4">
         {/* Summary Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse border border-gray-300">
+          <table className="w-full text-left text-xs border-collapse border border-gray-300 min-w-[500px]">
             <thead>
               <tr className="bg-white">
+                <th className="px-2 py-2 border border-gray-300 font-bold text-black text-center">Credit<br/>Received</th>
                 <th className="px-2 py-2 border border-gray-300 font-bold text-black text-center">Credit<br/>Remaining</th>
                 <th className="px-2 py-2 border border-gray-300 font-bold text-black text-center">Cash</th>
                 <th className="px-2 py-2 border border-gray-300 font-bold text-black text-center">P/L<br/>Downline</th>
-                <th className="px-2 py-2 border border-gray-300 font-bold text-black text-center">Users</th>
+                <th className="px-2 py-2 border border-gray-300 font-bold text-black text-center">Balance<br/>UpLine</th>
               </tr>
             </thead>
             <tbody>
               <tr>
+                <td className="px-2 py-2 border border-gray-300 text-center">{formatNum(totals.credit_received)}</td>
                 <td className="px-2 py-2 border border-gray-300 text-center">{formatNum(totals.credit_remaining)}</td>
                 <td className="px-2 py-2 border border-gray-300 text-center">{formatNum(totals.cash)}</td>
                 <td className="px-2 py-2 border border-gray-300 text-center">{formatNum(totals.pl_downline)}</td>
-                <td className="px-2 py-2 border border-gray-300 font-bold text-gray-800 text-center">{filteredClients.length}</td>
+                <td className="px-2 py-2 border border-gray-300 text-center">{formatNum(totals.balance_upline)}</td>
               </tr>
             </tbody>
           </table>

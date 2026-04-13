@@ -52,7 +52,7 @@ export default function Accounts() {
               />
               <button 
                 onClick={handleSearch}
-                className="bg-[#43A047] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#388E3C] transition-colors shadow-sm"
+                className="bg-[#26A69A] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#00897B] transition-colors shadow-sm"
               >
                 <Search className="w-4 h-4" />
                 Search

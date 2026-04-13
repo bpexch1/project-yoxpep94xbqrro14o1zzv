@@ -4,11 +4,13 @@ import { Header } from "@/components/layout/Header";
 import { Client } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { getClientSession } from "@/hooks/useClientAuth";
 
 export default function CreateUser() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const session = getClientSession();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -41,14 +43,14 @@ export default function CreateUser() {
     try {
       await Client.create({
         username,
-        role: type === "company" ? "admin" : "client",
+        role: type === "company" ? "supermaster" : "client",
         credit_received: 0,
         credit_remaining: 0,
         cash: 0,
         pl_downline: 0,
         balance_upline: 0,
         status: isActive ? "active" : "inactive",
-        parent_username: "NomanSA8592",
+        parent_username: session?.username || "NomanSA8592",
         phone,
         downline_share: type === "company" ? downlineShare : 0,
         reference,
@@ -72,7 +74,9 @@ export default function CreateUser() {
       <main className="max-w-[480px] mx-auto">
         {/* Title bar */}
         <div className="bg-[#ECEFF1] px-4 py-3 border-b border-[#E0E0E0]">
-          <h1 className="text-base font-bold text-gray-900">Create New User</h1>
+          <h1 className="text-base font-bold text-gray-900">
+            Create New User under <span className="font-bold italic">{session?.username || 'Admin'}</span>
+          </h1>
         </div>
 
         {/* White form body */}
@@ -115,7 +119,7 @@ export default function CreateUser() {
                   onChange={() => setType("company")}
                   className="w-5 h-5 accent-blue-600 cursor-pointer"
                 />
-                <span className="text-sm text-gray-800">Company</span>
+                <span className="text-sm text-gray-800">SuperMaster</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -198,7 +202,7 @@ export default function CreateUser() {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-full bg-[#43A047] hover:bg-[#388E3C] text-white font-medium py-3 rounded text-sm transition-colors disabled:opacity-60"
+            className="w-full bg-[#26A69A] hover:bg-[#00897B] text-white font-medium py-3 rounded text-sm transition-colors disabled:opacity-60"
           >
             {isSubmitting ? "Submitting..." : "Submit"}
           </button>
