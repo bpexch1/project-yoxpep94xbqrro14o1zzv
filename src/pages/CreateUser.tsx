@@ -23,8 +23,8 @@ export default function CreateUser() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const inputClass = "w-full border border-[#E0E0E0] rounded px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#26A69A] bg-white";
-  const labelClass = "block text-sm text-gray-800 mb-2";
+  const inputClass = "w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] bg-white";
+  const labelClass = "block text-sm text-[#2c3e50] mb-2";
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -68,13 +68,13 @@ export default function CreateUser() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
+    <div className="min-h-screen bg-[#f4f6f7]">
       <Header />
 
       <main className="max-w-[480px] mx-auto">
         {/* Title bar */}
-        <div className="bg-[#ECEFF1] px-4 py-3 border-b border-[#E0E0E0]">
-          <h1 className="text-base font-bold text-gray-900">
+        <div className="bg-[#ecf0f1] px-4 py-3 border-b border-[#d5d8dc]">
+          <h1 className="text-base font-bold text-[#2c3e50]">
             Create New User under <span className="font-bold italic">{session?.username || 'Admin'}</span>
           </h1>
         </div>
@@ -91,7 +91,7 @@ export default function CreateUser() {
               onChange={(e) => setUsername(e.target.value)}
               className={inputClass}
             />
-            {errors.username && <p className="text-xs text-red-500 mt-1">{errors.username}</p>}
+            {errors.username && <p className="text-xs text-[#e74c3c] mt-1">{errors.username}</p>}
           </div>
 
           {/* Password */}
@@ -103,7 +103,7 @@ export default function CreateUser() {
               onChange={(e) => setPassword(e.target.value)}
               className={inputClass}
             />
-            {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+            {errors.password && <p className="text-xs text-[#e74c3c] mt-1">{errors.password}</p>}
           </div>
 
           {/* Type - Radio buttons */}
@@ -117,9 +117,9 @@ export default function CreateUser() {
                   value="company"
                   checked={type === "company"}
                   onChange={() => setType("company")}
-                  className="w-5 h-5 accent-blue-600 cursor-pointer"
+                  className="w-5 h-5 accent-[#16a085] cursor-pointer"
                 />
-                <span className="text-sm text-gray-800">SuperMaster</span>
+                <span className="text-sm text-[#2c3e50]">SuperMaster</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -128,9 +128,9 @@ export default function CreateUser() {
                   value="bettor"
                   checked={type === "bettor"}
                   onChange={() => setType("bettor")}
-                  className="w-5 h-5 accent-blue-600 cursor-pointer"
+                  className="w-5 h-5 accent-[#16a085] cursor-pointer"
                 />
-                <span className="text-sm text-gray-800">Bettor</span>
+                <span className="text-sm text-[#2c3e50]">Bettor</span>
               </label>
             </div>
           </div>
@@ -145,10 +145,10 @@ export default function CreateUser() {
                 max={85}
                 value={downlineShare}
                 onChange={(e) => setDownlineShare(Number(e.target.value))}
-                className="w-24 border border-[#E0E0E0] rounded px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#26A69A] bg-white"
+                className="w-24 border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] bg-white"
               />
-              <p className="text-sm text-gray-700 mt-1">Max allowed downline share is 0 - 85</p>
-              {errors.downlineShare && <p className="text-xs text-red-500 mt-1">{errors.downlineShare}</p>}
+              <p className="text-sm text-[#7f8c8d] mt-1">Max allowed downline share is 0 - 85</p>
+              {errors.downlineShare && <p className="text-xs text-[#e74c3c] mt-1">{errors.downlineShare}</p>}
             </div>
           )}
 
@@ -159,7 +159,7 @@ export default function CreateUser() {
               type="checkbox"
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
-              className="w-5 h-5 accent-blue-600 cursor-pointer"
+              className="w-5 h-5 accent-[#16a085] cursor-pointer"
               id="isActive"
             />
           </div>
@@ -202,7 +202,7 @@ export default function CreateUser() {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-full bg-[#26A69A] hover:bg-[#00897B] text-white font-medium py-3 rounded text-sm transition-colors disabled:opacity-60"
+            className="w-full bg-[#16a085] hover:bg-[#138d75] text-white font-medium py-3 rounded text-sm transition-colors disabled:opacity-60"
           >
             {isSubmitting ? "Submitting..." : "Submit"}
           </button>

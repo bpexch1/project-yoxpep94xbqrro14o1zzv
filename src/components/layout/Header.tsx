@@ -26,14 +26,14 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white flex items-center justify-between px-4 h-12 border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white flex items-center justify-between px-4 h-12 border-b border-[#d5d8dc] shadow-sm">
         {/* LEFT: Hamburger */}
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setIsSidebarOpen(true)}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-[#ecf0f1] rounded transition-colors"
           >
-            <Menu className="w-6 h-6 text-gray-600" />
+            <Menu className="w-6 h-6 text-[#2c3e50]" />
           </button>
         </div>
 
@@ -42,20 +42,20 @@ export function Header() {
           {session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-colors">
-                  <span className="text-gray-600 text-sm">
-                    {session.full_name} <span className="text-gray-400 text-xs">({session.role})</span>
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f4f6f7] px-2 py-1 rounded transition-colors">
+                  <span className="text-[#2c3e50] text-sm font-medium">
+                    {session.full_name} <span className="text-[#7f8c8d] text-xs">({session.role})</span>
                   </span>
-                  <ChevronDown className="w-3 h-3 text-gray-500" />
+                  <ChevronDown className="w-3 h-3 text-[#7f8c8d]" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-gray-500 border-b border-gray-100 mb-1">
-                  Logged in as <span className="font-semibold text-gray-700">{session.username}</span>
+              <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
+                <div className="px-2 py-1.5 text-xs text-[#7f8c8d] border-b border-[#d5d8dc] mb-1">
+                  Logged in as <span className="font-semibold text-[#2c3e50]">{session.username}</span>
                 </div>
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-red-600 hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-red-600 focus:bg-red-50"
+                  className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50"
                 >
                   <LogOut className="w-3 h-3 mr-2" />
                   Logout
@@ -65,15 +65,15 @@ export function Header() {
           ) : (
             <button 
               onClick={() => navigate("/login")}
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 uppercase"
+              className="text-xs font-bold text-[#16a085] hover:text-[#138d75] uppercase"
             >
               Login
             </button>
           )}
 
-          <div className="flex items-center gap-2 text-sm whitespace-nowrap border-l border-gray-200 pl-3">
-            <span className="text-gray-800"><span className="font-bold">B:</span> 0</span>
-            <span className="text-gray-800"><span className="font-bold">Exp:</span> 0</span>
+          <div className="flex items-center gap-2 text-sm whitespace-nowrap border-l border-[#d5d8dc] pl-3">
+            <span className="text-[#2c3e50] font-bold"><span className="text-[#7f8c8d]">B:</span> 0</span>
+            <span className="text-[#2c3e50] font-bold"><span className="text-[#7f8c8d]">Exp:</span> 0</span>
           </div>
         </div>
       </header>

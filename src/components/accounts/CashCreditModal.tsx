@@ -143,8 +143,8 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
             className={cn(
               "flex-1 py-3.5 text-base font-semibold transition-colors",
               activeTab === 'cash'
-                ? "bg-blue-500 text-white"
-                : "bg-white text-emerald-500"
+                ? "bg-[#3498db] text-white"
+                : "bg-white text-[#16a085]"
             )}
           >
             Cash
@@ -154,8 +154,8 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
             className={cn(
               "flex-1 py-3.5 text-base font-semibold transition-colors",
               activeTab === 'credit'
-                ? "bg-blue-500 text-white"
-                : "bg-white text-emerald-500"
+                ? "bg-[#3498db] text-white"
+                : "bg-white text-[#16a085]"
             )}
           >
             Credit
@@ -163,52 +163,52 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 z-10"
+            className="absolute top-2 right-2 p-1 text-[#7f8c8d] hover:text-[#2c3e50] z-10"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="h-px bg-gray-200" />
+        <div className="h-px bg-[#d5d8dc]" />
         
         {/* CONTENT - scrollable */}
-        <div className="bg-gray-100 max-h-[85vh] overflow-y-auto">
+        <div className="bg-[#f4f6f7] max-h-[85vh] overflow-y-auto">
           
           {/* White card: client name + summary table */}
-          <div className="bg-white p-4 mb-3">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{client?.username}</h2>
+          <div className="bg-white p-4 mb-3 border-b border-[#d5d8dc]">
+            <h2 className="text-xl font-bold text-[#2c3e50] mb-4">{client?.username}</h2>
             
             {/* Summary table */}
-            <div className="border border-gray-200 rounded overflow-hidden text-xs">
+            <div className="border border-[#d5d8dc] rounded overflow-hidden text-xs">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-white">
                     {activeTab === 'cash' ? (
                       <>
-                        <th className="px-3 py-2 text-left text-gray-800 font-medium border-r border-gray-200 w-1/3">Credit</th>
-                        <th className="px-3 py-2 text-left text-gray-800 font-medium border-r border-gray-200 w-1/3">Balance</th>
-                        <th className="px-3 py-2 text-left text-gray-800 font-medium w-1/3">Max Withdraw</th>
+                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">Credit</th>
+                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">Balance</th>
+                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium w-1/3">Max Withdraw</th>
                       </>
                     ) : (
                       <>
-                        <th className="px-3 py-2 text-left text-gray-800 font-medium border-r border-gray-200 w-1/3">Credit limit</th>
-                        <th className="px-3 py-2 text-left text-gray-800 font-medium border-r border-gray-200 w-1/3">{client?.username} Credit</th>
-                        <th className="px-3 py-2 text-left text-gray-800 font-medium w-1/3">{client?.username} Available Balance</th>
+                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">Credit limit</th>
+                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">{client?.username} Credit</th>
+                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium w-1/3">{client?.username} Available Balance</th>
                       </>
                     )}
                   </tr>
                 </thead>
-                <tbody className="border-t border-gray-200">
+                <tbody className="border-t border-[#d5d8dc]">
                   <tr className="bg-white">
                     {activeTab === 'cash' ? (
                       <>
-                        <td className="px-3 py-2 font-bold border-r border-gray-200">{(client?.credit_remaining || 0).toLocaleString()} Rs.</td>
-                        <td className="px-3 py-2 font-bold border-r border-gray-200">{(client?.cash || 0).toLocaleString()} Rs.</td>
+                        <td className="px-3 py-2 font-bold border-r border-[#d5d8dc]">{(client?.credit_remaining || 0).toLocaleString()} Rs.</td>
+                        <td className="px-3 py-2 font-bold border-r border-[#d5d8dc]">{(client?.cash || 0).toLocaleString()} Rs.</td>
                         <td className="px-3 py-2 font-bold">{Math.max(0, client?.cash || 0).toLocaleString()} Rs.</td>
                       </>
                     ) : (
                       <>
-                        <td className="px-3 py-2 font-bold border-r border-gray-200">{(client?.credit_received || 0).toLocaleString()} Rs.</td>
-                        <td className="px-3 py-2 font-bold border-r border-gray-200">{(client?.credit_remaining || 0).toLocaleString()} Rs.</td>
+                        <td className="px-3 py-2 font-bold border-r border-[#d5d8dc]">{(client?.credit_received || 0).toLocaleString()} Rs.</td>
+                        <td className="px-3 py-2 font-bold border-r border-[#d5d8dc]">{(client?.credit_remaining || 0).toLocaleString()} Rs.</td>
                         <td className="px-3 py-2 font-bold">{(client?.credit_remaining || 0).toLocaleString()} Rs.</td>
                       </>
                     )}
@@ -220,9 +220,9 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
           
           {/* DEPOSIT SECTION */}
           <div className="mb-3 px-2">
-            <div className="rounded overflow-hidden border border-emerald-200">
+            <div className="rounded overflow-hidden border border-[#d5d8dc]">
               {/* Green header */}
-              <div className="bg-emerald-500 px-4 py-2.5">
+              <div className="bg-[#16a085] px-4 py-2.5">
                 {activeTab === 'cash' ? (
                   <p className="text-white text-sm">
                     <span className="font-bold uppercase">Deposit</span> Cash in <span className="font-bold">{client?.username}</span> Account
@@ -236,18 +236,18 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               {/* White form */}
               <div className="bg-white px-4 py-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Description</label>
                   <input
                     type="text"
                     value={depositDesc}
                     onChange={(e) => setDepositDesc(e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                    className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#16a085]/20 focus:border-[#16a085] transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Amount</label>
-                  <div className="flex rounded overflow-hidden shadow-sm border border-gray-300 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
-                    <span className="bg-gray-100 px-4 py-2.5 text-sm text-gray-600 border-r border-gray-300 flex items-center font-medium">Rs.</span>
+                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Amount</label>
+                  <div className="flex rounded overflow-hidden shadow-sm border border-[#d5d8dc] focus-within:ring-2 focus-within:ring-[#16a085]/20 focus-within:border-[#16a085] transition-all">
+                    <span className="bg-[#ecf0f1] px-4 py-2.5 text-sm text-[#7f8c8d] border-r border-[#d5d8dc] flex items-center font-medium">Rs.</span>
                     <input
                       type="number"
                       value={depositAmount}
@@ -261,7 +261,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                   <button
                     onClick={handleDeposit}
                     disabled={isSubmittingDeposit}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-2 rounded shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+                    className="bg-[#16a085] hover:bg-[#138d75] text-white font-bold px-8 py-2 rounded shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
                   >
                     {isSubmittingDeposit && <Loader2 className="w-4 h-4 animate-spin" />}
                     Submit
@@ -273,9 +273,9 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
           
           {/* WITHDRAW SECTION */}
           <div className="mb-6 px-2">
-            <div className="rounded overflow-hidden border border-red-200">
+            <div className="rounded overflow-hidden border border-[#d5d8dc]">
               {/* Red header */}
-              <div className="bg-red-500 px-4 py-2.5">
+              <div className="bg-[#e74c3c] px-4 py-2.5">
                 {activeTab === 'cash' ? (
                   <p className="text-white text-sm">
                     <span className="font-bold uppercase">Withdraw</span> Cash from <span className="font-bold">{client?.username}</span> Account
@@ -289,18 +289,18 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               {/* White form */}
               <div className="bg-white px-4 py-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Description</label>
                   <input
                     type="text"
                     value={withdrawDesc}
                     onChange={(e) => setWithdrawDesc(e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                    className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/20 focus:border-[#e74c3c] transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Amount</label>
-                  <div className="flex rounded overflow-hidden shadow-sm border border-gray-300 focus-within:ring-2 focus-within:ring-red-500/20 focus-within:border-red-500 transition-all">
-                    <span className="bg-gray-100 px-4 py-2.5 text-sm text-gray-600 border-r border-gray-300 flex items-center font-medium">Rs.</span>
+                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Amount</label>
+                  <div className="flex rounded overflow-hidden shadow-sm border border-[#d5d8dc] focus-within:ring-2 focus-within:ring-[#e74c3c]/20 focus-within:border-[#e74c3c] transition-all">
+                    <span className="bg-[#ecf0f1] px-4 py-2.5 text-sm text-[#7f8c8d] border-r border-[#d5d8dc] flex items-center font-medium">Rs.</span>
                     <input
                       type="number"
                       value={withdrawAmount}
@@ -314,7 +314,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                   <button
                     onClick={handleWithdraw}
                     disabled={isSubmittingWithdraw}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold px-8 py-2 rounded shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+                    className="bg-[#e74c3c] hover:bg-red-600 text-white font-bold px-8 py-2 rounded shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
                   >
                     {isSubmittingWithdraw && <Loader2 className="w-4 h-4 animate-spin" />}
                     Submit
@@ -327,7 +327,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
           <div className="px-3 pb-5">
             <button
               onClick={onClose}
-              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-5 py-2.5 rounded transition-colors active:scale-95"
+              className="flex items-center gap-2 bg-[#ecf0f1] hover:bg-[#d5d8dc] text-[#2c3e50] font-semibold px-5 py-2.5 rounded transition-colors active:scale-95"
             >
               <ChevronLeft className="w-4 h-4" />
               Back

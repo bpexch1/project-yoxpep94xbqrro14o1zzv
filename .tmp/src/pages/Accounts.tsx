@@ -23,7 +23,7 @@ export default function Accounts() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ECEFF1] pb-16">
+    <div className="min-h-screen bg-[#f4f6f7] pb-16">
       <Header />
       
       <main className="px-0 pt-0 pb-8 max-w-[480px] mx-auto font-sans">
@@ -36,10 +36,10 @@ export default function Accounts() {
 
         {/* Search Users Section */}
         <div className="mx-2 mb-2">
-          <section className="bg-white border border-[#E0E0E0] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E0E0E0] bg-[#F5F5F5]">
-              <Filter className="w-4 h-4 fill-black text-black" />
-              <span className="font-bold text-black text-sm">Search-Users</span>
+          <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#ecf0f1]">
+              <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
+              <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
             </div>
             <div className="p-4 flex gap-2">
               <input
@@ -48,11 +48,11 @@ export default function Accounts() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#26A69A] text-black bg-white"
+                className="flex-1 border border-[#d5d8dc] rounded px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#16a085] text-[#2c3e50] bg-white"
               />
               <button 
                 onClick={handleSearch}
-                className="bg-[#26A69A] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#00897B] transition-colors shadow-sm"
+                className="bg-[#16a085] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#138d75] transition-colors shadow-sm"
               >
                 <Search className="w-4 h-4" />
                 Search

@@ -3,37 +3,37 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0F1419;
-  --bg-card: #1A1D24;
-  --accent-green: #10B981;
-  --accent-blue: #3B82F6;
-  --accent-pink: #EC4899;
-  --text-primary: #FFFFFF;
-  --text-secondary: #9CA3AF;
-  --border-color: #374151;
+  --bg-primary: #f4f6f7;
+  --bg-card: #ffffff;
+  --accent-green: #16a085;
+  --accent-blue: #3498db;
+  --accent-yellow: #f1c40f;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --border-color: #d5d8dc;
 
   /* Shadcn/Tailwind CSS variable mappings */
-  --background: 220 22% 8%;
-  --foreground: 0 0% 100%;
-  --card: 225 16% 12%;
-  --card-foreground: 0 0% 100%;
-  --popover: 225 16% 12%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 160 84% 39%;
+  --background: 0 0% 96%;
+  --foreground: 210 25% 24%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 25% 24%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 25% 24%;
+  --primary: 162 80% 30%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 225 16% 18%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 225 16% 16%;
-  --muted-foreground: 220 9% 62%;
-  --accent: 160 84% 39%;
+  --secondary: 210 15% 83%;
+  --secondary-foreground: 210 25% 24%;
+  --muted: 210 15% 94%;
+  --muted-foreground: 210 10% 52%;
+  --accent: 162 80% 30%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 0 72% 51%;
+  --destructive: 6 78% 57%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 13% 23%;
-  --input: 220 13% 23%;
-  --ring: 160 84% 39%;
+  --border: 210 15% 83%;
+  --input: 210 15% 83%;
+  --ring: 162 80% 30%;
   --radius: 0.5rem;
-  --teal: 160 84% 39%;
+  --teal: 162 80% 30%;
 }
 
 @layer base {
@@ -46,6 +46,7 @@
     margin: 0 auto;
     background: var(--bg-primary);
     color: var(--text-primary);
+    font-family: Arial, sans-serif;
   }
 }
 
@@ -54,13 +55,14 @@ html {
 }
 
 .app-container {
-  background-color: #1E2936;
+  background-color: #f4f6f7;
   min-height: 100vh;
 }
 
 .content-card {
-  background-color: #252B3B;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 16px;
   margin: 16px;
+  border: 1px solid #d5d8dc;
 }
