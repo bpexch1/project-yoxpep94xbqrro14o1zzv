@@ -24,12 +24,15 @@ export function ClientSummaryCard({
   const [localSearch, setLocalSearch] = useState("");
   const [editingClient, setEditingClient] = useState<any | null>(null);
   const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
 
   const handleLoadBalance = () => {
     onRefresh && onRefresh();
     setIsBalanceLoaded(true);
+    // Auto-expand all clients
+    const allIds = new Set(clients.map((c: any) => c.id));
+    setExpandedIds(allIds);
   };
 
   const getTypeLabel = (role: string) => {
@@ -74,7 +77,15 @@ export function ClientSummaryCard({
   );
 
   const toggleExpand = (id: string) => {
-    setExpandedId(expandedId === id ? null : id);
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   return (
@@ -214,7 +225,7 @@ export function ClientSummaryCard({
               filteredClients.map((client, idx) => {
                 const roleLower = client.role?.toLowerCase();
                 const isAdminType = roleLower === "admin" || roleLower === "supermaster" || roleLower === "superadmin";
-                const isExpanded = expandedId === client.id;
+                const isExpanded = expandedIds.has(client.id);
 
                 return (
                   <React.Fragment key={client.id}>
