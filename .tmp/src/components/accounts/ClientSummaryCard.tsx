@@ -25,6 +25,12 @@ export function ClientSummaryCard({
   const [editingClient, setEditingClient] = useState<any | null>(null);
   const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
+
+  const handleLoadBalance = () => {
+    onRefresh && onRefresh();
+    setIsBalanceLoaded(true);
+  };
 
   const getTypeLabel = (role: string) => {
     switch(role?.toLowerCase()) {
@@ -160,19 +166,28 @@ export function ClientSummaryCard({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            {/* Green Total header row */}
-            <tr className="bg-[#26A69A]">
-              <td colSpan={3} className="px-3 py-2.5">
-                <button
-                  type="button"
-                  onClick={() => onRefresh && onRefresh()}
-                  className="bg-[#F59E0B] hover:bg-amber-500 active:bg-amber-600 text-black font-bold text-xs px-5 py-2 rounded transition-colors cursor-pointer select-none"
-                >
-                  Load Balance
-                </button>
-              </td>
-            </tr>
-            {/* Column headers */}
+            {!isBalanceLoaded ? (
+              <tr className="bg-[#26A69A]">
+                <td colSpan={3} className="px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={handleLoadBalance}
+                    className="bg-[#F59E0B] hover:bg-amber-500 active:bg-amber-600 text-black font-bold text-xs px-5 py-2 rounded transition-colors cursor-pointer select-none"
+                  >
+                    Load Balance
+                  </button>
+                </td>
+              </tr>
+            ) : (
+              <tr className="bg-[#26A69A]">
+                <td className="px-3 py-2.5 font-bold text-white border-r border-white/20">Total</td>
+                <td className="px-3 py-2.5 border-r border-white/20"></td>
+                <td className="px-3 py-2.5 font-bold text-white text-right">
+                  {totals.credit_remaining.toLocaleString()}
+                </td>
+              </tr>
+            )}
+            {/* Column headers — always visible */}
             <tr className="bg-white border-b border-gray-300">
               <th className="px-3 py-2.5 font-bold text-black border-r border-gray-200">Username</th>
               <th className="px-3 py-2.5 font-bold text-black border-r border-gray-200">Type</th>
