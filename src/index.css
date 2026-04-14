@@ -45,7 +45,7 @@
     @apply bg-background text-foreground antialiased;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Poppins', Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
   }
 }
 
