@@ -29,7 +29,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
-        "w-full lg:w-auto text-[11px] lg:text-xs py-1.5 px-2 lg:px-4 text-center rounded border border-[#1a9e71] transition-colors whitespace-nowrap",
+        "w-full lg:w-auto text-[13px] lg:text-xs py-2 px-3 lg:px-4 text-center rounded border border-[#1a9e71] transition-colors whitespace-nowrap",
         activeTab === tab.id
           ? "bg-[#1a9e71] border-[#1a9e71] text-white font-bold"
           : "text-[#1a9e71] bg-white border-[#1a9e71] hover:bg-green-50",
@@ -41,12 +41,12 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   );
 
   return (
-    <div className="bg-white border border-[#d5d8dc] mb-3">
-      <div className="bg-[#f0f0f0] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
+    <div className="bg-white border border-[#d5d8dc] mb-3 rounded-lg overflow-hidden">
+      <div className="bg-[#f0f0f0] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-2">
         <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
         <span className="font-bold text-[#2c3e50] text-sm">Report Type</span>
       </div>
-      <div className="p-3 grid grid-cols-3 gap-2 lg:flex lg:flex-wrap lg:gap-2">
+      <div className="p-4 grid grid-cols-3 gap-2.5 lg:flex lg:flex-wrap lg:gap-2">
         {tabs.map((tab, i) => {
           const isMobileCenter = i === 6; // Commission Report
           return (

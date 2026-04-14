@@ -64,21 +64,21 @@ export default function Accounts() {
   return (
     <div className="bg-[#f4f6f7] pb-16">
       <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
-        <div className="h-2" />
+        <div className="h-3" />
         
         {/* Report Type card */}
-        <div className="mx-2 mb-2">
+        <div className="mx-3 mb-3">
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* Search Users Section */}
-        <div className="mx-2 mb-2">
-          <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-[#d5d8dc] bg-[#f0f0f0]">
+        <div className="mx-3 mb-3">
+          <section className="bg-white border border-[#d5d8dc] rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#f0f0f0]">
               <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
               <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
             </div>
-            <div className="flex gap-2 px-3 py-3">
+            <div className="flex gap-2 px-4 py-4">
               <input
                 type="text"
                 placeholder="Username"
@@ -99,7 +99,7 @@ export default function Accounts() {
         </div>
 
         {/* Client List card */}
-        <div className="mx-2">
+        <div className="mx-3">
           <ClientSummaryCard 
             clients={clients || []} 
             isLoading={isLoading} 

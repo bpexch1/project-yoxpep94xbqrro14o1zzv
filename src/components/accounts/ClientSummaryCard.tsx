@@ -88,9 +88,9 @@ export function ClientSummaryCard({
   };
 
   return (
-    <section className="bg-white border border-[#d5d8dc] shadow-sm">
+    <section className="bg-white border border-[#d5d8dc] shadow-sm rounded-lg overflow-hidden">
       {/* Card title */}
-      <div className="px-4 py-2.5 bg-[#f0f0f0] border-b border-[#d5d8dc]">
+      <div className="px-4 py-3 bg-[#f0f0f0] border-b border-[#d5d8dc]">
         <span className="font-bold text-sm text-[#2c3e50]">
           {username} - Clients List{!isBalanceLoaded ? " | Default" : ""}
         </span>
@@ -98,7 +98,7 @@ export function ClientSummaryCard({
 
       <div className="space-y-4">
         {/* Stats table */}
-        <div className="px-3 pt-3 overflow-x-auto">
+        <div className="px-4 pt-4 overflow-x-auto">
           {!isBalanceLoaded ? (
             <table className="w-full text-left border-collapse border border-gray-300">
               <thead>
@@ -159,7 +159,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Action buttons + Legend merged row for desktop */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-3 py-2 gap-3">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-4 py-3 gap-3">
           {/* Left: Action buttons */}
           <div className="flex gap-2">
             <button
@@ -201,7 +201,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Search Field - right aligned on desktop */}
-        <div className="flex flex-col lg:flex-row lg:justify-end items-center gap-1 py-3 border-t border-gray-100 px-3">
+        <div className="flex flex-col lg:flex-row lg:justify-end items-center gap-1 py-3 border-t border-gray-100 px-4">
           <span className="text-sm text-[#2c3e50] font-semibold">Search:</span>
           <input
             type="text"
@@ -218,7 +218,7 @@ export function ClientSummaryCard({
           <thead>
             {!isBalanceLoaded ? (
               <tr className="bg-[#1a9e71]">
-                <td colSpan={3} className="px-3 py-2.5">
+                <td colSpan={3} className="px-4 py-3">
                   <button
                     type="button"
                     onClick={handleLoadBalance}
@@ -230,16 +230,16 @@ export function ClientSummaryCard({
               </tr>
             ) : (
               <tr className="bg-[#1a9e71] text-white">
-                <td className="px-3 py-2.5 font-bold text-sm">Total</td>
-                <td className="px-3 py-2.5 text-sm"></td>
-                <td className="px-3 py-2.5 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
+                <td className="px-4 py-3 font-bold text-sm">Total</td>
+                <td className="px-4 py-3 text-sm"></td>
+                <td className="px-4 py-3 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
               </tr>
             )}
             {/* Column headers — always visible */}
             <tr className="bg-[#ecf0f1] border-b border-[#d5d8dc]">
-              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-[12px] border-r border-[#d5d8dc]">Username</th>
-              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-[12px] border-r border-[#d5d8dc]">Type</th>
-              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-[12px] text-right">Credit</th>
+              <th className="px-3 lg:px-4 py-3 font-bold text-[#2c3e50] text-[12px] border-r border-[#d5d8dc]">Username</th>
+              <th className="px-3 lg:px-4 py-3 font-bold text-[#2c3e50] text-[12px] border-r border-[#d5d8dc]">Type</th>
+              <th className="px-3 lg:px-4 py-3 font-bold text-[#2c3e50] text-[12px] text-right">Credit</th>
             </tr>
           </thead>
           <tbody>
@@ -292,7 +292,7 @@ export function ClientSummaryCard({
                     {/* Expanded details row — only when balance is loaded AND row is expanded */}
                     {isBalanceLoaded && isExpanded && (
                       <tr>
-                        <td colSpan={3} className={cn("px-6 lg:px-8 py-4 border-b border-[#d5d8dc]", idx % 2 === 0 ? "bg-slate-50" : "bg-white")}>
+                        <td colSpan={3} className={cn("px-5 py-4 border-b border-[#d5d8dc]", idx % 2 === 0 ? "bg-slate-50" : "bg-white")}>
                           <div className="relative">
                             <ul className="text-[13px] text-[#2c3e50] space-y-2 relative z-10">
                               <li className="flex items-center gap-2">
@@ -379,7 +379,7 @@ export function ClientSummaryCard({
             )}
           </tbody>
         </table>
-        <div className="px-3 py-2.5 text-[11px] text-[#2c3e50] border-t border-[#d5d8dc] bg-[#ecf0f1] font-medium">
+        <div className="px-4 py-3 text-[11px] text-[#2c3e50] border-t border-[#d5d8dc] bg-[#ecf0f1] font-medium">
           Showing {filteredClients.length} entries
         </div>
       </div>
