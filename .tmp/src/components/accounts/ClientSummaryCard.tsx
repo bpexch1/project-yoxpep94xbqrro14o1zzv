@@ -75,12 +75,6 @@ export function ClientSummaryCard({
     [filteredClients]
   );
 
-  const formatNum = (val: number) => (
-    <span className={cn("font-bold", val < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
-      {val.toLocaleString()}
-    </span>
-  );
-
   const toggleExpand = (id: string) => {
     setExpandedIds(prev => {
       const next = new Set(prev);
@@ -96,39 +90,39 @@ export function ClientSummaryCard({
   return (
     <section className="bg-white border border-[#d5d8dc] shadow-sm">
       {/* Card title */}
-      <div className="px-4 py-2.5 bg-[#e8e8e8] border-b border-[#d5d8dc]">
+      <div className="px-4 py-2.5 bg-[#f0f0f0] border-b border-[#d5d8dc]">
         <span className="font-bold text-sm text-[#2c3e50]">
           {username} - Clients List | Default
         </span>
       </div>
 
-      <div className="p-3 space-y-4">
-        {/* Summary Table - Exactly 4 columns */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse border border-[#d5d8dc]">
+      <div className="space-y-4">
+        {/* Stats table */}
+        <div className="px-3 pt-3 overflow-x-auto">
+          <table className="w-full text-left border-collapse border border-gray-300">
             <thead>
-              <tr className="bg-[#f5f5f5]">
-                <th className="px-3 py-2 border border-[#d5d8dc] font-bold text-[#2c3e50] text-center">Credit<br/>Remaining</th>
-                <th className="px-3 py-2 border border-[#d5d8dc] font-bold text-[#2c3e50] text-center">Cash</th>
-                <th className="px-3 py-2 border border-[#d5d8dc] font-bold text-[#2c3e50] text-center">P/L<br/>Downline</th>
-                <th className="px-3 py-2 border border-[#d5d8dc] font-bold text-[#2c3e50] text-center">Users</th>
+              <tr className="bg-gray-50">
+                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
+                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Cash</th>
+                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
+                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Users</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="px-3 py-2 border border-[#d5d8dc] text-center">
-                  <span className="font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
+                <td className="py-2 border border-gray-300 text-center">
+                  <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
                 </td>
-                <td className="px-3 py-2 border border-[#d5d8dc] text-center">
-                  <span className="font-bold text-[#1a9e71]">{totals.cash.toLocaleString()}</span>
+                <td className="py-2 border border-gray-300 text-center">
+                  <span className="text-sm font-bold text-[#1a9e71]">{totals.cash.toLocaleString()}</span>
                 </td>
-                <td className="px-3 py-2 border border-[#d5d8dc] text-center">
-                  <span className={cn("font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                <td className="py-2 border border-gray-300 text-center">
+                  <span className={cn("text-sm font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
                     {totals.pl_downline.toLocaleString()}
                   </span>
                 </td>
-                <td className="px-3 py-2 border border-[#d5d8dc] text-center">
-                  <span className="font-bold text-[#1a9e71]">{filteredClients.length}</span>
+                <td className="py-2 border border-gray-300 text-center">
+                  <span className="text-sm font-bold text-[#1a9e71]">{filteredClients.length}</span>
                 </td>
               </tr>
             </tbody>
@@ -136,46 +130,46 @@ export function ClientSummaryCard({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 px-3 py-2">
           <button
             onClick={() => navigate("/accounts/create")}
-            className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm"
+            className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1 transition-colors shadow-sm"
           >
             <UserPlus className="w-3.5 h-3.5" /> New User
           </button>
-          <button className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm">
+          <button className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1 transition-colors shadow-sm">
             <BookOpen className="w-3.5 h-3.5" /> Account Ledger
           </button>
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#2c3e50] pt-2">
-          <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-[#f1c40f] text-black font-bold text-xs flex items-center justify-center rounded">C</div>
-            <span>Cash / Credit</span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 text-xs text-[#2c3e50]">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm">C</div>
+            <span className="font-medium">Cash / Credit</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-[#5dade2] text-white flex items-center justify-center rounded">
-              <Pencil className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 bg-[#5dade2] text-white flex items-center justify-center rounded-sm">
+              <Pencil className="w-3 h-3" />
             </div>
-            <span>Edit</span>
+            <span className="font-medium">Edit</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-[#3498db] text-white font-bold text-xs flex items-center justify-center rounded">L</div>
-            <span>Ledger</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 bg-[#3498db] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">L</div>
+            <span className="font-medium">Ledger</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-[#1a9e71] text-white font-bold text-xs flex items-center justify-center rounded">A</div>
-            <span>Active</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">A</div>
+            <span className="font-medium">Active</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-xs flex items-center justify-center rounded">D</div>
-            <span>InActive</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
+            <span className="font-medium">InActive</span>
           </div>
         </div>
 
-        {/* Local Search Field */}
-        <div className="flex flex-col items-center gap-1 py-2 border-t border-gray-100">
+        {/* Search Field */}
+        <div className="flex flex-col items-center gap-1 py-3 border-t border-gray-100">
           <span className="text-sm text-[#2c3e50] font-medium">Search:</span>
           <input
             type="text"

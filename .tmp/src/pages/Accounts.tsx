@@ -74,22 +74,22 @@ export default function Accounts() {
         {/* Search Users Section */}
         <div className="mx-2 mb-2">
           <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-[#d5d8dc] bg-[#e8e8e8]">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-[#d5d8dc] bg-[#f0f0f0]">
               <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
               <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
             </div>
-            <div className="p-4 pb-10 flex gap-2">
+            <div className="flex gap-2 px-3 py-3">
               <input
                 type="text"
                 placeholder="Username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 border border-[#d5d8dc] rounded px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#1a9e71] text-[#2c3e50] bg-white"
+                className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#1a9e71] text-[#2c3e50] bg-white"
               />
               <button 
                 onClick={handleSearch}
-                className="bg-[#1a9e71] text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-1.5 hover:bg-[#158c61] transition-colors shadow-sm"
+                className="bg-[#1a9e71] hover:bg-[#158c61] text-white px-4 py-2 rounded text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
               >
                 <Search className="w-4 h-4" />
                 Search
