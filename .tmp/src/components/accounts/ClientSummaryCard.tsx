@@ -88,7 +88,7 @@ export function ClientSummaryCard({
   };
 
   return (
-    <section className="bg-white border border-[#d5d8dc] shadow-none rounded-none overflow-hidden">
+    <section className="bg-white border border-[#d5d8dc] shadow-none rounded-lg overflow-hidden">
       {/* Card title */}
       <div className="px-4 py-3 bg-white border-b border-[#d5d8dc]">
         <span className="font-bold text-sm text-[#2c3e50]">

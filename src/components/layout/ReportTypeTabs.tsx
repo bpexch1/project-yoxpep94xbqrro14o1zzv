@@ -41,7 +41,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   );
 
   return (
-    <div className="bg-white border border-[#d5d8dc] mb-3 rounded-none overflow-hidden">
+    <div className="bg-white border border-[#d5d8dc] mb-3 rounded-lg overflow-hidden">
       <div className="bg-[#f0f0f0] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-2">
         <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
         <span className="font-bold text-[#2c3e50] text-sm">Report Type</span>

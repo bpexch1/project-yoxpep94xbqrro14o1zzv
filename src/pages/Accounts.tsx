@@ -73,7 +73,7 @@ export default function Accounts() {
 
         {/* Search Users Section */}
         <div className="mx-3 mb-3">
-          <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
+          <section className="bg-white border border-[#d5d8dc] rounded-lg shadow-sm">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#f0f0f0]">
               <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
               <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>

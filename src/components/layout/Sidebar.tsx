@@ -38,27 +38,44 @@ function SidebarNavItems({ onNavigate }: { onNavigate: () => void }) {
     onNavigate();
   };
 
-  const allItems = [
-    ...mainMenuItems.map(item => ({ ...item, showArrow: false })),
-    ...sportsItems.map(item => ({ ...item, showArrow: true })),
-  ];
-
   return (
-    <nav className="flex flex-col py-2">
-      {allItems.map((item) => {
+    <nav className="flex flex-col py-1">
+      {/* Main menu items */}
+      {mainMenuItems.map((item) => {
         const isActive = location.pathname === item.link || (item.link !== "/" && location.pathname.startsWith(item.link));
         return (
           <button
             key={item.label}
             onClick={() => handleNavigate(item.link)}
             className={cn(
-              "flex items-center gap-4 px-6 py-3 text-[15px] transition-colors text-left w-full",
-              isActive ? "bg-white/5 text-white" : "text-white/85 hover:bg-white/5"
+              "flex items-center gap-5 px-5 py-[18px] text-[16px] transition-colors text-left w-full",
+              isActive ? "text-white" : "text-white/85 hover:bg-white/5"
             )}
           >
-            <item.icon className={cn("w-5 h-5 shrink-0", isActive ? "text-[#26c6da]" : "text-[#5d8a9a]")} />
+            <item.icon className={cn("w-6 h-6 shrink-0", isActive ? "text-[#26c6da]" : "text-[#5d8a9a]")} />
             <span className="flex-1">{item.label}</span>
-            {item.showArrow && <ChevronLeft className="w-3.5 h-3.5 text-[#4a7080] shrink-0" />}
+          </button>
+        );
+      })}
+
+      {/* Separator */}
+      <div className="h-px bg-white/10 mx-5 my-1" />
+
+      {/* Sports items */}
+      {sportsItems.map((item) => {
+        const isActive = location.pathname === item.link || (item.link !== "/" && location.pathname.startsWith(item.link));
+        return (
+          <button
+            key={item.label}
+            onClick={() => handleNavigate(item.link)}
+            className={cn(
+              "flex items-center gap-5 px-5 py-[18px] text-[16px] transition-colors text-left w-full",
+              isActive ? "text-white" : "text-white/85 hover:bg-white/5"
+            )}
+          >
+            <item.icon className={cn("w-6 h-6 shrink-0", isActive ? "text-[#26c6da]" : "text-[#5d8a9a]")} />
+            <span className="flex-1">{item.label}</span>
+            <ChevronLeft className="w-4 h-4 text-[#4a7080] shrink-0" />
           </button>
         );
       })}
@@ -94,22 +111,19 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
             
             {/* Sidebar Panel */}
             <motion.div
-              initial={{ x: -260 }}
+              initial={{ x: -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -260 }}
+              exit={{ x: -280 }}
               transition={{ type: "tween", duration: 0.2 }}
-              className="fixed left-0 top-0 h-full w-[260px] z-50 bg-[#1e2d3a] flex flex-col overflow-y-auto lg:hidden"
+              className="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#1e2d3a] flex flex-col overflow-y-auto lg:hidden"
             >
-              <div className="p-4 border-b border-[#152535] flex items-center justify-between">
-                <div className="flex items-center">
-                  <span className="text-white font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>BP</span>
-                  <span className="text-[#26c6da] font-bold text-xs ml-2">Exchange</span>
-                </div>
+              {/* Close button - minimal, top right */}
+              <div className="flex justify-end px-3 pt-3 pb-1">
                 <button
                   onClick={onMobileClose}
                   className="p-1.5 rounded hover:bg-white/5 transition-colors"
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-5 h-5 text-white/70" />
                 </button>
               </div>
               <SidebarNavItems onNavigate={onMobileClose} />
