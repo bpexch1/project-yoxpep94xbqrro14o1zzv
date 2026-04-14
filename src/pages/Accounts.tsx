@@ -78,7 +78,7 @@ export default function Accounts() {
               <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
               <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
             </div>
-            <div className="p-4 flex gap-2">
+            <div className="p-4 pb-10 flex gap-2">
               <input
                 type="text"
                 placeholder="Username"

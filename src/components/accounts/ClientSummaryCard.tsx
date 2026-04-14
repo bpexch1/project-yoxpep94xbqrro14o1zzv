@@ -155,13 +155,13 @@ export function ClientSummaryCard({
             <span>Cash / Credit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-[#1a9e71] text-white flex items-center justify-center rounded">
+            <div className="w-7 h-7 bg-[#5dade2] text-white flex items-center justify-center rounded">
               <Pencil className="w-3.5 h-3.5" />
             </div>
             <span>Edit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-7 h-7 bg-[#1a9e71] text-white font-bold text-xs flex items-center justify-center rounded">L</div>
+            <div className="w-7 h-7 bg-[#3498db] text-white font-bold text-xs flex items-center justify-center rounded">L</div>
             <span>Ledger</span>
           </div>
           <div className="flex items-center gap-1">
@@ -301,13 +301,13 @@ export function ClientSummaryCard({
                                   </button>
                                   <button 
                                     onClick={() => setEditingClient(client)}
-                                    className="w-9 h-9 bg-[#1a9e71] hover:bg-[#158c61] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#5dade2] hover:bg-[#3498db] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Edit"
                                   >
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
-                                    className="w-9 h-9 bg-[#1a9e71] hover:bg-[#158c61] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#3498db] hover:bg-blue-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Ledger"
                                   >
                                     L
