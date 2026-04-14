@@ -76,7 +76,7 @@ export default function Dashboard() {
   const isLoading = isLoadingMatches || isLoadingBets;
 
   return (
-    <div className="bg-[#f4f6f7] pb-16">
+    <div className="bg-[#f4f6f7] pb-16 min-h-screen">
       <main className="px-2 pt-2 pb-8 max-w-5xl mx-auto">
         {/* Search Users Section */}
         <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none mb-2">
@@ -84,7 +84,7 @@ export default function Dashboard() {
             <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
             <span className="font-bold text-[#2c3e50] text-sm uppercase">Search-Users</span>
           </div>
-          <div className="p-4 flex gap-2">
+          <div className="p-4 pb-6 flex gap-2">
             <input
               type="text"
               placeholder="Username"
@@ -121,18 +121,18 @@ export default function Dashboard() {
                 <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
-              <div className="py-8 text-center text-[#7f8c8d] text-sm">
+              <div className="py-8 text-center text-[#7f8c8d] text-sm border border-[#bdc3c7]">
                 No matches found.
               </div>
             ) : (
-              <table className="w-full text-sm border-collapse">
+              <table className="w-full text-sm border-collapse border border-[#bdc3c7]">
                 <tbody>
                   {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                     <Fragment key={sport}>
                       {/* Sport Sub-header */}
-                      <tr className="bg-[#16a085]">
-                        <td className="px-4 py-2 font-bold text-white border-r border-white/20">{sport}</td>
-                        <td className="px-4 py-2 font-bold text-white text-right w-32">Amount</td>
+                      <tr>
+                        <td className="border border-[#bdc3c7] px-4 py-2 font-bold text-[#2c3e50] bg-white">{sport}</td>
+                        <td className="border border-[#bdc3c7] px-4 py-2 font-bold text-[#2c3e50] bg-white text-right w-32">Amount</td>
                       </tr>
                       
                       {/* Match Rows */}
@@ -141,18 +141,23 @@ export default function Dashboard() {
                         return (
                           <tr 
                             key={match.id} 
-                            className={`${idx % 2 === 1 ? 'bg-[#ecf0f1]' : 'bg-white'} border-b border-[#d5d8dc]`}
+                            className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f2f2f2]'}
                           >
-                            <td className="px-4 py-2 border-r border-[#d5d8dc]">
-                              <a 
-                                href="#" 
-                                onClick={(e) => e.preventDefault()}
-                                className="text-[#16a085] font-medium hover:underline"
+                            <td className="border border-[#bdc3c7] px-4 py-2">
+                              <span 
+                                className="text-[#16a085] font-medium cursor-pointer hover:underline"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  // Potential navigation here
+                                }}
                               >
                                 {match.title} / Match Odds
-                              </a>
+                              </span>
+                              {match.status === 'live' && (
+                                <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#16a085] ml-1 align-middle" />
+                              )}
                             </td>
-                            <td className="px-4 py-2 text-right font-medium text-[#2c3e50]">
+                            <td className="border border-[#bdc3c7] px-4 py-2 text-right text-[#2c3e50] font-medium">
                               {formatAmount(amount)}
                             </td>
                           </tr>
