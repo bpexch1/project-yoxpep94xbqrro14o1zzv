@@ -87,7 +87,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-[#d5d8dc] px-2 py-1 rounded transition-colors">
                   <span className="text-[#555555] text-sm font-normal">
-                    {session.username} <span className="hidden sm:inline">({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})</span>
+                    {session.username} ({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})
                   </span>
                   <ChevronDown className="w-3 h-3 text-[#555555]" />
                 </div>
