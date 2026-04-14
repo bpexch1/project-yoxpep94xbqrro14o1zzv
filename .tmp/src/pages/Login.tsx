@@ -65,27 +65,38 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center pt-24 px-6" style={{ backgroundColor: '#121d30' }}>
+    <div 
+      className="min-h-screen flex items-center justify-center px-6 relative"
+      style={{ 
+        backgroundColor: '#3a3a3a',
+        backgroundImage: `linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.05)), linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.05))`,
+        backgroundSize: '80px 80px',
+        backgroundPosition: '0 0, 40px 40px'
+      }}
+    >
       <div
-        className="w-full max-w-sm rounded-2xl shadow-2xl px-8 py-10"
-        style={{ background: 'linear-gradient(180deg, #3e6d8d 0%, #121d30 100%)' }}
+        className="w-full max-w-sm rounded-2xl px-8 py-10 shadow-2xl relative z-10"
+        style={{ background: 'linear-gradient(160deg, #2e6b8a 0%, #1a3d5c 50%, #152c44 100%)' }}
       >
-        {/* BP Logo Circle */}
         <div className="flex justify-center mb-8">
           <div
             className="w-24 h-24 rounded-full flex items-center justify-center shadow-lg"
-            style={{ backgroundColor: '#00b181' }}
+            style={{ backgroundColor: '#3dd6c8' }}
           >
-            <span style={{ fontSize: '2.5rem', fontWeight: 900, fontStyle: 'italic', color: '#0d1f2d', fontFamily: 'Georgia, serif', lineHeight: 1 }}>
+            <span style={{
+              fontFamily: 'Pacifico, cursive',
+              fontSize: '2.4rem',
+              color: '#1a2a3a',
+              lineHeight: 1
+            }}>
               BP
             </span>
           </div>
         </div>
 
         <form onSubmit={handleLogin}>
-          {/* Username Field */}
           <div className="flex items-center gap-3 mb-6 border-b border-white/30 pb-2">
-            <User size={20} color="rgba(255,255,255,0.7)" />
+            <User size={18} color="rgba(255,255,255,0.6)" />
             <input
               type="text"
               placeholder="Username"
@@ -96,9 +107,8 @@ export default function Login() {
             />
           </div>
 
-          {/* Password Field */}
           <div className="flex items-center gap-3 mb-10 border-b border-white/30 pb-2">
-            <Lock size={20} color="rgba(255,255,255,0.7)" />
+            <Lock size={18} color="rgba(255,255,255,0.6)" />
             <input
               type="password"
               placeholder="Password"
@@ -109,13 +119,15 @@ export default function Login() {
             />
           </div>
 
-          {/* Login Button */}
           <div className="flex justify-center">
             <button
               type="submit"
               disabled={loading}
-              className="px-16 py-3 rounded-full text-white font-semibold text-base transition-all active:scale-95 flex items-center justify-center disabled:opacity-60"
-              style={{ background: 'linear-gradient(180deg, #3e6d8d 0%, #121d30 100%)' }}
+              className="px-16 py-3 rounded-full text-white text-base transition-all active:scale-95 flex items-center justify-center disabled:opacity-60 shadow-lg"
+              style={{
+                background: 'linear-gradient(180deg, #3a6a8a 0%, #1e3d5a 100%)',
+                border: '1px solid rgba(74, 138, 176, 0.3)'
+              }}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Login'}
             </button>
