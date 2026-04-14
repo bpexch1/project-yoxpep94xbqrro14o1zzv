@@ -29,10 +29,10 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
-        "px-4 py-2 rounded text-xs transition-colors border whitespace-nowrap min-w-[100px] text-center",
+        "px-4 py-2 rounded text-sm transition-colors whitespace-nowrap",
         activeTab === tab.id
-          ? "bg-[#26A69A] border-[#26A69A] text-white font-bold"
-          : "border-gray-200 text-gray-600 bg-white hover:bg-gray-50 font-medium"
+          ? "bg-[#1a9e71] border border-[#1a9e71] text-white font-bold"
+          : "border border-[#1a9e71] text-[#1a9e71] bg-white hover:bg-green-50 font-medium"
       )}
     >
       {tab.label}
@@ -40,17 +40,15 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   );
 
   return (
-    <div className="bg-white rounded-none border-b border-gray-200 shadow-sm overflow-hidden mb-4">
-      <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center gap-2">
-        <Filter className="w-3.5 h-3.5 text-gray-500" />
-        <span className="font-bold text-[11px] text-gray-600 uppercase tracking-tight">Report Type</span>
+    <div className="bg-white border border-[#d5d8dc] mb-3">
+      <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
+        <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
+        <span className="font-bold text-[#2c3e50] text-sm">Report Type</span>
       </div>
-      <div className="p-3 overflow-x-auto custom-scrollbar">
-        <div className="flex gap-2 min-w-max lg:flex-wrap lg:min-w-0 lg:justify-start">
-          {tabs.map((tab) => (
-            <TabButton key={tab.id} tab={tab} />
-          ))}
-        </div>
+      <div className="p-3 flex flex-wrap gap-2">
+        {tabs.map((tab) => (
+          <TabButton key={tab.id} tab={tab} />
+        ))}
       </div>
     </div>
   );
