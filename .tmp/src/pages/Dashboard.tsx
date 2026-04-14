@@ -45,6 +45,7 @@ export default function Dashboard() {
   };
 
   const formatAmount = (amount: number) => {
+    if (amount === 0) return "0";
     return new Intl.NumberFormat('en-IN').format(amount);
   };
 
@@ -76,14 +77,15 @@ export default function Dashboard() {
   const isLoading = isLoadingMatches || isLoadingBets;
 
   return (
-    <div className="bg-[#f4f6f7] pb-16 min-h-screen">
-      <main className="px-0 pt-3 pb-8 max-w-4xl mx-auto">
-
-        {/* Search-Users Section */}
+    <div className="bg-[#f0f2f5] min-h-screen pb-20">
+      <main className="max-w-4xl mx-auto px-0">
+        <div className="h-3" />
+        
+        {/* Search Users Section */}
         <div className="mx-3 mb-3">
           <section className="bg-white border border-[#d5d8dc] rounded-lg shadow-sm overflow-hidden">
-            <div className="bg-[#f0f0f0] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-2">
-              <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
+            <div className="bg-[#e8e8e8] px-4 py-2.5 border-b border-[#d5d8dc] flex items-center gap-2">
+              <Filter className="w-4 h-4 text-[#333333]" />
               <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
             </div>
             <div className="px-4 py-4 flex gap-2">
@@ -93,11 +95,11 @@ export default function Dashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 border border-[#ced4da] rounded px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#16a085] text-[#2c3e50] bg-white"
+                className="flex-1 border border-[#ced4da] rounded px-3 py-1.5 text-sm text-[#2c3e50] placeholder-gray-400 focus:outline-none focus:border-[#1a9e71] bg-white"
               />
-              <button
+              <button 
                 onClick={handleSearch}
-                className="bg-[#1a9e71] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
+                className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
               >
                 <Search className="w-3.5 h-3.5" />
                 Search
@@ -109,23 +111,23 @@ export default function Dashboard() {
         {/* Sport Highlights Card */}
         <div className="mx-3">
           <section className="bg-white border border-[#d5d8dc] rounded-lg shadow-sm overflow-hidden">
-            <div className="bg-[#f0f0f0] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-3">
+            <div className="bg-[#e8e8e8] px-4 py-2.5 border-b border-[#d5d8dc] flex items-center gap-3">
               <span className="font-bold text-[#2c3e50] text-sm">Sport Highlights</span>
-              <button
+              <button 
                 onClick={handleRefresh}
-                className="bg-[#1a9e71] text-white text-xs px-3 py-1 rounded hover:bg-[#158c61] transition-colors"
+                className="bg-[#1a9e71] text-white text-xs px-3 py-0.5 rounded hover:bg-[#158c61] transition-colors"
               >
                 Refresh
               </button>
             </div>
-
+            
             <div className="overflow-x-auto">
               {isLoading ? (
                 <div className="flex items-center justify-center py-16">
-                  <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
+                  <Loader2 className="w-8 h-8 text-[#1a9e71] animate-spin" />
                 </div>
               ) : filteredMatches.length === 0 ? (
-                <div className="py-10 text-center text-[#7f8c8d] text-sm">
+                <div className="py-8 text-center text-[#7f8c8d] text-sm">
                   No matches found.
                 </div>
               ) : (
@@ -135,35 +137,38 @@ export default function Dashboard() {
                       <Fragment key={sport}>
                         {/* Sport group header row */}
                         <tr>
-                          <td className="border border-[#d5d8dc] px-4 py-2 font-bold text-[#1a6b4a] bg-[#e8f5e9] text-sm">
+                          <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-[#f5f5f5] text-sm">
                             {sport}
                           </td>
-                          <td className="border border-[#d5d8dc] px-4 py-2 font-bold text-[#1a6b4a] bg-[#e8f5e9] w-28 text-sm text-right">
+                          <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-[#f5f5f5] w-28 text-sm text-right">
                             Amount
                           </td>
                         </tr>
-
+                        
                         {/* Match rows */}
                         {sportMatches.map((match, idx) => {
                           const amount = calculateAmount(match.id);
                           return (
-                            <tr
-                              key={match.id}
-                              className={idx % 2 === 0 ? 'bg-white hover:bg-[#f5faff]' : 'bg-[#f9fbfc] hover:bg-[#f5faff]'}
+                            <tr 
+                              key={match.id} 
+                              className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9f9f9]'}
                             >
-                              <td className="border border-[#d5d8dc] px-4 py-2.5">
-                                <div className="flex items-center gap-2">
-                                  {match.status === 'live' && (
-                                    <span className="inline-block w-2 h-2 rounded-full bg-[#1a9e71] animate-pulse shrink-0" />
-                                  )}
-                                  <span
-                                    className="text-[#1a9e71] text-sm font-medium cursor-pointer hover:underline"
+                              <td className="border border-[#d5d8dc] px-3 py-2.5">
+                                <div className="flex items-center gap-1">
+                                  <span 
+                                    className="text-[#1a9e71] text-sm font-normal cursor-pointer hover:underline"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                    }}
                                   >
                                     {match.title} / Match Odds
                                   </span>
+                                  {match.status === 'live' && (
+                                    <span className="w-2 h-2 rounded-full bg-red-500 inline-block animate-pulse ml-1" />
+                                  )}
                                 </div>
                               </td>
-                              <td className="border border-[#d5d8dc] px-4 py-2.5 text-[#2c3e50] text-sm font-semibold text-right w-28">
+                              <td className={`border border-[#d5d8dc] px-3 py-2.5 text-sm font-medium w-28 text-right ${amount === 0 ? 'text-gray-400' : 'text-[#2c3e50]'}`}>
                                 {formatAmount(amount)}
                               </td>
                             </tr>
@@ -177,7 +182,6 @@ export default function Dashboard() {
             </div>
           </section>
         </div>
-
       </main>
     </div>
   );
