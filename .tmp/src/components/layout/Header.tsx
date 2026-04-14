@@ -23,8 +23,8 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
     <Link 
       to={to} 
       className={cn(
-        "px-3 py-1.5 text-sm rounded transition-colors font-medium whitespace-nowrap",
-        isActive ? "bg-[#3d6b8b] text-white" : "text-white/80 hover:bg-[#3d6b8b]"
+        "px-3 py-1.5 text-xs rounded transition-colors font-semibold uppercase tracking-wider",
+        isActive ? "bg-white/10 text-white" : "text-white/70 hover:text-white hover:bg-white/5"
       )}
     >
       {label}
@@ -47,7 +47,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           const total = pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
           setTotalExposure(total);
         })
-        .catch(() => {}); // silently ignore fetch errors (e.g. not authenticated)
+        .catch(() => {}); // silently ignore fetch errors
     }
   }, []);
 
@@ -57,71 +57,80 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#254465] flex items-center px-3 h-12 border-b border-[#1a3550] shadow-none">
-      {/* LEFT: Hamburger + Logo (Desktop) */}
-      <div className="flex items-center shrink-0">
+    <header className="sticky top-0 z-40 bg-[#1a3550] flex items-center px-3 h-12 border-b border-[#0f2236] shadow-sm">
+      {/* LEFT: Hamburger + Logo */}
+      <div className="flex items-center gap-3 shrink-0">
         <button 
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-transparent rounded hover:bg-[#3d6b8b] transition-colors bg-transparent"
+          className="p-1.5 border border-white/20 rounded bg-transparent hover:bg-white/10 transition-colors"
         >
           <Menu className="w-5 h-5 text-white" />
         </button>
-        <span className="hidden lg:block font-black italic text-xl text-white ml-2" style={{fontFamily:'Georgia,serif'}}>
-          BP<span className="text-[#00b181] font-bold text-sm not-italic ml-1">Exchange</span>
-        </span>
+        <Link to="/dashboard" className="flex items-baseline group">
+          <span className="font-pacifico text-white text-xl leading-none">BP</span>
+          <span className="text-[#3dd6c8] font-bold text-[10px] ml-1 uppercase tracking-tighter">Exchange</span>
+        </Link>
       </div>
 
       {/* CENTER: Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-1 ml-6 flex-1">
+      <nav className="hidden lg:flex items-center gap-1 ml-8 flex-1">
         <NavLink to="/dashboard" label="Dashboard" />
         <NavLink to="/accounts" label="Users" />
         <NavLink to="/reports/daily-pl" label="Reports" />
       </nav>
 
       {/* RIGHT SECTION: User + Stats */}
-      <div className="flex-1 lg:flex-none flex items-center justify-end ml-auto gap-3">
+      <div className="flex items-center ml-auto gap-2 lg:gap-4 overflow-hidden">
         {session ? (
-          <div className="flex items-center gap-3 lg:gap-5">
+          <>
             {/* User Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#3d6b8b] px-2 py-1 rounded transition-colors">
-                  <span className="text-white text-sm font-semibold">
-                    {session.username} ({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-white/10 px-2 py-1 rounded transition-colors shrink-0 max-w-[120px] lg:max-w-none">
+                  <span className="text-white text-xs lg:text-sm font-semibold truncate">
+                    {session.username} <span className="text-white/60 font-normal">({session.role?.charAt(0).toUpperCase()})</span>
                   </span>
-                  <ChevronDown className="w-3 h-3 text-white" />
+                  <ChevronDown className="w-3 h-3 text-white/50" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
-                  Logged in as <span className="font-semibold text-[#2c3e50]">{session.username}</span>
+              <DropdownMenuContent align="end" className="bg-[#1a3550] border border-[#0f2236] shadow-2xl rounded-md w-48 mt-1">
+                <div className="px-3 py-2 text-[10px] text-white/50 border-b border-white/10 mb-1 uppercase tracking-widest">
+                  Account: <span className="font-bold text-white">{session.username}</span>
                 </div>
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50"
+                  className="text-red-400 hover:bg-red-500/10 cursor-pointer text-xs font-semibold focus:text-red-400 focus:bg-red-500/10 px-3 py-2"
                 >
-                  <LogOut className="w-3 h-3 mr-2" />
+                  <LogOut className="w-3.5 h-3.5 mr-2" />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Stats Separator */}
+            <div className="h-6 w-px bg-white/20 mx-1 hidden sm:block" />
+
             {/* Stats */}
-            <div className="flex items-center gap-2 border-l border-[#3d6b8b] pl-3 lg:pl-5">
-              <span className="text-sm font-bold text-white whitespace-nowrap">
-                B: <span>0</span>
-              </span>
-              <span className="text-sm font-bold text-white whitespace-nowrap">
-                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-white'}>
+            <div className="flex items-center gap-2 lg:gap-4 shrink-0 pr-1">
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
+                <span className="text-[9px] lg:text-[10px] text-white/60 font-bold uppercase">B:</span>
+                <span className="text-[11px] lg:text-xs font-bold text-white">0</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
+                <span className="text-[9px] lg:text-[10px] text-white/60 font-bold uppercase">Exp:</span>
+                <span className={cn(
+                  "text-[11px] lg:text-xs font-bold",
+                  totalExposure > 0 ? 'text-red-400' : 'text-white'
+                )}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
-              </span>
+              </div>
             </div>
-          </div>
+          </>
         ) : (
           <button 
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-white hover:text-white/80 uppercase"
+            className="text-xs font-bold text-white hover:text-white/80 uppercase tracking-wider"
           >
             Login
           </button>

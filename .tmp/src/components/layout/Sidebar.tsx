@@ -81,11 +81,11 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   return (
     <>
       {/* DESKTOP SIDEBAR: fixed left, always visible on lg+ */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-[240px] z-30 bg-[#254465] flex-col overflow-y-auto">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-[240px] z-30 bg-[#1a3550] flex-col overflow-y-auto">
         {/* Logo area */}
-        <div className="flex items-center justify-center h-14 border-b border-[#1a3550]">
-          <span className="text-white font-black italic text-2xl" style={{fontFamily:'Georgia,serif'}}>BP</span>
-          <span className="text-[#00b181] font-bold text-sm ml-2">Exchange</span>
+        <div className="flex items-center justify-center h-14 border-b border-[#0f2236]">
+          <span className="text-white font-pacifico text-2xl">BP</span>
+          <span className="text-[#3dd6c8] font-bold text-sm ml-2 uppercase">Exchange</span>
         </div>
         <SidebarNavItems onNavigate={() => {}} />
       </aside>
@@ -109,12 +109,12 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
               animate={{ x: 0 }}
               exit={{ x: -260 }}
               transition={{ type: "tween", duration: 0.2 }}
-              className="fixed left-0 top-0 h-full w-[260px] z-50 bg-[#254465] flex flex-col overflow-y-auto lg:hidden"
+              className="fixed left-0 top-0 h-full w-[260px] z-50 bg-[#1a3550] flex flex-col overflow-y-auto lg:hidden"
             >
-              <div className="p-4 border-b border-[#1a3550] flex items-center justify-between">
+              <div className="p-4 border-b border-[#0f2236] flex items-center justify-between">
                 <div className="flex items-center">
-                  <span className="text-white font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>BP</span>
-                  <span className="text-[#00b181] font-bold text-xs ml-2">Exchange</span>
+                  <span className="text-white font-pacifico text-xl">BP</span>
+                  <span className="text-[#3dd6c8] font-bold text-xs ml-2 uppercase">Exchange</span>
                 </div>
                 <button
                   onClick={onMobileClose}
