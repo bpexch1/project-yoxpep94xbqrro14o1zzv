@@ -29,7 +29,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
-        "px-4 py-2 rounded text-sm transition-colors whitespace-nowrap",
+        "w-full px-4 py-2 rounded text-sm transition-colors text-left",
         activeTab === tab.id
           ? "bg-[#1a9e71] border border-[#1a9e71] text-white font-bold"
           : "border border-[#1a9e71] text-[#1a9e71] bg-white hover:bg-green-50 font-medium"
@@ -45,7 +45,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
         <span className="font-bold text-[#2c3e50] text-sm">Report Type</span>
       </div>
-      <div className="p-3 flex flex-wrap gap-2">
+      <div className="p-3 flex flex-col gap-2">
         {tabs.map((tab) => (
           <TabButton key={tab.id} tab={tab} />
         ))}
