@@ -92,45 +92,66 @@ export function ClientSummaryCard({
       {/* Card title */}
       <div className="px-4 py-3 bg-white border-b border-[#d5d8dc]">
         <span className="font-bold text-sm text-[#2c3e50]">
-          {username} - Clients List
+          {username} - Clients List{!isBalanceLoaded ? " | Default" : ""}
         </span>
       </div>
 
       <div className="space-y-4">
         {/* Stats table */}
         <div className="px-4 pt-4 overflow-x-auto">
-          <table className="w-full text-left border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Received</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Cash</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Balance<br/>UpLine</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{isBalanceLoaded ? totals.credit_received.toLocaleString() : "0"}</span>
-                </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{isBalanceLoaded ? totals.credit_remaining.toLocaleString() : "0"}</span>
-                </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{isBalanceLoaded ? totals.cash.toLocaleString() : "0"}</span>
-                </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className={cn("text-sm font-bold", (isBalanceLoaded && totals.pl_downline < 0) ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
-                    {isBalanceLoaded ? totals.pl_downline.toLocaleString() : "0"}
-                  </span>
-                </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{isBalanceLoaded ? totals.balance_upline.toLocaleString() : "0"}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {!isBalanceLoaded ? (
+            <table className="w-full text-left border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Cash</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full text-left border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Received</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Cash</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Balance<br/>UpLine</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-2 px-1 border border-gray-300 text-center">
+                    <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 px-1 border border-gray-300 text-center">
+                    <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 px-1 border border-gray-300 text-center">
+                    <span className={cn("text-sm font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.cash.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 px-1 border border-gray-300 text-center">
+                    <span className={cn("text-sm font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                      {totals.pl_downline.toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="py-2 px-1 border border-gray-300 text-center">
+                    <span className={cn("text-sm font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.balance_upline.toLocaleString()}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Action buttons + Legend merged row */}
@@ -171,6 +192,10 @@ export function ClientSummaryCard({
             <div className="flex items-center gap-1.5">
               <div className="w-6 h-6 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
               <span className="font-medium">InActive</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 bg-[#e74c3c] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">S</div>
+              <span className="font-medium">Settle Account</span>
             </div>
           </div>
         </div>
