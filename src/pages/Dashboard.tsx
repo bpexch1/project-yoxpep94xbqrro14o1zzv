@@ -77,17 +77,17 @@ export default function Dashboard() {
 
   return (
     <div className="bg-[#f0f2f5] pb-16 min-h-screen">
-      <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
+      <main className="max-w-4xl mx-auto px-0 pb-8">
         <div className="h-3" />
         
         {/* Search Users Section */}
         <div className="mx-3 mb-3">
           <section className="bg-white border border-[#d5d8dc] rounded-lg shadow-sm overflow-hidden">
-            <div className="bg-[#f0f0f0] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-2">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#f0f0f0]">
               <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
               <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
             </div>
-            <div className="px-4 py-4 flex gap-2">
+            <div className="flex gap-2 px-4 py-4">
               <input
                 type="text"
                 placeholder="Username"
@@ -98,7 +98,7 @@ export default function Dashboard() {
               />
               <button 
                 onClick={handleSearch}
-                className="bg-[#1a9e71] text-white px-6 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
+                className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
               >
                 <Search className="w-3.5 h-3.5" />
                 Search
@@ -110,23 +110,23 @@ export default function Dashboard() {
         {/* Sport Highlights Card */}
         <div className="mx-3">
           <section className="bg-white border border-[#d5d8dc] rounded-lg shadow-sm overflow-hidden">
-            <div className="bg-[#f0f0f0] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-3">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#d5d8dc] bg-[#f0f0f0]">
               <span className="font-bold text-[#2c3e50] text-sm">Sport Highlights</span>
               <button 
                 onClick={handleRefresh}
-                className="bg-[#1a9e71] text-white text-xs px-3 py-1 rounded hover:bg-[#158c61] transition-colors"
+                className="bg-[#1a9e71] text-white text-xs px-3 py-0.5 rounded hover:bg-[#158c61] transition-colors"
               >
                 Refresh
               </button>
             </div>
             
-            <div className="p-0 overflow-x-auto mt-0">
+            <div className="overflow-x-auto">
               {isLoading ? (
                 <div className="flex items-center justify-center py-16">
-                  <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
+                  <Loader2 className="w-8 h-8 text-[#1a9e71] animate-spin" />
                 </div>
               ) : filteredMatches.length === 0 ? (
-                <div className="py-10 text-center text-[#7f8c8d] text-sm">
+                <div className="py-8 text-center text-[#7f8c8d] text-sm">
                   No matches found.
                 </div>
               ) : (
@@ -134,38 +134,40 @@ export default function Dashboard() {
                   <tbody>
                     {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                       <Fragment key={sport}>
-                        {/* Sport Sub-header */}
+                        {/* Sport group header row */}
                         <tr>
-                          <td className="border border-[#d5d8dc] px-4 py-2 font-bold text-[#1a6b4a] bg-[#e8f5e9] text-sm">
+                          <td className="border border-[#d5d8dc] px-4 py-2.5 font-bold text-[#2c3e50] bg-[#ecf0f1] text-sm">
                             {sport}
                           </td>
-                          <td className="border border-[#d5d8dc] px-4 py-2 font-bold text-[#1a6b4a] bg-[#e8f5e9] w-32 text-sm">
+                          <td className="border border-[#d5d8dc] px-4 py-2.5 font-bold text-[#2c3e50] bg-[#ecf0f1] w-32 text-sm text-right">
                             Amount
                           </td>
                         </tr>
                         
-                        {/* Match Rows */}
+                        {/* Match rows */}
                         {sportMatches.map((match, idx) => {
                           const amount = calculateAmount(match.id);
                           return (
                             <tr 
                               key={match.id} 
-                              className={idx % 2 === 0 ? 'bg-white hover:bg-[#f5faff]' : 'bg-[#f9f9f9] hover:bg-[#f5faff]'}
+                              className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9fbfc]'}
                             >
                               <td className="border border-[#d5d8dc] px-4 py-2.5">
-                                <span 
-                                  className="text-[#1a9e71] text-sm font-medium cursor-pointer hover:underline"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                  }}
-                                >
-                                  {match.title} / Match Odds
-                                </span>
-                                {match.status === 'live' && (
-                                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block ml-1 animate-pulse" />
-                                )}
+                                <div className="flex items-center gap-2">
+                                  {match.status === 'live' && (
+                                    <span className="inline-block w-2 h-2 rounded-full bg-[#1a9e71] shrink-0 animate-pulse" />
+                                  )}
+                                  <span 
+                                    className="text-[#1a9e71] text-sm cursor-pointer hover:underline"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                    }}
+                                  >
+                                    {match.title} / Match Odds
+                                  </span>
+                                </div>
                               </td>
-                              <td className="border border-[#d5d8dc] px-4 py-2.5 text-[#2c3e50] text-sm font-medium">
+                              <td className="border border-[#d5d8dc] px-4 py-2.5 text-[#2c3e50] text-sm font-medium text-right">
                                 {formatAmount(amount)}
                               </td>
                             </tr>
