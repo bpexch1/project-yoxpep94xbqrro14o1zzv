@@ -46,7 +46,7 @@ export function ClientSummaryCard({
       case 'supermaster': return 'SuperMaster';
       case 'admin': return 'Admin';
       case 'agent': return 'Agent';
-      case 'client': return 'Client';
+      case 'client': return 'Bettor';
       default: return 'Bettor';
     }
   };
