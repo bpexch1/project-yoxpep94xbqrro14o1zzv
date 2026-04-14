@@ -29,7 +29,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
-        "w-full px-3 py-2 rounded text-sm transition-colors text-center border",
+        "w-full px-2 py-1.5 rounded text-xs transition-colors text-center border",
         activeTab === tab.id
           ? "bg-[#1a9e71] border-[#1a9e71] text-white font-bold"
           : "border-[#1a9e71] text-[#1a9e71] bg-white hover:bg-green-50",
