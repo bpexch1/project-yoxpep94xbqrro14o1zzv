@@ -88,11 +88,6 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
     <>
       {/* DESKTOP SIDEBAR: fixed left, always visible on lg+ */}
       <aside className="hidden lg:flex fixed left-0 top-0 h-full w-[240px] z-30 bg-[#1e2d3a] flex-col overflow-y-auto">
-        {/* Logo area */}
-        <div className="flex items-center justify-center h-14 border-b border-[#152535]">
-          <span className="text-white font-black italic text-2xl" style={{fontFamily:'Georgia,serif'}}>BP</span>
-          <span className="text-[#26c6da] font-bold text-sm ml-2">Exchange</span>
-        </div>
         <SidebarNavItems onNavigate={() => {}} />
       </aside>
 

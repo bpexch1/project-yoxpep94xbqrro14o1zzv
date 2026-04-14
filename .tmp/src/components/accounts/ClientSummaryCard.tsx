@@ -193,7 +193,7 @@ export function ClientSummaryCard({
           <thead>
             {!isBalanceLoaded ? (
               <tr className="bg-[#1a9e71]">
-                <td colSpan={3} className="px-4 py-3 text-center">
+                <td colSpan={3} className="px-4 py-3 text-left">
                   <button
                     type="button"
                     onClick={handleLoadBalance}
