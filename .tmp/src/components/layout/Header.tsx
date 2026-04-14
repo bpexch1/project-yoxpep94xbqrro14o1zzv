@@ -47,7 +47,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           const total = pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
           setTotalExposure(total);
         })
-        .catch((e) => console.error('Exp fetch error:', e));
+        .catch(() => {}); // silently ignore fetch errors (e.g. not authenticated)
     }
   }, []);
 
