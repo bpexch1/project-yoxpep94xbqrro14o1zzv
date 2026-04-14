@@ -204,7 +204,6 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                 <SelectContent>
                   {isCompany && <SelectItem value="superadmin">SuperAdmin</SelectItem>}
                   <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="agent">Agent</SelectItem>
                   <SelectItem value="client">Bettor</SelectItem>
                 </SelectContent>
               </Select>
