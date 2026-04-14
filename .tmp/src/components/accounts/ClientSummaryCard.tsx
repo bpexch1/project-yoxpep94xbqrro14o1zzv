@@ -92,49 +92,70 @@ export function ClientSummaryCard({
       {/* Card title */}
       <div className="px-4 py-2.5 bg-[#f0f0f0] border-b border-[#d5d8dc]">
         <span className="font-bold text-sm text-[#2c3e50]">
-          {username} - Clients List | Default
+          {username} - Clients List{!isBalanceLoaded ? " | Default" : ""}
         </span>
       </div>
 
       <div className="space-y-4">
         {/* Stats table */}
         <div className="px-3 pt-3 overflow-x-auto">
-          <table className="w-full text-left border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Received</th>
-                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Remaining</th>
-                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Cash</th>
-                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">P/L<br/>Downline</th>
-                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Balance<br/>UpLine</th>
-                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Users</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
-                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
-                </td>
-                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
-                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
-                </td>
-                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
-                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.cash.toLocaleString()}</span>
-                </td>
-                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
-                  <span className={cn("text-sm lg:text-base font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
-                    {totals.pl_downline.toLocaleString()}
-                  </span>
-                </td>
-                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
-                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.balance_upline.toLocaleString()}</span>
-                </td>
-                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
-                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{filteredClients.length}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {!isBalanceLoaded ? (
+            <table className="w-full text-left border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">Credit<br/>Remaining</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center">Cash</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">P/L<br/>Downline</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full text-left border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Received</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Remaining</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Cash</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">P/L<br/>Downline</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Balance<br/>UpLine</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                    <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                    <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                    <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.cash.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                    <span className={cn("text-sm lg:text-base font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                      {totals.pl_downline.toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                    <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.balance_upline.toLocaleString()}</span>
+                  </td>
+                  <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                    <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{filteredClients.length}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Action buttons + Legend merged row for desktop */}
@@ -195,7 +216,7 @@ export function ClientSummaryCard({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            {!isBalanceLoaded && (
+            {!isBalanceLoaded ? (
               <tr className="bg-[#1a9e71]">
                 <td colSpan={3} className="px-3 py-2.5">
                   <button
@@ -207,6 +228,12 @@ export function ClientSummaryCard({
                   </button>
                 </td>
               </tr>
+            ) : (
+              <tr className="bg-[#1a9e71] text-white">
+                <td className="px-3 py-2.5 font-bold text-sm">Total</td>
+                <td className="px-3 py-2.5 text-sm"></td>
+                <td className="px-3 py-2.5 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
+              </tr>
             )}
             {/* Column headers — always visible */}
             <tr className="bg-[#ecf0f1] border-b border-[#d5d8dc]">
@@ -216,7 +243,7 @@ export function ClientSummaryCard({
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {!isBalanceLoaded ? null : isLoading ? (
               <tr>
                 <td colSpan={3} className="px-3 py-8 text-center text-[#7f8c8d] bg-white">
                   <div className="flex flex-col items-center gap-2">
@@ -258,7 +285,7 @@ export function ClientSummaryCard({
                         {getTypeLabel(client.role)}
                       </td>
                       <td className="px-3 lg:px-4 py-3 text-[#2c3e50] text-right font-medium">
-                        {(client.credit_remaining || 0).toLocaleString()}
+                        {(client.credit_received || 0).toLocaleString()}
                       </td>
                     </tr>
 
