@@ -40,13 +40,12 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     const s = getClientSession();
     setSession(s);
     if (s?.id) {
-      // Fetch all pending bets exposure
       Bet.filter({ status: 'pending' }, '-created_at', 500)
         .then((pendingBets: any[]) => {
           const total = pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
           setTotalExposure(total);
         })
-        .catch(() => {}); // silently ignore fetch errors
+        .catch(() => {});
     }
   }, []);
 

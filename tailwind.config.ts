@@ -72,7 +72,6 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Roboto', 'Arial', 'sans-serif'],
-				pacifico: ['Pacifico', 'cursive'],
 			},
 		}
 	},
