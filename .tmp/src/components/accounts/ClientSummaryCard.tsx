@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { EditClientModal } from "./EditClientModal";
 import { CashCreditModal } from "./CashCreditModal";
 import { SettlePLModal } from "./SettlePLModal";
-import { TransactionHistoryModal } from "./TransactionHistoryModal";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,8 +30,6 @@ export function ClientSummaryCard({
   const [editingClient, setEditingClient] = useState<any | null>(null);
   const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
   const [settlePLClient, setSettlePLClient] = useState<any | null>(null);
-  const [txClient, setTxClient] = useState<any | null>(null);
-  const [txType, setTxType] = useState<'cash' | 'credit' | 'all'>('all');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
 
@@ -299,15 +296,9 @@ export function ClientSummaryCard({
                       <td className="px-3 lg:px-4 py-3 text-[#2c3e50] text-right font-semibold">
                         {/* Only show credit value after Load Balance is clicked */}
                         {isBalanceLoaded ? (
-                          <div className="flex flex-col items-end gap-0.5">
-                            <span
-                              onClick={() => { setTxClient(client); setTxType('credit'); }}
-                              className="font-bold underline cursor-pointer hover:opacity-75"
-                            >
-                              {(client.credit_received || 0).toLocaleString()}
-                            </span>
-                            <span className="text-[10px] text-[#7f8c8d]">tap to view ledger</span>
-                          </div>
+                          <span className="font-bold">
+                            {(client.credit_received || 0).toLocaleString()}
+                          </span>
                         ) : "-"}
                       </td>
                     </tr>
@@ -321,13 +312,9 @@ export function ClientSummaryCard({
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#2c3e50]">Balance:</span>
-                                <span 
-                                  onClick={() => { setTxClient(client); setTxType('cash'); }}
-                                  className="font-bold underline cursor-pointer hover:opacity-75"
-                                >
+                                <span className="font-bold">
                                   {(client.balance_upline || 0).toLocaleString()}
                                 </span>
-                                <span className="text-[10px] text-[#7f8c8d] ml-2 font-normal">tap to view ledger</span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
@@ -349,13 +336,9 @@ export function ClientSummaryCard({
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#2c3e50]">Available Balance:</span>
-                                <span 
-                                  onClick={() => { setTxClient(client); setTxType('credit'); }}
-                                  className="font-bold text-[#1a9e71] underline cursor-pointer hover:text-[#158c61]"
-                                >
+                                <span className="font-bold text-[#1a9e71]">
                                   {(client.credit_remaining || 0).toLocaleString()}
                                 </span>
-                                <span className="text-[10px] text-[#7f8c8d] ml-2 font-normal">tap to view ledger</span>
                               </li>
                               
                               <li className="flex items-center gap-3 mt-4 pt-3 border-t border-[#d5d8dc]">
@@ -422,12 +405,6 @@ export function ClientSummaryCard({
       <EditClientModal isOpen={!!editingClient} onClose={() => setEditingClient(null)} client={editingClient} />
       <CashCreditModal isOpen={!!cashCreditClient} onClose={() => setCashCreditClient(null)} client={cashCreditClient} />
       <SettlePLModal isOpen={!!settlePLClient} onClose={() => setSettlePLClient(null)} client={settlePLClient} />
-      <TransactionHistoryModal 
-        isOpen={!!txClient} 
-        onClose={() => setTxClient(null)} 
-        client={txClient} 
-        filterType={txType}
-      />
     </section>
   );
 }
