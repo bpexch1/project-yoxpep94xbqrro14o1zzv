@@ -79,7 +79,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       </nav>
 
       {/* RIGHT SECTION: User + Stats */}
-      <div className="flex-1 lg:flex-none flex items-center justify-center lg:justify-end ml-auto gap-3">
+      <div className="flex-1 lg:flex-none flex items-center justify-end ml-auto gap-3">
         {session ? (
           <div className="flex items-center gap-3 lg:gap-5">
             {/* User Dropdown */}
@@ -87,7 +87,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-[#d5d8dc] px-2 py-1 rounded transition-colors">
                   <span className="text-[#555555] text-sm font-normal">
-                    {session.username} <span className="hidden sm:inline">({session.role})</span>
+                    {session.username} <span className="hidden sm:inline">({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})</span>
                   </span>
                   <ChevronDown className="w-3 h-3 text-[#555555]" />
                 </div>
