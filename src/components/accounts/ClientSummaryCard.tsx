@@ -102,88 +102,91 @@ export function ClientSummaryCard({
           <table className="w-full text-left border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-50">
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">Credit<br/>Received</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">Credit<br/>Remaining</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center">Cash</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">P/L<br/>Downline</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">Balance<br/>UpLine</th>
-                <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center">Users</th>
+                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Received</th>
+                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Remaining</th>
+                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Cash</th>
+                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">P/L<br/>Downline</th>
+                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Balance<br/>UpLine</th>
+                <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Users</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
+                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
                 </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
+                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
                 </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{totals.cash.toLocaleString()}</span>
+                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.cash.toLocaleString()}</span>
                 </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className={cn("text-sm font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                  <span className={cn("text-sm lg:text-base font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
                     {totals.pl_downline.toLocaleString()}
                   </span>
                 </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{totals.balance_upline.toLocaleString()}</span>
+                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{totals.balance_upline.toLocaleString()}</span>
                 </td>
-                <td className="py-2 px-1 border border-gray-300 text-center">
-                  <span className="text-sm font-bold text-[#1a9e71]">{filteredClients.length}</span>
+                <td className="py-2 lg:py-3 px-1 border border-gray-300 text-center">
+                  <span className="text-sm lg:text-base font-bold text-[#1a9e71]">{filteredClients.length}</span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-2 px-3 py-2">
-          <button
-            onClick={() => navigate("/accounts/create")}
-            className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1 transition-colors shadow-sm"
-          >
-            <UserPlus className="w-3.5 h-3.5" /> New User
-          </button>
-          <button className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1 transition-colors shadow-sm">
-            <BookOpen className="w-3.5 h-3.5" /> Account Ledger
-          </button>
-        </div>
-
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 text-xs text-[#2c3e50]">
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm">C</div>
-            <span className="font-medium">Cash / Credit</span>
+        {/* Action buttons + Legend merged row for desktop */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-3 py-2 gap-3">
+          {/* Left: Action buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate("/accounts/create")}
+              className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
+            >
+              <UserPlus className="w-3.5 h-3.5" /> New User
+            </button>
+            <button className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap">
+              <BookOpen className="w-3.5 h-3.5" /> Account Ledger
+            </button>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 bg-[#5dade2] text-white flex items-center justify-center rounded-sm">
-              <Pencil className="w-3 h-3" />
+
+          {/* Right: Legend */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[#2c3e50]">
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm">C</div>
+              <span className="font-medium">Cash / Credit</span>
             </div>
-            <span className="font-medium">Edit</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 bg-[#3498db] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">L</div>
-            <span className="font-medium">Ledger</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">A</div>
-            <span className="font-medium">Active</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
-            <span className="font-medium">InActive</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 bg-[#5dade2] text-white flex items-center justify-center rounded-sm">
+                < Pencil className="w-3 h-3" />
+              </div>
+              <span className="font-medium">Edit</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 bg-[#3498db] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">L</div>
+              <span className="font-medium">Ledger</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">A</div>
+              <span className="font-medium">Active</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
+              <span className="font-medium">InActive</span>
+            </div>
           </div>
         </div>
 
-        {/* Search Field */}
-        <div className="flex flex-col items-center gap-1 py-3 border-t border-gray-100">
+        {/* Search Field - right aligned on desktop */}
+        <div className="flex flex-col lg:flex-row lg:justify-end items-center gap-1 py-3 border-t border-gray-100 px-3">
           <span className="text-sm text-[#2c3e50] font-medium">Search:</span>
           <input
             type="text"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            className="border border-[#d5d8dc] px-3 py-1.5 text-sm w-52 focus:outline-none focus:border-[#1a9e71] text-[#2c3e50] bg-white"
+            className="border border-[#d5d8dc] px-3 py-1.5 text-sm w-full lg:w-52 focus:outline-none focus:border-[#1a9e71] text-[#2c3e50] bg-white"
           />
         </div>
       </div>
@@ -205,9 +208,9 @@ export function ClientSummaryCard({
             </tr>
             {/* Column headers — always visible */}
             <tr className="bg-[#ecf0f1] border-b border-[#d5d8dc]">
-              <th className="px-3 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Username</th>
-              <th className="px-3 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Type</th>
-              <th className="px-3 py-2.5 font-bold text-[#2c3e50] text-right">Credit</th>
+              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Username</th>
+              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Type</th>
+              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-right">Credit</th>
             </tr>
           </thead>
           <tbody>
@@ -236,7 +239,7 @@ export function ClientSummaryCard({
                   <React.Fragment key={client.id}>
                     {/* Main row */}
                     <tr className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]", "border-b border-[#d5d8dc]")}>
-                      <td className="px-3 py-3 border-r border-[#d5d8dc]">
+                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc]">
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => toggleExpand(client.id)}
@@ -249,10 +252,10 @@ export function ClientSummaryCard({
                           </button>
                         </div>
                       </td>
-                      <td className="px-3 py-3 border-r border-[#d5d8dc] text-[#2c3e50]">
+                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#2c3e50]">
                         {getTypeLabel(client.role)}
                       </td>
-                      <td className="px-3 py-3 text-[#2c3e50] text-right font-medium">
+                      <td className="px-3 lg:px-4 py-3 text-[#2c3e50] text-right font-medium">
                         {(client.credit_remaining || 0).toLocaleString()}
                       </td>
                     </tr>
@@ -260,7 +263,7 @@ export function ClientSummaryCard({
                     {/* Expanded details row */}
                     {isExpanded && (
                       <tr>
-                        <td colSpan={3} className={cn("px-6 py-4 border-b border-[#d5d8dc]", idx % 2 === 0 ? "bg-slate-50" : "bg-white")}>
+                        <td colSpan={3} className={cn("px-6 lg:px-8 py-4 border-b border-[#d5d8dc]", idx % 2 === 0 ? "bg-slate-50" : "bg-white")}>
                           <div className="relative">
                             <ul className="text-[13px] text-[#2c3e50] space-y-2 relative z-10">
                               <li className="flex items-center gap-2">

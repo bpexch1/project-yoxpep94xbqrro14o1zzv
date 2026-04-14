@@ -29,7 +29,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
-        "w-full text-xs py-1.5 px-1 text-center rounded border border-[#1a9e71] transition-colors",
+        "w-full lg:w-auto text-[11px] lg:text-xs py-1.5 px-2 lg:px-4 text-center rounded border border-[#1a9e71] transition-colors whitespace-nowrap",
         activeTab === tab.id
           ? "bg-[#1a9e71] border-[#1a9e71] text-white font-bold"
           : "text-[#1a9e71] bg-white border-[#1a9e71] hover:bg-green-50",
@@ -46,14 +46,15 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
         <span className="font-bold text-[#2c3e50] text-sm">Report Type</span>
       </div>
-      <div className="p-3 grid grid-cols-3 gap-2">
-        {tabs.slice(0, 6).map((tab) => (
-          <TabButton key={tab.id} tab={tab} />
-        ))}
-        {/* Commission Report: center of last row */}
-        <div className="col-start-2">
-          <TabButton tab={tabs[6]} />
-        </div>
+      <div className="p-3 grid grid-cols-3 gap-2 lg:flex lg:flex-wrap lg:gap-2">
+        {tabs.map((tab, i) => {
+          const isMobileCenter = i === 6; // Commission Report
+          return (
+            <div key={tab.id} className={cn("lg:col-auto", isMobileCenter ? "col-start-2" : "")}>
+              <TabButton tab={tab} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
