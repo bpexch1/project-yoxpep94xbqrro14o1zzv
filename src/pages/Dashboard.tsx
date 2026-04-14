@@ -76,28 +76,28 @@ export default function Dashboard() {
   const isLoading = isLoadingMatches || isLoadingBets;
 
   return (
-    <div className="bg-[#f4f6f7] pb-16 min-h-screen">
-      <main className="px-2 pt-2 pb-8 max-w-5xl mx-auto">
+    <div className="bg-[#f0f2f5] pb-16 min-h-screen">
+      <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
         {/* Search Users Section */}
-        <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none mb-2">
-          <div className="bg-[#ecf0f1] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-2">
+        <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none mb-3">
+          <div className="bg-[#ecf0f1] px-4 py-2.5 border-b border-[#d5d8dc] flex items-center gap-2">
             <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
-            <span className="font-bold text-[#2c3e50] text-sm uppercase">Search-Users</span>
+            <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
           </div>
-          <div className="p-4 pb-6 flex gap-2">
+          <div className="p-4 pb-8 flex gap-2">
             <input
               type="text"
               placeholder="Username"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 border border-[#d5d8dc] rounded px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#16a085] text-[#2c3e50] bg-white"
+              className="flex-1 border border-[#ced4da] rounded px-3 py-1.5 text-sm placeholder-gray-400 focus:outline-none focus:border-[#16a085] text-[#2c3e50] bg-white"
             />
             <button 
               onClick={handleSearch}
-              className="bg-[#16a085] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#138d75] transition-colors shadow-sm"
+              className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors shadow-sm"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-3.5 h-3.5" />
               Search
             </button>
           </div>
@@ -105,11 +105,11 @@ export default function Dashboard() {
 
         {/* Sport Highlights Card */}
         <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
-          <div className="bg-[#ecf0f1] px-4 py-3 border-b border-[#d5d8dc] flex items-center justify-between">
-            <span className="font-bold text-[#2c3e50] text-sm uppercase">Sport Highlights</span>
+          <div className="bg-[#ecf0f1] px-4 py-2.5 border-b border-[#d5d8dc] flex items-center gap-3">
+            <span className="font-bold text-[#2c3e50] text-sm">Sport Highlights</span>
             <button 
               onClick={handleRefresh}
-              className="bg-[#16a085] text-white text-xs px-3 py-1 rounded hover:bg-[#138d75] transition-colors"
+              className="bg-[#1a9e71] text-white text-xs px-3 py-0.5 rounded hover:bg-[#158c61] transition-colors"
             >
               Refresh
             </button>
@@ -121,18 +121,18 @@ export default function Dashboard() {
                 <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
-              <div className="py-8 text-center text-[#7f8c8d] text-sm border border-[#bdc3c7]">
+              <div className="py-8 text-center text-[#7f8c8d] text-sm border border-[#d5d8dc]">
                 No matches found.
               </div>
             ) : (
-              <table className="w-full text-sm border-collapse border border-[#bdc3c7]">
+              <table className="w-full text-sm border-collapse">
                 <tbody>
                   {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                     <Fragment key={sport}>
                       {/* Sport Sub-header */}
                       <tr>
-                        <td className="border border-[#bdc3c7] px-4 py-2 font-bold text-[#2c3e50] bg-white">{sport}</td>
-                        <td className="border border-[#bdc3c7] px-4 py-2 font-bold text-[#2c3e50] bg-white text-right w-32">Amount</td>
+                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white">{sport}</td>
+                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white w-32">Amount</td>
                       </tr>
                       
                       {/* Match Rows */}
@@ -141,14 +141,13 @@ export default function Dashboard() {
                         return (
                           <tr 
                             key={match.id} 
-                            className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f2f2f2]'}
+                            className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9f9f9]'}
                           >
-                            <td className="border border-[#bdc3c7] px-4 py-2">
+                            <td className="border border-[#d5d8dc] px-3 py-2">
                               <span 
                                 className="text-[#16a085] font-medium cursor-pointer hover:underline"
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  // Potential navigation here
                                 }}
                               >
                                 {match.title} / Match Odds
@@ -157,7 +156,7 @@ export default function Dashboard() {
                                 <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#16a085] ml-1 align-middle" />
                               )}
                             </td>
-                            <td className="border border-[#bdc3c7] px-4 py-2 text-right text-[#2c3e50] font-medium">
+                            <td className="border border-[#d5d8dc] px-3 py-2 text-[#2c3e50] font-medium">
                               {formatAmount(amount)}
                             </td>
                           </tr>
