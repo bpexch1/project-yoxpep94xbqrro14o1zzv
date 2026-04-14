@@ -39,33 +39,30 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#254465] flex items-center justify-between px-4 h-14 border-b border-[#1a3550] shadow-sm">
-      {/* LEFT: Hamburger or Logo Label */}
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-40 bg-[#ecf0f1] flex items-center justify-between px-4 h-12 border-b border-[#d5d8dc] shadow-none">
+      {/* LEFT: Hamburger */}
+      <div className="flex items-center">
         <button 
           onClick={onOpenMobileSidebar}
-          className="lg:hidden p-1 hover:bg-[#3d6b8b] rounded transition-colors"
+          className="p-1 hover:bg-[#d5d8dc] rounded transition-colors"
         >
-          <Menu className="w-6 h-6 text-white" />
+          <Menu className="w-5 h-5 text-[#2c3e50]" />
         </button>
-        <div className="hidden lg:flex items-center">
-          <span className="text-white font-bold text-sm tracking-wide">EXCHANGE ADMIN</span>
-        </div>
       </div>
 
-      {/* RIGHT: User info and Balance */}
-      <div className="flex items-center gap-3">
+      {/* CENTER: User info with dropdown */}
+      <div className="absolute left-1/2 -translate-x-1/2">
         {session ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-1 cursor-pointer hover:bg-[#3d6b8b] px-2 py-1 rounded transition-colors">
-                <span className="text-white text-sm font-medium">
-                  {session.full_name} <span className="text-[#a8c8e8] text-xs">({session.role})</span>
+              <div className="flex items-center gap-1 cursor-pointer hover:bg-[#d5d8dc] px-2 py-1 rounded transition-colors">
+                <span className="text-[#2c3e50] text-sm font-medium">
+                  {session.username} <span className="text-[#7f8c8d]">({session.role})</span>
                 </span>
-                <ChevronDown className="w-3 h-3 text-[#a8c8e8]" />
+                <ChevronDown className="w-3 h-3 text-[#7f8c8d]" />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
+            <DropdownMenuContent align="center" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
               <div className="px-2 py-1.5 text-xs text-[#7f8c8d] border-b border-[#d5d8dc] mb-1">
                 Logged in as <span className="font-semibold text-[#2c3e50]">{session.username}</span>
               </div>
@@ -81,24 +78,21 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button 
             onClick={() => navigate("/login")}
-            className="text-xs font-bold text-[#00b181] hover:text-[#4dbd74] uppercase"
+            className="text-sm font-bold text-[#2c3e50] hover:text-[#7f8c8d] uppercase"
           >
             Login
           </button>
         )}
+      </div>
 
-        <div className="flex items-center gap-2 text-sm whitespace-nowrap border-l border-[#3d6b8b] pl-3">
-          <div className="flex flex-col lg:flex-row lg:gap-3">
-            <span className="text-white font-bold text-xs lg:text-sm">
-              <span className="text-[#a8c8e8]">B: </span>
-              0
-            </span>
-            <span className="text-white font-bold text-xs lg:text-sm">
-              <span className="text-[#a8c8e8]">Exp: </span>
-              {totalExposure.toLocaleString('en-IN')}
-            </span>
-          </div>
-        </div>
+      {/* RIGHT: B and Exp */}
+      <div className="flex items-center gap-3 text-sm text-[#2c3e50] font-medium">
+        <span>B: <span className="font-bold">0</span></span>
+        <span>
+          Exp: <span className={`font-bold ${totalExposure > 0 ? 'text-[#e74c3c]' : ''}`}>
+            {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
+          </span>
+        </span>
       </div>
     </header>
   );
