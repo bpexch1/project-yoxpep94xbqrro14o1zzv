@@ -13,6 +13,7 @@ interface ClientSummaryCardProps {
   username?: string;
   searchFilter?: string;
   onRefresh?: () => void;
+  hideCreateButton?: boolean;
 }
 
 export function ClientSummaryCard({ 
@@ -20,7 +21,8 @@ export function ClientSummaryCard({
   isLoading, 
   username = "Admin", 
   searchFilter = "",
-  onRefresh
+  onRefresh,
+  hideCreateButton = false
 }: ClientSummaryCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -158,12 +160,14 @@ export function ClientSummaryCard({
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-4 py-3 gap-3">
           {/* Left: Action buttons */}
           <div className="flex gap-2">
-            <button
-              onClick={() => navigate("/accounts/create")}
-              className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-sm font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
-            >
-              <UserPlus className="w-3.5 h-3.5" /> New User
-            </button>
+            {!hideCreateButton && (
+              <button
+                onClick={() => navigate("/accounts/create")}
+                className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-sm font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+              >
+                <UserPlus className="w-3.5 h-3.5" /> New User
+              </button>
+            )}
             <button className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-sm font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap">
               <BookOpen className="w-3.5 h-3.5" /> Account Ledger
             </button>
@@ -270,11 +274,17 @@ export function ClientSummaryCard({
                     <tr className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]", "border-b border-[#d5d8dc]")}>
                       <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc]">
                         <button
-                          onClick={() => isBalanceLoaded && toggleExpand(client.id)}
+                          onClick={() => {
+                            if (isAdminType) {
+                              navigate(`/accounts/view/${client.username}`);
+                            } else if (isBalanceLoaded) {
+                              toggleExpand(client.id);
+                            }
+                          }}
                           className={cn(
                             "font-bold text-left",
-                            isAdminType ? "text-[#1a9e71]" : "text-[#2c3e50]",
-                            isBalanceLoaded && "hover:underline cursor-pointer"
+                            isAdminType ? "text-[#1a9e71] underline cursor-pointer" : "text-[#2c3e50]",
+                            !isAdminType && isBalanceLoaded && "hover:underline cursor-pointer"
                           )}
                         >
                           {client.username}
