@@ -39,14 +39,14 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#ecf0f1] flex items-center justify-between px-4 h-12 border-b border-[#d5d8dc] shadow-none">
+    <header className="sticky top-0 z-40 bg-[#ecf0f1] flex items-center justify-between px-3 h-12 border-b border-[#d5d8dc] shadow-none">
       {/* LEFT: Hamburger */}
       <div className="flex items-center">
         <button 
           onClick={onOpenMobileSidebar}
           className="p-1 hover:bg-[#d5d8dc] rounded transition-colors"
         >
-          <Menu className="w-5 h-5 text-[#2c3e50]" />
+          <Menu className="w-5 h-5 text-[#555555]" />
         </button>
       </div>
 
@@ -56,10 +56,10 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-1 cursor-pointer hover:bg-[#d5d8dc] px-2 py-1 rounded transition-colors">
-                <span className="text-[#2c3e50] text-sm font-medium">
-                  {session.username} <span className="text-[#7f8c8d]">({session.role})</span>
+                <span className="text-[#555555] text-sm font-normal">
+                  {session.username} <span>({session.role})</span>
                 </span>
-                <ChevronDown className="w-3 h-3 text-[#7f8c8d]" />
+                <ChevronDown className="w-3 h-3 text-[#555555]" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
@@ -78,7 +78,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button 
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#2c3e50] hover:text-[#7f8c8d] uppercase"
+            className="text-sm font-bold text-[#555555] hover:text-[#7f8c8d] uppercase"
           >
             Login
           </button>
@@ -86,10 +86,12 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       </div>
 
       {/* RIGHT: B and Exp */}
-      <div className="flex items-center gap-3 text-sm text-[#2c3e50] font-medium">
-        <span>B: <span className="font-bold">0</span></span>
-        <span>
-          Exp: <span className={`font-bold ${totalExposure > 0 ? 'text-[#e74c3c]' : ''}`}>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold text-[#333333]">
+          B: <span>0</span>
+        </span>
+        <span className="text-sm font-semibold text-[#333333]">
+          Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : ''}>
             {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
           </span>
         </span>

@@ -80,8 +80,8 @@ export default function Dashboard() {
       <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
         {/* Search Users Section */}
         <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none mb-3">
-          <div className="bg-[#ecf0f1] px-4 py-2.5 border-b border-[#d5d8dc] flex items-center gap-2">
-            <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
+          <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
+            <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
             <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
           </div>
           <div className="p-4 pb-8 flex gap-2">
@@ -95,7 +95,7 @@ export default function Dashboard() {
             />
             <button 
               onClick={handleSearch}
-              className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors shadow-sm"
+              className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
             >
               <Search className="w-3.5 h-3.5" />
               Search
@@ -105,7 +105,7 @@ export default function Dashboard() {
 
         {/* Sport Highlights Card */}
         <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
-          <div className="bg-[#ecf0f1] px-4 py-2.5 border-b border-[#d5d8dc] flex items-center gap-3">
+          <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-3">
             <span className="font-bold text-[#2c3e50] text-sm">Sport Highlights</span>
             <button 
               onClick={handleRefresh}
@@ -115,7 +115,7 @@ export default function Dashboard() {
             </button>
           </div>
           
-          <div className="p-0 overflow-x-auto">
+          <div className="p-0 overflow-x-auto mt-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
@@ -131,8 +131,12 @@ export default function Dashboard() {
                     <Fragment key={sport}>
                       {/* Sport Sub-header */}
                       <tr>
-                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white">{sport}</td>
-                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white w-32">Amount</td>
+                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white text-sm">
+                          {sport}
+                        </td>
+                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white w-32 text-sm">
+                          Amount
+                        </td>
                       </tr>
                       
                       {/* Match Rows */}
@@ -145,7 +149,7 @@ export default function Dashboard() {
                           >
                             <td className="border border-[#d5d8dc] px-3 py-2">
                               <span 
-                                className="text-[#16a085] font-medium cursor-pointer hover:underline"
+                                className="text-[#1a9e71] text-sm font-normal cursor-pointer hover:underline"
                                 onClick={(e) => {
                                   e.preventDefault();
                                 }}
@@ -153,10 +157,13 @@ export default function Dashboard() {
                                 {match.title} / Match Odds
                               </span>
                               {match.status === 'live' && (
-                                <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#16a085] ml-1 align-middle" />
+                                <>
+                                  <br />
+                                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1a9e71] mt-1" />
+                                </>
                               )}
                             </td>
-                            <td className="border border-[#d5d8dc] px-3 py-2 text-[#2c3e50] font-medium">
+                            <td className="border border-[#d5d8dc] px-3 py-2 text-[#2c3e50] text-sm font-medium">
                               {formatAmount(amount)}
                             </td>
                           </tr>
