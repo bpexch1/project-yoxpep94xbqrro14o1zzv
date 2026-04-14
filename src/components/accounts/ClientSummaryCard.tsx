@@ -195,17 +195,19 @@ export function ClientSummaryCard({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="bg-[#1a9e71]">
-              <td colSpan={3} className="px-3 py-2.5">
-                <button
-                  type="button"
-                  onClick={handleLoadBalance}
-                  className="bg-[#f1c40f] hover:bg-yellow-400 active:bg-yellow-500 text-black font-bold text-xs px-5 py-2 rounded transition-colors cursor-pointer select-none"
-                >
-                  Load Balance
-                </button>
-              </td>
-            </tr>
+            {!isBalanceLoaded && (
+              <tr className="bg-[#1a9e71]">
+                <td colSpan={3} className="px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={handleLoadBalance}
+                    className="bg-[#f1c40f] hover:bg-yellow-400 active:bg-yellow-500 text-black font-bold text-xs px-5 py-2 rounded transition-colors cursor-pointer select-none"
+                  >
+                    Load Balance
+                  </button>
+                </td>
+              </tr>
+            )}
             {/* Column headers — always visible */}
             <tr className="bg-[#ecf0f1] border-b border-[#d5d8dc]">
               <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Username</th>
