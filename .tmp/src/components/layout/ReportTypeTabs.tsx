@@ -25,14 +25,15 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     navigate(tab.path);
   };
 
-  const TabButton = ({ tab }: { tab: typeof tabs[0] }) => (
+  const TabButton = ({ tab, className = "" }: { tab: typeof tabs[0]; className?: string }) => (
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
-        "w-full px-4 py-2 rounded text-sm transition-colors text-left",
+        "w-full px-3 py-2 rounded text-sm transition-colors text-center border",
         activeTab === tab.id
-          ? "bg-[#1a9e71] border border-[#1a9e71] text-white font-bold"
-          : "border border-[#1a9e71] text-[#1a9e71] bg-white hover:bg-green-50 font-medium"
+          ? "bg-[#1a9e71] border-[#1a9e71] text-white font-bold"
+          : "border-[#1a9e71] text-[#1a9e71] bg-white hover:bg-green-50",
+        className
       )}
     >
       {tab.label}
@@ -45,10 +46,14 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
         <span className="font-bold text-[#2c3e50] text-sm">Report Type</span>
       </div>
-      <div className="p-3 flex flex-col gap-2">
-        {tabs.map((tab) => (
+      <div className="p-3 grid grid-cols-3 gap-2">
+        {tabs.slice(0, 6).map((tab) => (
           <TabButton key={tab.id} tab={tab} />
         ))}
+        {/* Commission Report: center of last row */}
+        <div className="col-start-2">
+          <TabButton tab={tabs[6]} />
+        </div>
       </div>
     </div>
   );
