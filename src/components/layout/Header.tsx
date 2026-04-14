@@ -86,14 +86,14 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-[#d5d8dc] px-2 py-1 rounded transition-colors">
-                  <span className="text-[#555555] text-sm font-normal">
+                  <span className="text-[#2c3e50] text-sm font-semibold">
                     {session.username} ({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})
                   </span>
-                  <ChevronDown className="w-3 h-3 text-[#555555]" />
+                  <ChevronDown className="w-3 h-3 text-[#2c3e50]" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-[#7f8c8d] border-b border-[#d5d8dc] mb-1">
+                <div className="px-2 py-1.5 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
                   Logged in as <span className="font-semibold text-[#2c3e50]">{session.username}</span>
                 </div>
                 <DropdownMenuItem
@@ -108,10 +108,10 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
 
             {/* Stats */}
             <div className="flex items-center gap-2 border-l border-[#d5d8dc] pl-3 lg:pl-5">
-              <span className="text-sm font-semibold text-[#333333] whitespace-nowrap">
+              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
                 B: <span>0</span>
               </span>
-              <span className="text-sm font-semibold text-[#333333] whitespace-nowrap">
+              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
                 Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : ''}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
@@ -121,7 +121,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button 
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#555555] hover:text-[#7f8c8d] uppercase"
+            className="text-sm font-bold text-[#2c3e50] hover:text-[#7f8c8d] uppercase"
           >
             Login
           </button>

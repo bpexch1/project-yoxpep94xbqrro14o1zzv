@@ -103,10 +103,10 @@ export function ClientSummaryCard({
             <table className="w-full text-left border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">Credit<br/>Remaining</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center">Cash</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center leading-tight">P/L<br/>Downline</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] text-center">Users</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Cash</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
+                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] text-center">Users</th>
                 </tr>
               </thead>
               <tbody>
@@ -122,12 +122,12 @@ export function ClientSummaryCard({
             <table className="w-full text-left border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Received</th>
-                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Credit<br/>Remaining</th>
-                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Cash</th>
-                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">P/L<br/>Downline</th>
-                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center leading-tight">Balance<br/>UpLine</th>
-                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[10px] lg:text-xs text-center">Users</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] lg:text-xs text-center leading-tight">Credit<br/>Received</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] lg:text-xs text-center leading-tight">Credit<br/>Remaining</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] lg:text-xs text-center">Cash</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] lg:text-xs text-center leading-tight">P/L<br/>Downline</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] lg:text-xs text-center leading-tight">Balance<br/>UpLine</th>
+                  <th className="py-2 lg:py-3 px-1 border border-gray-300 font-bold text-[#2c3e50] text-[11px] lg:text-xs text-center">Users</th>
                 </tr>
               </thead>
               <tbody>
@@ -174,7 +174,7 @@ export function ClientSummaryCard({
           </div>
 
           {/* Right: Legend */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[#2c3e50]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-semibold text-[#2c3e50]">
             <div className="flex items-center gap-1.5">
               <div className="w-6 h-6 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm">C</div>
               <span className="font-medium">Cash / Credit</span>
@@ -202,7 +202,7 @@ export function ClientSummaryCard({
 
         {/* Search Field - right aligned on desktop */}
         <div className="flex flex-col lg:flex-row lg:justify-end items-center gap-1 py-3 border-t border-gray-100 px-3">
-          <span className="text-sm text-[#2c3e50] font-medium">Search:</span>
+          <span className="text-sm text-[#2c3e50] font-semibold">Search:</span>
           <input
             type="text"
             value={localSearch}
@@ -237,24 +237,24 @@ export function ClientSummaryCard({
             )}
             {/* Column headers — always visible */}
             <tr className="bg-[#ecf0f1] border-b border-[#d5d8dc]">
-              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Username</th>
-              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] border-r border-[#d5d8dc]">Type</th>
-              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-right">Credit</th>
+              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-[12px] border-r border-[#d5d8dc]">Username</th>
+              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-[12px] border-r border-[#d5d8dc]">Type</th>
+              <th className="px-3 lg:px-4 py-2.5 font-bold text-[#2c3e50] text-[12px] text-right">Credit</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={3} className="px-3 py-8 text-center text-[#7f8c8d] bg-white">
+                <td colSpan={3} className="px-3 py-8 text-center text-[#2c3e50] bg-white">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71]" />
-                    <span>Loading data...</span>
+                    <span className="font-medium">Loading data...</span>
                   </div>
                 </td>
               </tr>
             ) : filteredClients.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-3 py-8 text-center text-[#7f8c8d] bg-white">
+                <td colSpan={3} className="px-3 py-8 text-center text-[#2c3e50] bg-white font-medium">
                   No data available
                 </td>
               </tr>
@@ -272,18 +272,18 @@ export function ClientSummaryCard({
                         <button
                           onClick={() => isBalanceLoaded && toggleExpand(client.id)}
                           className={cn(
-                            "font-medium text-left",
-                            isAdminType ? "text-[#1a9e71]" : "font-bold text-[#2c3e50]",
+                            "font-bold text-left",
+                            isAdminType ? "text-[#1a9e71]" : "text-[#2c3e50]",
                             isBalanceLoaded && "hover:underline cursor-pointer"
                           )}
                         >
                           {client.username}
                         </button>
                       </td>
-                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#2c3e50]">
+                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#2c3e50] font-semibold">
                         {getTypeLabel(client.role)}
                       </td>
-                      <td className="px-3 lg:px-4 py-3 text-[#2c3e50] text-right font-medium">
+                      <td className="px-3 lg:px-4 py-3 text-[#2c3e50] text-right font-semibold">
                         {/* Only show credit value after Load Balance is clicked */}
                         {isBalanceLoaded ? (client.credit_received || 0).toLocaleString() : "-"}
                       </td>
@@ -297,34 +297,34 @@ export function ClientSummaryCard({
                             <ul className="text-[13px] text-[#2c3e50] space-y-2 relative z-10">
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
-                                <span className="font-medium text-[#7f8c8d]">Balance:</span>
+                                <span className="font-semibold text-[#2c3e50]">Balance:</span>
                                 <span className="font-bold">{(client.balance_upline || 0).toLocaleString()}</span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
-                                <span className="font-medium text-[#7f8c8d]">Client (P/L):</span>
+                                <span className="font-semibold text-[#2c3e50]">Client (P/L):</span>
                                 <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
                                   {(client.pl_downline || 0).toLocaleString()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
-                                <span className="font-medium text-[#7f8c8d]">Share:</span>
+                                <span className="font-semibold text-[#2c3e50]">Share:</span>
                                 <span className="font-bold">{client.downline_share || 0}</span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
-                                <span className="font-medium text-[#7f8c8d]">Exposure:</span>
+                                <span className="font-semibold text-[#2c3e50]">Exposure:</span>
                                 <span className="font-bold">0</span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <span className="text-[#1a9e71] font-bold">•</span>
-                                <span className="font-medium text-[#7f8c8d]">Available Balance:</span>
+                                <span className="font-semibold text-[#2c3e50]">Available Balance:</span>
                                 <span className="font-bold">{(client.credit_remaining || 0).toLocaleString()}</span>
                               </li>
                               
                               <li className="flex items-center gap-3 mt-4 pt-3 border-t border-[#d5d8dc]">
-                                <span className="font-medium text-[#7f8c8d]">• Options</span>
+                                <span className="font-semibold text-[#2c3e50]">• Options</span>
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <button 
                                     onClick={() => setCashCreditClient(client)}
@@ -379,7 +379,7 @@ export function ClientSummaryCard({
             )}
           </tbody>
         </table>
-        <div className="px-3 py-2.5 text-[10px] text-[#7f8c8d] border-t border-[#d5d8dc] bg-[#ecf0f1] font-medium">
+        <div className="px-3 py-2.5 text-[11px] text-[#2c3e50] border-t border-[#d5d8dc] bg-[#ecf0f1] font-medium">
           Showing {filteredClients.length} entries
         </div>
       </div>

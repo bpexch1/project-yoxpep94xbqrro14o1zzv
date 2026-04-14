@@ -85,7 +85,7 @@ export default function Accounts() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#1a9e71] text-[#2c3e50] bg-white"
+                className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm placeholder:text-[#999] focus:outline-none focus:border-[#1a9e71] text-[#2c3e50] bg-white"
               />
               <button 
                 onClick={handleSearch}
