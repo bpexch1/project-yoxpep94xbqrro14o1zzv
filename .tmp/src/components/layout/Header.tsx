@@ -68,7 +68,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         </button>
         <Link to="/dashboard" className="flex items-baseline group">
           <span className="font-pacifico text-white text-xl leading-none">BP</span>
-          <span className="text-[#3dd6c8] font-bold text-[10px] ml-1 uppercase tracking-tighter">Exchange</span>
+          <span className="text-[#3dd6c8] font-bold text-xs ml-1 uppercase tracking-tighter">Exchange</span>
         </Link>
       </div>
 
@@ -90,7 +90,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                   <span className="text-white text-xs lg:text-sm font-semibold truncate">
                     {session.username} <span className="text-white/60 font-normal">({session.role?.charAt(0).toUpperCase()})</span>
                   </span>
-                  <ChevronDown className="w-3 h-3 text-white/50" />
+                  <ChevronDown className="w-3 h-3 text-white" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-[#1a3550] border border-[#0f2236] shadow-2xl rounded-md w-48 mt-1">
@@ -111,13 +111,13 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             <div className="h-6 w-px bg-white/20 mx-1 hidden sm:block" />
 
             {/* Stats */}
-            <div className="flex items-center gap-2 lg:gap-4 shrink-0 pr-1">
-              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
-                <span className="text-[9px] lg:text-[10px] text-white/60 font-bold uppercase">B:</span>
+            <div className="flex items-center gap-2 lg:gap-3 shrink-0 pr-1">
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-[10px] text-white/60 font-bold uppercase">B:</span>
                 <span className="text-[11px] lg:text-xs font-bold text-white">0</span>
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
-                <span className="text-[9px] lg:text-[10px] text-white/60 font-bold uppercase">Exp:</span>
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-[10px] text-white/60 font-bold uppercase">Exp:</span>
                 <span className={cn(
                   "text-[11px] lg:text-xs font-bold",
                   totalExposure > 0 ? 'text-red-400' : 'text-white'
