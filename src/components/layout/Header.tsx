@@ -24,7 +24,7 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
       to={to} 
       className={cn(
         "px-3 py-1.5 text-sm rounded transition-colors font-medium whitespace-nowrap",
-        isActive ? "bg-[#3d6b8b] text-white" : "text-[#a8c8e8] hover:bg-[#3d6b8b]/50 hover:text-white"
+        isActive ? "bg-[#3d6b8b] text-white" : "text-white/80 hover:bg-[#3d6b8b]"
       )}
     >
       {label}
@@ -62,7 +62,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       <div className="flex items-center shrink-0">
         <button 
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#3d6b8b] rounded bg-transparent hover:bg-[#3d6b8b] transition-colors"
+          className="p-1.5 border border-transparent rounded hover:bg-[#3d6b8b] transition-colors bg-transparent"
         >
           <Menu className="w-5 h-5 text-white" />
         </button>
@@ -89,7 +89,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                   <span className="text-white text-sm font-semibold">
                     {session.username} ({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})
                   </span>
-                  <ChevronDown className="w-3 h-3 text-white/70" />
+                  <ChevronDown className="w-3 h-3 text-white" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
@@ -109,10 +109,10 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             {/* Stats */}
             <div className="flex items-center gap-2 border-l border-[#3d6b8b] pl-3 lg:pl-5">
               <span className="text-sm font-bold text-white whitespace-nowrap">
-                B: <span className="text-white font-bold">0</span>
+                B: <span>0</span>
               </span>
               <span className="text-sm font-bold text-white whitespace-nowrap">
-                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-white font-bold'}>
+                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-white'}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>

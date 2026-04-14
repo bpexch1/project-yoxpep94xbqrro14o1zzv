@@ -71,7 +71,8 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Roboto', 'Arial', 'sans-serif'],
+				sans: ['Poppins', 'Arial', 'sans-serif'],
+				pacifico: ['Pacifico', 'cursive'],
 			},
 		}
 	},

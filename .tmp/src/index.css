@@ -45,7 +45,7 @@
     @apply bg-background text-foreground antialiased;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Poppins', Arial, sans-serif;
   }
 }
 
@@ -61,7 +61,7 @@ html {
 .content-card {
   background-color: #ffffff;
   border-radius: 12px;
-  padding: 16px;
+  padding: 166px;
   margin: 16px;
   border: 1px solid #c8dff0;
 }
