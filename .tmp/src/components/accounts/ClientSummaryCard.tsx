@@ -243,7 +243,7 @@ export function ClientSummaryCard({
             </tr>
           </thead>
           <tbody>
-            {!isBalanceLoaded ? null : isLoading ? (
+            {isLoading ? (
               <tr>
                 <td colSpan={3} className="px-3 py-8 text-center text-[#7f8c8d] bg-white">
                   <div className="flex flex-col items-center gap-2">
@@ -266,31 +266,31 @@ export function ClientSummaryCard({
 
                 return (
                   <React.Fragment key={client.id}>
-                    {/* Main row */}
+                    {/* Main row — always visible */}
                     <tr className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]", "border-b border-[#d5d8dc]")}>
                       <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc]">
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => toggleExpand(client.id)}
-                            className={cn(
-                              "font-medium hover:underline text-left",
-                              isAdminType ? "text-[#1a9e71]" : "font-bold text-[#2c3e50]"
-                            )}
-                          >
-                            {client.username}
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => isBalanceLoaded && toggleExpand(client.id)}
+                          className={cn(
+                            "font-medium text-left",
+                            isAdminType ? "text-[#1a9e71]" : "font-bold text-[#2c3e50]",
+                            isBalanceLoaded && "hover:underline cursor-pointer"
+                          )}
+                        >
+                          {client.username}
+                        </button>
                       </td>
                       <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#2c3e50]">
                         {getTypeLabel(client.role)}
                       </td>
                       <td className="px-3 lg:px-4 py-3 text-[#2c3e50] text-right font-medium">
-                        {(client.credit_received || 0).toLocaleString()}
+                        {/* Only show credit value after Load Balance is clicked */}
+                        {isBalanceLoaded ? (client.credit_received || 0).toLocaleString() : "-"}
                       </td>
                     </tr>
 
-                    {/* Expanded details row */}
-                    {isExpanded && (
+                    {/* Expanded details row — only when balance is loaded AND row is expanded */}
+                    {isBalanceLoaded && isExpanded && (
                       <tr>
                         <td colSpan={3} className={cn("px-6 lg:px-8 py-4 border-b border-[#d5d8dc]", idx % 2 === 0 ? "bg-slate-50" : "bg-white")}>
                           <div className="relative">
