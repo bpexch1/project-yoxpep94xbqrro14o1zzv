@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Client, Transaction } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface SettlePLModalProps {
   isOpen: boolean;
@@ -19,8 +19,9 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setAmount("0.00");
+    if (isOpen && client) {
+      const plAmount = client.pl_downline || 0;
+      setAmount(plAmount > 0 ? plAmount.toString() : "0");
       setDescription("P/L to Cash transfer");
     }
   }, [isOpen, client]);
@@ -38,11 +39,21 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
       return;
     }
 
-    if (settleAmount > (client.pl_downline || 0)) {
+    const maxAmount = client.pl_downline || 0;
+    if (maxAmount <= 0) {
+      toast({
+        variant: "destructive",
+        title: "No P/L to settle",
+        description: "This client has no P/L balance available to settle.",
+      });
+      return;
+    }
+
+    if (settleAmount > maxAmount) {
       toast({
         variant: "destructive",
         title: "Amount exceeds balance",
-        description: `Max amount to transfer is ${client.pl_downline || 0} Rs.`,
+        description: `Max amount to transfer is ${maxAmount.toLocaleString()} Rs.`,
       });
       return;
     }
@@ -68,7 +79,7 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({
         title: "Success",
-        description: "P/L amount settled successfully",
+        description: `Rs. ${settleAmount.toLocaleString()} settled to cash for ${client.username}`,
       });
       onClose();
     } catch (err) {
