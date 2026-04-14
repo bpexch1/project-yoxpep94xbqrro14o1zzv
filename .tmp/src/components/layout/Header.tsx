@@ -24,7 +24,7 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
       to={to} 
       className={cn(
         "px-3 py-1.5 text-sm rounded transition-colors font-medium whitespace-nowrap",
-        isActive ? "bg-[#d5d8dc] text-[#2c3e50]" : "text-[#2c3e50] hover:bg-[#d5d8dc]"
+        isActive ? "bg-[#3d6b8b] text-white" : "text-[#a8c8e8] hover:bg-[#3d6b8b]/50 hover:text-white"
       )}
     >
       {label}
@@ -57,16 +57,16 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#ecf0f1] flex items-center px-3 h-12 border-b border-[#d5d8dc] shadow-none">
+    <header className="sticky top-0 z-40 bg-[#254465] flex items-center px-3 h-12 border-b border-[#1a3550] shadow-none">
       {/* LEFT: Hamburger + Logo (Desktop) */}
       <div className="flex items-center shrink-0">
         <button 
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#b0b8c0] rounded hover:bg-[#d5d8dc] transition-colors bg-white lg:bg-transparent lg:border-transparent"
+          className="p-1.5 border border-[#3d6b8b] rounded bg-transparent hover:bg-[#3d6b8b] transition-colors"
         >
-          <Menu className="w-5 h-5 text-[#555555]" />
+          <Menu className="w-5 h-5 text-white" />
         </button>
-        <span className="hidden lg:block font-black italic text-xl text-[#254465] ml-2" style={{fontFamily:'Georgia,serif'}}>
+        <span className="hidden lg:block font-black italic text-xl text-white ml-2" style={{fontFamily:'Georgia,serif'}}>
           BP<span className="text-[#00b181] font-bold text-sm not-italic ml-1">Exchange</span>
         </span>
       </div>
@@ -85,11 +85,11 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             {/* User Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#d5d8dc] px-2 py-1 rounded transition-colors">
-                  <span className="text-[#2c3e50] text-sm font-semibold">
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#3d6b8b] px-2 py-1 rounded transition-colors">
+                  <span className="text-white text-sm font-semibold">
                     {session.username} ({session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : ''})
                   </span>
-                  <ChevronDown className="w-3 h-3 text-[#2c3e50]" />
+                  <ChevronDown className="w-3 h-3 text-white/70" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
@@ -107,12 +107,12 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             </DropdownMenu>
 
             {/* Stats */}
-            <div className="flex items-center gap-2 border-l border-[#d5d8dc] pl-3 lg:pl-5">
-              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
-                B: <span>0</span>
+            <div className="flex items-center gap-2 border-l border-[#3d6b8b] pl-3 lg:pl-5">
+              <span className="text-sm font-bold text-white whitespace-nowrap">
+                B: <span className="text-white font-bold">0</span>
               </span>
-              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
-                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : ''}>
+              <span className="text-sm font-bold text-white whitespace-nowrap">
+                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-white font-bold'}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
@@ -121,7 +121,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button 
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#2c3e50] hover:text-[#7f8c8d] uppercase"
+            className="text-sm font-bold text-white hover:text-white/80 uppercase"
           >
             Login
           </button>
