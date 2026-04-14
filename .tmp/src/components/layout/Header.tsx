@@ -62,7 +62,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       <div className="flex items-center shrink-0">
         <button 
           onClick={onOpenMobileSidebar}
-          className="p-1 hover:bg-[#d5d8dc] rounded transition-colors"
+          className="p-1.5 border border-[#b0b8c0] rounded hover:bg-[#d5d8dc] transition-colors bg-white lg:bg-transparent lg:border-transparent"
         >
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>

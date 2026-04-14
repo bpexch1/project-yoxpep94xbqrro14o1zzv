@@ -1,5 +1,5 @@
 import { 
-  LayoutDashboard, Users, CircleDollarSign, FileBarChart2, Lock, Star, Globe, Menu, Activity, CircleDot, Trophy, Zap, Rabbit, X 
+  LayoutDashboard, Users, CircleDollarSign, FileBarChart2, Lock, Star, Globe, Menu, Activity, CircleDot, Trophy, Zap, Rabbit, X, ChevronLeft 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -38,19 +38,20 @@ function SidebarNavItems({ onNavigate }: { onNavigate: () => void }) {
     onNavigate();
   };
 
-  const NavItem = ({ item }: { item: typeof mainMenuItems[0] }) => {
+  const NavItem = ({ item, showArrow = false }: { item: typeof mainMenuItems[0]; showArrow?: boolean }) => {
     const isActive = location.pathname === item.link || (item.link !== "/" && location.pathname.startsWith(item.link));
     
     return (
       <button
         onClick={() => handleNavigate(item.link)}
         className={cn(
-          "flex items-center gap-3 px-5 py-2.5 text-white text-[14px] transition-colors text-left",
+          "flex items-center gap-3 px-5 py-2.5 text-white text-[14px] transition-colors text-left w-full",
           isActive ? "bg-[#3d6b8b] border-l-4 border-[#00b181]" : "hover:bg-[#3d6b8b]/50"
         )}
       >
         <item.icon className={cn("w-4 h-4", isActive ? "text-white" : "text-[#a8c8e8]")} />
-        <span>{item.label}</span>
+        <span className="flex-1">{item.label}</span>
+        {showArrow && <ChevronLeft className="w-3.5 h-3.5 text-[#7fa8c8] shrink-0" />}
       </button>
     );
   };
@@ -70,7 +71,7 @@ function SidebarNavItems({ onNavigate }: { onNavigate: () => void }) {
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sports</span>
       </div>
       {sportsItems.map((item) => (
-        <NavItem key={item.label} item={item} />
+        <NavItem key={item.label} item={item} showArrow={true} />
       ))}
     </nav>
   );
