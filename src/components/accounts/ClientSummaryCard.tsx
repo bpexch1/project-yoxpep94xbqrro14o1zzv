@@ -357,15 +357,13 @@ export function ClientSummaryCard({
                                   >
                                     {client.status === "active" ? "A" : "D"}
                                   </button>
-                                  {client.can_settle_pl && (
-                                    <button 
-                                      className="w-9 h-9 bg-[#e74c3c] hover:bg-red-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
-                                      title="Settle Account"
-                                      onClick={() => setSettlePLClient(client)}
-                                    >
-                                      S
-                                    </button>
-                                  )}
+                                  <button 
+                                    className="w-9 h-9 bg-[#e74c3c] hover:bg-red-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    title="Settle Account"
+                                    onClick={() => setSettlePLClient(client)}
+                                  >
+                                    S
+                                  </button>
                                 </div>
                               </li>
                             </ul>
