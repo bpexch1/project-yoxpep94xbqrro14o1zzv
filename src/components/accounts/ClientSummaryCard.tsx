@@ -55,8 +55,9 @@ export function ClientSummaryCard({
     const query = localSearch.toLowerCase() || searchFilter.toLowerCase();
     return clients.filter(
       (c) =>
-        c.username?.toLowerCase().includes(query) ||
-        c.full_name?.toLowerCase().includes(query)
+        c.role?.toLowerCase() !== 'company' &&
+        (c.username?.toLowerCase().includes(query) ||
+        c.full_name?.toLowerCase().includes(query))
     );
   }, [clients, localSearch, searchFilter]);
 
