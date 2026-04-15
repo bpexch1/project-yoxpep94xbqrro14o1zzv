@@ -96,7 +96,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
     <>
       {/* DESKTOP SIDEBAR */}
       <aside className={cn(
-        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#1c2a2a] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
+        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#2c3e50] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
         isCollapsed ? "w-[60px]" : "w-[220px]"
       )}>
         {/* Minimal collapse toggle at very top */}
@@ -135,7 +135,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "tween", duration: 0.2 }}
-              className="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#1c2a2a] flex flex-col overflow-y-auto lg:hidden"
+              className="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#2c3e50] flex flex-col overflow-y-auto lg:hidden"
             >
               {/* Header for mobile sidebar */}
               <div className="flex items-center justify-end px-4 h-14 border-b border-white/10 shrink-0">
