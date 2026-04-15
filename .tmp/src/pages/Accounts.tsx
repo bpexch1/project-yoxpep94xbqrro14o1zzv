@@ -15,18 +15,13 @@ export default function Accounts() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!session) {
-      navigate("/login");
-    }
-
-    // One-time fix: update Book account role to "company"
+    if (!session) navigate("/login");
     async function fixBookRole() {
       try {
         const results = await ClientEntity.filter({ username: "Book" }, "-created_at", 1);
         if (results && results.length > 0) {
           const book = results[0];
           if (book.role === "superadmin") {
-            console.log("Updating Book role to company...");
             await ClientEntity.update(book.id, { role: "company" });
           }
         }
@@ -42,73 +37,71 @@ export default function Accounts() {
     queryFn: () => {
       if (!session) return [];
       const role = session.role?.toLowerCase();
-      
       if (role === 'superadmin' || role === 'company') {
-        // Show all clients
         return ClientEntity.list("-created_at");
       }
-      if (role === 'admin' || role === 'supermaster' || role === 'agent') {
-        // Show only their direct downline
-        return ClientEntity.filter({ parent_username: session.username }, "-created_at");
-      }
-      // Regular clients see nobody (or only their own record)
       return ClientEntity.filter({ parent_username: session.username }, "-created_at");
     },
     enabled: !!session,
   });
 
-  const handleSearch = () => {
-    setSearchFilter(searchQuery);
-  };
+  const handleSearch = () => setSearchFilter(searchQuery);
 
   return (
-    <div className="bg-[#e8e8e8] min-h-screen">
-      <main className="max-w-2xl mx-auto px-3 pt-4 pb-16 font-sans">
-        
-        {/* Report Type card */}
+    <div className="min-h-screen" style={{ background: '#f5f5f5', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main className="max-w-2xl mx-auto px-3 pt-4 pb-16">
+
+        {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Search Users Section */}
-        <div className="bg-white border border-[#d0d0d0] rounded-xl shadow-sm mb-4 overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d0d0d0]">
-            <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
-            <span className="font-bold text-[#2c3e50] text-base">Search-Users</span>
+        {/* 2. Search-Users Card */}
+        <div className="bg-white mb-4 overflow-hidden shadow-sm border border-gray-200" style={{ borderRadius: 10 }}>
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
+            <Filter className="w-4 h-4 fill-[#1a1a2e] text-[#1a1a2e]" />
+            <span className="font-bold text-[#1a1a2e] text-[16px]">Search-Users</span>
           </div>
-          <div className="p-4 flex gap-2">
-            <input
-              type="text"
-              placeholder="Username"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 border-2 border-[#d0d0d0] rounded-lg px-4 py-3 text-base placeholder-gray-400 focus:outline-none focus:border-[#26bebe] text-[#2c3e50] bg-white"
-            />
-            <button 
-              onClick={handleSearch}
-              className="bg-[#1a9e71] hover:bg-[#158c61] text-white px-5 py-3 rounded-lg font-medium flex items-center gap-2 text-[15px] transition-colors"
-            >
-              <Search className="w-5 h-5" />
-              Search
-            </button>
+          <div className="px-4 py-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Username"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="flex-1 border border-gray-300 bg-white px-4 py-3 text-[15px] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#14b8a6] focus:ring-1 focus:ring-[#14b8a6]"
+                style={{ borderRadius: 8, fontSize: 15 }}
+              />
+              <button
+                onClick={handleSearch}
+                className="flex items-center gap-2 px-5 py-3 text-white font-semibold text-[15px] transition-colors hover:bg-[#15803d]"
+                style={{ background: '#16a34a', borderRadius: 8 }}
+              >
+                <Search className="w-4 h-4" />
+                Search
+              </button>
+            </div>
           </div>
+          {/* Extra bottom space to match screenshot */}
+          <div className="h-3" />
         </div>
 
-        {/* Username Header Card */}
-        <div className="bg-white border border-[#d0d0d0] rounded-xl shadow-sm mb-4 px-5 py-4">
-          <h2 className="font-bold text-[#2c3e50] text-lg">
+        {/* 3. Clients List heading card */}
+        <div className="bg-white border border-gray-200 shadow-sm px-5 py-4 mb-4" style={{ borderRadius: 10 }}>
+          <h2 className="font-bold text-[#1a1a2e] text-[18px]">
             {session?.username || 'Admin'} - Clients List
           </h2>
         </div>
 
-        {/* Client List card */}
-        <ClientSummaryCard 
-          clients={clients || []} 
-          isLoading={isLoading} 
+        {/* 4. Clients table/list */}
+        <ClientSummaryCard
+          clients={clients || []}
+          isLoading={isLoading}
           username={session?.username || 'Admin'}
           searchFilter={searchFilter}
           onRefresh={refetch}
-          hideHeader={true} // We'll add this prop to ClientSummaryCard
+          hideHeader={true}
         />
+
       </main>
     </div>
   );

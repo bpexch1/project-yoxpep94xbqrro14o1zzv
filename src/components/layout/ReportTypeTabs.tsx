@@ -21,7 +21,6 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine active tab from URL
   const currentTabId = tabs.find(t => t.path === location.pathname)?.id || activeTab;
 
   const handleTabClick = (tab: typeof tabs[0]) => {
@@ -30,37 +29,40 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   };
 
   return (
-    <div className="bg-white border border-[#d0d0d0] mb-4 rounded-xl overflow-hidden shadow-sm">
-      <div className="px-4 py-3 border-b border-[#d0d0d0] flex items-center gap-2">
-        <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
-        <span className="font-bold text-[#2c3e50] text-base">Report Type</span>
+    <div style={{ borderRadius: 10 }} className="bg-white mb-4 overflow-hidden shadow-sm border border-gray-200">
+      {/* Card header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
+        <Filter className="w-4 h-4 fill-[#1a1a2e] text-[#1a1a2e]" />
+        <span className="font-bold text-[#1a1a2e] text-[16px]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Report Type</span>
       </div>
-      <div className="p-4 grid grid-cols-3 gap-3 lg:flex lg:flex-wrap lg:gap-2">
-        {tabs.map((tab, i) => {
-          const isActive = currentTabId === tab.id;
-          const isCommissionReport = tab.id === "Commission Report";
-          return (
-            <div
-              key={tab.id}
-              className={cn(
-                "lg:col-auto",
-                isCommissionReport ? "col-start-2" : ""
-              )}
-            >
-              <button
-                onClick={() => handleTabClick(tab)}
-                className={cn(
-                  "w-full py-3 px-2 rounded-lg border-2 text-[14px] font-medium text-center transition-colors leading-tight min-h-[52px] flex items-center justify-center",
-                  isActive
-                    ? "bg-[#1a9e71] border-[#1a9e71] text-white font-semibold"
-                    : "border-[#26bebe] text-[#26bebe] bg-white hover:bg-teal-50"
-                )}
+
+      {/* Button grid */}
+      <div className="p-4">
+        <div className="grid grid-cols-3 gap-2">
+          {tabs.map((tab, i) => {
+            const isActive = currentTabId === tab.id;
+            const isCommissionReport = tab.id === "Commission Report";
+            return (
+              <div
+                key={tab.id}
+                className={cn(isCommissionReport ? "col-start-2" : "")}
               >
-                {tab.label}
-              </button>
-            </div>
-          );
-        })}
+                <button
+                  onClick={() => handleTabClick(tab)}
+                  style={{ borderRadius: 8, height: 40, fontFamily: 'Inter, system-ui, sans-serif' }}
+                  className={cn(
+                    "w-full border-2 text-[13px] font-medium text-center transition-all flex items-center justify-center px-1",
+                    isActive
+                      ? "bg-[#16a34a] border-[#16a34a] text-white"
+                      : "border-[#14b8a6] text-[#14b8a6] bg-white hover:bg-teal-50"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
