@@ -167,13 +167,43 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-sm font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                style={{
+                  background: "#1a9e71",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "10px 20px",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  whiteSpace: "nowrap",
+                }}
               >
-                <UserPlus className="w-3.5 h-3.5" /> New User
+                <UserPlus style={{ width: 18, height: 18 }} /> New User
               </button>
             )}
-            <button className="bg-[#1a9e71] hover:bg-[#158c61] text-white text-sm font-bold px-4 py-2 rounded flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap">
-              <BookOpen className="w-3.5 h-3.5" /> Account Ledger
+            <button
+              style={{
+                background: "#1a9e71",
+                color: "#fff",
+                border: "none",
+                borderRadius: 6,
+                padding: "10px 20px",
+                fontSize: 15,
+                fontWeight: 700,
+                fontFamily: "Inter, system-ui, sans-serif",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <BookOpen style={{ width: 18, height: 18 }} /> Account Ledger
             </button>
           </div>
 

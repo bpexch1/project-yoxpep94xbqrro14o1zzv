@@ -73,7 +73,7 @@ export default function Accounts() {
             <Filter style={{ width: 16, height: 16, fill: "#1a1a2e", color: "#1a1a2e", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e", fontFamily: "Inter, system-ui, sans-serif" }}>Search-Users</span>
           </div>
-          <div style={{ padding: "16px" }}>
+          <div style={{ padding: "12px 16px" }}>
             <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"

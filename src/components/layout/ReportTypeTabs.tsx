@@ -20,7 +20,6 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   const navigate  = useNavigate();
   const location  = useLocation();
   const currentId = tabs.find(t => t.path === location.pathname)?.id ?? activeTab;
-
   const go = (tab: typeof tabs[0]) => { onTabChange(tab.id); navigate(tab.path); };
 
   return (
@@ -45,15 +44,15 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e" }}>Report Type</span>
       </div>
 
-      {/* Button grid */}
+      {/* Button grid — strict 3-col */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: "8px",
-        padding: "16px",
+        padding: "12px 16px 16px",
       }}>
         {tabs.map((tab) => {
-          const isActive    = currentId === tab.id;
+          const isActive     = currentId === tab.id;
           const isCommission = tab.id === "Commission Report";
           return (
             <button
@@ -70,14 +69,13 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 background: isActive ? "#16a34a" : "#fff",
                 color: isActive ? "#fff" : "#14b8a6",
                 fontFamily: "Inter, system-ui, sans-serif",
-                fontSize: "13px",
+                // Commission Report gets smaller font so text fully shows
+                fontSize: isCommission ? "11px" : "13px",
                 fontWeight: 500,
                 cursor: "pointer",
                 transition: "background .15s, color .15s",
                 whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                padding: "0 6px",
+                padding: "0 4px",
                 boxSizing: "border-box",
                 display: "flex",
                 alignItems: "center",
