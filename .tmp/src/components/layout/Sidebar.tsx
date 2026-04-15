@@ -12,6 +12,7 @@ interface SidebarProps {
   onMobileClose: () => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  onCollapseChange?: (collapsed: boolean) => void;
 }
 
 const mainMenuItems = [
@@ -51,21 +52,21 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         key={item.label}
         onClick={() => handleNavigate(item.link)}
         className={cn(
-          "flex items-center transition-colors text-left w-full group",
-          isCollapsed && !isMobile ? "justify-center px-0 py-4" : "gap-4 px-5 py-4",
-          isActive ? "bg-white/[0.07] text-white" : "text-white/80 hover:bg-white/[0.04] hover:text-white"
+          "flex items-center w-full text-left transition-colors group",
+          isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-4 px-5",
+          isActive ? "bg-white/[0.06] text-white" : "text-white/80 hover:bg-white/[0.04] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? item.label : undefined}
       >
         <item.icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[22px] h-[22px]",
-          isActive ? "text-[#26c6da]" : "text-[#4db8b8]"
+          isActive ? "text-[#4db6ac]" : "text-[#4db6ac]/80"
         )} />
         {showLabels && (
           <>
             <span className="flex-1 text-[15px] font-normal whitespace-nowrap">{item.label}</span>
-            {showChevron && <ChevronLeft className="w-4 h-4 text-white/50 shrink-0" />}
+            {showChevron && <ChevronLeft className="w-4 h-4 text-white/40 shrink-0" />}
           </>
         )}
       </button>
@@ -80,7 +81,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
       </div>
 
       {/* Separator */}
-      <div className="h-px bg-white/[0.08] mx-4 my-0" />
+      <div className="h-px bg-white/[0.06] my-1" />
 
       {/* Sports items */}
       <div className="flex flex-col">
@@ -93,29 +94,29 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
 export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onToggleCollapse }: SidebarProps) {
   return (
     <>
-      {/* DESKTOP SIDEBAR: fixed left, always visible on lg+ */}
+      {/* DESKTOP SIDEBAR */}
       <aside className={cn(
-        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#1c2a2a] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-300",
+        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#1c2a2a] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
         isCollapsed ? "w-[60px]" : "w-[220px]"
       )}>
         {/* Minimal collapse toggle at very top */}
         <div className={cn(
-          "flex items-center py-2 border-b border-white/[0.06] shrink-0",
-          isCollapsed ? "justify-center px-0" : "justify-end px-3"
+          "flex items-center h-[40px] border-b border-white/[0.06] shrink-0",
+          isCollapsed ? "justify-center" : "justify-end px-3"
         )}>
           <button 
             onClick={onToggleCollapse} 
             className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors shrink-0"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {isCollapsed ? <ChevronRight className="w-4 h-4 text-white/50" /> : <ChevronLeft className="w-4 h-4 text-white/50" />}
+            {isCollapsed ? <ChevronRight className="w-4 h-4 text-white/40" /> : <ChevronLeft className="w-4 h-4 text-white/40" />}
           </button>
         </div>
         
         <SidebarNavItems onNavigate={() => {}} isCollapsed={isCollapsed} />
       </aside>
 
-      {/* MOBILE SIDEBAR: AnimatePresence overlay */}
+      {/* MOBILE SIDEBAR */}
       <AnimatePresence>
         {isMobileOpen && (
           <>
