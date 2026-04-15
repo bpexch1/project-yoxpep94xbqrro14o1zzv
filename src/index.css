@@ -5,8 +5,8 @@
 :root {
   --bg-primary: #f0f0f0;
   --bg-card: #ffffff;
-  --accent-green: #28a745;
-  --accent-green-hover: #218838;
+  --accent-green: #1a9e71;
+  --accent-green-hover: #158a60;
   --sidebar-bg: #254465;
   --accent-blue: #3d6b8b;
   --text-primary: #212529;
@@ -20,19 +20,19 @@
   --card-foreground: 210 11% 15%;
   --popover: 0 0% 100%;
   --popover-foreground: 210 11% 15%;
-  --primary: 134 61% 41%;          /* #28a745 green */
+  --primary: 160 72% 36%;          /* #1a9e71 teal-green */
   --primary-foreground: 0 0% 100%;
   --secondary: 210 17% 91%;
   --secondary-foreground: 210 11% 15%;
   --muted: 210 17% 91%;
   --muted-foreground: 210 8% 45%;
-  --accent: 134 61% 41%;
+  --accent: 160 72% 36%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 354 70% 54%;      /* #dc3545 red */
+  --destructive: 6 78% 57%;        /* #e74c3c red */
   --destructive-foreground: 0 0% 100%;
   --border: 210 14% 89%;
   --input: 210 14% 89%;
-  --ring: 134 61% 41%;
+  --ring: 160 72% 36%;
   --radius: 0.5rem;
   --teal: 174 63% 38%;
 }
@@ -67,8 +67,8 @@ html {
 }
 
 a {
-  color: #28a745;
+  color: #1a9e71;
 }
 a:hover {
-  color: #218838;
+  color: #158a60;
 }

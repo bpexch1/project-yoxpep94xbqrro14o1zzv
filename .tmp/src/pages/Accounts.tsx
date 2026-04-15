@@ -104,7 +104,7 @@ export default function Accounts() {
                   minHeight: "40px",
                   maxHeight: "40px",
                   padding: "0 18px",
-                  background: "#28a745",
+                  background: "#1a9e71",
                   color: "#fff",
                   border: "none",
                   borderRadius: "7px",

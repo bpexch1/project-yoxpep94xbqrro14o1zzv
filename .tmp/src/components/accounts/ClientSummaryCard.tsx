@@ -117,10 +117,10 @@ export function ClientSummaryCard({
               </thead>
               <tbody>
                 <tr>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#28a745]">0</span></td>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#28a745]">0</span></td>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#28a745]">0</span></td>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#28a745]">{filteredClients.length}</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
+                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
                 </tr>
               </tbody>
             </table>
@@ -138,21 +138,21 @@ export function ClientSummaryCard({
               <tbody>
                 <tr>
                   <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className="text-sm font-bold text-[#28a745]">{totals.credit_received.toLocaleString()}</span>
+                    <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
                   </td>
                   <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className="text-sm font-bold text-[#28a745]">{totals.credit_remaining.toLocaleString()}</span>
+                    <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
                   </td>
                   <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className={cn("text-sm font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>{totals.cash.toLocaleString()}</span>
+                    <span className={cn("text-sm font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.cash.toLocaleString()}</span>
                   </td>
                   <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className={cn("text-sm font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                    <span className={cn("text-sm font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
                       {totals.pl_downline.toLocaleString()}
                     </span>
                   </td>
                   <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className={cn("text-sm font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>{totals.balance_upline.toLocaleString()}</span>
+                    <span className={cn("text-sm font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.balance_upline.toLocaleString()}</span>
                   </td>
                 </tr>
               </tbody>
@@ -168,7 +168,7 @@ export function ClientSummaryCard({
               <button
                 onClick={() => navigate("/accounts/create")}
                 style={{
-                  background: "#28a745",
+                  background: "#1a9e71",
                   color: "#fff",
                   border: "none",
                   borderRadius: 5,
@@ -188,7 +188,7 @@ export function ClientSummaryCard({
             )}
             <button
               style={{
-                background: "#28a745",
+                background: "#1a9e71",
                 color: "#fff",
                 border: "none",
                 borderRadius: 5,
@@ -224,15 +224,15 @@ export function ClientSummaryCard({
               <span className="font-medium">Ledger</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#28a745] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">A</div>
+              <div className="w-6 h-6 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">A</div>
               <span className="font-medium">Active</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-white border border-[#dc3545] text-[#dc3545] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
+              <div className="w-6 h-6 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
               <span className="font-medium">InActive</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#dc3545] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">S</div>
+              <div className="w-6 h-6 bg-[#e74c3c] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">S</div>
               <span className="font-medium">Settle Account</span>
             </div>
           </div>
@@ -244,7 +244,7 @@ export function ClientSummaryCard({
         <table className="w-full text-left text-xs border-collapse">
           <thead>
             {!isBalanceLoaded ? (
-              <tr className="bg-[#28a745]">
+              <tr className="bg-[#1a9e71]">
                 <td colSpan={3} className="px-4 py-3 text-left">
                   <button
                     type="button"
@@ -256,7 +256,7 @@ export function ClientSummaryCard({
                 </td>
               </tr>
             ) : (
-              <tr className="bg-[#28a745] text-white">
+              <tr className="bg-[#1a9e71] text-white">
                 <td className="px-4 py-3 font-bold text-sm">Total</td>
                 <td className="px-4 py-3 text-sm"></td>
                 <td className="px-4 py-3 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
@@ -274,7 +274,7 @@ export function ClientSummaryCard({
               <tr>
                 <td colSpan={3} className="px-3 py-8 text-center text-[#212529] bg-white">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#28a745]" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71]" />
                     <span className="font-medium">Loading data...</span>
                   </div>
                 </td>
@@ -306,7 +306,7 @@ export function ClientSummaryCard({
                           }}
                           className={cn(
                             "font-bold text-left",
-                            isAdminType ? "text-[#28a745] underline cursor-pointer" : "text-[#212529]",
+                            isAdminType ? "text-[#1a9e71] underline cursor-pointer" : "text-[#212529]",
                             !isAdminType && isBalanceLoaded && "hover:underline cursor-pointer"
                           )}
                         >
@@ -333,33 +333,33 @@ export function ClientSummaryCard({
                           <div className="relative">
                             <ul className="text-[13px] text-[#212529] space-y-2 relative z-10">
                               <li className="flex items-center gap-2">
-                                <span className="text-[#28a745] font-bold">•</span>
+                                <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Balance:</span>
                                 <span className="font-bold">
                                   {(client.balance_upline || 0).toLocaleString()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#28a745] font-bold">•</span>
+                                <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Client (P/L):</span>
-                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
                                   {(client.pl_downline || 0).toLocaleString()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#28a745] font-bold">•</span>
+                                <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Share:</span>
                                 <span className="font-bold">{client.downline_share || 0}</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#28a745] font-bold">•</span>
+                                <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Exposure:</span>
                                 <span className="font-bold">0</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#28a745] font-bold">•</span>
+                                <span className="text-[#1a9e71] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Available Balance:</span>
-                                <span className="font-bold text-[#28a745]">
+                                <span className="font-bold text-[#1a9e71]">
                                   {(client.credit_remaining || 0).toLocaleString()}
                                 </span>
                               </li>
@@ -391,8 +391,8 @@ export function ClientSummaryCard({
                                     className={cn(
                                       "w-9 h-9 rounded-sm font-bold text-sm flex items-center justify-center transition-all shadow-sm",
                                       client.status === "active" 
-                                        ? "bg-[#28a745] hover:bg-[#218838] text-white" 
-                                        : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
+                                        ? "bg-[#1a9e71] hover:bg-[#158a60] text-white" 
+                                        : "bg-white border border-[#e74c3c] text-[#e74c3c] hover:bg-red-50"
                                     )}
                                     title={client.status === "active" ? "Active" : "Inactive"}
                                   >
@@ -400,7 +400,7 @@ export function ClientSummaryCard({
                                   </button>
                                   {client.role !== 'client' && (
                                     <button 
-                                      className="w-9 h-9 bg-[#dc3545] hover:bg-[#c82333] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                      className="w-9 h-9 bg-[#e74c3c] hover:bg-[#c0392b] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                       title="Settle Account"
                                       onClick={() => setSettlePLClient(client)}
                                     >
