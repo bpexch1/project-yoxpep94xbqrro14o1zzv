@@ -17,8 +17,8 @@ interface ReportTypeTabsProps {
 }
 
 export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) {
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentId = tabs.find(t => t.path === location.pathname)?.id ?? activeTab;
   const go = (tab: typeof tabs[0]) => { onTabChange(tab.id); navigate(tab.path); };
 
@@ -44,15 +44,15 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e" }}>Report Type</span>
       </div>
 
-      {/* Button grid — strict 3-col */}
+      {/* Button grid — 3 columns */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: "8px",
-        padding: "12px 16px 16px",
+        padding: "10px 12px 12px",
       }}>
         {tabs.map((tab) => {
-          const isActive     = currentId === tab.id;
+          const isActive = currentId === tab.id;
           const isCommission = tab.id === "Commission Report";
           return (
             <button
@@ -60,17 +60,16 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               onClick={() => go(tab)}
               style={{
                 gridColumnStart: isCommission ? 2 : undefined,
-                height: "40px",
-                minHeight: "40px",
-                maxHeight: "40px",
+                height: "38px",
+                minHeight: "38px",
+                maxHeight: "38px",
                 width: "100%",
-                border: `2px solid ${isActive ? "#16a34a" : "#14b8a6"}`,
-                borderRadius: "8px",
+                border: `1.5px solid ${isActive ? "#16a34a" : "#14b8a6"}`,
+                borderRadius: "7px",
                 background: isActive ? "#16a34a" : "#fff",
                 color: isActive ? "#fff" : "#14b8a6",
                 fontFamily: "Inter, system-ui, sans-serif",
-                // Commission Report gets smaller font so text fully shows
-                fontSize: isCommission ? "11px" : "13px",
+                fontSize: isCommission ? "11px" : "12px",
                 fontWeight: 500,
                 cursor: "pointer",
                 transition: "background .15s, color .15s",
@@ -81,6 +80,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 alignItems: "center",
                 justifyContent: "center",
                 lineHeight: 1,
+                overflow: "hidden",
               }}
             >
               {tab.label}

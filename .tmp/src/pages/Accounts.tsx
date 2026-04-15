@@ -83,11 +83,11 @@ export default function Accounts() {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 style={{
                   flex: 1,
-                  height: "38px",
-                  minHeight: "38px",
-                  maxHeight: "38px",
+                  height: "40px",
+                  minHeight: "40px",
+                  maxHeight: "40px",
                   border: "1px solid #d1d5db",
-                  borderRadius: "6px",
+                  borderRadius: "7px",
                   padding: "0 12px",
                   fontSize: "14px",
                   color: "#374151",
@@ -100,14 +100,14 @@ export default function Accounts() {
               <button
                 onClick={handleSearch}
                 style={{
-                  height: "38px",
-                  minHeight: "38px",
-                  maxHeight: "38px",
-                  padding: "0 16px",
+                  height: "40px",
+                  minHeight: "40px",
+                  maxHeight: "40px",
+                  padding: "0 18px",
                   background: "#16a34a",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "6px",
+                  borderRadius: "7px",
                   fontSize: "14px",
                   fontWeight: 600,
                   fontFamily: "Inter, system-ui, sans-serif",
@@ -119,35 +119,20 @@ export default function Accounts() {
                   flexShrink: 0,
                 }}
               >
-                <Search style={{ width: 14, height: 14 }} />
+                <Search style={{ width: 15, height: 15 }} />
                 Search
               </button>
             </div>
           </div>
         </div>
 
-        {/* 3. Clients List heading */}
-        <div style={{
-          background: "#fff",
-          borderRadius: 10,
-          border: "1px solid #e5e7eb",
-          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
-          padding: "14px 20px",
-          marginBottom: 16,
-        }}>
-          <h2 style={{ fontWeight: 700, color: "#1a1a2e", fontSize: 18, margin: 0 }}>
-            {session?.username || 'Admin'} - Clients List
-          </h2>
-        </div>
-
-        {/* 4. Clients table/list */}
+        {/* 3. Clients table/list — header shown inside ClientSummaryCard */}
         <ClientSummaryCard
           clients={clients || []}
           isLoading={isLoading}
           username={session?.username || 'Admin'}
           searchFilter={searchFilter}
           onRefresh={refetch}
-          hideHeader={true}
         />
 
       </main>
