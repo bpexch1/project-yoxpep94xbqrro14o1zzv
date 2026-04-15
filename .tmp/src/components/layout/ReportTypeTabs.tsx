@@ -25,15 +25,14 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     navigate(tab.path);
   };
 
-  const TabButton = ({ tab, className = "" }: { tab: typeof tabs[0]; className?: string }) => (
+  const TabButton = ({ tab }: { tab: typeof tabs[0] }) => (
     <button
       onClick={() => handleTabClick(tab)}
       className={cn(
         "w-full text-[12px] py-2 px-2 rounded text-center border transition-colors leading-tight min-h-[40px] flex items-center justify-center",
         activeTab === tab.id
           ? "bg-[#1a9e71] border-[#1a9e71] text-white font-bold"
-          : "text-[#1a9e71] bg-white border-[#1a9e71] hover:bg-green-50",
-        className
+          : "text-[#1a9e71] bg-white border-[#1a9e71] hover:bg-green-50"
       )}
     >
       {tab.label}
@@ -48,7 +47,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       </div>
       <div className="p-4 grid grid-cols-3 gap-2 lg:flex lg:flex-wrap lg:gap-2">
         {tabs.map((tab, i) => {
-          const isLast = i === tabs.length - 1; // Commission Report
+          const isLast = i === tabs.length - 1;
           return (
             <div key={tab.id} className={cn("lg:col-auto", isLast ? "col-span-3" : "")}>
               <TabButton tab={tab} />
