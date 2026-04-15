@@ -83,13 +83,13 @@ export default function Accounts() {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 style={{
                   flex: 1,
-                  height: "48px",
-                  minHeight: "48px",
-                  maxHeight: "48px",
+                  height: "38px",
+                  minHeight: "38px",
+                  maxHeight: "38px",
                   border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  padding: "0 16px",
-                  fontSize: "15px",
+                  borderRadius: "6px",
+                  padding: "0 12px",
+                  fontSize: "14px",
                   color: "#374151",
                   fontFamily: "Inter, system-ui, sans-serif",
                   outline: "none",
@@ -100,26 +100,26 @@ export default function Accounts() {
               <button
                 onClick={handleSearch}
                 style={{
-                  height: "48px",
-                  minHeight: "48px",
-                  maxHeight: "48px",
-                  padding: "0 20px",
+                  height: "38px",
+                  minHeight: "38px",
+                  maxHeight: "38px",
+                  padding: "0 16px",
                   background: "#16a34a",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "8px",
-                  fontSize: "15px",
+                  borderRadius: "6px",
+                  fontSize: "14px",
                   fontWeight: 600,
                   fontFamily: "Inter, system-ui, sans-serif",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 6,
                   boxSizing: "border-box",
                   flexShrink: 0,
                 }}
               >
-                <Search style={{ width: 16, height: 16 }} />
+                <Search style={{ width: 14, height: 14 }} />
                 Search
               </button>
             </div>

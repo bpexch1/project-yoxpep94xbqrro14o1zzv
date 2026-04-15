@@ -171,19 +171,19 @@ export function ClientSummaryCard({
                   background: "#1a9e71",
                   color: "#fff",
                   border: "none",
-                  borderRadius: 6,
-                  padding: "10px 20px",
-                  fontSize: 15,
+                  borderRadius: 5,
+                  padding: "6px 14px",
+                  fontSize: 13,
                   fontWeight: 700,
                   fontFamily: "Inter, system-ui, sans-serif",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 6,
                   whiteSpace: "nowrap",
                 }}
               >
-                <UserPlus style={{ width: 18, height: 18 }} /> New User
+                <UserPlus style={{ width: 14, height: 14 }} /> New User
               </button>
             )}
             <button
@@ -191,19 +191,19 @@ export function ClientSummaryCard({
                 background: "#1a9e71",
                 color: "#fff",
                 border: "none",
-                borderRadius: 6,
-                padding: "10px 20px",
-                fontSize: 15,
+                borderRadius: 5,
+                padding: "6px 14px",
+                fontSize: 13,
                 fontWeight: 700,
                 fontFamily: "Inter, system-ui, sans-serif",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
+                gap: 6,
                 whiteSpace: "nowrap",
               }}
             >
-              <BookOpen style={{ width: 18, height: 18 }} /> Account Ledger
+              <BookOpen style={{ width: 14, height: 14 }} /> Account Ledger
             </button>
           </div>
 
