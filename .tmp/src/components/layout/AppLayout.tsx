@@ -13,7 +13,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar 
         isMobileOpen={isMobileSidebarOpen} 
         onMobileClose={() => setIsMobileSidebarOpen(false)} 
-        onCollapseChange={(collapsed) => setSidebarCollapsed(collapsed)}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
       />
       
       {/* Right side: header + content, offset by sidebar width on desktop */}
