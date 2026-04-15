@@ -48,46 +48,94 @@ export default function Accounts() {
   const handleSearch = () => setSearchFilter(searchQuery);
 
   return (
-    <div className="min-h-screen" style={{ background: '#f5f5f5', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <main className="max-w-2xl mx-auto px-3 pt-4 pb-16">
+    <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "Inter, system-ui, sans-serif" }}>
+      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
 
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
-        <div className="bg-white mb-4 overflow-hidden shadow-sm border border-gray-200" style={{ borderRadius: 10 }}>
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
-            <Filter className="w-4 h-4 fill-[#1a1a2e] text-[#1a1a2e]" />
-            <span className="font-bold text-[#1a1a2e] text-[16px]">Search-Users</span>
+        <div style={{
+          background: "#fff",
+          borderRadius: 10,
+          border: "1px solid #e5e7eb",
+          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+          marginBottom: 16,
+          overflow: "hidden",
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 16px",
+            borderBottom: "1px solid #e5e7eb",
+          }}>
+            <Filter style={{ width: 16, height: 16, fill: "#1a1a2e", color: "#1a1a2e", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e", fontFamily: "Inter, system-ui, sans-serif" }}>Search-Users</span>
           </div>
-          <div className="px-4 py-4">
-            <div className="flex gap-2">
+          <div style={{ padding: "16px" }}>
+            <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
                 placeholder="Username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 border border-gray-300 bg-white px-4 py-3 text-[15px] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#14b8a6] focus:ring-1 focus:ring-[#14b8a6]"
-                style={{ borderRadius: 8, fontSize: 15 }}
+                style={{
+                  flex: 1,
+                  height: "48px",
+                  minHeight: "48px",
+                  maxHeight: "48px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  padding: "0 16px",
+                  fontSize: "15px",
+                  color: "#374151",
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  outline: "none",
+                  boxSizing: "border-box",
+                  background: "#fff",
+                }}
               />
               <button
                 onClick={handleSearch}
-                className="flex items-center gap-2 px-5 py-3 text-white font-semibold text-[15px] transition-colors hover:bg-[#15803d]"
-                style={{ background: '#16a34a', borderRadius: 8 }}
+                style={{
+                  height: "48px",
+                  minHeight: "48px",
+                  maxHeight: "48px",
+                  padding: "0 20px",
+                  background: "#16a34a",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  boxSizing: "border-box",
+                  flexShrink: 0,
+                }}
               >
-                <Search className="w-4 h-4" />
+                <Search style={{ width: 16, height: 16 }} />
                 Search
               </button>
             </div>
           </div>
-          {/* Extra bottom space to match screenshot */}
-          <div className="h-3" />
         </div>
 
-        {/* 3. Clients List heading card */}
-        <div className="bg-white border border-gray-200 shadow-sm px-5 py-4 mb-4" style={{ borderRadius: 10 }}>
-          <h2 className="font-bold text-[#1a1a2e] text-[18px]">
+        {/* 3. Clients List heading */}
+        <div style={{
+          background: "#fff",
+          borderRadius: 10,
+          border: "1px solid #e5e7eb",
+          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+          padding: "14px 20px",
+          marginBottom: 16,
+        }}>
+          <h2 style={{ fontWeight: 700, color: "#1a1a2e", fontSize: 18, margin: 0 }}>
             {session?.username || 'Admin'} - Clients List
           </h2>
         </div>
