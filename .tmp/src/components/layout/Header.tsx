@@ -64,6 +64,9 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         >
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>
+        <span className="hidden lg:block font-black italic text-xl ml-3" style={{fontFamily:'Georgia,serif'}}>
+          <span className="text-[#26c6da]">BPEXCH</span>
+        </span>
       </div>
 
       {/* CENTER: Desktop Nav */}
