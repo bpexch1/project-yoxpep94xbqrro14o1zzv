@@ -52,9 +52,11 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         key={item.label}
         onClick={() => handleNavigate(item.link)}
         className={cn(
-          "flex items-center w-full text-left transition-colors group",
+          "flex items-center w-full text-left transition-colors group border-b border-white/[0.08]",
           isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-4 px-5",
-          isActive ? "bg-white/[0.06] text-white" : "text-white/80 hover:bg-white/[0.04] hover:text-white"
+          isActive
+            ? "bg-[#1e2d3d] text-white font-medium"
+            : "text-white/75 hover:bg-white/[0.04] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? item.label : undefined}
       >
@@ -65,7 +67,10 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         )} />
         {showLabels && (
           <>
-            <span className="flex-1 text-[15px] font-normal whitespace-nowrap">{item.label}</span>
+            <span className={cn(
+              "flex-1 text-[15px] whitespace-nowrap",
+              isActive ? "font-medium" : "font-normal"
+            )}>{item.label}</span>
             {showChevron && <ChevronLeft className="w-4 h-4 text-white/40 shrink-0" />}
           </>
         )}
