@@ -30,7 +30,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       boxShadow: "0 1px 3px rgba(0,0,0,.08)",
       marginBottom: 16,
       overflow: "hidden",
-      fontFamily: "Inter, system-ui, sans-serif",
+      fontFamily: "Roboto, system-ui, sans-serif",
     }}>
       {/* Header */}
       <div style={{
@@ -40,8 +40,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         padding: "10px 16px",
         borderBottom: "1px solid #e5e7eb",
       }}>
-        <Filter style={{ width: 16, height: 16, fill: "#1a1a2e", color: "#1a1a2e", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e" }}>Report Type</span>
+        <Filter style={{ width: 16, height: 16, fill: "#212529", color: "#212529", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
       </div>
 
       {/* Button grid — 3 columns */}
@@ -64,11 +64,11 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 minHeight: "38px",
                 maxHeight: "38px",
                 width: "100%",
-                border: `1.5px solid ${isActive ? "#16a34a" : "#14b8a6"}`,
+                border: `1.5px solid ${isActive ? "#28a745" : "#14b8a6"}`,
                 borderRadius: "7px",
-                background: isActive ? "#16a34a" : "#fff",
+                background: isActive ? "#28a745" : "#fff",
                 color: isActive ? "#fff" : "#14b8a6",
-                fontFamily: "Inter, system-ui, sans-serif",
+                fontFamily: "Roboto, system-ui, sans-serif",
                 fontSize: isCommission ? "11px" : "12px",
                 fontWeight: 500,
                 cursor: "pointer",

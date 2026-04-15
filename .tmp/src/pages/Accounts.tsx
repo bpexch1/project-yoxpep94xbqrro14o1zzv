@@ -48,7 +48,7 @@ export default function Accounts() {
   const handleSearch = () => setSearchFilter(searchQuery);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
 
         {/* 1. Report Type Card */}
@@ -70,8 +70,8 @@ export default function Accounts() {
             padding: "10px 16px",
             borderBottom: "1px solid #e5e7eb",
           }}>
-            <Filter style={{ width: 16, height: 16, fill: "#1a1a2e", color: "#1a1a2e", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e", fontFamily: "Inter, system-ui, sans-serif" }}>Search-Users</span>
+            <Filter style={{ width: 16, height: 16, fill: "#212529", color: "#212529", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
           <div style={{ padding: "12px 16px" }}>
             <div style={{ display: "flex", gap: 8 }}>
@@ -91,7 +91,7 @@ export default function Accounts() {
                   padding: "0 12px",
                   fontSize: "14px",
                   color: "#374151",
-                  fontFamily: "Inter, system-ui, sans-serif",
+                  fontFamily: "Roboto, system-ui, sans-serif",
                   outline: "none",
                   boxSizing: "border-box",
                   background: "#fff",
@@ -104,13 +104,13 @@ export default function Accounts() {
                   minHeight: "40px",
                   maxHeight: "40px",
                   padding: "0 18px",
-                  background: "#16a34a",
+                  background: "#28a745",
                   color: "#fff",
                   border: "none",
                   borderRadius: "7px",
                   fontSize: "14px",
                   fontWeight: 600,
-                  fontFamily: "Inter, system-ui, sans-serif",
+                  fontFamily: "Roboto, system-ui, sans-serif",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
