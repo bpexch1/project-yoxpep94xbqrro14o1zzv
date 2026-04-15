@@ -10,7 +10,6 @@ import { getClientSession } from "@/hooks/useClientAuth";
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchFilter, setSearchFilter] = useState("");
   const session = getClientSession();
   const navigate = useNavigate();
 
@@ -45,8 +44,6 @@ export default function Accounts() {
     enabled: !!session,
   });
 
-  const handleSearch = () => setSearchFilter(searchQuery);
-
   return (
     <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
@@ -80,7 +77,6 @@ export default function Accounts() {
                 placeholder="Username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 style={{
                   flex: 1,
                   height: "40px",
@@ -98,7 +94,6 @@ export default function Accounts() {
                 }}
               />
               <button
-                onClick={handleSearch}
                 style={{
                   height: "40px",
                   minHeight: "40px",
@@ -131,7 +126,7 @@ export default function Accounts() {
           clients={clients || []}
           isLoading={isLoading}
           username={session?.username || 'Admin'}
-          searchFilter={searchFilter}
+          searchFilter={searchQuery}
           onRefresh={refetch}
         />
 
