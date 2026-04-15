@@ -48,9 +48,9 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       </div>
       <div className="p-4 grid grid-cols-3 gap-2 lg:flex lg:flex-wrap lg:gap-2">
         {tabs.map((tab, i) => {
-          const isMobileCenter = i === 6; // Commission Report
+          const isLast = i === tabs.length - 1; // Commission Report
           return (
-            <div key={tab.id} className={cn("lg:col-auto", isMobileCenter ? "col-start-2" : "")}>
+            <div key={tab.id} className={cn("lg:col-auto", isLast ? "col-span-3" : "")}>
               <TabButton tab={tab} />
             </div>
           );
