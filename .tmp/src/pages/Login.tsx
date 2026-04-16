@@ -24,19 +24,11 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      // Step 1: try exact filter by username
-      let results = await Client.filter({ username: username.trim() });
-
-      // Step 2: if not found, try case-insensitive by loading more records
-      if (!results || results.length === 0) {
-        const all = await Client.list('-created_at', 500);
-        results = all.filter((c: any) => 
-          c.username?.toLowerCase() === username.trim().toLowerCase()
-        );
-      }
-
-      // Step 3: match password
-      const client = results.find((c: any) => c.password === password);
+      const allClients = await Client.list('-created_at', 500);
+      const client = allClients.find((c: any) => 
+        c.username?.toLowerCase().trim() === username.trim().toLowerCase() && 
+        c.password === password
+      );
       
       if (client) {
         setClientSession({
