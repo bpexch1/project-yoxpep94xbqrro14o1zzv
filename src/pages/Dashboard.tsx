@@ -92,31 +92,31 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
-      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
+      <main style={{ padding: "16px 16px 80px" }}>
         
         {/* Search Users Card */}
         <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #d0d0d0", boxShadow: "0 1px 3px rgba(0,0,0,.08)", marginBottom: 16, overflow: "hidden" }}>
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
-            <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Search-Users</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
+            <Filter style={{ width: 18, height: 18, fill: "#000", color: "#000", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>Search-Users</span>
           </div>
           {/* Body */}
-          <div style={{ padding: "12px 16px" }}>
-            <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ padding: "14px 16px" }}>
+            <div style={{ display: "flex", gap: 10 }}>
               <input
                 type="text"
                 placeholder="Username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                style={{ flex: 1, height: 40, border: "1px solid #d1d5db", borderRadius: 4, padding: "0 12px", fontSize: 14, outline: "none", background: "#fff" }}
+                style={{ flex: 1, height: 46, border: "1px solid #d1d5db", borderRadius: 6, padding: "0 14px", fontSize: 15, outline: "none", background: "#fff" }}
               />
               <button
                 onClick={handleSearch}
-                style={{ height: 40, padding: "0 18px", background: "#1a9e71", color: "#fff", border: "none", borderRadius: 7, fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                style={{ height: 46, padding: "0 22px", background: "#1a9e71", color: "#fff", border: "none", borderRadius: 7, fontSize: 15, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
               >
-                <Search style={{ width: 15, height: 15 }} /> Search
+                <Search style={{ width: 16, height: 16 }} /> Search
               </button>
             </div>
           </div>
@@ -125,11 +125,11 @@ export default function Dashboard() {
         {/* Sport Highlights Card */}
         <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #d0d0d0", boxShadow: "0 1px 3px rgba(0,0,0,.08)", overflow: "hidden" }}>
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", flex: 1 }}>Sport Highlights</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
+            <span style={{ fontWeight: 700, fontSize: 16, color: "#212529", flex: 1 }}>Sport Highlights</span>
             <button
               onClick={handleRefresh}
-              style={{ background: "#1a9e71", color: "#fff", border: "none", borderRadius: 5, padding: "4px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+              style={{ background: "#1a9e71", color: "#fff", border: "none", borderRadius: 5, padding: "6px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
             >
               Refresh
             </button>
@@ -137,11 +137,11 @@ export default function Dashboard() {
           
           <div style={{ overflowX: "auto" }}>
             {isLoading ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 0" }}>
-                <Loader2 style={{ width: 32, height: 32, color: "#16a085", margin: "0 auto" }} className="animate-spin" />
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "60px 0" }}>
+                <Loader2 style={{ width: 40, height: 40, color: "#16a085", margin: "0 auto" }} className="animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
-              <div style={{ padding: "32px 16px", textAlign: "center", color: "#7f8c8d", fontSize: 14 }}>
+              <div style={{ padding: "48px 16px", textAlign: "center", color: "#7f8c8d", fontSize: 15 }}>
                 No matches found.
               </div>
             ) : (
@@ -150,10 +150,10 @@ export default function Dashboard() {
                   {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                     <Fragment key={sport}>
                       <tr style={{ background: "#fff" }}>
-                        <td style={{ border: "1px solid #d5d8dc", padding: "10px 12px", fontWeight: 700, color: "#212529", fontSize: 14 }}>
+                        <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15 }}>
                           {sport}
                         </td>
-                        <td style={{ border: "1px solid #d5d8dc", padding: "10px 12px", fontWeight: 700, color: "#212529", fontSize: 14, width: 120, textAlign: "right" }}>
+                        <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15, minWidth: 100, textAlign: "right" }}>
                           Amount
                         </td>
                       </tr>
@@ -164,7 +164,7 @@ export default function Dashboard() {
                             key={match.id}
                             style={{ background: idx % 2 === 0 ? '#fff' : '#f9f9f9' }}
                           >
-                            <td style={{ border: "1px solid #d5d8dc", padding: "10px 12px", fontSize: 14 }}>
+                            <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontSize: 15 }}>
                               <span
                                 style={{ color: "#1a9e71", cursor: "pointer", textDecoration: "none" }}
                                 className="hover:underline"
@@ -172,10 +172,10 @@ export default function Dashboard() {
                                 {match.title} / Match Odds
                               </span>
                               {match.status === 'live' && (
-                                <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#1a9e71", marginLeft: 8 }} />
+                                <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#1a9e71", marginLeft: 10 }} />
                               )}
                             </td>
-                            <td style={{ border: "1px solid #d5d8dc", padding: "10px 12px", fontSize: 14, fontWeight: 500, color: "#212529", textAlign: "right" }}>
+                            <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontSize: 15, fontWeight: 500, color: "#212529", textAlign: "right" }}>
                               {formatAmount(amount)}
                             </td>
                           </tr>
