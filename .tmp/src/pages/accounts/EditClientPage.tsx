@@ -4,10 +4,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client } from "@/entities";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ChevronLeft, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export default function EditClientPage() {
   const { username } = useParams();
@@ -98,172 +94,144 @@ export default function EditClientPage() {
     }
   };
 
+  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
+
   if (isFetching) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
+      <div className="min-h-screen bg-[#ececec] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#12b886]" />
       </div>
     );
   }
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center p-4">
-        <h1 className="text-xl font-bold text-gray-800 mb-4">Client not found</h1>
-        <Button onClick={() => navigate(-1)} variant="outline">
-          <ChevronLeft className="w-4 h-4 mr-2" /> Go Back
-        </Button>
+      <div className="min-h-screen bg-[#ececec] flex flex-col items-center justify-center p-4">
+        <h1 className="text-xl font-bold text-[#333] mb-4">Client not found</h1>
+        <button onClick={() => navigate(-1)} className="bg-white border border-[#cccccc] px-4 h-10 rounded-[4px] font-bold text-[#333]">
+          Go Back
+        </button>
       </div>
     );
   }
 
+  const InputRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
+    <div className="flex items-center py-2.5 border-b border-[#d4d4d4] gap-3">
+      <label className="w-24 text-[13px] font-bold text-[#333]">{label}</label>
+      <div className="flex-1">
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#f0f0f0] font-roboto">
-      <main className="max-w-[720px] mx-auto p-4 lg:p-6">
+    <div className="min-h-screen bg-[#ececec] pb-12" style={arialFont}>
+      <main className="max-w-[420px] mx-auto p-3">
         {/* Header Bar */}
-        <div className="flex items-center gap-3 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex items-center gap-3 mb-3 bg-[#f3f3f3] p-3 rounded-[6px] border border-[#d4d4d4]">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-[#2c3e50]" />
+            <ChevronLeft className="w-5 h-5 text-[#333]" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-[#2c3e50]">Edit: @{client.username}</h1>
-            <p className="text-sm text-[#7f8c8d] font-medium uppercase tracking-wider">
-              {client.role || "Client"} Account
+            <h1 className="text-[15px] font-bold text-[#333]">Edit: {client.username}</h1>
+            <p className="text-[11px] text-[#12b886] font-bold uppercase tracking-wider">
+              {client.role || "Client"}
             </p>
           </div>
         </div>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 space-y-0">
-            {/* Password Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Password</label>
-              <Input
+        <form onSubmit={handleSubmit} className="bg-[#f3f3f3] rounded-[6px] border border-[#d4d4d4] overflow-hidden">
+          <div className="p-3 pt-1">
+            <InputRow label="Password">
+              <input
                 type="text"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="flex-1 h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
-                placeholder="Enter new password to change"
+                className="w-full h-[40px] bg-white border border-[#cccccc] rounded-[4px] px-3 text-[13px] focus:outline-none focus:border-[#12b886]"
+                placeholder="New password"
               />
-            </div>
+            </InputRow>
 
-            {/* IsActive Row */}
-            <div className="flex items-center py-4 border-b border-gray-100">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">IsActive</label>
-              <div className="flex-1">
-                <Checkbox
-                  checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked === true })}
-                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
-                />
-              </div>
-            </div>
+            <InputRow label="IsActive">
+              <input
+                type="checkbox"
+                checked={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                className="w-5 h-5 accent-[#12b886]"
+              />
+            </InputRow>
 
-            {/* Betting Allowed Row */}
-            <div className="flex items-center py-4 border-b border-gray-100">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">Betting Allowed</label>
-              <div className="flex-1">
-                <Checkbox
-                  checked={formData.bettingAllowed}
-                  onCheckedChange={(checked) => setFormData({ ...formData, bettingAllowed: checked === true })}
-                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
-                />
-              </div>
-            </div>
+            <InputRow label="Betting">
+              <input
+                type="checkbox"
+                checked={formData.bettingAllowed}
+                onChange={(e) => setFormData({ ...formData, bettingAllowed: e.target.checked })}
+                className="w-5 h-5 accent-[#12b886]"
+              />
+            </InputRow>
 
-            {/* Can Settle PL Row */}
-            <div className="flex items-center py-4 border-b border-gray-100">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">Can Settle PL</label>
-              <div className="flex-1 flex items-center gap-2">
-                <Checkbox
-                  checked={formData.canSettlePL}
-                  onCheckedChange={(checked) => setFormData({ ...formData, canSettlePL: checked === true })}
-                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
-                />
-                <span className="text-xs text-gray-500 italic">Enables settlement features</span>
-              </div>
-            </div>
+            <InputRow label="Settle PL">
+              <input
+                type="checkbox"
+                checked={formData.canSettlePL}
+                onChange={(e) => setFormData({ ...formData, canSettlePL: e.target.checked })}
+                className="w-5 h-5 accent-[#12b886]"
+              />
+            </InputRow>
 
-            {/* Phone Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Phone</label>
-              <Input
+            <InputRow label="Phone">
+              <input
                 type="text"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="flex-1 h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
+                className="w-full h-[40px] bg-white border border-[#cccccc] rounded-[4px] px-3 text-[13px] focus:outline-none focus:border-[#12b886]"
               />
-            </div>
+            </InputRow>
 
-            {/* Reference Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Reference</label>
-              <Input
+            <InputRow label="Reference">
+              <input
                 type="text"
                 value={formData.reference}
                 onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                className="flex-1 h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
+                className="w-full h-[40px] bg-white border border-[#cccccc] rounded-[4px] px-3 text-[13px] focus:outline-none focus:border-[#12b886]"
               />
-            </div>
+            </InputRow>
 
-            {/* Notes Row */}
-            <div className="flex flex-col sm:flex-row sm:items-start py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50] pt-2">Notes</label>
-              <Textarea
-                rows={3}
+            <div className="py-2.5 border-b border-[#d4d4d4]">
+              <label className="block text-[13px] font-bold text-[#333] mb-1.5">Notes</label>
+              <textarea
+                rows={2}
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="flex-1 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085] resize-none"
+                className="w-full bg-white border border-[#cccccc] rounded-[4px] p-2 text-[13px] focus:outline-none focus:border-[#12b886] resize-none"
               />
             </div>
 
-            {/* Commission Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Commission (%)</label>
-              <div className="flex-1 space-y-1">
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={formData.commission}
-                  onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
-                  className="w-full h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
-                />
-                <p className="text-[10px] text-gray-500 italic">Minimum commission is 2.00 %</p>
-              </div>
-            </div>
-
-            {/* UserDomain Row */}
-            <div className="flex items-center py-4">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">UserDomain</label>
-              <div className="flex-1 text-sm text-[#7f8c8d] font-semibold">
-                1 ( betproexch.com )
-              </div>
-            </div>
+            <InputRow label="Comm (%)">
+              <input
+                type="number"
+                step="0.01"
+                value={formData.commission}
+                onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
+                className="w-full h-[40px] bg-white border border-[#cccccc] rounded-[4px] px-3 text-[13px] focus:outline-none focus:border-[#12b886]"
+              />
+            </InputRow>
           </div>
 
           {/* Action Footer */}
-          <div className="px-6 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
-            <Button
+          <div className="p-3 bg-[#ececec] flex justify-end">
+            <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#16a085] hover:bg-[#138d75] text-white px-10 py-2.5 h-auto rounded-lg font-bold transition-all shadow-md active:scale-95 flex items-center gap-2"
+              className="bg-[#12b886] text-white px-8 h-[40px] rounded-[4px] font-bold transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Changes
+            </button>
           </div>
         </form>
       </main>

@@ -45,36 +45,35 @@ export default function Accounts() {
     enabled: !!session,
   });
 
-  const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
+  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "Roboto, system-ui, sans-serif" }}>
-      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
+    <div style={{ minHeight: "100vh", background: "#ececec", ...arialFont }}>
+      <main style={{ maxWidth: 420, margin: "0 auto", padding: "12px 10px 80px" }}>
 
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
         <div style={{
-          background: "#fff",
-          borderRadius: 10,
-          border: "1px solid #d0d0d0",
-          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
-          marginBottom: 16,
+          background: "#f3f3f3",
+          borderRadius: 6,
+          border: "1px solid #d4d4d4",
+          marginBottom: 14,
           overflow: "hidden",
         }}>
           <div style={{
             display: "flex",
             alignItems: "center",
             gap: 8,
-            padding: "10px 16px",
-            background: "#f5f5f5",
-            borderBottom: "1px solid #d0d0d0",
+            padding: "8px 12px",
+            background: "#ececec",
+            borderBottom: "1px solid #d4d4d4",
           }}>
-            <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#333", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
+            <Filter style={{ width: 15, height: 15, color: "#333", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#333" }}>Search-Users</span>
           </div>
-          <div style={{ padding: "12px 16px" }}>
+          <div style={{ padding: "10px 12px" }}>
             <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
@@ -84,38 +83,34 @@ export default function Accounts() {
                 style={{
                   flex: 1,
                   height: "40px",
-                  minHeight: "40px",
-                  maxHeight: "40px",
-                  border: "1px solid #d1d5db",
+                  border: "1px solid #cccccc",
                   borderRadius: "4px",
-                  padding: "0 12px",
+                  padding: "0 10px",
                   fontSize: "14px",
-                  color: "#374151",
-                  fontFamily: "Roboto, system-ui, sans-serif",
+                  color: "#333",
                   outline: "none",
                   boxSizing: "border-box",
                   background: "#fff",
+                  ...arialFont
                 }}
               />
               <button
                 style={{
                   height: "40px",
-                  minHeight: "40px",
-                  maxHeight: "40px",
-                  padding: "0 18px",
+                  padding: "0 16px",
                   background: "#12b886",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "7px",
+                  borderRadius: "4px",
                   fontSize: "14px",
                   fontWeight: 600,
-                  fontFamily: "Roboto, system-ui, sans-serif",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
                   boxSizing: "border-box",
                   flexShrink: 0,
+                  ...arialFont
                 }}
               >
                 <Search style={{ width: 15, height: 15 }} />

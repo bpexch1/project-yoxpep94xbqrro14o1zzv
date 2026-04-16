@@ -22,35 +22,36 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   const currentId = tabs.find(t => t.path === location.pathname)?.id ?? activeTab;
   const go = (tab: typeof tabs[0]) => { onTabChange(tab.id); navigate(tab.path); };
 
+  const arialFont = "Arial, Helvetica, sans-serif";
+
   return (
     <div style={{
-      background: "#fff",
-      borderRadius: 10,
-      border: "1px solid #d0d0d0",
-      boxShadow: "0 1px 3px rgba(0,0,0,.08)",
-      marginBottom: 16,
+      background: "#f3f3f3",
+      borderRadius: 6,
+      border: "1px solid #d4d4d4",
+      marginBottom: 14,
       overflow: "hidden",
-      fontFamily: "Roboto, system-ui, sans-serif",
+      fontFamily: arialFont,
     }}>
-      {/* Header */}
+      {/* Header bar */}
       <div style={{
         display: "flex",
         alignItems: "center",
         gap: 8,
-        padding: "10px 16px",
-        background: "#ecf0f1",
-        borderBottom: "1px solid #d0d0d0",
+        padding: "8px 12px",
+        background: "#ececec",
+        borderBottom: "1px solid #d4d4d4",
       }}>
-        <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#333" }}>Report Type</span>
+        <Filter style={{ width: 14, height: 14, color: "#333", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 14, color: "#333" }}>Report Type</span>
       </div>
 
       {/* Button grid — 3 columns */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "8px",
-        padding: "10px 12px 12px",
+        gap: "6px",
+        padding: "10px 10px",
       }}>
         {tabs.map((tab) => {
           const isActive = currentId === tab.id;
@@ -65,13 +66,13 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 minHeight: "38px",
                 maxHeight: "38px",
                 width: "100%",
-                border: `1.5px solid ${isActive ? "#1a9e71" : "#14b8a6"}`,
-                borderRadius: "7px",
-                background: isActive ? "#1a9e71" : "#fff",
-                color: isActive ? "#fff" : "#14b8a6",
-                fontFamily: "Roboto, system-ui, sans-serif",
-                fontSize: isCommission ? "11px" : "12px",
-                fontWeight: 500,
+                border: `1.5px solid #12b886`,
+                borderRadius: "4px",
+                background: isActive ? "#12b886" : "#fff",
+                color: isActive ? "#fff" : "#12b886",
+                fontFamily: arialFont,
+                fontSize: isCommission ? "11px" : "13px",
+                fontWeight: 600,
                 cursor: "pointer",
                 transition: "background .15s, color .15s",
                 whiteSpace: "nowrap",

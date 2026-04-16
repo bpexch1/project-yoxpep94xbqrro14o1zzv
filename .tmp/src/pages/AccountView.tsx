@@ -28,16 +28,18 @@ export default function AccountView() {
     enabled: !!username && !!session,
   });
 
+  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
+
   return (
-    <div className="bg-[#f5f5f5] min-h-screen pb-16">
-      <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
+    <div className="bg-[#ececec] min-h-screen pb-16" style={arialFont}>
+      <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
         <div className="h-3" />
         
         {/* Breadcrumb / Back Bar */}
-        <div className="mx-3 mb-3 flex items-center gap-2 bg-white border border-[#d5d8dc] rounded-lg p-2 shadow-sm">
+        <div className="mx-3 mb-3 flex items-center gap-2 bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] p-3 shadow-none">
           <button 
             onClick={() => navigate("/accounts")}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
           >
             <ChevronLeft className="w-5 h-5 text-[#333]" />
           </button>

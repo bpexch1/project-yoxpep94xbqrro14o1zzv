@@ -3,49 +3,51 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #f5f5f5;
-  --bg-card: #ffffff;
+  --bg-primary: #ececec;
+  --bg-card: #f3f3f3;
   --accent-green: #12b886;
   --accent-green-hover: #0ca678;
-  --sidebar-bg: #254465;
+  --sidebar-bg: #2c3e50;
   --accent-blue: #3d6b8b;
-  --text-primary: #333;
-  --text-secondary: #6c757d;
-  --border-color: #dee2e6;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #d4d4d4;
 
   /* Shadcn CSS variable mappings */
-  --background: 0 0% 96%;
-  --foreground: 210 11% 15%;
-  --card: 0 0% 100%;
-  --card-foreground: 210 11% 15%;
+  --background: 0 0% 93%; /* #ececec approximate */
+  --foreground: 0 0% 20%;
+  --card: 0 0% 95%; /* #f3f3f3 approximate */
+  --card-foreground: 0 0% 20%;
   --popover: 0 0% 100%;
-  --popover-foreground: 210 11% 15%;
+  --popover-foreground: 0 0% 20%;
   --primary: 162 83% 39%;          /* #12b886 teal-green */
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 17% 91%;
-  --secondary-foreground: 210 11% 15%;
-  --muted: 210 17% 91%;
-  --muted-foreground: 210 8% 45%;
+  --secondary: 0 0% 90%;
+  --secondary-foreground: 0 0% 20%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 40%;
   --accent: 162 83% 39%;
   --accent-foreground: 0 0% 100%;
   --destructive: 6 78% 57%;        /* #e74c3c red */
   --destructive-foreground: 0 0% 100%;
-  --border: 210 14% 89%;
-  --input: 210 14% 89%;
+  --border: 0 0% 83%; /* #d4d4d4 approximate */
+  --input: 0 0% 83%;
   --ring: 162 83% 39%;
-  --radius: 0.5rem;
+  --radius: 6px;
   --teal: 174 63% 38%;
 }
 
 @layer base {
   * {
     @apply border-border;
+    font-family: Arial, Helvetica, sans-serif !important;
   }
   body {
     @apply bg-background text-foreground antialiased;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Roboto', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
   }
 }
 
@@ -54,23 +56,28 @@ html {
 }
 
 .app-container {
-  background-color: #f5f5f5;
+  background-color: #ececec;
   min-height: 100vh;
 }
 
 .content-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  margin: 16px;
-  border: 1px solid #dee2e6;
+  background-color: #f3f3f3;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 14px;
+  border: 1px solid #d4d4d4;
 }
 
 a {
   color: #12b886;
+  text-decoration: none;
 }
 a:hover {
   color: #0ca678;
+}
+
+.admin-row {
+  height: 34px;
 }
 
 @keyframes marquee {
@@ -88,4 +95,20 @@ a:hover {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Custom Scrollbar for better UI match */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
 }

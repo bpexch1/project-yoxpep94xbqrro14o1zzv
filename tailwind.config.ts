@@ -53,17 +53,17 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'bg-primary': 'var(--bg-primary)',
-				'bg-card': 'var(--bg-card)',
-				'accent-green': 'var(--accent-green)',
-				'accent-blue': 'var(--accent-blue)',
-				'accent-pink': 'var(--accent-pink)',
+				'bg-primary': '#ececec',
+				'bg-card': '#f3f3f3',
+				'accent-green': '#12b886',
+				'accent-blue': '#3d6b8b',
+				'accent-pink': '#e74c3c',
 				'brand-green': '#12b886',
 				'brand-green-hover': '#0ca678',
 				'border-green': '#20c997',
-				'brand-blue': '#254465',
-				'brand-blue-dark': '#3d6b8b',
-				'brand-bg': '#f5f5f5',
+				'brand-blue': '#2c3e50',
+				'brand-blue-dark': '#1e2d3d',
+				'brand-bg': '#ececec',
 			},
 			borderRadius: {
 				xl: 'calc(var(--radius) + 4px)',
@@ -72,7 +72,7 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Roboto', 'system-ui', 'sans-serif'],
+				sans: ['Arial', 'Helvetica', 'sans-serif'],
 			},
 		}
 	},

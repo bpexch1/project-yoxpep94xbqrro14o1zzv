@@ -29,22 +29,6 @@ function formatRole(role: string): string {
   return roleMap[role?.toLowerCase()] ?? role;
 }
 
-const NavLink = ({ to, label }: { to: string; label: string }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || (to !== "/dashboard" && location.pathname.startsWith(to.split('?')[0]));
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "px-3 py-1.5 text-sm rounded transition-colors font-medium whitespace-nowrap",
-        isActive ? "bg-[#e8f0f5] text-[#254465] font-bold" : "text-[#555555] hover:bg-[#f5f5f5]"
-      )}
-    >
-      {label}
-    </Link>
-  );
-};
-
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
@@ -63,19 +47,16 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       
       const role = session.role?.toLowerCase();
       
-      // Company sees all
       if (role === 'company' || downlineUsernames === null) {
         return pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
       
-      // Client sees only own bets
       if (role === 'client') {
         return pendingBets
           .filter((b: any) => b.user_email === session.username)
           .reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
       
-      // Others: only downline bets
       if (!downlineUsernames || downlineUsernames.length === 0) return 0;
       return pendingBets
         .filter((b: any) => downlineUsernames.includes(b.user_email))
@@ -89,70 +70,68 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     navigate("/login");
   };
 
+  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
+
   return (
-    <header className="sticky top-0 z-40 bg-white flex items-center px-3 h-12 border-b border-[#e0e0e0]">
+    <header 
+      className="sticky top-0 z-40 bg-white flex items-center px-3 h-12 border-b border-[#dcdcdc]"
+      style={arialFont}
+    >
       {/* LEFT: Hamburger */}
-      <div className="flex items-center shrink-0">
+      <div className="flex items-center shrink-0 w-1/4">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
+          className="p-1 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
         >
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>
-        <span className="hidden lg:block font-black italic text-xl ml-3" style={{fontFamily:'Georgia,serif'}}>
-          <span className="text-[#26c6da]">BPEXCH</span>
-        </span>
       </div>
 
-      {/* CENTER: Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-1 ml-6 flex-1">
-        <NavLink to="/dashboard" label="Dashboard" />
-        <NavLink to="/accounts" label="Users" />
-        <NavLink to="/reports/daily-pl" label="Reports" />
-      </nav>
-
-      {/* RIGHT: User + Stats */}
-      <div className="flex-1 lg:flex-none overflow-x-auto no-scrollbar flex items-center justify-end ml-auto gap-2">
-        {session ? (
-          <div className="flex items-center gap-2 lg:gap-4 min-w-max">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
-                  <span className="text-[#333] text-sm font-medium">
-                    {session.username} ({session.role ? formatRole(session.role) : ''})
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-[#555555]" />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-[#333] border-b border-[#d5d8dc] mb-1">
-                  Logged in as <span className="font-semibold">{session.username}</span>
-                </div>
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50 p-2"
-                >
-                  <LogOut className="w-3 h-3 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
-              <span className="text-sm font-bold text-[#333] whitespace-nowrap">
-                B: <span>0</span>
-              </span>
-              <span className="text-sm font-bold text-[#333] whitespace-nowrap">
-                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#333]'}>
-                  {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
+      {/* CENTER: Username */}
+      <div className="flex-1 flex justify-center overflow-hidden px-2">
+        {session && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-1 cursor-pointer truncate max-w-full">
+                <span className="text-[#333] text-[14px] font-bold truncate">
+                  {session.username} ({session.role ? formatRole(session.role) : ''})
                 </span>
+                <ChevronDown className="w-3 h-3 text-[#555555] shrink-0" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
+              <div className="px-2 py-1.5 text-xs text-[#333] border-b border-[#d5d8dc] mb-1">
+                Logged in as <span className="font-semibold">{session.username}</span>
+              </div>
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50 p-2"
+              >
+                <LogOut className="w-3 h-3 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+
+      {/* RIGHT: Stats */}
+      <div className="flex items-center justify-end gap-2 w-1/4">
+        {session ? (
+          <div className="flex flex-col items-end leading-none">
+            <span className="text-[11px] font-bold text-[#333] whitespace-nowrap">
+              B: <span className="text-black">0</span>
+            </span>
+            <span className="text-[11px] font-bold text-[#333] whitespace-nowrap mt-0.5">
+              Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-black'}>
+                {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
               </span>
-            </div>
+            </span>
           </div>
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#254465] hover:text-[#12b886] uppercase"
+            className="text-xs font-bold text-[#254465] uppercase"
           >
             Login
           </button>
