@@ -204,7 +204,7 @@ export function ClientSummaryCard({
             <span>Ledger</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">A</div>
+            <div className="w-5 h-5 bg-[#42A665] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">A</div>
             <span>Active</span>
           </div>
           <div className="flex items-center gap-1">
@@ -383,7 +383,7 @@ export function ClientSummaryCard({
                                     className={cn(
                                       "w-9 h-9 rounded-sm font-bold text-sm flex items-center justify-center transition-all shadow-sm",
                                       client.status === "active" 
-                                        ? "bg-[#1a9e71] hover:bg-[#158a60] text-white" 
+                                        ? "bg-[#42A665] hover:bg-[#379055] text-white" 
                                         : "bg-white border border-[#e74c3c] text-[#e74c3c] hover:bg-red-50"
                                     )}
                                     title={client.status === "active" ? "Active" : "Inactive"}
