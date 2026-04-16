@@ -43,10 +43,6 @@ export default function Login() {
           balance_upline: client.balance_upline || 0,
           status: client.status || 'active',
         });
-        toast({
-          title: "Success",
-          description: "Logged in successfully!",
-        });
         if (client.role === 'client') {
           navigate("/play");
         } else {
