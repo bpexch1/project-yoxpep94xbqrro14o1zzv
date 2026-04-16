@@ -48,6 +48,7 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setSession(getClientSession());
@@ -97,7 +98,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       <div className="flex items-center shrink-0">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
+          className="p-1.5 border border-[#999] rounded-[3px] bg-white hover:bg-[#f5f5f5] transition-colors"
         >
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>
@@ -114,13 +115,16 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       </nav>
 
       {/* RIGHT: User + Stats */}
-      <div className="flex-1 lg:flex-none overflow-x-auto no-scrollbar flex items-center justify-end ml-auto gap-2">
+      <div className={cn(
+        "flex items-center justify-end gap-2",
+        isMobile ? "flex-1 ml-2" : "lg:flex-none ml-auto"
+      )}>
         {session ? (
           <div className="flex items-center gap-2 lg:gap-4 min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
-                  <span className="text-[#333] text-sm font-medium">
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-1 lg:px-2 py-1 rounded transition-colors">
+                  <span className="text-[#333] text-[13px] lg:text-sm font-medium">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
                   </span>
                   <ChevronDown className="w-3 h-3 text-[#555555]" />
@@ -139,12 +143,12 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
-              <span className="text-sm font-bold text-[#333] whitespace-nowrap">
-                B: <span className="text-black">0</span>
+            <div className="flex items-center gap-1.5 lg:gap-3 border-l border-[#e0e0e0] pl-2 lg:pl-4">
+              <span className="text-[12px] lg:text-sm font-bold text-[#333] whitespace-nowrap">
+                B: <span className="text-black font-medium">0</span>
               </span>
-              <span className="text-sm font-bold text-[#333] whitespace-nowrap">
-                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-black'}>
+              <span className="text-[12px] lg:text-sm font-bold text-[#333] whitespace-nowrap">
+                Exp: <span className={cn("font-medium", totalExposure > 0 ? 'text-[#e74c3c]' : 'text-black')}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
