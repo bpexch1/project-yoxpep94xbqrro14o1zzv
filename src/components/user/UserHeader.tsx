@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { User } from "@/entities";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown, Bell } from "lucide-react";
@@ -23,12 +24,28 @@ export function UserHeader({
   sidebarOpen 
 }: UserHeaderProps) {
   const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleLogout = async () => {
     await User.logout();
     clearClientSession();
     navigate("/login");
   };
+
+  const menuItems = ["Statement", "Result", "Profit Loss", "Bet History", "Profile"];
 
   return (
     <header className="flex flex-col w-full z-50 sticky top-0">
@@ -49,23 +66,41 @@ export function UserHeader({
         </div>
 
         <div className="flex-1 max-w-md mx-4 hidden md:flex overflow-hidden relative">
-          <div className="whitespace-nowrap animate-marquee flex items-center gap-2 text-white text-[11px] font-medium italic">
-            <span>Announcement :- ⚡</span>
-            <span>Welcome to BETPRO EXCHANGE. Enjoy the best betting experience! ⚡</span>
-            <span>Check out our new Aviator game and Sports Book! ⚡</span>
+          <div className="whitespace-nowrap animate-marquee flex items-center gap-2 text-white text-[12px] font-medium">
+            <span>Welcome to Exchange.</span>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2 text-white font-bold text-[11px] uppercase tracking-wider">
-            <span>B: 0</span>
-            <span className="opacity-30">|</span>
-            <span>L: 0</span>
-          </div>
-          
-          <div className="flex items-center gap-1 group cursor-pointer" onClick={handleLogout}>
-            <span className="text-white font-bold text-[11px] uppercase tracking-widest">{userEmail}</span>
-            <ChevronDown className="w-3 h-3 text-white/60 group-hover:text-white" />
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-1 text-white hover:opacity-80 transition-opacity"
+            >
+              <span className="text-[12px] font-bold">B: Rs. {clientBalance.toLocaleString('en-IN')} | L: 0</span>
+              <span className="text-[12px] font-bold ml-1">{userEmail}</span>
+              <ChevronDown className="w-3 h-3 text-white/70" />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute top-full right-0 mt-1 z-[200] bg-white shadow-lg border border-gray-200 min-w-[160px] rounded-sm py-1">
+                {menuItems.map(item => (
+                  <button 
+                    key={item} 
+                    onClick={() => setDropdownOpen(false)} 
+                    className="block w-full text-left px-4 py-3 text-[14px] text-gray-800 hover:bg-gray-100 border-b border-gray-100 transition-colors"
+                  >
+                    {item}
+                  </button>
+                ))}
+                <button 
+                  onClick={handleLogout} 
+                  className="block w-full text-left px-4 py-3 text-[14px] text-red-600 font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
