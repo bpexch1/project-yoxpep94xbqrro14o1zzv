@@ -246,6 +246,31 @@ export function ClientSummaryCard({
             </div>
           </div>
         </div>
+
+        {/* Search row */}
+        <div className="px-4 pb-3">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-[#212529] whitespace-nowrap">Search:</label>
+            <input
+              type="text"
+              placeholder="Search username..."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              style={{
+                flex: 1,
+                height: "34px",
+                border: "1px solid #d1d5db",
+                borderRadius: "5px",
+                padding: "0 10px",
+                fontSize: "13px",
+                color: "#374151",
+                fontFamily: "Roboto, system-ui, sans-serif",
+                outline: "none",
+                background: "#fff",
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Main Table */}
