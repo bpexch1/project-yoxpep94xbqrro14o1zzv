@@ -18,6 +18,7 @@ import FinalSheet from "./pages/reports/FinalSheet";
 import CurrentPosition from "./pages/CurrentPosition";
 import AccountView from "./pages/AccountView";
 import UserDashboard from "./pages/UserDashboard";
+import MatchDetail from "./pages/MatchDetail";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
 import { AppLayout } from "./components/layout/AppLayout";
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/current-position" element={<AppLayout><CurrentPosition /></AppLayout>} />
             <Route path="/accounts/view/:username" element={<AppLayout><AccountView /></AppLayout>} />
             <Route path="/play" element={<UserDashboard />} />
+            <Route path="/play/match/:matchId" element={<MatchDetail />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

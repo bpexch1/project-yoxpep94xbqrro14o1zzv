@@ -1,4 +1,5 @@
 import { Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface BettingMatchCardProps {
@@ -7,6 +8,7 @@ interface BettingMatchCardProps {
 }
 
 export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) {
+  const navigate = useNavigate();
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
   const matchTime = match.match_time || "16:00";
   
@@ -19,7 +21,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
 
   return (
     <button
-      onClick={() => onSelectBet(match, match.team1, 'back', match.back_odds)}
+      onClick={() => navigate(`/play/match/${match.id}`)}
       className="w-full bg-white border-b border-[#e0e8ef] flex items-center px-3 py-3 text-left hover:bg-[#f5f8fa] transition-colors active:bg-[#eef2f5]"
     >
       {/* Date / Time Column */}
