@@ -374,7 +374,7 @@ export function ClientSummaryCard({
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
-                                    className="w-9 h-9 bg-[#73C2D7] hover:bg-[#5BAFC5] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#73C2D7] hover:bg-[#5aafc4] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Ledger"
                                   >
                                     L
