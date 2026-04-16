@@ -27,63 +27,54 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   return (
     <div style={{
       background: "#fff",
-      borderRadius: 10,
-      border: "1px solid #d0d0d0",
-      marginBottom: 16,
+      borderRadius: "0px",
+      border: "1px solid #ccc",
+      marginBottom: "8px",
       overflow: "hidden",
       fontFamily: arialFont,
-      boxShadow: "0 1px 3px rgba(0,0,0,.08)",
     }}>
       {/* Header bar */}
       <div style={{
         display: "flex",
         alignItems: "center",
         gap: 8,
-        padding: "10px 16px",
-        background: "#ecf0f1",
-        borderBottom: "1px solid #d0d0d0",
+        padding: "8px 14px",
+        background: "#e8e8e8",
+        borderBottom: "1px solid #ccc",
       }}>
         <Filter style={{ width: 14, height: 14, color: "#333", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 14, color: "#333" }}>Report Type</span>
       </div>
 
-      {/* Button grid — 3 columns */}
+      {/* Buttons row */}
       <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "8px",
-        padding: "10px 12px 12px",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "6px",
+        padding: "10px 14px 12px",
       }}>
         {tabs.map((tab) => {
           const isActive = currentId === tab.id;
-          const isCommission = tab.id === "Commission Report";
           return (
             <button
               key={tab.id}
               onClick={() => go(tab)}
               style={{
-                gridColumnStart: isCommission ? 2 : undefined,
-                height: "38px",
-                minHeight: "38px",
-                maxHeight: "38px",
-                width: "100%",
-                border: `1.5px solid #12b886`,
-                borderRadius: "7px",
+                height: "32px",
+                padding: "0 14px",
+                border: "1px solid #12b886",
+                borderRadius: "4px",
                 background: isActive ? "#12b886" : "#fff",
                 color: isActive ? "#fff" : "#12b886",
                 fontFamily: arialFont,
-                fontSize: isCommission ? "11px" : "12px",
+                fontSize: "13px",
                 fontWeight: 500,
                 cursor: "pointer",
                 transition: "background .15s, color .15s",
                 whiteSpace: "nowrap",
-                padding: "0 4px",
-                boxSizing: "border-box",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                lineHeight: 1,
-                overflow: "hidden",
               }}
             >
               {tab.label}

@@ -48,8 +48,8 @@ export default function Accounts() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f5", ...arialFont }}>
-      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
+    <div style={{ minHeight: "100vh", background: "#d8d8d8", ...arialFont }}>
+      <main style={{ maxWidth: 980, margin: "0 auto", padding: "8px" }}>
 
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
@@ -57,24 +57,23 @@ export default function Accounts() {
         {/* 2. Search-Users Card */}
         <div style={{
           background: "#fff",
-          borderRadius: 10,
-          border: "1px solid #d0d0d0",
-          marginBottom: 16,
+          borderRadius: 0,
+          border: "1px solid #ccc",
+          marginBottom: 8,
           overflow: "hidden",
-          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
         }}>
           <div style={{
             display: "flex",
             alignItems: "center",
             gap: 8,
-            padding: "10px 16px",
-            background: "#ecf0f1",
-            borderBottom: "1px solid #d0d0d0",
+            padding: "8px 14px",
+            background: "#e8e8e8",
+            borderBottom: "1px solid #ccc",
           }}>
-            <Filter style={{ width: 15, height: 15, color: "#333", flexShrink: 0 }} />
+            <Filter style={{ width: 14, height: 14, color: "#333", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: 14, color: "#333" }}>Search-Users</span>
           </div>
-          <div style={{ padding: "12px 16px 16px" }}>
+          <div style={{ padding: "12px 14px" }}>
             <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
@@ -83,10 +82,10 @@ export default function Accounts() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   flex: 1,
-                  height: "40px",
-                  border: "1px solid #d1d5db",
+                  height: "34px",
+                  border: "1px solid #ccc",
                   borderRadius: "4px",
-                  padding: "0 12px",
+                  padding: "0 10px",
                   fontSize: "14px",
                   color: "#333",
                   outline: "none",
@@ -97,14 +96,14 @@ export default function Accounts() {
               />
               <button
                 style={{
-                  height: "40px",
+                  height: "34px",
                   padding: "0 16px",
                   background: "#12b886",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "7px",
+                  borderRadius: "4px",
                   fontSize: "14px",
-                  fontWeight: 600,
+                  fontWeight: "bold",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",

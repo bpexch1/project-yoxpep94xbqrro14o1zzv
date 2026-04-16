@@ -31,12 +31,11 @@ export default function AccountView() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div className="bg-[#f5f5f5] min-h-screen pb-16" style={arialFont}>
-      <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
-        <div className="h-3" />
+    <div className="bg-[#d8d8d8] min-h-screen pb-16" style={arialFont}>
+      <main className="px-0 pt-2 pb-8 max-w-[980px] mx-auto">
         
         {/* Breadcrumb / Back Bar */}
-        <div className="mx-3 mb-3 flex items-center gap-2 bg-white border border-[#d4d4d4] rounded-[10px] p-3 shadow-sm">
+        <div className="mx-2 mb-2 flex items-center gap-2 bg-white border border-[#ccc] rounded-none p-[10px] shadow-none">
           <button 
             onClick={() => navigate("/accounts")}
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -51,12 +50,12 @@ export default function AccountView() {
         </div>
 
         {/* Report Type card */}
-        <div className="mx-3 mb-3">
+        <div className="mx-2">
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* Client List card */}
-        <div className="mx-3">
+        <div className="mx-2">
           <ClientSummaryCard 
             clients={clients || []} 
             isLoading={isLoading} 
