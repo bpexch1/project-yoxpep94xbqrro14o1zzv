@@ -12,15 +12,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const superdev = createSuperdevClient({
-      appId: Deno.env.get('SUPERDEV_APP_ID') ?? '',
-    });
+    const appId = Deno.env.get('SUPERDEV_APP_ID') ?? '';
+    
+    const superdev = createSuperdevClient({ appId });
 
-    // Extract and set the auth token from request headers
-    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
-    if (authHeader) {
-      const token = authHeader.replace('Bearer ', '').trim();
-      superdev.auth.setToken(token);
+    // Try to set auth from request header if available and not expired
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
+    const userToken = authHeader.replace('Bearer ', '').trim();
+    if (userToken) {
+      superdev.auth.setToken(userToken);
     }
 
     const body = await req.json();
@@ -44,7 +44,6 @@ Deno.serve(async (req) => {
     }
 
     const txAmount = transactionType === 'deposit' ? amount : -amount;
-
     let beforeBalance: number;
     let afterBalance: number;
     let clientUpdateData: Record<string, number> = {};
@@ -68,7 +67,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    await superdev.entities.Transaction.create({
+    // Use .entity() method instead of .entities property
+    const TransactionEntity = superdev.entity('Transaction');
+    const ClientEntity = superdev.entity('Client');
+
+    await TransactionEntity.create({
       client_username: clientUsername,
       type: tabType,
       amount: txAmount,
@@ -77,14 +80,14 @@ Deno.serve(async (req) => {
       after_balance: afterBalance,
     });
 
-    await superdev.entities.Client.update(clientId, clientUpdateData);
+    await ClientEntity.update(clientId, clientUpdateData);
 
     return new Response(JSON.stringify({ success: true, afterBalance }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err: any) {
-    console.error('handle-transaction error:', err);
+    console.error('handle-transaction error:', err?.message);
     return new Response(JSON.stringify({ error: err?.message ?? 'Unknown error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
