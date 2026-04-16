@@ -45,6 +45,17 @@ export default function MatchDetail() {
     enabled: !!session?.username
   });
 
+  const { data: openBets = [] } = useQuery({
+    queryKey: ['open-bets', matchId, session?.username],
+    queryFn: () => Bet.filter({ 
+      user_email: session?.username,
+      match_id: matchId,
+      status: 'pending'
+    }),
+    enabled: !!session?.username && !!matchId,
+    refetchInterval: 5000 // refresh every 5s
+  });
+
   const clientData = clients?.[0];
   const clientBalance = clientData?.cash ?? 0;
   const creditRemaining = clientData?.credit_remaining ?? 0;
@@ -83,6 +94,7 @@ export default function MatchDetail() {
       });
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data'] });
+      queryClient.invalidateQueries({ queryKey: ['open-bets'] });
     },
     onError: (error: any) => {
       toast({
@@ -277,6 +289,60 @@ export default function MatchDetail() {
               </div>
             </div>
           )}
+
+          {/* OPEN BETS SECTION */}
+          <div className="mt-2">
+            {/* Section Header */}
+            <div className="bg-[#1e3a5c] text-white flex items-center justify-between px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#e67e22] flex items-center justify-center">
+                  <span className="text-white text-[9px] font-black">!</span>
+                </div>
+                <span className="text-[13px] font-black uppercase tracking-wide">
+                  OPEN BETS ({openBets.length})
+                </span>
+              </div>
+            </div>
+
+            {/* Bets List */}
+            <div className="bg-white">
+              {openBets.length === 0 ? (
+                <div className="py-6 text-center text-gray-400 text-[13px] font-semibold">
+                  No open bets for this match
+                </div>
+              ) : (
+                openBets.map((bet: any) => (
+                  <div key={bet.id} className="flex items-center border-b border-[#eef2f5] last:border-0 px-3 py-3 gap-3">
+                    {/* Back/Lay badge */}
+                    <div className={cn(
+                      "w-10 h-7 rounded flex items-center justify-center text-[10px] font-black text-white shrink-0",
+                      bet.bet_type === 'back' ? "bg-[#72bbef]" : "bg-[#faa9ba]"
+                    )}>
+                      {bet.bet_type === 'back' ? 'BACK' : 'LAY'}
+                    </div>
+
+                    {/* Selection name */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-bold text-[#1e3a5c] truncate">{bet.selection}</p>
+                      <p className="text-[11px] text-gray-400 font-medium">
+                        Odds: <span className="text-[#1e3a5c] font-black">{bet.odds}</span>
+                      </p>
+                    </div>
+
+                    {/* Stake & P/L */}
+                    <div className="text-right shrink-0">
+                      <p className="text-[13px] font-black text-[#1e3a5c]">
+                        Rs. {bet.stake?.toLocaleString('en-IN')}
+                      </p>
+                      <p className="text-[11px] font-bold text-[#16a085]">
+                        Win: {bet.potential_win?.toFixed(0)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </main>
 
