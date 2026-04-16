@@ -258,9 +258,19 @@ export default function MatchDetail() {
               <div className="mt-2">
                 <SectionHeader title="BOOKMAKER (MaxBet: 1M)" />
                 <OddsColumnHeaders />
-                <div className="flex flex-col">
-                  <SuspendedRow name={match.team1} />
-                  <SuspendedRow name={match.team2} />
+                <div className="flex flex-col bg-white">
+                  <TeamRow 
+                    name={match.team1} 
+                    odds={Math.round((match.back_odds || 1.9) * 10) / 10} 
+                    layOdds={Math.round((match.lay_odds || 2.0) * 10) / 10}
+                    onBet={(type, o) => setActiveBet({ match, selection: match.team1, betType: type, odds: o })}
+                  />
+                  <TeamRow 
+                    name={match.team2} 
+                    odds={Math.round(((match.back_odds2 || match.back_odds || 2.1)) * 10) / 10} 
+                    layOdds={Math.round(((match.lay_odds2 || match.lay_odds || 2.2)) * 10) / 10}
+                    onBet={(type, o) => setActiveBet({ match, selection: match.team2, betType: type, odds: o })}
+                  />
                 </div>
               </div>
             </>
@@ -272,7 +282,11 @@ export default function MatchDetail() {
               <OddsColumnHeaders />
               <div className="flex flex-col bg-white">
                 {fancyBets.map((fancy, idx) => (
-                  <FancyRow key={idx} {...fancy} />
+                  <FancyRow 
+                    key={idx} 
+                    {...fancy} 
+                    onBet={(type, o) => setActiveBet({ match, selection: fancy.name, betType: type, odds: o })}
+                  />
                 ))}
               </div>
             </div>
@@ -284,7 +298,11 @@ export default function MatchDetail() {
               <OddsColumnHeaders />
               <div className="flex flex-col bg-white">
                 {fancy2Bets.map((fancy, idx) => (
-                  <FancyRow key={idx} {...fancy} />
+                  <FancyRow 
+                    key={idx} 
+                    {...fancy} 
+                    onBet={(type, o) => setActiveBet({ match, selection: fancy.name, betType: type, odds: o })}
+                  />
                 ))}
               </div>
             </div>
@@ -400,28 +418,15 @@ function TeamRow({ name, odds, layOdds, onBet }: TeamRowProps) {
         onClick={() => onBet('back', odds)}
         className="w-[90px] h-full bg-[#72bbef] flex flex-col items-center justify-center cursor-pointer hover:brightness-95 transition-all border-r border-white/20"
       >
-        <span className="text-[17px] font-black text-[#1e3a5c] leading-none">{odds.toFixed(2)}</span>
+        <span className="text-[17px] font-black text-[#1e3a5c] leading-none">{(odds || 1.5).toFixed(2)}</span>
         <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{(Math.random() * 100).toFixed(0)}</span>
       </div>
       <div 
         onClick={() => onBet('lay', layOdds)}
         className="w-[90px] h-full bg-[#faa9ba] flex flex-col items-center justify-center cursor-pointer hover:brightness-95 transition-all"
       >
-        <span className="text-[17px] font-black text-[#1e3a5c] leading-none">{layOdds.toFixed(2)}</span>
+        <span className="text-[17px] font-black text-[#1e3a5c] leading-none">{(layOdds || 1.5).toFixed(2)}</span>
         <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{(Math.random() * 100).toFixed(0)}</span>
-      </div>
-    </div>
-  );
-}
-
-function SuspendedRow({ name }: { name: string }) {
-  return (
-    <div className="flex items-center bg-[#f5f5f5] border-b border-[#ccd9e5] last:border-0 h-[64px]">
-      <div className="flex-1 px-3">
-        <span className="text-[14px] font-black text-[#1e3a5c]/60 uppercase">{name}</span>
-      </div>
-      <div className="w-[180px] h-full flex items-center justify-center">
-        <span className="text-red-500 font-black text-[13px] tracking-widest">SUSPENDED</span>
       </div>
     </div>
   );
@@ -434,9 +439,10 @@ interface FancyRowProps {
   backSize: string;
   laySize: string;
   label: string;
+  onBet: (type: 'back' | 'lay', odds: number) => void;
 }
 
-function FancyRow({ name, backOdds, layOdds, backSize, laySize, label }: FancyRowProps) {
+function FancyRow({ name, backOdds, layOdds, backSize, laySize, label, onBet }: FancyRowProps) {
   return (
     <div className="flex items-center border-b border-[#ccd9e5] last:border-0 h-[64px]">
       <div className="flex-1 px-3 flex flex-col justify-center">
@@ -445,11 +451,17 @@ function FancyRow({ name, backOdds, layOdds, backSize, laySize, label }: FancyRo
           {label}
         </span>
       </div>
-      <div className="w-[90px] h-full bg-[#72bbef] flex flex-col items-center justify-center border-r border-white/20">
+      <div 
+        onClick={() => onBet('back', backOdds)}
+        className="w-[90px] h-full bg-[#72bbef] flex flex-col items-center justify-center border-r border-white/20 cursor-pointer hover:brightness-95 transition-all"
+      >
         <span className="text-[17px] font-black text-[#1e3a5c] leading-none">{backOdds}</span>
         <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{backSize}</span>
       </div>
-      <div className="w-[90px] h-full bg-[#faa9ba] flex flex-col items-center justify-center">
+      <div 
+        onClick={() => onBet('lay', layOdds)}
+        className="w-[90px] h-full bg-[#faa9ba] flex flex-col items-center justify-center cursor-pointer hover:brightness-95 transition-all"
+      >
         <span className="text-[17px] font-black text-[#1e3a5c] leading-none">{layOdds}</span>
         <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{laySize}</span>
       </div>
