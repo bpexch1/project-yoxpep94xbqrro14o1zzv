@@ -97,7 +97,7 @@ export default function Accounts() {
           username={session?.username || 'Admin'}
           searchFilter={searchQuery}
           onRefresh={refetch}
-          autoLoadBalance={false}
+          autoLoadBalance={true}
         />
 
       </main>

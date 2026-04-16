@@ -25,21 +25,15 @@ export function ClientSummaryCard({
   onRefresh,
   hideCreateButton = false,
   hideHeader = false,
-  autoLoadBalance = false
+  autoLoadBalance = true
 }: ClientSummaryCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [localSearch, setLocalSearch] = useState("");
-  const [isBalanceLoaded, setIsBalanceLoaded] = useState(autoLoadBalance);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
-
-  const handleLoadBalance = () => {
-    onRefresh && onRefresh();
-    setIsBalanceLoaded(true);
-  };
 
   const toggleExpand = (id: string) => {
     const newExpanded = new Set(expandedIds);
@@ -108,7 +102,7 @@ export function ClientSummaryCard({
       {!hideHeader && (
         <div className="px-[14px] py-[10px] border-b border-[#ddd]">
           <span className="font-bold text-[15px] text-[#333]">
-            <span className="text-[#12b886]">{username}</span> - Clients List{!isBalanceLoaded ? " | Default" : ""}
+            <span className="text-[#12b886]">{username}</span> - Clients List
           </span>
         </div>
       )}
@@ -118,64 +112,42 @@ export function ClientSummaryCard({
         <table className="w-full sm:w-auto text-left border-collapse border border-[#ccc]">
           <thead>
             <tr className="bg-[#f5f5f5]">
-              {!isBalanceLoaded ? (
-                <>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Remaining</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Cash</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">P/L Downline</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Users</th>
-                </>
-              ) : (
-                <>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Received</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Remaining</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Cash</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">P/L Downline</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap sm:table-cell">Balance UpLine</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Users</th>
-                </>
-              )}
+              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Received</th>
+              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Remaining</th>
+              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Cash</th>
+              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">P/L Downline</th>
+              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap sm:table-cell">Balance UpLine</th>
+              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Users</th>
             </tr>
           </thead>
           <tbody className="bg-white">
             <tr>
-              {!isBalanceLoaded ? (
-                <>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">0</td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">0</td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">0</td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">{filteredClients.length}</td>
-                </>
-              ) : (
-                <>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
-                    {totals.credit_received.toLocaleString()}
-                  </td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
-                    {totals.credit_remaining.toLocaleString()}
-                  </td>
-                  <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                    {totals.cash.toLocaleString()}
-                  </td>
-                  <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                    {totals.pl_downline.toLocaleString()}
-                  </td>
-                  <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold sm:table-cell", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                    {totals.balance_upline.toLocaleString()}
-                  </td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
-                    {filteredClients.length}
-                  </td>
-                </>
-              )}
+              <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
+                {totals.credit_received.toLocaleString()}
+              </td>
+              <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
+                {totals.credit_remaining.toLocaleString()}
+              </td>
+              <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
+                {totals.cash.toLocaleString()}
+              </td>
+              <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
+                {totals.pl_downline.toLocaleString()}
+              </td>
+              <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold sm:table-cell", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
+                {totals.balance_upline.toLocaleString()}
+              </td>
+              <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
+                {filteredClients.length}
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
       {/* Action row with legend and search */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-[14px] pb-3">
-        <div className="flex items-center gap-1.5">
+      <div className="flex flex-col gap-3 px-[14px] pb-3">
+        <div className="flex items-center gap-2">
           {!hideCreateButton && (
             <button
               onClick={() => navigate("/accounts/create")}
@@ -192,8 +164,8 @@ export function ClientSummaryCard({
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-[#333]">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] font-bold text-[#333]">
             <div className="flex items-center gap-1">
               <div className="w-[20px] h-[20px] bg-[#f1c40f] text-black flex items-center justify-center rounded-sm">C</div>
               <span>Cash / Credit</span>
@@ -212,21 +184,19 @@ export function ClientSummaryCard({
               <div className="w-[20px] h-[20px] bg-[#12b886] text-white flex items-center justify-center rounded-sm">A</div>
               <span>Active</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 w-full sm:w-auto">
               <div className="w-[20px] h-[20px] bg-white border border-[#e74c3c] text-[#e74c3c] flex items-center justify-center rounded-sm">D</div>
               <span>InActive</span>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5">
-            <span className={cn("text-[13px] font-bold text-[#333]", isMobile && "text-center")}>Search:</span>
+          
+          <div className="flex flex-col gap-1">
+            <span className="text-[13px] font-bold text-[#333] text-center">Search:</span>
             <input
               type="text"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              className={cn(
-                "h-[28px] border border-[#ccc] rounded-none px-2 text-[13px] outline-none",
-                isMobile ? "w-full" : "w-[150px]"
-              )}
+              className="h-[28px] border border-[#ccc] rounded-none px-2 text-[13px] outline-none w-full"
             />
           </div>
         </div>
@@ -236,65 +206,41 @@ export function ClientSummaryCard({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            {!isBalanceLoaded ? (
-              <>
-                <tr className="bg-[#12b886]">
-                  <td colSpan={isMobile ? 3 : 3} className="px-[10px] py-2">
-                    <button
-                      type="button"
-                      onClick={handleLoadBalance}
-                      className="bg-[#f1c40f] text-black font-bold text-[12px] px-4 h-[30px] rounded-[4px] hover:bg-yellow-400 transition-colors"
-                    >
-                      Load Balance
-                    </button>
-                  </td>
-                </tr>
-                <tr className="bg-[#f5f5f5] border-y border-[#ccc]">
-                  <th className="px-3 py-2 font-bold text-[#333] border-r border-[#ccc] text-[12px]">Username</th>
-                  <th className="px-3 py-2 font-bold text-[#333] border-r border-[#ccc] text-[12px]">Type</th>
-                  <th className="px-3 py-2 font-bold text-[#333] text-right text-[12px]">Credit</th>
-                  {!isMobile && <th className="px-3 py-2 font-bold text-[#333] text-[12px]">Options</th>}
-                </tr>
-              </>
-            ) : (
-              <>
-                <tr className="bg-[#12b886] text-white font-bold text-[13px]">
-                  <td className="px-[10px] py-2">Total</td>
-                  {!isMobile ? (
-                    <>
-                      <td className="px-[10px] py-2"></td>
-                      <td className="px-[10px] py-2 text-right">{totals.credit_received.toLocaleString()}</td>
-                      <td className="px-[10px] py-2 text-right">{totals.balance_upline.toLocaleString()}</td>
-                      <td className="px-[10px] py-2 text-right">{totals.pl_downline.toLocaleString()}</td>
-                      <td className="px-[10px] py-2"></td>
-                      <td className="px-[10px] py-2 text-right">0</td>
-                      <td className="px-[10px] py-2 text-right">{totals.credit_remaining.toLocaleString()}</td>
-                      <td className="px-[10px] py-2"></td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-[10px] py-2"></td>
-                      <td className="px-[10px] py-2 text-right">{totals.credit_received.toLocaleString()}</td>
-                    </>
-                  )}
-                </tr>
-                <tr className="bg-[#f5f5f5] border-y border-[#ccc] text-[12px] text-[#333]">
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc]">Username</th>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc]">Type</th>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Credit</th>
-                  {!isMobile && (
-                    <>
-                      <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Balance</th>
-                      <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Client (P/L)</th>
-                      <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Share</th>
-                      <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Exposure</th>
-                      <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Available Balance</th>
-                      <th className="px-[10px] py-2 font-bold">Options</th>
-                    </>
-                  )}
-                </tr>
-              </>
-            )}
+            <tr className="bg-[#12b886] text-white font-bold text-[13px]">
+              <td className="px-[10px] py-2">Total</td>
+              {!isMobile ? (
+                <>
+                  <td className="px-[10px] py-2"></td>
+                  <td className="px-[10px] py-2 text-right">{totals.credit_received.toLocaleString()}</td>
+                  <td className="px-[10px] py-2 text-right">{totals.balance_upline.toLocaleString()}</td>
+                  <td className="px-[10px] py-2 text-right">{totals.pl_downline.toLocaleString()}</td>
+                  <td className="px-[10px] py-2"></td>
+                  <td className="px-[10px] py-2 text-right">0</td>
+                  <td className="px-[10px] py-2 text-right">{totals.credit_remaining.toLocaleString()}</td>
+                  <td className="px-[10px] py-2"></td>
+                </>
+              ) : (
+                <>
+                  <td className="px-[10px] py-2"></td>
+                  <td className="px-[10px] py-2 text-right">{totals.credit_received.toLocaleString()}</td>
+                </>
+              )}
+            </tr>
+            <tr className="bg-[#f5f5f5] border-y border-[#ccc] text-[12px] text-[#333]">
+              <th className="px-[10px] py-2 font-bold border-r border-[#ccc]">Username</th>
+              <th className="px-[10px] py-2 font-bold border-r border-[#ccc]">Type</th>
+              <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Credit</th>
+              {!isMobile && (
+                <>
+                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Balance</th>
+                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Client (P/L)</th>
+                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Share</th>
+                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Exposure</th>
+                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Available Balance</th>
+                  <th className="px-[10px] py-2 font-bold">Options</th>
+                </>
+              )}
+            </tr>
           </thead>
           <tbody>
             {isLoading ? (
@@ -346,7 +292,7 @@ export function ClientSummaryCard({
                         {getTypeLabel(client.role)}
                       </td>
                       <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#333] text-right text-[13px] font-medium">
-                        {isBalanceLoaded ? (client.credit_received || 0).toLocaleString() : "-"}
+                        {(client.credit_received || 0).toLocaleString()}
                       </td>
                       
                       {!isMobile && (
@@ -420,81 +366,75 @@ export function ClientSummaryCard({
                     {isMobile && isExpanded && (
                       <tr className="bg-[#f9f9f9] border-b border-[#ddd]">
                         <td colSpan={3} className="px-3 py-3">
-                          {!isBalanceLoaded ? (
-                            <div className="text-[13px] text-center font-medium text-[#666]">
-                              Load Balance to see details
-                            </div>
-                          ) : (
-                            <div className="space-y-3">
-                              <div className="grid grid-cols-2 gap-y-2 text-[13px]">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Balance:</span>
-                                  <span className={cn("font-medium", (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#333]")}>
-                                    {(client.balance_upline || 0).toLocaleString()}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">P/L:</span>
-                                  <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                                    {(client.pl_downline || 0).toLocaleString()}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Share:</span>
-                                  <span className="text-[#333]">{client.downline_share || 0}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Exposure:</span>
-                                  <span className="text-[#333]">0</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Avail:</span>
-                                  <span className="text-[#12b886] font-bold">
-                                    {(client.credit_remaining || 0).toLocaleString()}
-                                  </span>
-                                </div>
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-y-2 text-[13px]">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-[#333]">Balance:</span>
+                                <span className={cn("font-medium", (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#333]")}>
+                                  {(client.balance_upline || 0).toLocaleString()}
+                                </span>
                               </div>
-                              <div className="flex flex-wrap items-center gap-2 pt-1">
-                                <button 
-                                  onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                                  className="h-[28px] px-3 bg-[#f1c40f] text-black font-bold text-[12px] flex items-center justify-center rounded-[3px]"
-                                >
-                                  C
-                                </button>
-                                <button 
-                                  onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                                  className="h-[28px] px-3 bg-[#1EB990] text-white flex items-center justify-center rounded-[3px]"
-                                >
-                                  <Pencil className="w-3 h-3 mr-1" /> Edit
-                                </button>
-                                <button 
-                                  onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                                  className="h-[28px] px-3 bg-[#63C2DE] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px]"
-                                >
-                                  L
-                                </button>
-                                <button 
-                                  onClick={() => toggleStatus(client)}
-                                  className={cn(
-                                    "h-[28px] px-3 rounded-[3px] font-bold text-[12px] flex items-center justify-center",
-                                    client.status === "active" 
-                                      ? "bg-[#12b886] text-white" 
-                                      : "bg-white border border-[#e74c3c] text-[#e74c3c]"
-                                  )}
-                                >
-                                  {client.status === "active" ? "Active" : "Inactive"}
-                                </button>
-                                {client.role !== 'client' && (
-                                  <button 
-                                    className="h-[28px] px-3 bg-[#e74c3c] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px]"
-                                    onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                                  >
-                                    Settle
-                                  </button>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-[#333]">P/L:</span>
+                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
+                                  {(client.pl_downline || 0).toLocaleString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-[#333]">Share:</span>
+                                <span className="text-[#333]">{client.downline_share || 0}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-[#333]">Exposure:</span>
+                                <span className="text-[#333]">0</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-[#333]">Avail:</span>
+                                <span className="text-[#12b886] font-bold">
+                                  {(client.credit_remaining || 0).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              <button 
+                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
+                                className="h-[28px] px-3 bg-[#f1c40f] text-black font-bold text-[12px] flex items-center justify-center rounded-[3px]"
+                              >
+                                C
+                              </button>
+                              <button 
+                                onClick={() => navigate(`/accounts/edit/${client.username}`)}
+                                className="h-[28px] px-3 bg-[#1EB990] text-white flex items-center justify-center rounded-[3px]"
+                              >
+                                <Pencil className="w-3 h-3 mr-1" /> Edit
+                              </button>
+                              <button 
+                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}
+                                className="h-[28px] px-3 bg-[#63C2DE] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px]"
+                              >
+                                L
+                              </button>
+                              <button 
+                                onClick={() => toggleStatus(client)}
+                                className={cn(
+                                  "h-[28px] px-3 rounded-[3px] font-bold text-[12px] flex items-center justify-center",
+                                  client.status === "active" 
+                                    ? "bg-[#12b886] text-white" 
+                                    : "bg-white border border-[#e74c3c] text-[#e74c3c]"
                                 )}
-                              </div>
+                              >
+                                {client.status === "active" ? "Active" : "Inactive"}
+                              </button>
+                              {client.role !== 'client' && (
+                                <button 
+                                  className="h-[28px] px-3 bg-[#e74c3c] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px]"
+                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
+                                >
+                                  Settle
+                                </button>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     )}
