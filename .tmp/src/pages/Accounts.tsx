@@ -5,7 +5,6 @@ import { Filter, Search } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
-import { SuperAdminSummary } from "@/components/accounts/SuperAdminSummary";
 import { getClientSession } from "@/hooks/useClientAuth";
 
 export default function Accounts() {
@@ -125,13 +124,6 @@ export default function Accounts() {
             </div>
           </div>
         </div>
-
-        {/* Super Admin Summary */}
-        <SuperAdminSummary 
-          clients={clients || []} 
-          isLoading={isLoading} 
-          username={session?.username || 'Admin'} 
-        />
 
         {/* 3. Clients table/list — header shown inside ClientSummaryCard */}
         <ClientSummaryCard
