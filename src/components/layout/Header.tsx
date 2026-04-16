@@ -6,6 +6,7 @@ import { Bet } from "@/entities";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
