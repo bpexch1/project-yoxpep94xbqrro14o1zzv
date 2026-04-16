@@ -125,8 +125,8 @@ export function ClientSummaryCard({
       )}
 
       {/* Stats table section */}
-      <div className="px-[14px] pt-2.5 pb-2">
-        <table className="w-full sm:w-auto text-left border-collapse border border-[#ccc]">
+      <div className="overflow-x-auto px-[14px] pt-2.5 pb-2">
+        <table className="w-auto text-left border-collapse border border-[#ccc]">
           <thead>
             <tr className="bg-[#f5f5f5]">
               {isBalanceLoaded ? (
