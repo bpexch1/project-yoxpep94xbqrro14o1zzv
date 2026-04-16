@@ -13,15 +13,13 @@ Deno.serve(async (req) => {
 
   try {
     const appId = Deno.env.get('SUPERDEV_APP_ID') ?? '';
-    
-    const superdev = createSuperdevClient({ appId });
 
-    // Try to set auth from request header if available and not expired
-    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
-    const userToken = authHeader.replace('Bearer ', '').trim();
-    if (userToken) {
-      superdev.auth.setToken(userToken);
-    }
+    // Check for available service-level keys (auto-injected by Buildy for backend functions)
+    const serviceKey = Deno.env.get('SUPERDEV_SERVICE_KEY') 
+      || Deno.env.get('SUPERDEV_API_KEY')
+      || Deno.env.get('SUPERDEV_SECRET_KEY')
+      || Deno.env.get('SUPERDEV_ADMIN_KEY')
+      || '';
 
     const body = await req.json();
     const {
@@ -67,20 +65,38 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Use .entity() method instead of .entities property
-    const TransactionEntity = superdev.entity('Transaction');
-    const ClientEntity = superdev.entity('Client');
-
-    await TransactionEntity.create({
+    const txData = {
       client_username: clientUsername,
       type: tabType,
       amount: txAmount,
       description: description || '',
       before_balance: beforeBalance,
       after_balance: afterBalance,
-    });
+    };
 
-    await ClientEntity.update(clientId, clientUpdateData);
+    // Try approach 1: service key if available
+    if (serviceKey) {
+      const superdev = createSuperdevClient({ appId });
+      superdev.auth.setToken(serviceKey);
+      const TxEntity = superdev.entity('Transaction');
+      const ClientEntity = superdev.entity('Client');
+      await TxEntity.create(txData);
+      await ClientEntity.update(clientId, clientUpdateData);
+    } else {
+      // Approach 2: user token from request headers
+      const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
+      const userToken = authHeader.replace('Bearer ', '').trim();
+
+      const superdev = createSuperdevClient({ appId });
+      if (userToken) {
+        superdev.auth.setToken(userToken);
+      }
+      
+      const TxEntity = superdev.entity('Transaction');
+      const ClientEntity = superdev.entity('Client');
+      await TxEntity.create(txData);
+      await ClientEntity.update(clientId, clientUpdateData);
+    }
 
     return new Response(JSON.stringify({ success: true, afterBalance }), {
       status: 200,
