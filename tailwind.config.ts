@@ -53,17 +53,16 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'bg-primary': '#f5f5f5',
-				'bg-card': '#ffffff',
-				'accent-green': '#12b886',
-				'accent-blue': '#3d6b8b',
-				'accent-pink': '#e74c3c',
-				'brand-green': '#12b886',
-				'brand-green-hover': '#0ca678',
-				'border-green': '#20c997',
-				'brand-blue': '#2c3e50',
-				'brand-blue-dark': '#1e2d3d',
-				'brand-bg': '#f5f5f5',
+				'bg-primary': 'var(--bg-primary)',
+				'bg-card': 'var(--bg-card)',
+				'accent-green': 'var(--accent-green)',
+				'accent-blue': 'var(--accent-blue)',
+				'accent-pink': 'var(--accent-pink)',
+				'brand-green': '#1a9e71',
+				'brand-green-hover': '#158a60',
+				'brand-blue': '#254465',
+				'brand-blue-dark': '#3d6b8b',
+				'brand-bg': '#f0f0f0',
 			},
 			borderRadius: {
 				xl: 'calc(var(--radius) + 4px)',
@@ -72,7 +71,7 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Arial', 'Helvetica', 'sans-serif'],
+				sans: ['Roboto', 'system-ui', 'sans-serif'],
 			},
 		}
 	},

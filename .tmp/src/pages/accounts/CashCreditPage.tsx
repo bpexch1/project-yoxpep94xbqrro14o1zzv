@@ -8,7 +8,9 @@ import {
   Loader2, 
   ArrowUpCircle, 
   ArrowDownCircle,
-  History
+  History,
+  TrendingUp,
+  TrendingDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -150,21 +152,19 @@ export default function CashCreditPage() {
     }
   };
 
-  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
-
   if (isFetchingClient) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#12b886]" />
+      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
       </div>
     );
   }
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center p-4">
-        <h1 className="text-xl font-bold text-[#333] mb-4">Client not found</h1>
-        <button onClick={() => navigate(-1)} className="bg-white border border-[#cccccc] px-4 h-10 rounded-[4px] flex items-center gap-2 font-bold text-[#333]">
+      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center p-4">
+        <h1 className="text-xl font-bold text-gray-800 mb-4">Client not found</h1>
+        <button onClick={() => navigate(-1)} className="bg-white border border-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 font-medium">
           <ChevronLeft className="w-4 h-4" /> Go Back
         </button>
       </div>
@@ -172,18 +172,18 @@ export default function CashCreditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] pb-12" style={arialFont}>
-      <main className="max-w-[480px] mx-auto p-3">
+    <div className="min-h-screen bg-[#f0f0f0] font-roboto pb-12">
+      <main className="max-w-[720px] mx-auto p-4 lg:p-6">
         
         {/* TAB SWITCHER */}
-        <div className="flex bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden mb-4 p-1 shadow-sm">
+        <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
           <button
             onClick={() => setActiveTab('cash')}
             className={cn(
-              "flex-1 h-10 text-[14px] font-bold transition-all rounded-[7px]",
+              "flex-1 py-4 text-base font-bold transition-all",
               activeTab === 'cash'
-                ? "bg-[#12b886] text-white"
-                : "bg-transparent text-[#333]"
+                ? "bg-[#3498db] text-white shadow-inner"
+                : "bg-white text-[#16a085] hover:bg-gray-50"
             )}
           >
             Cash
@@ -191,10 +191,10 @@ export default function CashCreditPage() {
           <button
             onClick={() => setActiveTab('credit')}
             className={cn(
-              "flex-1 h-10 text-[14px] font-bold transition-all rounded-[7px]",
+              "flex-1 py-4 text-base font-bold transition-all",
               activeTab === 'credit'
-                ? "bg-[#12b886] text-white"
-                : "bg-transparent text-[#333]"
+                ? "bg-[#3498db] text-white shadow-inner"
+                : "bg-white text-[#16a085] hover:bg-gray-50"
             )}
           >
             Credit
@@ -202,157 +202,182 @@ export default function CashCreditPage() {
         </div>
 
         {/* CLIENT SUMMARY CARD */}
-        <div className="bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden mb-4 shadow-sm">
-          <div className="bg-[#ecf0f1] px-3 py-2 border-b border-[#d5d8dc] flex items-center justify-between">
-            <h2 className="text-[14px] font-bold text-[#333]">{client.username}</h2>
-            <div className="text-[11px] font-bold text-[#12b886] uppercase">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-[#2c3e50]">{client.username}</h2>
+            <div className="px-3 py-1 bg-emerald-50 text-[#16a085] rounded-full text-xs font-bold uppercase tracking-wider">
               {activeTab} Mode
             </div>
           </div>
-          <div className="p-4">
-            <div className="grid grid-cols-3 gap-0 border border-[#d0d0d0] rounded-[7px] overflow-hidden text-center bg-[#f9f9f9]">
-              <div className="py-2.5 border-r border-[#d0d0d0]">
-                <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">
-                  {activeTab === 'cash' ? 'Credit' : 'Limit'}
-                </p>
-                <p className="text-[13px] font-bold text-[#333]">
-                  {(client?.credit_remaining || 0).toLocaleString()}
-                </p>
-              </div>
-              <div className="py-2.5 border-r border-[#d0d0d0]">
-                <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">
-                  {activeTab === 'cash' ? 'Balance' : 'Credit'}
-                </p>
-                <p className="text-[13px] font-bold text-[#12b886]">
-                  {(activeTab === 'cash' ? client.cash : client.credit_remaining || 0).toLocaleString()}
-                </p>
-              </div>
-              <div className="py-2.5">
-                <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">
-                  Available
-                </p>
-                <p className="text-[13px] font-bold text-[#12b886]">
-                  {Math.max(0, activeTab === 'cash' ? (client.cash || 0) : (client.credit_remaining || 0)).toLocaleString()}
-                </p>
-              </div>
+          
+          <div className="grid grid-cols-3 gap-0 border border-[#d5d8dc] rounded-lg overflow-hidden text-center">
+            <div className="bg-gray-50 py-3 border-r border-[#d5d8dc]">
+              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">
+                {activeTab === 'cash' ? 'Credit' : 'Credit Limit'}
+              </p>
+              <p className="text-sm font-bold text-[#16a085]">
+                {(client?.credit_remaining || 0).toLocaleString()} Rs.
+              </p>
+            </div>
+            <div className="bg-white py-3 border-r border-[#d5d8dc]">
+              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">
+                {activeTab === 'cash' ? 'Balance' : `${client.username} Credit`}
+              </p>
+              <p className="text-sm font-bold text-[#16a085]">
+                {(activeTab === 'cash' ? client.cash : client.credit_remaining || 0).toLocaleString()} Rs.
+              </p>
+            </div>
+            <div className="bg-gray-50 py-3">
+              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">
+                {activeTab === 'cash' ? 'Max Withdraw' : 'Available'}
+              </p>
+              <p className="text-sm font-bold text-[#16a085]">
+                {Math.max(0, activeTab === 'cash' ? (client.cash || 0) : (client.credit_remaining || 0)).toLocaleString()} Rs.
+              </p>
             </div>
           </div>
         </div>
 
         {/* DEPOSIT SECTION */}
-        <div className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden mb-4 shadow-sm">
-          <div className="bg-[#ecf0f1] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
-            <ArrowUpCircle className="w-4 h-4 text-[#12b886]" />
-            <span className="text-[13px] font-bold text-[#333]">DEPOSIT {activeTab.toUpperCase()}</span>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="bg-[#16a085] px-6 py-3 flex items-center justify-between">
+            <p className="text-white text-sm font-bold flex items-center gap-2">
+              <ArrowUpCircle className="w-5 h-5" />
+              DEPOSIT {activeTab.toUpperCase()}
+            </p>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-6 space-y-4">
             <div>
-              <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Description</label>
+              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Description</label>
               <input
                 type="text"
                 value={depositDesc}
                 onChange={(e) => setDepositDesc(e.target.value)}
-                className="w-full border border-[#cccccc] rounded-[4px] px-3 h-10 text-[13px] focus:outline-none focus:border-[#12b886] bg-white"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16a085]/10 focus:border-[#16a085] transition-all bg-gray-50"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Amount (Rs.)</label>
-              <input
-                type="number"
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-                className="w-full border border-[#cccccc] rounded-[4px] px-3 h-10 text-[14px] font-bold focus:outline-none focus:border-[#12b886] bg-white"
-                min="0"
-              />
+              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Amount (Rs.)</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={depositAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 pl-12 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#16a085]/10 focus:border-[#16a085] transition-all bg-gray-50"
+                  min="0"
+                />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7f8c8d] font-bold">Rs.</span>
+              </div>
             </div>
-            <button
-              onClick={handleDeposit}
-              disabled={isSubmittingDeposit}
-              className="w-full bg-[#12b886] text-white font-bold h-10 rounded-[7px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-sm"
-            >
-              {isSubmittingDeposit && <Loader2 className="w-4 h-4 animate-spin" />}
-              Submit Deposit
-            </button>
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={handleDeposit}
+                disabled={isSubmittingDeposit}
+                className="bg-[#16a085] hover:bg-[#138d75] text-white font-bold px-10 py-3 rounded-lg shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+              >
+                {isSubmittingDeposit && <Loader2 className="w-4 h-4 animate-spin" />}
+                Submit Deposit
+              </button>
+            </div>
           </div>
         </div>
 
         {/* WITHDRAW SECTION */}
-        <div className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden mb-4 shadow-sm">
-          <div className="bg-[#ecf0f1] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
-            <ArrowDownCircle className="w-4 h-4 text-[#e74c3c]" />
-            <span className="text-[13px] font-bold text-[#333]">WITHDRAW {activeTab.toUpperCase()}</span>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+          <div className="bg-[#e74c3c] px-6 py-3 flex items-center justify-between">
+            <p className="text-white text-sm font-bold flex items-center gap-2">
+              <ArrowDownCircle className="w-5 h-5" />
+              WITHDRAW {activeTab.toUpperCase()}
+            </p>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-6 space-y-4">
             <div>
-              <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Description</label>
+              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Description</label>
               <input
                 type="text"
                 value={withdrawDesc}
                 onChange={(e) => setWithdrawDesc(e.target.value)}
-                className="w-full border border-[#cccccc] rounded-[4px] px-3 h-10 text-[13px] focus:outline-none focus:border-[#e74c3c] bg-white"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/10 focus:border-[#e74c3c] transition-all bg-gray-50"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Amount (Rs.)</label>
-              <input
-                type="number"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                className="w-full border border-[#cccccc] rounded-[4px] px-3 h-10 text-[14px] font-bold focus:outline-none focus:border-[#e74c3c] bg-white"
-                min="0"
-              />
+              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Amount (Rs.)</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 pl-12 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/10 focus:border-[#e74c3c] transition-all bg-gray-50"
+                  min="0"
+                />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7f8c8d] font-bold">Rs.</span>
+              </div>
             </div>
-            <button
-              onClick={handleWithdraw}
-              disabled={isSubmittingWithdraw}
-              className="w-full bg-[#e74c3c] text-white font-bold h-10 rounded-[7px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-sm"
-            >
-              {isSubmittingWithdraw && <Loader2 className="w-4 h-4 animate-spin" />}
-              Submit Withdrawal
-            </button>
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={handleWithdraw}
+                disabled={isSubmittingWithdraw}
+                className="bg-[#e74c3c] hover:bg-red-600 text-white font-bold px-10 py-3 rounded-lg shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+              >
+                {isSubmittingWithdraw && <Loader2 className="w-4 h-4 animate-spin" />}
+                Submit Withdrawal
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* RECENT HISTORY */}
-        <div className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden mb-4 shadow-sm">
-          <div className="px-3 py-2 border-b border-[#d5d8dc] bg-[#ecf0f1] flex items-center justify-between">
-            <h3 className="font-bold text-[#333] text-[13px] flex items-center gap-2">
-              <History className="w-4 h-4 text-[#12b886]" />
-              {activeTab} History
+        {/* RECENT TRANSACTIONS SECTION */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="font-bold text-[#2c3e50] flex items-center gap-2">
+              <History className="w-5 h-5 text-[#16a085]" />
+              Recent {activeTab} History
             </h3>
             <button 
               onClick={() => navigate(`/accounts/ledger/${username}`)}
-              className="text-[11px] font-bold text-[#12b886] hover:underline"
+              className="text-xs font-bold text-[#1a9e71] hover:underline"
             >
-              Ledger
+              View Full Ledger
             </button>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-[12px] border-collapse">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="bg-[#f5f5f5] border-b border-[#d0d0d0]">
-                  <th className="px-3 py-2 font-bold text-[#333] border-r border-[#d0d0d0]">Date</th>
-                  <th className="px-3 py-2 font-bold text-[#333] border-r border-[#d0d0d0]">Desc</th>
-                  <th className="px-3 py-2 font-bold text-[#333] text-right">Amount</th>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase">Date</th>
+                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase">Description</th>
+                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase text-right">Amount</th>
+                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase text-right">Balance</th>
                 </tr>
               </thead>
               <tbody>
                 {isFetchingTx ? (
-                  <tr><td colSpan={3} className="px-3 py-8 text-center bg-white"><Loader2 className="w-5 h-5 animate-spin text-[#12b886] mx-auto" /></td></tr>
+                  <tr>
+                    <td colSpan={4} className="px-6 py-10 text-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-[#16a085] mx-auto" />
+                    </td>
+                  </tr>
                 ) : transactions?.length === 0 ? (
-                  <tr><td colSpan={3} className="px-3 py-8 text-center text-gray-400 bg-white">No history found</td></tr>
+                  <tr>
+                    <td colSpan={4} className="px-6 py-10 text-center text-gray-400 font-medium italic">
+                      No transactions found
+                    </td>
+                  </tr>
                 ) : (
-                  transactions?.map((tx: any, idx) => (
-                    <tr key={tx.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "border-b border-[#d0d0d0] h-[34px]")}>
-                      <td className="px-3 py-1 text-[#333] border-r border-[#d0d0d0]">
+                  transactions?.map((tx: any) => (
+                    <tr key={tx.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-3 text-[#7f8c8d] whitespace-nowrap">
                         {new Date(tx.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                       </td>
-                      <td className="px-3 py-1 font-bold text-[#333] border-r border-[#d0d0d0] truncate max-w-[120px]">{tx.description}</td>
+                      <td className="px-6 py-3 font-medium text-[#2c3e50]">{tx.description}</td>
                       <td className={cn(
-                        "px-3 py-1 font-bold text-right",
-                        tx.amount >= 0 ? "text-[#12b886]" : "text-[#e74c3c]"
+                        "px-6 py-3 font-bold text-right",
+                        tx.amount >= 0 ? "text-[#16a085]" : "text-[#e74c3c]"
                       )}>
                         {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-3 font-bold text-[#2c3e50] text-right">
+                        {(tx.after_balance || 0).toLocaleString()}
                       </td>
                     </tr>
                   ))
@@ -363,13 +388,15 @@ export default function CashCreditPage() {
         </div>
 
         {/* BACK BUTTON */}
-        <button
-          onClick={() => navigate(-1)}
-          className="w-full flex items-center justify-center gap-2 bg-white text-[#333] font-bold h-10 rounded-[7px] border border-[#d5d8dc] transition-all hover:bg-gray-50 shadow-sm"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back
-        </button>
+        <div className="flex justify-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 bg-white hover:bg-gray-50 text-[#2c3e50] font-bold px-8 py-3 rounded-lg border border-gray-200 shadow-sm transition-all active:scale-95"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Back to Accounts
+          </button>
+        </div>
           
       </main>
     </div>

@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client, Transaction } from "@/entities";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ChevronLeft, ArrowRightLeft } from "lucide-react";
+import { Loader2, ChevronLeft, ArrowRightLeft, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function SettlePLPage() {
   const { username } = useParams();
@@ -100,100 +101,129 @@ export default function SettlePLPage() {
     }
   };
 
-  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
-
   if (isFetching) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#12b886]" />
+      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#1a9e71]" />
       </div>
     );
   }
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center p-4">
-        <h1 className="text-xl font-bold text-[#333] mb-4">Client not found</h1>
-        <button onClick={() => navigate(-1)} className="bg-white border border-[#cccccc] px-4 h-10 rounded-[7px] font-bold text-[#333]">
-          Go Back
-        </button>
+      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center p-4">
+        <h1 className="text-xl font-bold text-gray-800 mb-4">Client not found</h1>
+        <Button onClick={() => navigate(-1)} variant="outline">
+          <ChevronLeft className="w-4 h-4 mr-2" /> Go Back
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] pb-12" style={arialFont}>
-      <main className="max-w-[480px] mx-auto p-3">
+    <div className="min-h-screen bg-[#f0f0f0] font-roboto">
+      <main className="max-w-[720px] mx-auto p-4 lg:p-6">
         
         {/* Header Bar */}
-        <div className="flex items-center gap-3 mb-4 bg-white p-3 rounded-[10px] border border-[#d5d8dc] shadow-sm">
+        <div className="flex items-center gap-3 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
           <button 
             onClick={() => navigate(-1)}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-[#333]" />
+            <ChevronLeft className="w-5 h-5 text-[#2c3e50]" />
           </button>
           <div>
-            <h1 className="text-[15px] font-bold text-[#333]">Settle P/L</h1>
-            <p className="text-[11px] text-[#12b886] font-bold uppercase tracking-wider">
-              {client.username}
+            <h1 className="text-xl font-bold text-[#2c3e50]">Settle P/L Account</h1>
+            <p className="text-sm text-[#7f8c8d] font-bold uppercase tracking-wider">
+              @{client.username}
             </p>
           </div>
         </div>
 
         {/* Settlement Form Card */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden shadow-sm">
-          <div className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-8 space-y-6">
             
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#f9f9f9] p-3 rounded-[7px] border border-[#d5d8dc] text-center">
-                <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">P/L Balance</p>
-                <p className="text-[15px] font-bold text-[#12b886]">
-                  {(client?.pl_downline || 0).toLocaleString()}
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-700">
+                Settling P/L will deduct the specified amount from the downline P/L balance and add it to the client's cash balance.
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">Available P/L</p>
+                <p className="text-xl font-bold text-[#1a9e71]">
+                  {(client?.pl_downline || 0).toLocaleString()} Rs.
                 </p>
               </div>
-              <div className="bg-[#f9f9f9] p-3 rounded-[7px] border border-[#d5d8dc] text-center">
-                <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Cash Balance</p>
-                <p className="text-[15px] font-bold text-[#3498db]">
-                  {(client?.cash || 0).toLocaleString()}
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">Current Cash</p>
+                <p className="text-xl font-bold text-[#3498db]">
+                  {(client?.cash || 0).toLocaleString()} Rs.
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-[#333] uppercase mb-1.5">Settlement Amount</label>
-              <input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full border border-[#cccccc] rounded-[4px] px-3 h-10 text-[16px] font-bold focus:outline-none focus:border-[#12b886] bg-white"
-                placeholder="0.00"
-              />
+              <label className="block text-xs font-bold text-[#2c3e50] uppercase mb-2 tracking-wide">Settlement Amount (Rs.)</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-4 pl-12 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#1a9e71]/10 focus:border-[#1a9e71] transition-all bg-gray-50"
+                  placeholder="0.00"
+                />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rs.</span>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-2 italic">
+                * Maximum allowed transfer is {(client?.pl_downline || 0).toLocaleString()} Rs.
+              </p>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-[#333] uppercase mb-1.5">Description</label>
+              <label className="block text-xs font-bold text-[#2c3e50] uppercase mb-2 tracking-wide">Description</label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border border-[#cccccc] rounded-[4px] px-3 h-10 text-[13px] focus:outline-none focus:border-[#12b886] bg-white"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9e71]/10 focus:border-[#1a9e71] transition-all bg-gray-50"
               />
             </div>
           </div>
 
-          <div className="p-4 bg-[#f5f5f5] flex justify-end">
-            <button
+          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#12b886] text-white font-bold px-8 h-[40px] rounded-[7px] flex items-center gap-2 active:scale-95 disabled:opacity-70 shadow-sm"
+              className="bg-[#1a9e71] hover:bg-[#158c61] text-white font-bold px-12 py-3 h-auto rounded-lg shadow-lg flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
             >
-              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRightLeft className="w-4 h-4" />}
-              Settle Now
-            </button>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <ArrowRightLeft className="w-5 h-5" />
+                  Settle Now
+                </>
+              )}
+            </Button>
           </div>
         </form>
+
+        <div className="mt-6 flex justify-center">
+          <button 
+            onClick={() => navigate(-1)}
+            className="text-sm font-bold text-[#7f8c8d] hover:text-[#2c3e50] transition-colors"
+          >
+            Cancel and Return
+          </button>
+        </div>
       </main>
     </div>
   );

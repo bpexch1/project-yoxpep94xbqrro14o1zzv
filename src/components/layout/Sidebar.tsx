@@ -43,7 +43,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
     onNavigate();
   };
 
-  const renderItem = (item: typeof mainMenuItems[0], isSports = false) => {
+  const renderItem = (item: typeof mainMenuItems[0], showChevron = false) => {
     const isActive = location.pathname === item.link || (item.link !== "/" && location.pathname.startsWith(item.link));
     const showLabels = !isCollapsed || isMobile;
 
@@ -71,7 +71,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
               "flex-1 text-[15px] whitespace-nowrap",
               isActive ? "font-medium" : "font-normal"
             )}>{item.label}</span>
-            {isSports && <ChevronLeft className="w-3.5 h-3.5 text-white/40 shrink-0" />}
+            {showChevron && <ChevronLeft className="w-4 h-4 text-white/40 shrink-0" />}
           </>
         )}
       </button>

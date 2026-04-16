@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from "react";
-import { Pencil, UserPlus, BookOpen, Loader2, Info } from "lucide-react";
+import { Pencil, UserPlus, BookOpen, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/entities";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ClientSummaryCardProps {
   clients: any[];
@@ -29,53 +28,39 @@ export function ClientSummaryCard({
 }: ClientSummaryCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
   const [localSearch, setLocalSearch] = useState("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isBalanceLoaded, setIsBalanceLoaded] = useState(autoLoadBalance);
 
-  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
+  React.useEffect(() => {
+    if (autoLoadBalance && clients && clients.length > 0 && expandedIds.size === 0) {
+      const allIds = new Set(clients.map((c: any) => c.id));
+      setExpandedIds(allIds);
+    }
+  }, [autoLoadBalance, clients]);
 
   const handleLoadBalance = () => {
     onRefresh && onRefresh();
     setIsBalanceLoaded(true);
-  };
-
-  const toggleExpand = (id: string) => {
-    const newExpanded = new Set(expandedIds);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
-      newExpanded.add(id);
-    }
-    setExpandedIds(newExpanded);
+    // Auto-expand all clients
+    const allIds = new Set(clients.map((c: any) => c.id));
+    setExpandedIds(allIds);
   };
 
   const getTypeLabel = (role: string) => {
     switch(role?.toLowerCase()) {
-      case 'company': return 'Book';
+      case 'company': return 'Company';
       case 'superadmin': return 'SuperAdmin';
       case 'supermaster': return 'SuperMaster';
       case 'admin': return 'Admin';
-      case 'client': return 'Client';
-      default: return 'Client';
-    }
-  };
-
-  const getTypeColor = (role: string) => {
-    switch(role?.toLowerCase()) {
-      case 'company': return '#8B0000';        // dark red for Book
-      case 'superadmin': return '#e74c3c';     // red for SuperAdmin
-      case 'supermaster': return '#e67e22';    // orange for SuperMaster
-      case 'admin': return '#2980b9';          // blue for Admin
-      case 'client': return '#27ae60';         // green for Client
-      default: return '#333333';
+      case 'client': return 'Bettor';
+      default: return 'Bettor';
     }
   };
 
   const filteredClients = useMemo(() => {
     if (!clients) return [];
-    const query = (localSearch.toLowerCase() || searchFilter.toLowerCase()).trim();
+    const query = localSearch.toLowerCase() || searchFilter.toLowerCase();
     return clients.filter(
       (c) =>
         c.role?.toLowerCase() !== 'company' &&
@@ -98,6 +83,18 @@ export function ClientSummaryCard({
     [filteredClients]
   );
 
+  const toggleExpand = (id: string) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   const toggleStatus = async (client: any) => {
     try {
       const newStatus = client.status === "active" ? "inactive" : "active";
@@ -111,391 +108,314 @@ export function ClientSummaryCard({
   };
 
   return (
-    <section className={cn(
-      "bg-white border border-[#ccc] overflow-hidden mb-2",
-      isMobile ? "rounded-lg" : "rounded-none"
-    )} style={arialFont}>
-      {/* Card title bar */}
+    <section className="bg-white border border-[#d0d0d0] shadow-sm rounded-[10px] overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif", boxShadow: "0 1px 3px rgba(0,0,0,.07)" }}>
+      {/* Card title */}
       {!hideHeader && (
-        <div className="px-[14px] py-[10px] border-b border-[#ddd]">
-          <span className="font-bold text-[15px] text-[#333]">
-            <span className="text-[#12b886]">{username}</span> - Clients List{!isBalanceLoaded ? " | Default" : ""}
+        <div className="px-4 py-2.5 bg-white border-b border-[#d0d0d0]">
+          <span className="font-bold text-[15px] text-[#212529]">
+            {username} - Clients List{!isBalanceLoaded ? " | Default" : ""}
           </span>
         </div>
       )}
 
-      {/* Stats table section */}
-      <div className="overflow-x-auto px-[14px] pt-2.5 pb-2">
-        <table className="w-auto text-left border-collapse border border-[#ccc]">
-          <thead>
-            <tr className="bg-[#f5f5f5]">
-              {isBalanceLoaded ? (
-                <>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Received</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Remaining</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Cash</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">P/L Downline</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap sm:table-cell">Balance UpLine</th>
-                </>
-              ) : (
-                <>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Credit Remaining</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Cash</th>
-                  <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">P/L Downline</th>
-                </>
-              )}
-              <th className="py-1.5 px-3 border border-[#ccc] font-bold text-[#333] text-[13px] whitespace-nowrap">Users</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white">
-            <tr>
-              {isBalanceLoaded ? (
-                <>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
-                    {totals.credit_received.toLocaleString()}
-                  </td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
-                    {totals.credit_remaining.toLocaleString()}
-                  </td>
-                  <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                    {totals.cash.toLocaleString()}
-                  </td>
-                  <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                    {totals.pl_downline.toLocaleString()}
-                  </td>
-                  <td className={cn("py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold sm:table-cell", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                    {totals.balance_upline.toLocaleString()}
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">0</td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">0</td>
-                  <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">0</td>
-                </>
-              )}
-              <td className="py-1.5 px-3 border border-[#ccc] whitespace-nowrap text-[13px] font-bold text-[#12b886]">
-                {filteredClients.length}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div className="space-y-2 pt-3">
+        {/* Stats table */}
+        <div className="px-4 overflow-x-auto">
+          <table className="w-auto text-left border-collapse border border-[#ccc]">
+            <thead>
+              <tr className="bg-[#f8f9fa]">
+                {!isBalanceLoaded ? (
+                  <>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Remaining</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Cash</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">P/L<br/>Downline</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Users</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Received</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Remaining</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Cash</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">P/L<br/>Downline</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Balance<br/>UpLine</th>
+                    <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Users</th>
+                  </>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {!isBalanceLoaded ? (
+                  <>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap"><span className="text-[13px] font-bold text-[#256F39]">0</span></td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap"><span className="text-[13px] font-bold text-[#256F39]">0</span></td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap"><span className="text-[13px] font-bold text-[#256F39]">0</span></td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap"><span className="text-[13px] font-bold text-[#256F39]">{filteredClients.length}</span></td>
+                  </>
+                ) : (
+                  <>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                      <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_received.toLocaleString()}</span>
+                    </td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                      <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_remaining.toLocaleString()}</span>
+                    </td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                      <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>{totals.cash.toLocaleString()}</span>
+                    </td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                      <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                        {totals.pl_downline.toLocaleString()}
+                      </span>
+                    </td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                      <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>{totals.balance_upline.toLocaleString()}</span>
+                    </td>
+                    <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                      <span className="text-[13px] font-bold text-[#256F39]">{filteredClients.length}</span>
+                    </td>
+                  </>
+                )}
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      {/* Action row with legend and search */}
-      <div className="flex flex-col gap-3 px-[14px] pb-3">
-        <div className="flex items-center gap-2">
+        {/* Action buttons row */}
+        <div className="flex gap-2 px-4">
           {!hideCreateButton && (
             <button
               onClick={() => navigate("/accounts/create")}
-              className="bg-[#12b886] text-white font-bold text-[13px] h-[34px] px-3 rounded-[4px] flex items-center gap-1.5"
+              className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
             >
               <UserPlus className="w-3.5 h-3.5" /> New User
             </button>
           )}
           <button
             onClick={() => navigate(`/reports/daily`)}
-            className="bg-[#12b886] text-white font-bold text-[13px] h-[34px] px-3 rounded-[4px] flex items-center gap-1.5"
+            className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
           >
             <BookOpen className="w-3.5 h-3.5" /> Account Ledger
           </button>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] font-bold text-[#333]">
-            <div className="flex items-center gap-1">
-              <div className="w-[20px] h-[20px] bg-[#f1c40f] text-black flex items-center justify-center rounded-sm">C</div>
-              <span>Cash / Credit</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-[20px] h-[20px] bg-[#1EB990] text-white flex items-center justify-center rounded-sm">
-                <Pencil className="w-3 h-3" />
-              </div>
-              <span>Edit</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-[20px] h-[20px] bg-[#63C2DE] text-white flex items-center justify-center rounded-sm">L</div>
-              <span>Ledger</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-[20px] h-[20px] bg-[#12b886] text-white flex items-center justify-center rounded-sm">A</div>
-              <span>Active</span>
-            </div>
-            <div className="flex items-center gap-1 w-full sm:w-auto">
-              <div className="w-[20px] h-[20px] bg-white border border-[#e74c3c] text-[#e74c3c] flex items-center justify-center rounded-sm">D</div>
-              <span>InActive</span>
-            </div>
+        {/* Legend row */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 text-[11px] font-semibold text-[#212529]">
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">C</div>
+            <span>Cash / Credit</span>
           </div>
-          
-          <div className="flex flex-col gap-1">
-            <span className="text-[13px] font-bold text-[#333] text-center">Search:</span>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#1EB990] text-white flex items-center justify-center rounded-sm shadow-sm">
+              <Pencil className="w-3 h-3" />
+            </div>
+            <span>Edit</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#63C2DE] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">L</div>
+            <span>Ledger</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#42A665] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">A</div>
+            <span>Active</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">D</div>
+            <span>InActive</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#e74c3c] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">S</div>
+            <span>Settle Account</span>
+          </div>
+        </div>
+
+        {/* Search row */}
+        <div className="px-4 pb-1">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-[#212529] whitespace-nowrap">Search:</label>
             <input
               type="text"
+              placeholder="Search username..."
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              className="h-[28px] border border-[#ccc] rounded-none px-2 text-[13px] outline-none w-full"
+              className="flex-1 h-[34px] border border-[#d1d5db] rounded-[5px] px-2.5 text-[13px] outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* Main Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      <div className="overflow-x-auto mt-4">
+        <table className="w-full text-left text-[12px] border-collapse">
           <thead>
-            {isBalanceLoaded ? (
-              <tr className="bg-[#12b886] text-white font-bold text-[13px]">
-                <td className="px-[10px] py-2">Total</td>
-                {!isMobile ? (
-                  <>
-                    <td className="px-[10px] py-2"></td>
-                    <td className="px-[10px] py-2 text-right">{totals.credit_received.toLocaleString()}</td>
-                    <td className="px-[10px] py-2 text-right">{totals.balance_upline.toLocaleString()}</td>
-                    <td className="px-[10px] py-2 text-right">{totals.pl_downline.toLocaleString()}</td>
-                    <td className="px-[10px] py-2"></td>
-                    <td className="px-[10px] py-2 text-right">0</td>
-                    <td className="px-[10px] py-2 text-right">{totals.credit_remaining.toLocaleString()}</td>
-                    <td className="px-[10px] py-2"></td>
-                  </>
-                ) : (
-                  <>
-                    <td className="px-[10px] py-2"></td>
-                    <td className="px-[10px] py-2 text-right">{totals.credit_received.toLocaleString()}</td>
-                  </>
-                )}
-              </tr>
-            ) : (
-              <tr className="bg-[#12b886] h-[34px]">
-                <td colSpan={isMobile ? 3 : 9} className="px-[10px]">
+            {!isBalanceLoaded ? (
+              <tr className="bg-[#1a9e71]">
+                <td colSpan={3} className="px-4 py-2 text-left">
                   <button
+                    type="button"
                     onClick={handleLoadBalance}
-                    className="bg-[#f1c40f] text-black font-bold text-[12px] h-[24px] px-2 rounded-[2px]"
+                    className="bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-[11px] px-4 py-1.5 rounded transition-colors cursor-pointer"
                   >
                     Load Balance
                   </button>
                 </td>
               </tr>
+            ) : (
+              <tr className="bg-[#1a9e71] text-white">
+                <td className="px-4 py-2.5 font-bold text-sm">Total</td>
+                <td className="px-4 py-2.5 text-sm"></td>
+                <td className="px-4 py-2.5 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
+              </tr>
             )}
-            <tr className="bg-[#f5f5f5] border-y border-[#ccc] text-[12px] text-[#333]">
-              <th className="px-[10px] py-2 font-bold border-r border-[#ccc]">Username</th>
-              <th className="px-[10px] py-2 font-bold border-r border-[#ccc]">Type</th>
-              <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Credit</th>
-              {!isMobile && isBalanceLoaded && (
-                <>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Balance</th>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Client (P/L)</th>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Share</th>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Exposure</th>
-                  <th className="px-[10px] py-2 font-bold border-r border-[#ccc] text-right">Available Balance</th>
-                </>
-              )}
-              {!isMobile && <th className="px-[10px] py-2 font-bold">Options</th>}
+            <tr className="bg-[#ecf0f1] border-y border-[#d5d8dc]">
+              <th className="px-4 py-2.5 font-bold text-[#212529] border-r border-[#d5d8dc]">Username</th>
+              <th className="px-4 py-2.5 font-bold text-[#212529] border-r border-[#d5d8dc]">Type</th>
+              <th className="px-4 py-2.5 font-bold text-[#212529] text-right">Credit</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={isMobile ? 3 : 9} className="px-3 py-10 text-center bg-white">
+                <td colSpan={3} className="px-3 py-8 text-center text-[#212529] bg-white">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#12b886]" />
-                    <span className="font-medium text-[#333]">Loading...</span>
+                    <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71]" />
+                    <span className="font-medium">Loading data...</span>
                   </div>
                 </td>
               </tr>
             ) : filteredClients.length === 0 ? (
               <tr>
-                <td colSpan={isMobile ? 3 : 9} className="px-3 py-10 text-center bg-white font-medium text-[#333]">
+                <td colSpan={3} className="px-3 py-8 text-center text-[#212529] bg-white font-medium">
                   No data available
                 </td>
               </tr>
             ) : (
               filteredClients.map((client, idx) => {
                 const roleLower = client.role?.toLowerCase();
-                const isAdminType = roleLower !== "client";
+                const isAdminType = roleLower === "admin" || roleLower === "supermaster" || roleLower === "superadmin" || roleLower === "company";
                 const isExpanded = expandedIds.has(client.id);
 
                 return (
                   <React.Fragment key={client.id}>
-                    <tr className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "border-b border-[#ddd]")}>
-                      <td className="px-[10px] py-1.5 border-r border-[#ccc]">
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => isAdminType && navigate(`/accounts/view/${client.username}`)}
-                            className={cn(
-                              "font-bold text-left text-[13px]",
-                              isAdminType ? "text-[#12b886] underline cursor-pointer" : "text-[#333]"
-                            )}
-                          >
-                            {client.username}
-                          </button>
-                          {isMobile && (
-                            <button
-                              onClick={() => toggleExpand(client.id)}
-                              className="w-5 h-5 rounded-full bg-[#333] text-white text-[10px] flex items-center justify-center shrink-0"
-                            >
-                              i
-                            </button>
+                    {/* Main row — always visible */}
+                    <tr className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]", "border-b border-[#d5d8dc]")}>
+                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc]">
+                        <button
+                          onClick={() => {
+                            if (isAdminType) {
+                              navigate(`/accounts/view/${client.username}`);
+                            } else if (isBalanceLoaded) {
+                              toggleExpand(client.id);
+                            }
+                          }}
+                          className={cn(
+                            "font-bold text-left",
+                            isAdminType ? "text-[#1a9e71] underline cursor-pointer" : "text-[#212529]",
+                            !isAdminType && isBalanceLoaded && "hover:underline cursor-pointer"
                           )}
-                        </div>
+                        >
+                          {client.username}
+                        </button>
                       </td>
-                      <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[13px] font-bold">
-                        <span style={{ color: getTypeColor(client.role) }}>
-                          {getTypeLabel(client.role)}
-                        </span>
+                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#212529] font-semibold">
+                        {getTypeLabel(client.role)}
                       </td>
-                      <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#333] text-right text-[13px] font-medium">
-                        {isBalanceLoaded ? (client.credit_received || 0).toLocaleString() : "-"}
+                      <td className="px-3 lg:px-4 py-3 text-[#212529] text-right font-semibold">
+                        {/* Only show credit value after Load Balance is clicked */}
+                        {isBalanceLoaded ? (
+                          <span className="font-bold">
+                            {(client.credit_received || 0).toLocaleString()}
+                          </span>
+                        ) : "-"}
                       </td>
-                      
-                      {!isMobile && (
-                        <>
-                          {isBalanceLoaded && (
-                            <>
-                              <td className={cn("px-[10px] py-1.5 border-r border-[#ccc] text-right text-[13px] font-medium", (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#333]")}>
-                                {(client.balance_upline || 0).toLocaleString()}
-                              </td>
-                              <td className={cn("px-[10px] py-1.5 border-r border-[#ccc] text-right text-[13px] font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                                {(client.pl_downline || 0).toLocaleString()}
-                              </td>
-                              <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#333] text-right text-[13px]">
-                                {client.downline_share || 0}
-                              </td>
-                              <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#333] text-right text-[13px]">
-                                0
-                              </td>
-                              <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#12b886] text-right text-[13px] font-bold">
-                                {(client.credit_remaining || 0).toLocaleString()}
-                              </td>
-                            </>
-                          )}
-                          <td className="px-[10px] py-1.5 min-w-[150px]">
-                            <div className="flex flex-wrap items-center gap-[2px]">
-                              <button 
-                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                                className="w-[28px] h-[28px] bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-[12px] flex items-center justify-center rounded-[3px] transition-colors shadow-sm"
-                                title="Cash / Credit"
-                              >
-                                C
-                              </button>
-                              <button 
-                                onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                                className="w-[28px] h-[28px] bg-[#1EB990] hover:bg-[#17a37d] text-white flex items-center justify-center rounded-[3px] transition-colors shadow-sm"
-                                title="Edit"
-                              >
-                                <Pencil className="w-3 h-3" />
-                              </button>
-                              <button 
-                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                                className="w-[28px] h-[28px] bg-[#63C2DE] hover:bg-[#4db0cc] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px] transition-colors shadow-sm"
-                                title="Ledger"
-                              >
-                                L
-                              </button>
-                              <button 
-                                onClick={() => toggleStatus(client)}
-                                className={cn(
-                                  "w-[28px] h-[28px] rounded-[3px] font-bold text-[12px] flex items-center justify-center transition-all shadow-sm",
-                                  client.status === "active" 
-                                    ? "bg-[#12b886] hover:bg-[#0ca678] text-white" 
-                                    : "bg-white border border-[#e74c3c] text-[#e74c3c] hover:bg-red-50"
-                                )}
-                                title={client.status === "active" ? "Active" : "Inactive"}
-                              >
-                                {client.status === "active" ? "A" : "D"}
-                              </button>
-                              {client.role !== 'client' && (
-                                <button 
-                                  className="w-[28px] h-[28px] bg-[#e74c3c] hover:bg-[#c0392b] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px] transition-colors shadow-sm"
-                                  title="Settle Account"
-                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                                >
-                                  S
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </>
-                      )}
                     </tr>
 
-                    {/* Mobile Expanded Row */}
-                    {isMobile && isExpanded && (
-                      <tr className="bg-[#f9f9f9] border-b border-[#ddd]">
-                        <td colSpan={3} className="px-3 py-3">
-                          <div className="space-y-3">
-                            {isBalanceLoaded ? (
-                              <div className="grid grid-cols-2 gap-y-2 text-[13px]">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Balance:</span>
-                                  <span className={cn("font-medium", (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#333]")}>
-                                    {(client.balance_upline || 0).toLocaleString()}
-                                  </span>
+                    {/* Expanded details row — only when balance is loaded AND row is expanded */}
+                    {isBalanceLoaded && isExpanded && (
+                      <tr>
+                        <td colSpan={3} className={cn("px-5 py-4 border-b border-[#d5d8dc]", idx % 2 === 0 ? "bg-slate-50" : "bg-white")}>
+                          <div className="relative">
+                            <ul className="text-[13px] text-[#212529] space-y-2 relative z-10">
+                              <li className="flex items-center gap-2">
+                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="font-semibold text-[#212529]">Balance:</span>
+                                <span className="font-bold text-[#256F39]">
+                                  {(client.balance_upline || 0).toLocaleString()}
+                                </span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="font-semibold text-[#212529]">Client (P/L):</span>
+                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                                  {(client.pl_downline || 0).toLocaleString()}
+                                </span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="font-semibold text-[#212529]">Share:</span>
+                                <span className="font-bold text-[#256F39]">{client.downline_share || 0}</span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="font-semibold text-[#212529]">Exposure:</span>
+                                <span className="font-bold text-[#256F39]">0</span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="font-semibold text-[#212529]">Available Balance:</span>
+                                <span className="font-bold text-[#256F39]">
+                                  {(client.credit_remaining || 0).toLocaleString()}
+                                </span>
+                              </li>
+                              
+                              <li className="flex items-center gap-3 mt-4 pt-3 border-t border-[#d5d8dc]">
+                                <span className="font-semibold text-[#212529]">• Options</span>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <button 
+                                    onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
+                                    className="w-9 h-9 bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    title="Cash / Credit"
+                                  >
+                                    C
+                                  </button>
+                                  <button 
+                                    onClick={() => navigate(`/accounts/edit/${client.username}`)}
+                                    className="w-9 h-9 bg-[#1EB990] hover:bg-[#17a37d] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    title="Edit"
+                                  >
+                                    <Pencil className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => navigate(`/accounts/ledger/${client.username}`)}
+                                    className="w-9 h-9 bg-[#63C2DE] hover:bg-[#4db0cc] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    title="Ledger"
+                                  >
+                                    L
+                                  </button>
+                                  <button 
+                                    onClick={() => toggleStatus(client)}
+                                    className={cn(
+                                      "w-9 h-9 rounded-sm font-bold text-sm flex items-center justify-center transition-all shadow-sm",
+                                      client.status === "active" 
+                                        ? "bg-[#42A665] hover:bg-[#379055] text-white" 
+                                        : "bg-white border border-[#e74c3c] text-[#e74c3c] hover:bg-red-50"
+                                    )}
+                                    title={client.status === "active" ? "Active" : "Inactive"}
+                                  >
+                                    {client.status === "active" ? "A" : "D"}
+                                  </button>
+                                  {client.role !== 'client' && (
+                                    <button 
+                                      className="w-9 h-9 bg-[#e74c3c] hover:bg-[#c0392b] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                      title="Settle Account"
+                                      onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
+                                    >
+                                      S
+                                    </button>
+                                  )}
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">P/L:</span>
-                                  <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#12b886]")}>
-                                    {(client.pl_downline || 0).toLocaleString()}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Share:</span>
-                                  <span className="text-[#333]">{client.downline_share || 0}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Exposure:</span>
-                                  <span className="text-[#333]">0</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-bold text-[#333]">Avail:</span>
-                                  <span className="text-[#12b886] font-bold">
-                                    {(client.credit_remaining || 0).toLocaleString()}
-                                  </span>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-[13px] text-[#666] italic mb-2">
-                                Load Balance to see details
-                              </div>
-                            )}
-                            <div className="flex flex-wrap items-center gap-2 pt-1">
-                              <button 
-                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                                className="h-[28px] px-3 bg-[#f1c40f] text-black font-bold text-[12px] flex items-center justify-center rounded-[3px]"
-                              >
-                                C
-                              </button>
-                              <button 
-                                onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                                className="h-[28px] px-3 bg-[#1EB990] text-white flex items-center justify-center rounded-[3px]"
-                              >
-                                <Pencil className="w-3 h-3 mr-1" /> Edit
-                              </button>
-                              <button 
-                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                                className="h-[28px] px-3 bg-[#63C2DE] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px]"
-                              >
-                                L
-                              </button>
-                              <button 
-                                onClick={() => toggleStatus(client)}
-                                className={cn(
-                                  "h-[28px] px-3 rounded-[3px] font-bold text-[12px] flex items-center justify-center",
-                                  client.status === "active" 
-                                    ? "bg-[#12b886] text-white" 
-                                    : "bg-white border border-[#e74c3c] text-[#e74c3c]"
-                                )}
-                              >
-                                {client.status === "active" ? "Active" : "Inactive"}
-                              </button>
-                              {client.role !== 'client' && (
-                                <button 
-                                  className="h-[28px] px-3 bg-[#e74c3c] text-white font-bold text-[12px] flex items-center justify-center rounded-[3px]"
-                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                                >
-                                  Settle
-                                </button>
-                              )}
-                            </div>
+                              </li>
+                            </ul>
                           </div>
                         </td>
                       </tr>
@@ -506,7 +426,7 @@ export function ClientSummaryCard({
             )}
           </tbody>
         </table>
-        <div className="px-[14px] py-[6px] text-[12px] text-[#333] bg-[#e8e8e8] font-bold">
+        <div className="px-4 py-3 text-[11px] text-[#212529] border-t border-[#d5d8dc] bg-[#ecf0f1] font-medium">
           Showing {filteredClients.length} entries
         </div>
       </div>

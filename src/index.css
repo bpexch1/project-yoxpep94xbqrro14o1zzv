@@ -3,52 +3,49 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #f5f5f5;
+  --bg-primary: #f0f0f0;
   --bg-card: #ffffff;
-  --accent-green: #12b886;
-  --accent-green-hover: #0ca678;
-  --sidebar-bg: #2c3e50;
+  --accent-green: #1a9e71;
+  --accent-green-hover: #158a60;
+  --sidebar-bg: #254465;
   --accent-blue: #3d6b8b;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --border-color: #d4d4d4;
-  --bg-page: #d8d8d8;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
 
   /* Shadcn CSS variable mappings */
-  --background: 0 0% 96%; /* #f5f5f5 approximate */
-  --foreground: 0 0% 20%;
+  --background: 0 0% 94%;
+  --foreground: 210 11% 15%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 20%;
+  --card-foreground: 210 11% 15%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 20%;
-  --primary: 162 83% 39%;          /* #12b886 teal-green */
+  --popover-foreground: 210 11% 15%;
+  --primary: 160 72% 36%;          /* #1a9e71 teal-green */
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 90%;
-  --secondary-foreground: 0 0% 20%;
-  --muted: 0 0% 90%;
-  --muted-foreground: 0 0% 40%;
-  --accent: 162 83% 39%;
+  --secondary: 210 17% 91%;
+  --secondary-foreground: 210 11% 15%;
+  --muted: 210 17% 91%;
+  --muted-foreground: 210 8% 45%;
+  --accent: 160 72% 36%;
   --accent-foreground: 0 0% 100%;
   --destructive: 6 78% 57%;        /* #e74c3c red */
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 83%; /* #d4d4d4 approximate */
-  --input: 0 0% 83%;
-  --ring: 162 83% 39%;
-  --radius: 6px;
+  --border: 210 14% 89%;
+  --input: 210 14% 89%;
+  --ring: 160 72% 36%;
+  --radius: 0.5rem;
   --teal: 174 63% 38%;
 }
 
 @layer base {
   * {
     @apply border-border;
-    font-family: Arial, Helvetica, sans-serif !important;
   }
   body {
     @apply bg-background text-foreground antialiased;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.4;
+    font-family: 'Roboto', system-ui, sans-serif;
   }
 }
 
@@ -57,29 +54,23 @@ html {
 }
 
 .app-container {
-  background-color: #f5f5f5;
+  background-color: #f0f0f0;
   min-height: 100vh;
 }
 
 .content-card {
   background-color: #ffffff;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 14px;
-  border: 1px solid #d4d4d4;
-  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px;
+  border: 1px solid #dee2e6;
 }
 
 a {
-  color: #12b886;
-  text-decoration: none;
+  color: #1a9e71;
 }
 a:hover {
-  color: #0ca678;
-}
-
-.admin-row {
-  height: 34px;
+  color: #158a60;
 }
 
 @keyframes marquee {
@@ -97,20 +88,4 @@ a:hover {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* Custom Scrollbar for better UI match */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #bbb;
 }

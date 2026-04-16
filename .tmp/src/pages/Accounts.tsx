@@ -6,15 +6,12 @@ import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
 import { getClientSession } from "@/hooks/useClientAuth";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
   const [searchQuery, setSearchQuery] = useState("");
   const session = getClientSession();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!session) navigate("/login");
@@ -48,42 +45,80 @@ export default function Accounts() {
     enabled: !!session,
   });
 
-  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
+  const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
 
   return (
-    <div className="min-h-screen bg-[#d8d8d8]" style={arialFont}>
-      <main className={cn(
-        "mx-auto",
-        isMobile ? "p-1 w-full" : "max-w-[980px] p-2"
-      )}>
+    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
+      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
 
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
-        <div className={cn(
-          "bg-white border border-[#ccc] mb-2 overflow-hidden",
-          isMobile ? "rounded-lg" : "rounded-none"
-        )}>
-          <div className="flex items-center gap-2 px-[14px] py-2 bg-[#e8e8e8] border-b border-[#ccc]">
-            <Filter className="w-3.5 h-3.5 text-[#333]" />
-            <span className="font-bold text-[14px] text-[#333]">Search-Users</span>
+        <div style={{
+          background: "#fff",
+          borderRadius: 10,
+          border: "1px solid #d0d0d0",
+          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+          marginBottom: 16,
+          overflow: "hidden",
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 16px",
+            background: "#ecf0f1",
+            borderBottom: "1px solid #d0d0d0",
+          }}>
+            <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
-          <div className="p-3">
-            <div className="flex gap-2">
+          <div style={{ padding: "12px 16px" }}>
+            <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
                 placeholder="Username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 h-[34px] border border-[#ccc] rounded-none px-2.5 text-[14px] text-[#333] outline-none"
-                style={arialFont}
+                style={{
+                  flex: 1,
+                  height: "40px",
+                  minHeight: "40px",
+                  maxHeight: "40px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "4px",
+                  padding: "0 12px",
+                  fontSize: "14px",
+                  color: "#374151",
+                  fontFamily: "Roboto, system-ui, sans-serif",
+                  outline: "none",
+                  boxSizing: "border-box",
+                  background: "#fff",
+                }}
               />
               <button
-                className="h-[34px] px-4 bg-[#12b886] text-white font-bold text-[14px] rounded-none flex items-center gap-1.5 shrink-0"
-                style={arialFont}
+                style={{
+                  height: "40px",
+                  minHeight: "40px",
+                  maxHeight: "40px",
+                  padding: "0 18px",
+                  background: "#1a9e71",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "7px",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  fontFamily: "Roboto, system-ui, sans-serif",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  boxSizing: "border-box",
+                  flexShrink: 0,
+                }}
               >
-                <Search className="w-[15px] h-[15px]" />
+                <Search style={{ width: 15, height: 15 }} />
                 Search
               </button>
             </div>

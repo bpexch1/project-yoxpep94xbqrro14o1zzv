@@ -1,221 +1,220 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Client } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { getClientSession } from "@/hooks/useClientAuth";
+import { ArrowLeft, Shield } from "lucide-react";
 
 export default function CreateCompanyAccount() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const session = getClientSession();
-  
+  const { toast } = useToast();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [downlineShare, setDownlineShare] = useState(100);
+  const [isActive, setIsActive] = useState(true);
+  const [reference, setReference] = useState("");
+  const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    fullName: "",
-    phone: "",
-    creditLimit: "0",
-    notes: "",
-    commission: "2.00",
-    isActive: true,
-  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    // Only 'company' role should access this, though it's restricted by logic
-    if (session?.role !== 'company' && session?.role !== 'superadmin') {
-      // navigate("/dashboard");
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!username) newErrors.username = "Username is required";
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 6) newErrors.password = "Password must be at least 6 characters";
+    if (downlineShare < 0 || downlineShare > 100) {
+      newErrors.downlineShare = "Must be between 0 and 100";
     }
-  }, [session, navigate]);
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.username || !formData.password || !formData.fullName) {
-      toast({ variant: "destructive", title: "Missing fields", description: "Username, Password and Name are required" });
-      return;
-    }
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
     setIsSubmitting(true);
     try {
       await Client.create({
-        username: formData.username.trim(),
-        password: formData.password,
-        full_name: formData.fullName,
-        phone: formData.phone,
+        username,
+        full_name: fullName,
         role: "company",
-        credit_received: parseFloat(formData.creditLimit) || 0,
-        credit_remaining: parseFloat(formData.creditLimit) || 0,
+        credit_received: 0,
+        credit_remaining: 0,
         cash: 0,
         pl_downline: 0,
         balance_upline: 0,
-        status: formData.isActive ? "active" : "inactive",
-        commission: parseFloat(formData.commission) || 2.0,
-        notes: formData.notes,
-        parent_username: "system",
+        status: isActive ? "active" : "inactive",
+        parent_username: "", // Top level
+        phone,
+        downline_share: downlineShare,
+        reference,
+        notes,
       });
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({ title: "Account Created", description: `Company account ${formData.username} is ready.` });
+      toast({
+        title: "Company Account Created",
+        description: `Company Account ${username} has been created successfully.`,
+      });
       navigate("/accounts");
-    } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Error", description: "Could not create company account." });
+    } catch (error) {
+      console.error("Error creating company account:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create company account. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-[#f5f5f5] pb-10">
-      <main className="max-w-xl mx-auto pt-6 px-3">
-        
-        {/* Header Card */}
-        <section className="bg-white border border-[#d5d8dc] rounded-lg overflow-hidden shadow-sm mb-6">
-          <div className="bg-[#f5f5f5] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-3">
+    <div className="bg-[#f4f6f7] pb-10">
+      <main className="max-w-2xl mx-auto px-4 py-4">
+        {/* Card */}
+        <div className="bg-white rounded shadow-sm overflow-hidden border border-[#d5d8dc]">
+          
+          {/* Gray title bar */}
+          <div className="bg-[#ecf0f1] px-4 py-3 border-b border-[#d5d8dc] flex items-center gap-3">
             <button 
               onClick={() => navigate(-1)}
-              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+              className="p-1 hover:bg-[#d5d8dc] rounded transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#333]" />
+              <ArrowLeft className="w-5 h-5 text-[#2c3e50]" />
             </button>
-            <div className="flex flex-col">
-              <h1 className="text-sm font-bold text-[#333] uppercase">
-                Create New Company Account
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#3498db]" />
+              <h1 className="text-sm font-bold text-[#2c3e50] uppercase">
+                Create Company Account (Company)
               </h1>
-              <p className="text-[10px] text-gray-500 font-medium">Add a top-level book operator</p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
-            <div className="grid grid-cols-1 gap-5">
+          {/* Form body */}
+          <div className="p-6 space-y-5">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Username */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Username</label>
+              <div>
+                <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Username *</label>
                 <input
                   type="text"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  placeholder="e.g. MasterBook77"
-                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
+                  placeholder="e.g. company_main"
                 />
+                {errors.username && <p className="text-[10px] text-[#e74c3c] mt-1 font-bold">{errors.username}</p>}
               </div>
 
               {/* Password */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Password</label>
+              <div>
+                <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Password *</label>
                 <input
-                  type="text"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Set account password"
-                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
                 />
+                {errors.password && <p className="text-[10px] text-[#e74c3c] mt-1 font-bold">{errors.password}</p>}
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Full Name */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name</label>
+              <div>
+                <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Full Name</label>
                 <input
                   type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="Legal name or book title"
-                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
                 />
               </div>
 
               {/* Phone */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Phone (Optional)</label>
+              <div>
+                <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Phone</label>
                 <input
                   type="text"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+91..."
-                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {/* Commission */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Commission %</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.commission}
-                    onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
-                    className="border border-[#d5d8dc] rounded px-3 py-2.5 text-sm w-full text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner"
-                  />
-                </div>
-                {/* Credit Limit */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Starting Credit</label>
-                  <input
-                    type="number"
-                    value={formData.creditLimit}
-                    onChange={(e) => setFormData({ ...formData, creditLimit: e.target.value })}
-                    className="border border-[#d5d8dc] rounded px-3 py-2.5 text-sm w-full text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner"
-                  />
-                </div>
-              </div>
-
-              {/* Is Active */}
-              <div className="flex items-center gap-3 pt-2">
-                <input
-                  id="isActive"
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-6 h-6 accent-[#12b886] cursor-pointer"
-                />
-                <label htmlFor="isActive" className="text-sm font-bold text-[#333] cursor-pointer select-none">
-                  Account is Active
-                </label>
-              </div>
-
-              {/* Notes */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Notes</label>
-                <textarea
-                  rows={3}
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Internal notes about this company..."
-                  className="w-full border border-[#d5d8dc] rounded-lg px-3 py-2.5 text-sm text-[#333] focus:outline-none focus:border-[#12b886] shadow-inner resize-none"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
                 />
               </div>
             </div>
-          </form>
 
-          {/* Footer Action */}
-          <div className="bg-[#f5f5f5] border-t border-[#d5d8dc] px-6 py-4">
-            <button 
+            {/* Downline Share */}
+            <div>
+              <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Downline Share (%)</label>
+              <input
+                type="number"
+                value={downlineShare}
+                min={0}
+                max={100}
+                onChange={(e) => setDownlineShare(Number(e.target.value))}
+                className="border border-[#d5d8dc] rounded px-3 py-2.5 text-sm w-32 text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
+              />
+              <p className="text-[10px] text-[#7f8c8d] mt-1 font-medium">Standard range is 0 - 100 for top level</p>
+              {errors.downlineShare && <p className="text-[10px] text-[#e74c3c] mt-1 font-bold">{errors.downlineShare}</p>}
+            </div>
+
+            {/* IsActive */}
+            <div className="flex items-center gap-3 bg-gray-50 p-4 rounded border border-[#d5d8dc]">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                className="w-6 h-6 accent-[#16a085] cursor-pointer"
+                id="isActive"
+              />
+              <label htmlFor="isActive" className="text-sm font-bold text-[#2c3e50] cursor-pointer select-none">
+                Account Active
+                <span className="block text-[10px] font-normal text-[#7f8c8d] uppercase mt-0.5">Toggle status for new account</span>
+              </label>
+            </div>
+
+            {/* Reference */}
+            <div>
+              <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Reference</label>
+              <input
+                type="text"
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
+              />
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-xs font-bold text-[#7f8c8d] mb-1 uppercase tracking-wider">Notes</label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
+              />
+            </div>
+          </div>
+
+          {/* Footer with Submit button */}
+          <div className="bg-[#ecf0f1] border-t border-[#d5d8dc] px-6 py-4">
+            <button
+              type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full sm:w-auto bg-[#12b886] hover:bg-[#0ca678] text-white font-bold px-10 py-3 rounded text-sm transition-all shadow-md active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-[#16a085] hover:bg-[#138d75] text-white font-bold px-10 py-3 rounded text-sm transition-all shadow-md active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating Account...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4" />
-                  Create Company
-                </>
-              )}
+              {isSubmitting ? "Processing..." : "Create Account"}
             </button>
           </div>
-        </section>
 
-        <div className="flex items-center gap-2 text-gray-400 text-xs justify-center">
-          <AlertCircle className="w-3 h-3" />
-          <span>This account will be able to create SuperAdmins and Admins.</span>
         </div>
       </main>
     </div>

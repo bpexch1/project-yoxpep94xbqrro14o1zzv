@@ -1,7 +1,5 @@
 import { Filter } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const tabs = [
   { id: "Book Detail",       label: "Book Detail",       path: "/reports/book-detail" },
@@ -21,36 +19,70 @@ interface ReportTypeTabsProps {
 export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useIsMobile();
   const currentId = tabs.find(t => t.path === location.pathname)?.id ?? activeTab;
   const go = (tab: typeof tabs[0]) => { onTabChange(tab.id); navigate(tab.path); };
 
-  const arialFont = "Arial, Helvetica, sans-serif";
-
   return (
-    <div className={cn(
-      "bg-white border border-[#ccc] mb-2 overflow-hidden",
-      isMobile ? "rounded-lg" : "rounded-none"
-    )} style={{ fontFamily: arialFont }}>
-      {/* Header bar */}
-      <div className="flex items-center gap-2 px-[14px] py-2 bg-[#e8e8e8] border-b border-[#ccc]">
-        <Filter className="w-3.5 h-3.5 text-[#333] shrink-0" />
-        <span className="font-bold text-[14px] text-[#333]">Report Type</span>
+    <div style={{
+      background: "#fff",
+      borderRadius: 10,
+      border: "1px solid #d0d0d0",
+      boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+      marginBottom: 16,
+      overflow: "hidden",
+      fontFamily: "Roboto, system-ui, sans-serif",
+    }}>
+      {/* Header */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 16px",
+        background: "#ecf0f1",
+        borderBottom: "1px solid #d0d0d0",
+      }}>
+        <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
       </div>
 
-      {/* Buttons row */}
-      <div className="flex flex-wrap gap-1.5 p-3 sm:px-[14px] sm:pt-[10px] sm:pb-[12px]">
+      {/* Button grid — 3 columns */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: "8px",
+        padding: "10px 12px 12px",
+      }}>
         {tabs.map((tab) => {
           const isActive = currentId === tab.id;
+          const isCommission = tab.id === "Commission Report";
           return (
             <button
               key={tab.id}
               onClick={() => go(tab)}
-              className={cn(
-                "h-8 px-3.5 border border-[#12b886] rounded-[4px] text-[13px] font-medium cursor-pointer transition-all whitespace-nowrap flex items-center justify-center",
-                isActive ? "bg-[#12b886] text-white" : "bg-white text-[#12b886]"
-              )}
-              style={{ fontFamily: arialFont }}
+              style={{
+                gridColumnStart: isCommission ? 2 : undefined,
+                height: "38px",
+                minHeight: "38px",
+                maxHeight: "38px",
+                width: "100%",
+                border: `1.5px solid ${isActive ? "#1a9e71" : "#14b8a6"}`,
+                borderRadius: "7px",
+                background: isActive ? "#1a9e71" : "#fff",
+                color: isActive ? "#fff" : "#14b8a6",
+                fontFamily: "Roboto, system-ui, sans-serif",
+                fontSize: isCommission ? "11px" : "12px",
+                fontWeight: 500,
+                cursor: "pointer",
+                transition: "background .15s, color .15s",
+                whiteSpace: "nowrap",
+                padding: "0 4px",
+                boxSizing: "border-box",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                lineHeight: 1,
+                overflow: "hidden",
+              }}
             >
               {tab.label}
             </button>

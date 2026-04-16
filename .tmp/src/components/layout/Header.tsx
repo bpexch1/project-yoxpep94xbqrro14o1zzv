@@ -6,7 +6,6 @@ import { Bet } from "@/entities";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +48,6 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     setSession(getClientSession());
@@ -65,16 +63,19 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       
       const role = session.role?.toLowerCase();
       
+      // Company sees all
       if (role === 'company' || downlineUsernames === null) {
         return pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
       
+      // Client sees only own bets
       if (role === 'client') {
         return pendingBets
           .filter((b: any) => b.user_email === session.username)
           .reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
       
+      // Others: only downline bets
       if (!downlineUsernames || downlineUsernames.length === 0) return 0;
       return pendingBets
         .filter((b: any) => downlineUsernames.includes(b.user_email))
@@ -88,18 +89,13 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     navigate("/login");
   };
 
-  const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
-
   return (
-    <header 
-      className="sticky top-0 z-40 bg-white flex items-center px-3 h-12 border-b border-[#e0e0e0]"
-      style={arialFont}
-    >
-      {/* LEFT: Hamburger + Logo */}
+    <header className="sticky top-0 z-40 bg-white flex items-center px-3 h-12 border-b border-[#e0e0e0]">
+      {/* LEFT: Hamburger */}
       <div className="flex items-center shrink-0">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#999] rounded-[3px] bg-white hover:bg-[#f5f5f5] transition-colors"
+          className="p-1.5 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
         >
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>
@@ -116,23 +112,20 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       </nav>
 
       {/* RIGHT: User + Stats */}
-      <div className={cn(
-        "flex items-center justify-end gap-2",
-        isMobile ? "flex-1 ml-2" : "lg:flex-none ml-auto"
-      )}>
+      <div className="flex-1 lg:flex-none overflow-x-auto no-scrollbar flex items-center justify-end ml-auto gap-2">
         {session ? (
           <div className="flex items-center gap-2 lg:gap-4 min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-1 lg:px-2 py-1 rounded transition-colors">
-                  <span className="text-[#333] text-[13px] lg:text-sm font-medium">
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
+                  <span className="text-[#2c3e50] text-sm font-medium">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
                   </span>
                   <ChevronDown className="w-3 h-3 text-[#555555]" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-[#333] border-b border-[#d5d8dc] mb-1">
+                <div className="px-2 py-1.5 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
                   Logged in as <span className="font-semibold">{session.username}</span>
                 </div>
                 <DropdownMenuItem
@@ -144,12 +137,13 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div className="flex items-center gap-1.5 lg:gap-3 border-l border-[#e0e0e0] pl-2 lg:pl-4">
-              <span className="text-[12px] lg:text-sm font-bold text-[#333] whitespace-nowrap">
-                B: <span className="text-black font-medium">0</span>
+
+            <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
+              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
+                B: <span>0</span>
               </span>
-              <span className="text-[12px] lg:text-sm font-bold text-[#333] whitespace-nowrap">
-                Exp: <span className={cn("font-medium", totalExposure > 0 ? 'text-[#e74c3c]' : 'text-black')}>
+              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
+                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#2c3e50]'}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
@@ -158,7 +152,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#254465] hover:text-[#12b886] uppercase"
+            className="text-sm font-bold text-[#254465] hover:text-[#1a9e71] uppercase"
           >
             Login
           </button>
