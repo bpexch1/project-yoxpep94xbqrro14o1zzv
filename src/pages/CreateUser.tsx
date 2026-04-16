@@ -24,18 +24,10 @@ export default function CreateUser() {
     notes: "",
   });
 
-  // Calculate creatable roles
-  const creatableRoles: { value: string; label: string }[] = [];
-  if (session?.role === 'company' || session?.role === 'superadmin') {
-    creatableRoles.push({ value: 'superadmin', label: 'SuperAdmin' });
-    creatableRoles.push({ value: 'supermaster', label: 'SuperMaster' });
-    creatableRoles.push({ value: 'admin', label: 'Admin' });
-  } else if (session?.role === 'admin' || session?.role === 'supermaster') {
-    creatableRoles.push({ value: 'admin', label: 'Admin' });
-  }
-  
-  // Add Bettor (client) as the last option
-  creatableRoles.push({ value: 'client', label: 'Bettor' });
+  const creatableRoles = [
+    { value: 'superadmin', label: 'SuperAdmin' },
+    { value: 'client', label: 'Bettor' },
+  ];
 
   useEffect(() => {
     if (!session) {
