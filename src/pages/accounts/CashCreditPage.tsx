@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client, Transaction } from "@/entities";
-import { handleTransaction } from "@/functions";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ChevronLeft, 
@@ -30,7 +29,7 @@ export default function CashCreditPage() {
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
   const [isSubmittingWithdraw, setIsSubmittingWithdraw] = useState(false);
 
-  const { data: clients, isLoading: isFetchingClient } = useQuery({
+  const { data: clients, isLoading: isFetchingClient, refetch: refetchClient } = useQuery({
     queryKey: ["client", username],
     queryFn: () => Client.filter({ username }),
     enabled: !!username,
@@ -38,7 +37,7 @@ export default function CashCreditPage() {
 
   const client = clients?.[0];
 
-  const { data: transactions, isLoading: isFetchingTx } = useQuery({
+  const { data: transactions, isLoading: isFetchingTx, refetch: refetchTx } = useQuery({
     queryKey: ["transactions", username, activeTab],
     queryFn: () => Transaction.filter({ client_username: username, type: activeTab }, "-created_at", 50),
     enabled: !!username,
@@ -55,37 +54,71 @@ export default function CashCreditPage() {
     }
     setDepositAmount('0');
     setWithdrawAmount('0');
-  }, [client, activeTab]);
+  }, [client?.username, activeTab]);
+
+  const refreshAll = async () => {
+    await refetchClient();
+    await refetchTx();
+    queryClient.invalidateQueries({ queryKey: ["clients"] });
+    queryClient.invalidateQueries({ queryKey: ["client", username] });
+    queryClient.invalidateQueries({ queryKey: ["transactions", username] });
+  };
 
   const handleDeposit = async () => {
     if (!client) return;
     const amount = parseFloat(depositAmount) || 0;
     if (amount <= 0) {
-      toast({ variant: "destructive", title: "Invalid amount", description: "Please enter an amount greater than 0" });
+      toast({ variant: "destructive", title: "Invalid Amount", description: "Enter an amount greater than 0" });
       return;
     }
-    
+
     setIsSubmittingDeposit(true);
     try {
-      await handleTransaction({
-        clientId: client.id,
-        clientUsername: client.username,
-        tabType: activeTab,
-        transactionType: 'deposit',
-        amount,
+      const beforeCash = client.cash || 0;
+      const beforeCreditReceived = client.credit_received || 0;
+      const beforeCreditRemaining = client.credit_remaining || 0;
+
+      let newBalance: number;
+      let clientUpdateData: Record<string, number> = {};
+      let beforeBalance: number;
+
+      if (activeTab === 'cash') {
+        beforeBalance = beforeCash;
+        newBalance = beforeCash + amount;
+        clientUpdateData = { cash: newBalance };
+      } else {
+        beforeBalance = beforeCreditRemaining;
+        newBalance = beforeCreditRemaining + amount;
+        clientUpdateData = {
+          credit_received: beforeCreditReceived + amount,
+          credit_remaining: newBalance,
+        };
+      }
+
+      // Create transaction record first
+      await Transaction.create({
+        client_username: client.username,
+        type: activeTab,
+        amount: amount,
         description: depositDesc,
-        beforeCash: client.cash || 0,
-        beforeCreditReceived: client.credit_received || 0,
-        beforeCreditRemaining: client.credit_remaining || 0,
+        before_balance: beforeBalance,
+        after_balance: newBalance,
       });
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
-      queryClient.invalidateQueries({ queryKey: ["client", username] });
-      queryClient.invalidateQueries({ queryKey: ["transactions", username] });
-      toast({ title: "Deposit Successful", description: `${amount} Rs. deposited to ${client.username}` });
+
+      // Update client balance
+      await Client.update(client.id, clientUpdateData);
+
+      await refreshAll();
+      toast({ title: "Deposit Successful ✓", description: `${amount.toLocaleString()} Rs. deposited to ${client.username}` });
       setDepositAmount('0');
-    } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Deposit Failed" });
+    } catch (err: any) {
+      console.error('Deposit error:', err);
+      const msg = err?.message || '';
+      if (msg.includes('Authentication') || msg.includes('auth') || msg.includes('token') || msg.includes('JWT')) {
+        toast({ variant: "destructive", title: "Session Expired", description: "Please refresh the page and try again" });
+      } else {
+        toast({ variant: "destructive", title: "Deposit Failed", description: msg || "Please try again" });
+      }
     } finally {
       setIsSubmittingDeposit(false);
     }
@@ -95,31 +128,62 @@ export default function CashCreditPage() {
     if (!client) return;
     const amount = parseFloat(withdrawAmount) || 0;
     if (amount <= 0) {
-      toast({ variant: "destructive", title: "Invalid amount", description: "Please enter an amount greater than 0" });
+      toast({ variant: "destructive", title: "Invalid Amount", description: "Enter an amount greater than 0" });
       return;
     }
-    
+
+    // Insufficient balance check
+    const availableBalance = activeTab === 'cash' ? (client.cash || 0) : (client.credit_remaining || 0);
+    if (amount > availableBalance) {
+      toast({
+        variant: "destructive",
+        title: "Insufficient Balance",
+        description: `Available: ${availableBalance.toLocaleString()} Rs. | Requested: ${amount.toLocaleString()} Rs.`,
+      });
+      return;
+    }
+
     setIsSubmittingWithdraw(true);
     try {
-      await handleTransaction({
-        clientId: client.id,
-        clientUsername: client.username,
-        tabType: activeTab,
-        transactionType: 'withdraw',
-        amount,
+      const beforeCash = client.cash || 0;
+      const beforeCreditRemaining = client.credit_remaining || 0;
+
+      let newBalance: number;
+      let clientUpdateData: Record<string, number> = {};
+      let beforeBalance: number;
+
+      if (activeTab === 'cash') {
+        beforeBalance = beforeCash;
+        newBalance = Math.max(0, beforeCash - amount);
+        clientUpdateData = { cash: newBalance };
+      } else {
+        beforeBalance = beforeCreditRemaining;
+        newBalance = Math.max(0, beforeCreditRemaining - amount);
+        clientUpdateData = { credit_remaining: newBalance };
+      }
+
+      await Transaction.create({
+        client_username: client.username,
+        type: activeTab,
+        amount: -amount,
         description: withdrawDesc,
-        beforeCash: client.cash || 0,
-        beforeCreditReceived: client.credit_received || 0,
-        beforeCreditRemaining: client.credit_remaining || 0,
+        before_balance: beforeBalance,
+        after_balance: newBalance,
       });
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
-      queryClient.invalidateQueries({ queryKey: ["client", username] });
-      queryClient.invalidateQueries({ queryKey: ["transactions", username] });
-      toast({ title: "Withdraw Successful", description: `${amount} Rs. withdrawn from ${client.username}` });
+
+      await Client.update(client.id, clientUpdateData);
+
+      await refreshAll();
+      toast({ title: "Withdraw Successful ✓", description: `${amount.toLocaleString()} Rs. withdrawn from ${client.username}` });
       setWithdrawAmount('0');
-    } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Withdraw Failed" });
+    } catch (err: any) {
+      console.error('Withdraw error:', err);
+      const msg = err?.message || '';
+      if (msg.includes('Authentication') || msg.includes('auth') || msg.includes('token') || msg.includes('JWT')) {
+        toast({ variant: "destructive", title: "Session Expired", description: "Please refresh the page and try again" });
+      } else {
+        toast({ variant: "destructive", title: "Withdraw Failed", description: msg || "Please try again" });
+      }
     } finally {
       setIsSubmittingWithdraw(false);
     }
@@ -275,15 +339,27 @@ export default function CashCreditPage() {
             </div>
             <div>
               <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Amount (Rs.)</label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 pl-12 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/10 focus:border-[#e74c3c] transition-all bg-gray-50"
-                  min="0"
-                />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7f8c8d] font-bold">Rs.</span>
+              <div className="relative flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-3 pl-12 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/10 focus:border-[#e74c3c] transition-all bg-gray-50"
+                    min="0"
+                  />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7f8c8d] font-bold">Rs.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const available = activeTab === 'cash' ? (client?.cash || 0) : (client?.credit_remaining || 0);
+                    setWithdrawAmount(Math.max(0, available).toString());
+                  }}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#2c3e50] font-bold rounded-lg text-xs uppercase transition-colors whitespace-nowrap"
+                >
+                  Max
+                </button>
               </div>
             </div>
             <div className="flex justify-end pt-2">

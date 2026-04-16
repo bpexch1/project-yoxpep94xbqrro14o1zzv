@@ -46,9 +46,26 @@ Deno.serve(async (req) => {
     let afterBalance: number;
     let clientUpdateData: Record<string, number> = {};
 
+    // Insufficient balance check
+    if (transactionType === 'withdraw') {
+      if (tabType === 'cash' && amount > (beforeCash ?? 0)) {
+        return new Response(JSON.stringify({ error: 'Insufficient Balance', available: beforeCash ?? 0 }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (tabType === 'credit' && amount > (beforeCreditRemaining ?? 0)) {
+        return new Response(JSON.stringify({ error: 'Insufficient Balance', available: beforeCreditRemaining ?? 0 }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     if (tabType === 'cash') {
       beforeBalance = beforeCash ?? 0;
       afterBalance = transactionType === 'deposit' ? beforeBalance + amount : beforeBalance - amount;
+      afterBalance = Math.max(0, afterBalance);
       clientUpdateData = { cash: afterBalance };
     } else {
       if (transactionType === 'deposit') {
@@ -61,6 +78,7 @@ Deno.serve(async (req) => {
       } else {
         beforeBalance = beforeCreditRemaining ?? 0;
         afterBalance = beforeBalance - amount;
+        afterBalance = Math.max(0, afterBalance);
         clientUpdateData = { credit_remaining: afterBalance };
       }
     }
