@@ -53,12 +53,23 @@ export function ClientSummaryCard({
 
   const getTypeLabel = (role: string) => {
     switch(role?.toLowerCase()) {
-      case 'company': return 'Company';
+      case 'company': return 'Book';
       case 'superadmin': return 'SuperAdmin';
       case 'supermaster': return 'SuperMaster';
       case 'admin': return 'Admin';
-      case 'client': return 'Bettor';
-      default: return 'Bettor';
+      case 'client': return 'Client';
+      default: return 'Client';
+    }
+  };
+
+  const getTypeColor = (role: string) => {
+    switch(role?.toLowerCase()) {
+      case 'company': return '#8B0000';        // dark red for Book
+      case 'superadmin': return '#e74c3c';     // red for SuperAdmin
+      case 'supermaster': return '#e67e22';    // orange for SuperMaster
+      case 'admin': return '#2980b9';          // blue for Admin
+      case 'client': return '#27ae60';         // green for Client
+      default: return '#333333';
     }
   };
 
@@ -327,8 +338,10 @@ export function ClientSummaryCard({
                           )}
                         </div>
                       </td>
-                      <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#333] text-[13px]">
-                        {getTypeLabel(client.role)}
+                      <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[13px] font-bold">
+                        <span style={{ color: getTypeColor(client.role) }}>
+                          {getTypeLabel(client.role)}
+                        </span>
                       </td>
                       <td className="px-[10px] py-1.5 border-r border-[#ccc] text-[#333] text-right text-[13px] font-medium">
                         {isBalanceLoaded ? (client.credit_received || 0).toLocaleString() : "-"}
