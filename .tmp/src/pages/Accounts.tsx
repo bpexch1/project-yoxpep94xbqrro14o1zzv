@@ -48,7 +48,7 @@ export default function Accounts() {
   const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
 
         {/* 1. Report Type Card */}
@@ -68,11 +68,11 @@ export default function Accounts() {
             alignItems: "center",
             gap: 8,
             padding: "10px 16px",
-            background: "#ecf0f1",
+            background: "#f5f5f5",
             borderBottom: "1px solid #d0d0d0",
           }}>
             <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#333", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
           <div style={{ padding: "12px 16px" }}>
             <div style={{ display: "flex", gap: 8 }}>
@@ -103,7 +103,7 @@ export default function Accounts() {
                   minHeight: "40px",
                   maxHeight: "40px",
                   padding: "0 18px",
-                  background: "#1a9e71",
+                  background: "#12b886",
                   color: "#fff",
                   border: "none",
                   borderRadius: "7px",

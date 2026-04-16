@@ -3,36 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #f0f0f0;
+  --bg-primary: #f5f5f5;
   --bg-card: #ffffff;
-  --accent-green: #1a9e71;
-  --accent-green-hover: #158a60;
+  --accent-green: #12b886;
+  --accent-green-hover: #0ca678;
   --sidebar-bg: #254465;
   --accent-blue: #3d6b8b;
-  --text-primary: #212529;
+  --text-primary: #333;
   --text-secondary: #6c757d;
   --border-color: #dee2e6;
 
   /* Shadcn CSS variable mappings */
-  --background: 0 0% 94%;
+  --background: 0 0% 96%;
   --foreground: 210 11% 15%;
   --card: 0 0% 100%;
   --card-foreground: 210 11% 15%;
   --popover: 0 0% 100%;
   --popover-foreground: 210 11% 15%;
-  --primary: 160 72% 36%;          /* #1a9e71 teal-green */
+  --primary: 162 83% 39%;          /* #12b886 teal-green */
   --primary-foreground: 0 0% 100%;
   --secondary: 210 17% 91%;
   --secondary-foreground: 210 11% 15%;
   --muted: 210 17% 91%;
   --muted-foreground: 210 8% 45%;
-  --accent: 160 72% 36%;
+  --accent: 162 83% 39%;
   --accent-foreground: 0 0% 100%;
   --destructive: 6 78% 57%;        /* #e74c3c red */
   --destructive-foreground: 0 0% 100%;
   --border: 210 14% 89%;
   --input: 210 14% 89%;
-  --ring: 160 72% 36%;
+  --ring: 162 83% 39%;
   --radius: 0.5rem;
   --teal: 174 63% 38%;
 }
@@ -54,7 +54,7 @@ html {
 }
 
 .app-container {
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
   min-height: 100vh;
 }
 
@@ -67,10 +67,10 @@ html {
 }
 
 a {
-  color: #1a9e71;
+  color: #12b886;
 }
 a:hover {
-  color: #158a60;
+  color: #0ca678;
 }
 
 @keyframes marquee {

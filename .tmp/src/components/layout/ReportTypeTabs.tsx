@@ -42,7 +42,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         borderBottom: "1px solid #d0d0d0",
       }}>
         <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#333" }}>Report Type</span>
       </div>
 
       {/* Button grid — 3 columns */}

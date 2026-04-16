@@ -82,7 +82,7 @@ export default function CurrentPosition() {
   const totalPotentialWin = filteredBets?.reduce((acc, b) => acc + (b.potential_win || 0), 0) || 0;
 
   return (
-    <div className="bg-[#f4f6f7] min-h-screen pb-16">
+    <div className="bg-[#f5f5f5] min-h-screen pb-16">
       <main className="px-0 pt-0 pb-8 max-w-6xl mx-auto font-sans">
         <div className="h-4" />
         
@@ -100,9 +100,9 @@ export default function CurrentPosition() {
         {/* Filters Card */}
         <div className="mx-2 mb-4">
           <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#ecf0f1]">
-              <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
-              <span className="font-bold text-[#2c3e50] text-sm">Filter Pending Bets</span>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#f5f5f5]">
+              <Filter className="w-4 h-4 fill-[#333] text-[#333]" />
+              <span className="font-bold text-[#333] text-sm">Filter Pending Bets</span>
             </div>
             <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <div>
@@ -114,7 +114,7 @@ export default function CurrentPosition() {
                     placeholder="Search match..."
                     value={matchFilter}
                     onChange={(e) => setMatchFilter(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                    className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#12b886]"
                   />
                 </div>
               </div>
@@ -127,13 +127,13 @@ export default function CurrentPosition() {
                     placeholder="Search user..."
                     value={usernameFilter}
                     onChange={(e) => setUsernameFilter(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                    className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#12b886]"
                   />
                 </div>
               </div>
               <button 
                 onClick={handleRefresh}
-                className="bg-[#00b181] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4dbd74] transition-colors"
+                className="bg-[#12b886] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0ca678] transition-colors"
               >
                 <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
                 Refresh Data
@@ -165,7 +165,7 @@ export default function CurrentPosition() {
           </div>
           <div className="bg-white p-3 border border-[#d5d8dc]">
             <div className="text-[10px] text-gray-400 uppercase font-bold">Total Potential Win</div>
-            <div className="text-lg font-bold text-[#00b181]">{totalPotentialWin.toLocaleString()}</div>
+            <div className="text-lg font-bold text-[#12b886]">{totalPotentialWin.toLocaleString()}</div>
           </div>
           <div className="bg-white p-3 border border-[#d5d8dc]">
             <div className="text-[10px] text-gray-400 uppercase font-bold">Active Markets</div>
@@ -197,7 +197,7 @@ export default function CurrentPosition() {
                   {isLoading ? (
                     <tr>
                       <td colSpan={9} className="py-12 text-center bg-white">
-                        <Loader2 className="w-8 h-8 animate-spin text-[#00b181] mx-auto" />
+                        <Loader2 className="w-8 h-8 animate-spin text-[#12b886] mx-auto" />
                         <p className="mt-2 text-gray-400 font-medium">Loading pending bets...</p>
                       </td>
                     </tr>
@@ -231,7 +231,7 @@ export default function CurrentPosition() {
                         <td className="border border-[#d5d8dc] px-3 py-2 text-right font-bold text-gray-900">
                           {b.stake?.toLocaleString()}
                         </td>
-                        <td className="border border-[#d5d8dc] px-3 py-2 text-right font-bold text-[#00b181]">
+                        <td className="border border-[#d5d8dc] px-3 py-2 text-right font-bold text-[#12b886]">
                           {b.potential_win?.toLocaleString()}
                         </td>
                       </tr>
@@ -249,14 +249,14 @@ export default function CurrentPosition() {
                 </tbody>
                 {filteredBets && filteredBets.length > 0 && (
                   <tfoot>
-                    <tr className="bg-[#ecf0f1] font-bold text-[#2c3e50]">
+                    <tr className="bg-[#f5f5f5] font-bold text-[#333]">
                       <td colSpan={7} className="border border-[#d5d8dc] px-3 py-3 text-right uppercase text-[10px] tracking-widest">
                         Total Exposure
                       </td>
                       <td className="border border-[#d5d8dc] px-3 py-3 text-right text-red-600">
                         {totalStake.toLocaleString()}
                       </td>
-                      <td className="border border-[#d5d8dc] px-3 py-3 text-right text-[#00b181]">
+                      <td className="border border-[#d5d8dc] px-3 py-3 text-right text-[#12b886]">
                         {totalPotentialWin.toLocaleString()}
                       </td>
                     </tr>
