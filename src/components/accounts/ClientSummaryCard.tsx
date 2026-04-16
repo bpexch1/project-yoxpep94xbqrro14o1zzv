@@ -138,6 +138,7 @@ export function ClientSummaryCard({
                     <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center min-w-[85px]">Cash</th>
                     <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">P/L<br/>Downline</th>
                     <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">Balance<br/>UpLine</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center min-w-[85px]">Users</th>
                   </>
                 )}
               </tr>
@@ -169,6 +170,9 @@ export function ClientSummaryCard({
                     </td>
                     <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
                       <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>{totals.balance_upline.toLocaleString()}</span>
+                    </td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
+                      <span className="text-[13px] font-bold text-[#256F39]">{filteredClients.length}</span>
                     </td>
                   </>
                 )}
