@@ -16,13 +16,20 @@ Deno.serve(async (req) => {
       appId: Deno.env.get('SUPERDEV_APP_ID') ?? '',
     });
 
+    // Extract and set the auth token from request headers
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '').trim();
+      superdev.auth.setToken(token);
+    }
+
     const body = await req.json();
     const {
       clientId,
       clientUsername,
-      tabType,         // 'cash' | 'credit'
-      transactionType, // 'deposit' | 'withdraw'
-      amount,          // positive number
+      tabType,
+      transactionType,
+      amount,
       description,
       beforeCash,
       beforeCreditReceived,
@@ -36,10 +43,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Calculate transaction amount (negative for withdraw)
     const txAmount = transactionType === 'deposit' ? amount : -amount;
 
-    // Calculate before/after balances
     let beforeBalance: number;
     let afterBalance: number;
     let clientUpdateData: Record<string, number> = {};
@@ -49,7 +54,6 @@ Deno.serve(async (req) => {
       afterBalance = transactionType === 'deposit' ? beforeBalance + amount : beforeBalance - amount;
       clientUpdateData = { cash: afterBalance };
     } else {
-      // credit tab
       if (transactionType === 'deposit') {
         beforeBalance = beforeCreditRemaining ?? 0;
         afterBalance = beforeBalance + amount;
@@ -64,7 +68,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Create transaction record
     await superdev.entities.Transaction.create({
       client_username: clientUsername,
       type: tabType,
@@ -74,7 +77,6 @@ Deno.serve(async (req) => {
       after_balance: afterBalance,
     });
 
-    // Update client record
     await superdev.entities.Client.update(clientId, clientUpdateData);
 
     return new Response(JSON.stringify({ success: true, afterBalance }), {
