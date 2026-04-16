@@ -4,6 +4,8 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
 import { Bet } from "@/entities";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,21 +47,42 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
 
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
-  const [totalExposure, setTotalExposure] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const s = getClientSession();
-    setSession(s);
-    if (s?.id) {
-      Bet.filter({ status: 'pending' }, '-created_at', 500)
-        .then((pendingBets: any[]) => {
-          const total = pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
-          setTotalExposure(total);
-        })
-        .catch(() => {});
-    }
+    setSession(getClientSession());
   }, []);
+
+  const { data: downlineUsernames } = useDownlineUsernames(session?.username, session?.role);
+
+  const { data: totalExposure = 0 } = useQuery({
+    queryKey: ["header-exposure", session?.username, downlineUsernames],
+    queryFn: async () => {
+      if (!session) return 0;
+      const pendingBets = await Bet.filter({ status: 'pending' }, '-created_at', 1000);
+      
+      const role = session.role?.toLowerCase();
+      
+      // Company sees all
+      if (role === 'company' || downlineUsernames === null) {
+        return pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
+      }
+      
+      // Client sees only own bets
+      if (role === 'client') {
+        return pendingBets
+          .filter((b: any) => b.user_email === session.username)
+          .reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
+      }
+      
+      // Others: only downline bets
+      if (!downlineUsernames || downlineUsernames.length === 0) return 0;
+      return pendingBets
+        .filter((b: any) => downlineUsernames.includes(b.user_email))
+        .reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
+    },
+    enabled: !!session && downlineUsernames !== undefined,
+  });
 
   const handleLogout = () => {
     clearClientSession();
