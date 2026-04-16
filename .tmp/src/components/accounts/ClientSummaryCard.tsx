@@ -194,7 +194,7 @@ export function ClientSummaryCard({
             <span>Cash / Credit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#5dade2] text-white flex items-center justify-center rounded-sm shadow-sm">
+            <div className="w-5 h-5 bg-[#1EB990] text-white flex items-center justify-center rounded-sm shadow-sm">
               <Pencil className="w-3 h-3" />
             </div>
             <span>Edit</span>
@@ -368,13 +368,13 @@ export function ClientSummaryCard({
                                   </button>
                                   <button 
                                     onClick={() => setEditingClient(client)}
-                                    className="w-9 h-9 bg-[#5dade2] hover:bg-[#3498db] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#1EB990] hover:bg-[#17a37d] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Edit"
                                   >
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
-                                    className="w-9 h-9 bg-[#73C2D7] hover:bg-[#5aafc4] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#73C2D7] hover:bg-[#5ab0c8] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Ledger"
                                   >
                                     L
