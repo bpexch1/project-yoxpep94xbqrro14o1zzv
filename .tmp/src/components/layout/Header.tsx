@@ -112,9 +112,9 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       </nav>
 
       {/* RIGHT: User + Stats */}
-      <div className="flex-1 lg:flex-none flex items-center justify-end ml-auto gap-2">
+      <div className="flex-1 lg:flex-none overflow-x-auto no-scrollbar flex items-center justify-end ml-auto gap-2">
         {session ? (
-          <div className="flex items-center gap-2 lg:gap-4">
+          <div className="flex items-center gap-2 lg:gap-4 min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
