@@ -92,12 +92,12 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
-      <main style={{ padding: "16px 16px 80px" }}>
+      <main style={{ maxWidth: 720, margin: "0 auto", padding: "20px 14px 100px" }}>
         
         {/* Search Users Card */}
         <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #d0d0d0", boxShadow: "0 1px 3px rgba(0,0,0,.08)", marginBottom: 16, overflow: "hidden" }}>
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
             <Filter style={{ width: 18, height: 18, fill: "#000", color: "#000", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>Search-Users</span>
           </div>
@@ -110,13 +110,13 @@ export default function Dashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                style={{ flex: 1, height: 46, border: "1px solid #d1d5db", borderRadius: 6, padding: "0 14px", fontSize: 15, outline: "none", background: "#fff" }}
+                style={{ flex: 1, height: 48, border: "1px solid #d1d5db", borderRadius: 6, padding: "0 14px", fontSize: 16, outline: "none", background: "#fff" }}
               />
               <button
                 onClick={handleSearch}
-                style={{ height: 46, padding: "0 22px", background: "#1a9e71", color: "#fff", border: "none", borderRadius: 7, fontSize: 15, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
+                style={{ height: 48, padding: "0 22px", background: "#1a9e71", color: "#fff", border: "none", borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
               >
-                <Search style={{ width: 16, height: 16 }} /> Search
+                <Search style={{ width: 17, height: 17 }} /> Search
               </button>
             </div>
           </div>
@@ -125,11 +125,11 @@ export default function Dashboard() {
         {/* Sport Highlights Card */}
         <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #d0d0d0", boxShadow: "0 1px 3px rgba(0,0,0,.08)", overflow: "hidden" }}>
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
             <span style={{ fontWeight: 700, fontSize: 16, color: "#212529", flex: 1 }}>Sport Highlights</span>
             <button
               onClick={handleRefresh}
-              style={{ background: "#1a9e71", color: "#fff", border: "none", borderRadius: 5, padding: "6px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+              style={{ background: "#1a9e71", color: "#fff", border: "none", borderRadius: 6, padding: "5px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
             >
               Refresh
             </button>
@@ -137,11 +137,11 @@ export default function Dashboard() {
           
           <div style={{ overflowX: "auto" }}>
             {isLoading ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "60px 0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "64px 0" }}>
                 <Loader2 style={{ width: 40, height: 40, color: "#16a085", margin: "0 auto" }} className="animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
-              <div style={{ padding: "48px 16px", textAlign: "center", color: "#7f8c8d", fontSize: 15 }}>
+              <div style={{ padding: "40px 16px", textAlign: "center", color: "#7f8c8d", fontSize: 15 }}>
                 No matches found.
               </div>
             ) : (
@@ -153,7 +153,7 @@ export default function Dashboard() {
                         <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15 }}>
                           {sport}
                         </td>
-                        <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15, minWidth: 100, textAlign: "right" }}>
+                        <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15, width: 130, textAlign: "right" }}>
                           Amount
                         </td>
                       </tr>
@@ -166,7 +166,7 @@ export default function Dashboard() {
                           >
                             <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontSize: 15 }}>
                               <span
-                                style={{ color: "#1a9e71", cursor: "pointer", textDecoration: "none" }}
+                                style={{ color: "#1a9e71", cursor: "pointer", textDecoration: "none", fontSize: 15 }}
                                 className="hover:underline"
                               >
                                 {match.title} / Match Odds
