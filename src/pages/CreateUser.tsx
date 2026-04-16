@@ -16,7 +16,7 @@ export default function CreateUser() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    role: "",
+    role: "superadmin",
     downlineShare: "80",
     isActive: false,
     phone: "",
@@ -34,16 +34,17 @@ export default function CreateUser() {
       navigate("/login");
       return;
     }
-    // Set default role if not set
-    if (!formData.role && creatableRoles.length > 0) {
-      setFormData(prev => ({ ...prev, role: creatableRoles[0].value }));
-    }
-  }, [session, navigate, formData.role, creatableRoles]);
+  }, [session, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.username || !formData.password) {
       toast({ variant: "destructive", title: "Required Fields", description: "Username and Password are required." });
+      return;
+    }
+
+    if (!formData.role) {
+      toast({ variant: "destructive", title: "Required Fields", description: "Please select a user type." });
       return;
     }
 
@@ -66,10 +67,24 @@ export default function CreateUser() {
         notes: formData.notes,
         commission: 2.0, // Default 2.0%
         parent_username: session?.username || "system",
+        betting_allowed: true,
       });
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({ title: "Success", description: `User ${formData.username} created successfully.` });
+      
+      // Reset form state
+      setFormData({
+        username: "",
+        password: "",
+        role: "superadmin",
+        downlineShare: "80",
+        isActive: false,
+        phone: "",
+        reference: "",
+        notes: "",
+      });
+
       navigate("/accounts");
     } catch (err) {
       console.error(err);
