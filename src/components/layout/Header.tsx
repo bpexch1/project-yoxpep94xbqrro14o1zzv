@@ -90,59 +90,59 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white flex items-center px-4 h-14 border-b border-[#e0e0e0]">
+    <header className="sticky top-0 z-40 bg-white flex items-center px-4 h-12 border-b border-[#e0e0e0]">
       {/* LEFT: Hamburger */}
       <div className="flex items-center shrink-0">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-2 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
+          className="p-1.5 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
         >
-          <Menu className="w-6 h-6 text-[#555555]" />
+          <Menu className="w-5 h-5 text-[#555555]" />
         </button>
-        <span className="hidden lg:block font-black italic text-2xl ml-4" style={{fontFamily:'Georgia,serif'}}>
+        <span className="hidden lg:block font-black italic text-xl ml-3" style={{fontFamily:'Georgia,serif'}}>
           <span className="text-[#26c6da]">BPEXCH</span>
         </span>
       </div>
 
       {/* CENTER: Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-2 ml-8 flex-1">
+      <nav className="hidden lg:flex items-center gap-1 ml-6 flex-1">
         <NavLink to="/dashboard" label="Dashboard" />
         <NavLink to="/accounts" label="Users" />
         <NavLink to="/reports/daily-pl" label="Reports" />
       </nav>
 
       {/* RIGHT: User + Stats */}
-      <div className="flex-1 lg:flex-none flex items-center justify-end ml-auto gap-3">
+      <div className="flex-1 lg:flex-none flex items-center justify-end ml-auto gap-2">
         {session ? (
-          <div className="flex items-center gap-3 lg:gap-6">
+          <div className="flex items-center gap-2 lg:gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1.5 cursor-pointer hover:bg-[#f5f5f5] px-2.5 py-1.5 rounded transition-colors">
-                  <span className="text-[#2c3e50] text-base font-medium">
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
+                  <span className="text-[#2c3e50] text-sm font-medium">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
                   </span>
-                  <ChevronDown className="w-4 h-4 text-[#555555]" />
+                  <ChevronDown className="w-3 h-3 text-[#555555]" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-56 mt-1">
-                <div className="px-3 py-2 text-sm text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
+              <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
+                <div className="px-3 py-2 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
                   Logged in as <span className="font-semibold">{session.username}</span>
                 </div>
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-sm font-medium focus:text-[#e74c3c] focus:bg-red-50 p-2.5"
+                  className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50 p-2"
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
+                  <LogOut className="w-3 h-3 mr-2" />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex items-center gap-3 border-l border-[#e0e0e0] pl-3 lg:pl-6">
-              <span className="text-base font-bold text-[#2c3e50] whitespace-nowrap">
+            <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
+              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
                 B: <span>0</span>
               </span>
-              <span className="text-base font-bold text-[#2c3e50] whitespace-nowrap">
+              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
                 Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#2c3e50]'}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
@@ -152,7 +152,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-base font-bold text-[#254465] hover:text-[#1a9e71] uppercase"
+            className="text-sm font-bold text-[#254465] hover:text-[#1a9e71] uppercase"
           >
             Login
           </button>

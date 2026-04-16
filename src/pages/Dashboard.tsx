@@ -91,69 +91,65 @@ export default function Dashboard() {
   const isLoading = isLoadingMatches || isLoadingBets;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
-      <main style={{ maxWidth: 720, margin: "0 auto", padding: "20px 14px 100px" }}>
+    <div className="bg-[#f0f2f5] pb-16 min-h-screen">
+      <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
         
-        {/* Search Users Card */}
-        <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #d0d0d0", boxShadow: "0 1px 3px rgba(0,0,0,.08)", marginBottom: 16, overflow: "hidden" }}>
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
-            <Filter style={{ width: 18, height: 18, fill: "#000", color: "#000", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>Search-Users</span>
+        {/* Search Users Section */}
+        <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none mb-3">
+          <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
+            <Filter className="w-4 h-4 fill-[#333333] text-[#333333]" />
+            <span className="font-bold text-[#2c3e50] text-sm">Search-Users</span>
           </div>
-          {/* Body */}
-          <div style={{ padding: "14px 16px" }}>
-            <div style={{ display: "flex", gap: 10 }}>
-              <input
-                type="text"
-                placeholder="Username"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                style={{ flex: 1, height: 48, border: "1px solid #d1d5db", borderRadius: 6, padding: "0 14px", fontSize: 16, outline: "none", background: "#fff" }}
-              />
-              <button
-                onClick={handleSearch}
-                style={{ height: 48, padding: "0 22px", background: "#1a9e71", color: "#fff", border: "none", borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <Search style={{ width: 17, height: 17 }} /> Search
-              </button>
-            </div>
+          <div className="p-4 pb-8 flex gap-2">
+            <input
+              type="text"
+              placeholder="Username"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="flex-1 border border-[#ced4da] rounded px-3 py-1.5 text-sm placeholder-gray-400 focus:outline-none focus:border-[#16a085] text-[#2c3e50] bg-white"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
+            >
+              <Search className="w-3.5 h-3.5" />
+              Search
+            </button>
           </div>
-        </div>
+        </section>
 
         {/* Sport Highlights Card */}
-        <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #d0d0d0", boxShadow: "0 1px 3px rgba(0,0,0,.08)", overflow: "hidden" }}>
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", background: "#ecf0f1", borderBottom: "1px solid #d0d0d0" }}>
-            <span style={{ fontWeight: 700, fontSize: 16, color: "#212529", flex: 1 }}>Sport Highlights</span>
+        <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
+          <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-3">
+            <span className="font-bold text-[#2c3e50] text-sm">Sport Highlights</span>
             <button
               onClick={handleRefresh}
-              style={{ background: "#1a9e71", color: "#fff", border: "none", borderRadius: 6, padding: "5px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+              className="bg-[#1a9e71] text-white text-xs px-3 py-0.5 rounded hover:bg-[#158c61] transition-colors"
             >
               Refresh
             </button>
           </div>
           
-          <div style={{ overflowX: "auto" }}>
+          <div className="p-0 overflow-x-auto mt-2">
             {isLoading ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "64px 0" }}>
-                <Loader2 style={{ width: 40, height: 40, color: "#16a085", margin: "0 auto" }} className="animate-spin" />
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
-              <div style={{ padding: "40px 16px", textAlign: "center", color: "#7f8c8d", fontSize: 15 }}>
+              <div className="py-8 text-center text-[#7f8c8d] text-sm border border-[#d5d8dc]">
                 No matches found.
               </div>
             ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <table className="w-full text-sm border-collapse">
                 <tbody>
                   {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                     <Fragment key={sport}>
-                      <tr style={{ background: "#fff" }}>
-                        <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15 }}>
+                      <tr>
+                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white text-sm">
                           {sport}
                         </td>
-                        <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontWeight: 700, color: "#212529", fontSize: 15, width: 130, textAlign: "right" }}>
+                        <td className="border border-[#d5d8dc] px-3 py-2 font-bold text-[#2c3e50] bg-white w-32 text-sm">
                           Amount
                         </td>
                       </tr>
@@ -162,20 +158,20 @@ export default function Dashboard() {
                         return (
                           <tr
                             key={match.id}
-                            style={{ background: idx % 2 === 0 ? '#fff' : '#f9f9f9' }}
+                            className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9f9f9]'}
                           >
-                            <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontSize: 15 }}>
-                              <span
-                                style={{ color: "#1a9e71", cursor: "pointer", textDecoration: "none", fontSize: 15 }}
-                                className="hover:underline"
-                              >
+                            <td className="border border-[#d5d8dc] px-3 py-2">
+                              <span className="text-[#1a9e71] text-sm font-normal cursor-pointer hover:underline">
                                 {match.title} / Match Odds
                               </span>
                               {match.status === 'live' && (
-                                <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#1a9e71", marginLeft: 10 }} />
+                                <>
+                                  <br />
+                                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1a9e71] mt-1" />
+                                </>
                               )}
                             </td>
-                            <td style={{ border: "1px solid #d5d8dc", padding: "12px 14px", fontSize: 15, fontWeight: 500, color: "#212529", textAlign: "right" }}>
+                            <td className="border border-[#d5d8dc] px-3 py-2 text-[#2c3e50] text-sm font-medium">
                               {formatAmount(amount)}
                             </td>
                           </tr>
@@ -187,7 +183,7 @@ export default function Dashboard() {
               </table>
             )}
           </div>
-        </div>
+        </section>
 
       </main>
     </div>
