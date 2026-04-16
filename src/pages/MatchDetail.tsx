@@ -280,19 +280,13 @@ export default function MatchDetail() {
         </div>
       </main>
 
-      {/* BetSlip modal overlay */}
-      {activeBet && (
-        <div className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none pointer-events-none">
-          <div className="pointer-events-auto">
-            <BetSlip 
-              bet={activeBet} 
-              onClose={() => setActiveBet(null)} 
-              onSubmit={(stake) => placeBet(stake)} 
-              isSubmitting={isSubmitting} 
-            />
-          </div>
-        </div>
-      )}
+      {/* BetSlip component (handles its own overlay) */}
+      <BetSlip 
+        bet={activeBet} 
+        onClose={() => setActiveBet(null)} 
+        onSubmit={(stake) => placeBet(stake)} 
+        isSubmitting={isSubmitting} 
+      />
     </div>
   );
 }
