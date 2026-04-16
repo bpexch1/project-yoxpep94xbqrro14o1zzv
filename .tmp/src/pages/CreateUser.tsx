@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, UserPlus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -16,18 +16,16 @@ export default function CreateUser() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    fullName: "",
+    role: "",
+    downlineShare: "80",
+    isActive: false,
     phone: "",
-    creditLimit: "0",
-    role: "client",
-    commission: "2.00",
+    reference: "",
+    notes: "",
   });
 
-  useEffect(() => {
-    if (!session) navigate("/login");
-  }, [session, navigate]);
-
-  const creatableRoles = [];
+  // Calculate creatable roles
+  const creatableRoles: { value: string; label: string }[] = [];
   if (session?.role === 'company' || session?.role === 'superadmin') {
     creatableRoles.push({ value: 'superadmin', label: 'SuperAdmin' });
     creatableRoles.push({ value: 'supermaster', label: 'SuperMaster' });
@@ -35,14 +33,25 @@ export default function CreateUser() {
   } else if (session?.role === 'admin' || session?.role === 'supermaster') {
     creatableRoles.push({ value: 'admin', label: 'Admin' });
   }
+  
+  // Add Bettor (client) as the last option
+  creatableRoles.push({ value: 'client', label: 'Bettor' });
 
-  const inputClass = "w-full border border-[#d5d8dc] rounded px-3 py-2 text-sm text-[#333] focus:outline-none focus:border-[#12b886] bg-white";
-  const labelClass = "block text-sm text-[#333] font-medium";
+  useEffect(() => {
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+    // Set default role if not set
+    if (!formData.role && creatableRoles.length > 0) {
+      setFormData(prev => ({ ...prev, role: creatableRoles[0].value }));
+    }
+  }, [session, navigate, formData.role, creatableRoles]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username || !formData.password || !formData.fullName) {
-      toast({ variant: "destructive", title: "Required Fields", description: "Username, Password, and Full Name are required." });
+    if (!formData.username || !formData.password) {
+      toast({ variant: "destructive", title: "Required Fields", description: "Username and Password are required." });
       return;
     }
 
@@ -51,16 +60,19 @@ export default function CreateUser() {
       await ClientEntity.create({
         username: formData.username.trim(),
         password: formData.password,
-        full_name: formData.fullName,
+        full_name: formData.username, // Use username as full_name since field is removed
         phone: formData.phone,
         role: formData.role,
-        credit_received: parseFloat(formData.creditLimit) || 0,
-        credit_remaining: parseFloat(formData.creditLimit) || 0,
+        credit_received: 0,
+        credit_remaining: 0,
         cash: 0,
         pl_downline: 0,
         balance_upline: 0,
-        status: "active",
-        commission: parseFloat(formData.commission) || 2.0,
+        status: formData.isActive ? "active" : "inactive",
+        downline_share: formData.role !== 'client' ? parseFloat(formData.downlineShare) || 0 : 0,
+        reference: formData.reference,
+        notes: formData.notes,
+        commission: 2.0, // Default 2.0%
         parent_username: session?.username || "system",
       });
 
@@ -75,156 +87,137 @@ export default function CreateUser() {
     }
   };
 
+  const labelClass = "block text-[14px] text-[#333] mb-[6px] font-normal";
+  const inputClass = "w-full h-[44px] border border-[#ccc] rounded-[4px] px-[12px] text-[15px] text-[#333] outline-none focus:border-[#12b886] box-border";
+  const fieldBlockClass = "mb-[20px]";
+
   return (
-    <div className="bg-[#f5f5f5] min-h-screen pb-10">
-      <main className="max-w-xl mx-auto pt-6 px-3 font-roboto">
-        <section className="bg-white border border-[#d5d8dc] shadow-sm">
-          <div className="bg-[#f5f5f5] px-4 py-3 border-b border-[#d5d8dc]">
-            <h1 className="text-base font-bold text-[#333]">
-              Add New User
-            </h1>
+    <div className="bg-white min-h-screen font-['Arial']">
+      {/* Header Bar */}
+      <div className="bg-[#e8e8e8] border-b border-[#ccc] px-4 py-3">
+        <h1 className="text-[15px] font-bold text-[#333]">
+          Create New User under <strong><em>{session?.username}</em></strong>
+        </h1>
+      </div>
+
+      <main className="max-w-[600px] mx-auto p-4">
+        <form onSubmit={handleSubmit}>
+          {/* Username */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>Username</label>
+            <input
+              type="text"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              className={inputClass}
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 space-y-4">
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Username</label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Password</label>
-                  <input
-                    type="text"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-              </div>
+          {/* Password */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>Password</label>
+            <input
+              type="text"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className={inputClass}
+            />
+          </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Full Name</label>
+          {/* Type */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>Type</label>
+            <div className="flex flex-wrap gap-[24px] pt-1">
+              {creatableRoles.map((r) => (
+                <label key={r.value} className="flex items-center gap-2 cursor-pointer">
                   <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className={inputClass}
+                    type="radio"
+                    name="role"
+                    value={r.value}
+                    checked={formData.role === r.value}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-4 h-4 accent-[#3b82f6] cursor-pointer"
                   />
-                </div>
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Phone</label>
-                  <input
-                    type="text"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className={labelClass}>Account Type</label>
-                <div className="flex flex-wrap gap-4 pt-1">
-                  {creatableRoles.map((creatableRole) => (
-                    <label key={creatableRole.value} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="role"
-                        value={creatableRole.value}
-                        checked={formData.role === creatableRole.value}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                        className="w-5 h-5 accent-[#12b886] cursor-pointer"
-                      />
-                      <span className="text-sm text-[#333]">{creatableRole.label}</span>
-                    </label>
-                  ))}
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="client"
-                      checked={formData.role === "client"}
-                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                      className="w-5 h-5 accent-[#12b886] cursor-pointer"
-                    />
-                    <span className="text-sm text-[#333]">Bettor</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Credit Limit</label>
-                  <input
-                    type="number"
-                    value={formData.creditLimit}
-                    onChange={(e) => setFormData({ ...formData, creditLimit: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Commission %</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.commission}
-                    onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
-                    className="w-24 border border-[#d5d8dc] rounded px-3 py-2 text-sm text-[#333] focus:outline-none focus:border-[#12b886] bg-white"
-                  />
-                  <span className="ml-2 text-[10px] text-gray-500 italic">Default 2.00%</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 pt-2">
-                <input
-                  type="checkbox"
-                  checked={true}
-                  readOnly
-                  className="w-5 h-5 accent-[#12b886] cursor-pointer mt-1"
-                />
-                <div className="text-[11px] text-gray-500">
-                  <p className="font-bold text-gray-700">Account is Active</p>
-                  <p>User will be able to log in and place bets immediately.</p>
-                </div>
-              </div>
+                  <span className="text-[15px] text-[#333]">{r.label}</span>
+                </label>
+              ))}
             </div>
+          </div>
 
-            <div className="flex flex-col lg:flex-row gap-3 pt-6 border-t border-[#d5d8dc]">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="flex items-center justify-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-700 px-4 py-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full lg:w-48 bg-[#12b886] hover:bg-[#0ca678] text-white font-medium py-3 rounded text-sm transition-colors disabled:opacity-60"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Processing...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <UserPlus className="w-4 h-4" />
-                    <span>Create Account</span>
-                  </div>
-                )}
-              </button>
+          {/* Downline Share (Conditional) */}
+          {formData.role !== 'client' && (
+            <div className={fieldBlockClass}>
+              <label className={labelClass}>Downline Share</label>
+              <input
+                type="number"
+                value={formData.downlineShare}
+                onChange={(e) => setFormData({ ...formData, downlineShare: e.target.value })}
+                className="w-[120px] h-[44px] border border-[#ccc] rounded-[4px] px-[12px] text-[15px] text-[#333] outline-none focus:border-[#12b886]"
+              />
+              <p className="text-[13px] text-gray-600 mt-1">Max allowed downline share is 0 - 85</p>
             </div>
-          </form>
-        </section>
+          )}
+
+          {/* IsActive */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>IsActive</label>
+            <div className="pt-1">
+              <input
+                type="checkbox"
+                checked={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                className="w-[18px] h-[18px] accent-[#3b82f6] cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>Phone</label>
+            <input
+              type="text"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+
+          {/* Reference */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>Reference</label>
+            <input
+              type="text"
+              value={formData.reference}
+              onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+
+          {/* Notes */}
+          <div className={fieldBlockClass}>
+            <label className={labelClass}>Notes</label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="w-full h-[100px] border border-[#ccc] rounded-[4px] p-[12px] text-[15px] text-[#333] outline-none focus:border-[#12b886] resize-y box-border"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-[#12b886] hover:bg-[#0ca678] text-white px-6 py-2.5 rounded text-[15px] font-bold border-none transition-colors disabled:opacity-60 flex items-center justify-center min-w-[100px]"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Submit"
+              )}
+            </button>
+          </div>
+        </form>
       </main>
     </div>
   );
