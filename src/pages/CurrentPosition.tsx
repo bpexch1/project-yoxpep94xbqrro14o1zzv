@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, Search, Loader2, RefreshCw } from "lucide-react";
+import { Filter, Search, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { Bet as BetEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
@@ -11,6 +11,7 @@ export default function CurrentPosition() {
   const [matchFilter, setMatchFilter] = useState("");
   const [usernameFilter, setUsernameFilter] = useState("");
   const [searchTrigger, setSearchTrigger] = useState(0);
+  const [isClearingAll, setIsClearingAll] = useState(false);
   
   const session = getClientSession();
   const navigate = useNavigate();
@@ -50,6 +51,25 @@ export default function CurrentPosition() {
   const handleRefresh = () => {
     setSearchTrigger(prev => prev + 1);
     refetch();
+  };
+
+  const handleClearAllBets = async () => {
+    if (!window.confirm("Are you sure you want to delete ALL bets? This cannot be undone.")) return;
+    setIsClearingAll(true);
+    try {
+      const allBets = await BetEntity.list("-created_at", 1000);
+      if (allBets && allBets.length > 0) {
+        const ids = allBets.map((b: any) => b.id);
+        await BetEntity.batch().delete(ids);
+      }
+      refetch();
+      alert("All bets have been cleared.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to clear bets.");
+    } finally {
+      setIsClearingAll(false);
+    }
   };
 
   const filteredBets = bets?.filter(b => {
@@ -118,6 +138,17 @@ export default function CurrentPosition() {
                 <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
                 Refresh Data
               </button>
+
+              {(session?.role === 'company' || session?.role === 'superadmin') && (
+                <button
+                  onClick={handleClearAllBets}
+                  disabled={isClearingAll}
+                  className="bg-[#e74c3c] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-red-700 transition-colors disabled:opacity-60"
+                >
+                  {isClearingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Clear All Bets
+                </button>
+              )}
             </div>
           </section>
         </div>
