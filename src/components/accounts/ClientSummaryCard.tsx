@@ -15,6 +15,7 @@ interface ClientSummaryCardProps {
   onRefresh?: () => void;
   hideCreateButton?: boolean;
   hideHeader?: boolean;
+  autoLoadBalance?: boolean;
 }
 
 export function ClientSummaryCard({ 
@@ -24,7 +25,8 @@ export function ClientSummaryCard({
   searchFilter = "",
   onRefresh,
   hideCreateButton = false,
-  hideHeader = false
+  hideHeader = false,
+  autoLoadBalance = false
 }: ClientSummaryCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -33,7 +35,14 @@ export function ClientSummaryCard({
   const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
   const [settlePLClient, setSettlePLClient] = useState<any | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
+  const [isBalanceLoaded, setIsBalanceLoaded] = useState(autoLoadBalance);
+
+  React.useEffect(() => {
+    if (autoLoadBalance && clients && clients.length > 0 && expandedIds.size === 0) {
+      const allIds = new Set(clients.map((c: any) => c.id));
+      setExpandedIds(allIds);
+    }
+  }, [autoLoadBalance, clients]);
 
   const handleLoadBalance = () => {
     onRefresh && onRefresh();

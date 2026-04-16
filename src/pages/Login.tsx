@@ -46,7 +46,7 @@ export default function Login() {
         if (client.role === 'client') {
           navigate("/play");
         } else {
-          navigate("/dashboard");
+          navigate("/accounts");
         }
       } else {
         toast({

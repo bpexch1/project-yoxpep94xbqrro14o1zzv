@@ -44,6 +44,8 @@ export default function Accounts() {
     enabled: !!session,
   });
 
+  const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
+
   return (
     <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
@@ -128,6 +130,7 @@ export default function Accounts() {
           username={session?.username || 'Admin'}
           searchFilter={searchQuery}
           onRefresh={refetch}
+          autoLoadBalance={isAdminRole}
         />
 
       </main>
