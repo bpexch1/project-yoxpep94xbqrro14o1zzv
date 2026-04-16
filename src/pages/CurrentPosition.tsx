@@ -32,7 +32,7 @@ export default function CurrentPosition() {
         .sort("-created_at")
         .exec();
       
-      // SuperAdmin/Company: see all pending bets
+      // Company role: see all pending bets
       if (downlineUsernames === null) return allPending;
 
       // Client: see only their own bets

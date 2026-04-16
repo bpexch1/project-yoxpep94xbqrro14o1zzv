@@ -30,7 +30,7 @@ export default function Dashboard() {
     queryKey: ["bets", session?.username, downlineUsernames],
     queryFn: async () => {
       if (!session) return [];
-      // SuperAdmin/Company: see all
+      // Company role: see all
       if (downlineUsernames === null) {
         return BetEntity.list();
       }

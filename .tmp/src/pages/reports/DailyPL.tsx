@@ -33,7 +33,7 @@ export default function DailyPL() {
       // Fetch bets based on role
       let all: any[];
       if (downlineUsernames === null) {
-        // SuperAdmin/Company: see all bets
+        // Company role: see all bets
         all = await BetEntity.query().sort("-created_at").exec();
       } else if (session.role === 'client') {
         all = await BetEntity.query().where("user_email", session.username).sort("-created_at").exec();

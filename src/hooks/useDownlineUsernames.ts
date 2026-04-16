@@ -7,8 +7,8 @@ export function useDownlineUsernames(sessionUsername: string | undefined, sessio
     queryFn: async () => {
       if (!sessionUsername) return null;
       const role = sessionRole?.toLowerCase();
-      // SuperAdmin and Company see all — return null meaning no filter
-      if (role === 'superadmin' || role === 'company') return null;
+      // Only Company sees all — return null meaning no filter
+      if (role === 'company') return null;
 
       // Level 1: direct children
       const level1 = await Client.filter({ parent_username: sessionUsername }, '-created_at');

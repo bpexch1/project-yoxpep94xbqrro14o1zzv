@@ -32,7 +32,7 @@ export default function BookDetail() {
       
       let all: any[];
       if (downlineUsernames === null) {
-        // SuperAdmin/Company: see all transactions
+        // Company role: see all transactions
         all = await TransactionEntity.query().sort("-created_at").exec();
       } else if (session.role === 'client') {
         all = await TransactionEntity.query().where("client_username", session.username).sort("-created_at").exec();

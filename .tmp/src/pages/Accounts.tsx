@@ -36,7 +36,8 @@ export default function Accounts() {
     queryFn: () => {
       if (!session) return [];
       const role = session.role?.toLowerCase();
-      if (role === 'superadmin' || role === 'company') {
+      // Only Company role can list all clients
+      if (role === 'company') {
         return ClientEntity.list("-created_at");
       }
       return ClientEntity.filter({ parent_username: session.username }, "-created_at");
