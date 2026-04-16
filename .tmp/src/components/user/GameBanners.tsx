@@ -1,16 +1,16 @@
 export function GameBanners() {
   const banners = [
     {
-      url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/6868a813-50ce-49e7-8efb-ea036e124f3f.png",
-      alt: "Aviator game",
-    },
-    {
       url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/637b4c3e-dc7b-4f3d-8c43-12d7cd0c3e0e.png",
       alt: "Sports Book",
     },
     {
       url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/f2541386-7298-4690-8799-1e288f5de967.png",
       alt: "AviatorX game",
+    },
+    {
+      url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/c7a9cb99-a862-46b6-9207-7147b05a3ca7.png",
+      alt: "European Roulette",
     },
   ];
 

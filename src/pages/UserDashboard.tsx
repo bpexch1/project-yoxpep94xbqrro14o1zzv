@@ -8,8 +8,19 @@ import { BettingMatchCard } from "@/components/user/BettingMatchCard";
 import { BetSlip } from "@/components/user/BetSlip";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { GameBanners } from "@/components/user/GameBanners";
+import { RaceSection } from "@/components/user/RaceSection";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Clock, Ticket, Rocket, Tent, Trophy } from "lucide-react";
+import { 
+  Loader2, 
+  Clock, 
+  Ticket, 
+  Rocket, 
+  Tent, 
+  Trophy, 
+  Volleyball, 
+  Disc,
+  Gamepad2
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function UserDashboard() {
@@ -111,7 +122,7 @@ export default function UserDashboard() {
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
-    if (activeFilter === "Inplay") return m.status === 'live';
+    if (activeFilter === "Inplay") return true; // Show all when Inplay is active per bpexch logic
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === 'soccer') return sport === 'football' || sport === 'soccer';
@@ -127,6 +138,34 @@ export default function UserDashboard() {
 
   const handleSelectBet = (match: any, selection: string, betType: 'back' | 'lay', odds: number) => {
     setActiveBet({ match, selection, betType, odds });
+  };
+
+  const horseRaceSlots = [
+    {time:"11:55 PM", venue:"Philadelphia (US)"}, 
+    {time:"12:00 AM", venue:"Newcastle (GB)"}, 
+    {time:"12:14 AM", venue:"Will Rogers Downs (US)"}, 
+    {time:"12:30 AM", venue:"Ascot (AU)"}, 
+    {time:"2:30 PM", venue:"Ascot (AU)"}, 
+    {time:"2:33 PM", venue:"Globe Derby (AU)"}, 
+    {time:"2:36 PM", venue:"Mildura (AU)"}, 
+    {time:"2:40 PM", venue:"Randwick (AU)"}
+  ];
+
+  const greyhoundSlots = [
+    {time:"11:56 PM", venue:"Yarmouth (GB)"}, 
+    {time:"11:58 PM", venue:"Harlow (GB)"}, 
+    {time:"12:01 AM", venue:"Nottingham (GB)"}, 
+    {time:"2:31 PM", venue:"The Gardens (AU)"}, 
+    {time:"2:34 PM", venue:"The Meadows (AU)"}, 
+    {time:"2:39 PM", venue:"Ballarat (AU)"}, 
+    {time:"2:42 PM", venue:"Cannington (AU)"}, 
+    {time:"2:45 PM", venue:"Dapto (AU)"}
+  ];
+
+  const getTabBg = (catId: string, isActive: boolean) => {
+    if (catId === 'Inplay' && isActive) return 'bg-[#16a085]';
+    if (catId === 'Soccer') return 'bg-[#111111]';
+    return isActive ? 'bg-[#1e3a5c]' : 'bg-[#254465]';
   };
 
   return (
@@ -148,6 +187,10 @@ export default function UserDashboard() {
         {/* Game Banners */}
         <GameBanners />
 
+        {/* Race Sections */}
+        <RaceSection title="Horse Race" icon={Trophy} slots={horseRaceSlots} />
+        <RaceSection title="Grey Hound" icon={Disc} slots={greyhoundSlots} />
+
         {/* Sport Category Tabs */}
         <div className="grid grid-cols-4 w-full bg-[#254465]">
           {categories.map((cat) => {
@@ -159,16 +202,14 @@ export default function UserDashboard() {
                 onClick={() => setActiveFilter(cat.id)}
                 className={cn(
                   "flex flex-col items-center justify-center py-2 relative transition-all border-r border-white/5",
-                  isActive ? "bg-[#16a085]" : "hover:bg-white/5"
+                  getTabBg(cat.id, isActive)
                 )}
               >
-                <div className="absolute top-1 right-1 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-4">
-                  <span className="bg-white/20 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
-                    {cat.count}
-                  </span>
-                </div>
-                <Icon className={cn("w-5 h-5 mb-1", isActive ? "text-white" : "text-white/60")} />
-                <span className={cn("text-[10px] font-bold uppercase tracking-widest", isActive ? "text-white" : "text-white/60")}>
+                <span className="text-white font-black text-[13px] leading-none mb-0.5">
+                  {cat.count}
+                </span>
+                <Icon className={cn("w-5 h-5 mb-0.5", isActive ? "text-white" : "text-white/60")} />
+                <span className={cn("text-[9px] font-bold uppercase tracking-widest", isActive ? "text-white" : "text-white/60")}>
                   {cat.label}
                 </span>
               </button>
@@ -178,25 +219,33 @@ export default function UserDashboard() {
         
         {/* Match List grouped by sport */}
         <div className="flex flex-col pb-20">
-          {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => (
-            <div key={sport} className="flex flex-col">
-              <div className="bg-[#e8eff5] border-b border-[#ccd9e5] px-4 py-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-[#1e3a5c] font-black text-xs uppercase tracking-wider">{sport}</span>
+          {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
+            // Pick an icon based on sport name
+            let SportIcon = Volleyball;
+            if (sport.toLowerCase().includes('cricket')) SportIcon = Trophy;
+            if (sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer')) SportIcon = Gamepad2;
+
+            return (
+              <div key={sport} className="flex flex-col">
+                <div className="bg-[#e8f0f5] border-b border-[#ccd9e5] px-3 py-2.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <SportIcon className="w-5 h-5 text-[#1e3a5c]" />
+                    <span className="text-[#1e3a5c] font-bold text-[13px]">{sport}</span>
+                  </div>
+                  <span className="text-[#1e3a5c]/50 font-bold text-[11px] uppercase tracking-wider">Matched</span>
                 </div>
-                <span className="text-[#1e3a5c]/40 font-black text-[10px] uppercase tracking-widest">Matched</span>
+                <div className="flex flex-col">
+                  {sportMatches.map((match: any) => (
+                    <BettingMatchCard 
+                      key={match.id} 
+                      match={match} 
+                      onSelectBet={handleSelectBet} 
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-col">
-                {sportMatches.map((match: any) => (
-                  <BettingMatchCard 
-                    key={match.id} 
-                    match={match} 
-                    onSelectBet={handleSelectBet} 
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Empty state */}
           {filteredMatches.length === 0 && (
