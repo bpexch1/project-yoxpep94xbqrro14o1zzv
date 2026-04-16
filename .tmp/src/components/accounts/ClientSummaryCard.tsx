@@ -101,154 +101,124 @@ export function ClientSummaryCard({
   };
 
   return (
-    <section className="bg-white border border-[#d0d0d0] shadow-sm rounded-xl overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <section className="bg-white border border-[#d0d0d0] shadow-sm rounded-[10px] overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif", boxShadow: "0 1px 3px rgba(0,0,0,.07)" }}>
       {/* Card title */}
       {!hideHeader && (
-        <div className="px-4 py-3 bg-white border-b border-[#d0d0d0]">
-          <span className="font-bold text-sm text-[#212529]">
+        <div className="px-4 py-2.5 bg-white border-b border-[#d0d0d0]">
+          <span className="font-bold text-[15px] text-[#212529]">
             {username} - Clients List{!isBalanceLoaded ? " | Default" : ""}
           </span>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-4 pt-4">
         {/* Stats table */}
-        <div className="px-4 pt-4 overflow-x-auto">
-          {!isBalanceLoaded ? (
-            <table className="w-full text-left border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center">Cash</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center">Users</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">0</span></td>
-                  <td className="py-2 px-1 border border-gray-300 text-center"><span className="text-sm font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
-                </tr>
-              </tbody>
-            </table>
-          ) : (
-            <table className="w-full text-left border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Received</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center">Cash</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
-                  <th className="py-2 px-1 border border-gray-300 font-bold text-[#212529] text-[11px] text-center leading-tight">Balance<br/>UpLine</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
-                  </td>
-                  <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className="text-sm font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
-                  </td>
-                  <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className={cn("text-sm font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.cash.toLocaleString()}</span>
-                  </td>
-                  <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className={cn("text-sm font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
-                      {totals.pl_downline.toLocaleString()}
-                    </span>
-                  </td>
-                  <td className="py-2 px-1 border border-gray-300 text-center">
-                    <span className={cn("text-sm font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.balance_upline.toLocaleString()}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          )}
+        <div className="px-4 overflow-x-auto">
+          <table className="w-full text-left border-collapse border border-[#ccc]">
+            <thead>
+              <tr className="bg-[#f8f9fa]">
+                {!isBalanceLoaded ? (
+                  <>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center">Cash</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center">Users</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Received</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center">Cash</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Balance<br/>UpLine</th>
+                  </>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {!isBalanceLoaded ? (
+                  <>
+                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
+                  </>
+                ) : (
+                  <>
+                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                      <span className="text-[13px] font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
+                    </td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                      <span className="text-[13px] font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
+                    </td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                      <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.cash.toLocaleString()}</span>
+                    </td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                      <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                        {totals.pl_downline.toLocaleString()}
+                      </span>
+                    </td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                      <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.balance_upline.toLocaleString()}</span>
+                    </td>
+                  </>
+                )}
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        {/* Action buttons + Legend merged row */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-4 py-3 gap-3">
-          {/* Left: Action buttons */}
-          <div className="flex gap-2">
-            {!hideCreateButton && (
-              <button
-                onClick={() => navigate("/accounts/create")}
-                style={{
-                  background: "#1a9e71",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 5,
-                  padding: "6px 14px",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  fontFamily: "Roboto, system-ui, sans-serif",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <UserPlus style={{ width: 14, height: 14 }} /> New User
-              </button>
-            )}
+        {/* Action buttons row */}
+        <div className="flex gap-2 px-4">
+          {!hideCreateButton && (
             <button
-              style={{
-                background: "#1a9e71",
-                color: "#fff",
-                border: "none",
-                borderRadius: 5,
-                padding: "6px 14px",
-                fontSize: 13,
-                fontWeight: 700,
-                fontFamily: "Roboto, system-ui, sans-serif",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                whiteSpace: "nowrap",
-              }}
+              onClick={() => navigate("/accounts/create")}
+              className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
             >
-              <BookOpen style={{ width: 14, height: 14 }} /> Account Ledger
+              <UserPlus className="w-3.5 h-3.5" /> New User
             </button>
-          </div>
+          )}
+          <button
+            className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <BookOpen className="w-3.5 h-3.5" /> Account Ledger
+          </button>
+        </div>
 
-          {/* Right: Legend */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-semibold text-[#212529]">
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm">C</div>
-              <span className="font-medium">Cash / Credit</span>
+        {/* Legend row */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 text-[11px] font-semibold text-[#212529]">
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">C</div>
+            <span>Cash / Credit</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#5dade2] text-white flex items-center justify-center rounded-sm shadow-sm">
+              <Pencil className="w-3 h-3" />
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#5dade2] text-white flex items-center justify-center rounded-sm">
-                < Pencil className="w-3 h-3" />
-              </div>
-              <span className="font-medium">Edit</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#3498db] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">L</div>
-              <span className="font-medium">Ledger</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">A</div>
-              <span className="font-medium">Active</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm">D</div>
-              <span className="font-medium">InActive</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 bg-[#e74c3c] text-white font-bold text-[10px] flex items-center justify-center rounded-sm">S</div>
-              <span className="font-medium">Settle Account</span>
-            </div>
+            <span>Edit</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#3498db] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">L</div>
+            <span>Ledger</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#1a9e71] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">A</div>
+            <span>Active</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">D</div>
+            <span>InActive</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-[#e74c3c] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">S</div>
+            <span>Settle Account</span>
           </div>
         </div>
 
         {/* Search row */}
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-1">
           <div className="flex items-center gap-2">
             <label className="text-sm font-semibold text-[#212529] whitespace-nowrap">Search:</label>
             <input
@@ -256,34 +226,23 @@ export function ClientSummaryCard({
               placeholder="Search username..."
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              style={{
-                flex: 1,
-                height: "34px",
-                border: "1px solid #d1d5db",
-                borderRadius: "5px",
-                padding: "0 10px",
-                fontSize: "13px",
-                color: "#374151",
-                fontFamily: "Roboto, system-ui, sans-serif",
-                outline: "none",
-                background: "#fff",
-              }}
+              className="flex-1 h-[34px] border border-[#d1d5db] rounded-[5px] px-2.5 text-[13px] outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* Main Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
+      <div className="overflow-x-auto mt-4">
+        <table className="w-full text-left text-[12px] border-collapse">
           <thead>
             {!isBalanceLoaded ? (
               <tr className="bg-[#1a9e71]">
-                <td colSpan={3} className="px-4 py-3 text-left">
+                <td colSpan={3} className="px-4 py-2 text-left">
                   <button
                     type="button"
                     onClick={handleLoadBalance}
-                    className="bg-[#f1c40f] hover:bg-yellow-400 active:bg-yellow-500 text-black font-bold text-xs px-5 py-2 rounded transition-colors cursor-pointer select-none"
+                    className="bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-[11px] px-4 py-1.5 rounded transition-colors cursor-pointer"
                   >
                     Load Balance
                   </button>
@@ -291,16 +250,15 @@ export function ClientSummaryCard({
               </tr>
             ) : (
               <tr className="bg-[#1a9e71] text-white">
-                <td className="px-4 py-3 font-bold text-sm">Total</td>
-                <td className="px-4 py-3 text-sm"></td>
-                <td className="px-4 py-3 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
+                <td className="px-4 py-2.5 font-bold text-sm">Total</td>
+                <td className="px-4 py-2.5 text-sm"></td>
+                <td className="px-4 py-2.5 font-bold text-sm text-right">{totals.credit_received.toLocaleString()}</td>
               </tr>
             )}
-            {/* Column headers — always visible */}
-            <tr className="bg-[#ecf0f1] border-b border-[#d5d8dc]">
-              <th className="px-3 lg:px-4 py-3 font-bold text-[#212529] text-[12px] border-r border-[#d5d8dc]">Username</th>
-              <th className="px-3 lg:px-4 py-3 font-bold text-[#212529] text-[12px] border-r border-[#d5d8dc]">Type</th>
-              <th className="px-3 lg:px-4 py-3 font-bold text-[#212529] text-[12px] text-right">Credit</th>
+            <tr className="bg-[#ecf0f1] border-y border-[#d5d8dc]">
+              <th className="px-4 py-2.5 font-bold text-[#212529] border-r border-[#d5d8dc]">Username</th>
+              <th className="px-4 py-2.5 font-bold text-[#212529] border-r border-[#d5d8dc]">Type</th>
+              <th className="px-4 py-2.5 font-bold text-[#212529] text-right">Credit</th>
             </tr>
           </thead>
           <tbody>

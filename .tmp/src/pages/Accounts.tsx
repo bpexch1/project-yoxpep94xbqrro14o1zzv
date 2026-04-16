@@ -58,7 +58,7 @@ export default function Accounts() {
         <div style={{
           background: "#fff",
           borderRadius: 10,
-          border: "1px solid #e5e7eb",
+          border: "1px solid #d0d0d0",
           boxShadow: "0 1px 3px rgba(0,0,0,.08)",
           marginBottom: 16,
           overflow: "hidden",
@@ -68,9 +68,10 @@ export default function Accounts() {
             alignItems: "center",
             gap: 8,
             padding: "10px 16px",
-            borderBottom: "1px solid #e5e7eb",
+            background: "#ecf0f1",
+            borderBottom: "1px solid #d0d0d0",
           }}>
-            <Filter style={{ width: 16, height: 16, fill: "#212529", color: "#212529", flexShrink: 0 }} />
+            <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
           <div style={{ padding: "12px 16px" }}>
@@ -86,7 +87,7 @@ export default function Accounts() {
                   minHeight: "40px",
                   maxHeight: "40px",
                   border: "1px solid #d1d5db",
-                  borderRadius: "7px",
+                  borderRadius: "4px",
                   padding: "0 12px",
                   fontSize: "14px",
                   color: "#374151",
