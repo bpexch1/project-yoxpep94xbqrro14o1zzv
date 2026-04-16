@@ -24,8 +24,8 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      const allClients = await Client.list();
-      const client = allClients.find((c: any) => c.username === username && c.password === password);
+      const results = await Client.filter({ username: username.trim() });
+      const client = results.find((c: any) => c.password === password);
       
       if (client) {
         setClientSession({
