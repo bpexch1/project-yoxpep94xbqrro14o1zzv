@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client, Transaction } from "@/entities";
+import { handleTransaction } from "@/functions";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ChevronLeft, 
@@ -66,33 +67,17 @@ export default function CashCreditPage() {
     
     setIsSubmittingDeposit(true);
     try {
-      if (activeTab === 'cash') {
-        const before = client.cash || 0;
-        await Transaction.create({
-          client_username: client.username,
-          type: 'cash',
-          amount: amount,
-          description: depositDesc,
-          before_balance: before,
-          after_balance: before + amount,
-        });
-        await Client.update(client.id, { cash: before + amount });
-      } else {
-        const beforeRec = client.credit_received || 0;
-        const beforeRem = client.credit_remaining || 0;
-        await Transaction.create({
-          client_username: client.username,
-          type: 'credit',
-          amount: amount,
-          description: depositDesc,
-          before_balance: beforeRem,
-          after_balance: beforeRem + amount,
-        });
-        await Client.update(client.id, {
-          credit_received: beforeRec + amount,
-          credit_remaining: beforeRem + amount,
-        });
-      }
+      await handleTransaction({
+        clientId: client.id,
+        clientUsername: client.username,
+        tabType: activeTab,
+        transactionType: 'deposit',
+        amount,
+        description: depositDesc,
+        beforeCash: client.cash || 0,
+        beforeCreditReceived: client.credit_received || 0,
+        beforeCreditRemaining: client.credit_remaining || 0,
+      });
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });
       queryClient.invalidateQueries({ queryKey: ["transactions", username] });
@@ -116,29 +101,17 @@ export default function CashCreditPage() {
     
     setIsSubmittingWithdraw(true);
     try {
-      if (activeTab === 'cash') {
-        const before = client.cash || 0;
-        await Transaction.create({
-          client_username: client.username,
-          type: 'cash',
-          amount: -amount,
-          description: withdrawDesc,
-          before_balance: before,
-          after_balance: before - amount,
-        });
-        await Client.update(client.id, { cash: before - amount });
-      } else {
-        const beforeRem = client.credit_remaining || 0;
-        await Transaction.create({
-          client_username: client.username,
-          type: 'credit',
-          amount: -amount,
-          description: withdrawDesc,
-          before_balance: beforeRem,
-          after_balance: beforeRem - amount,
-        });
-        await Client.update(client.id, { credit_remaining: beforeRem - amount });
-      }
+      await handleTransaction({
+        clientId: client.id,
+        clientUsername: client.username,
+        tabType: activeTab,
+        transactionType: 'withdraw',
+        amount,
+        description: withdrawDesc,
+        beforeCash: client.cash || 0,
+        beforeCreditReceived: client.credit_received || 0,
+        beforeCreditRemaining: client.credit_remaining || 0,
+      });
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });
       queryClient.invalidateQueries({ queryKey: ["transactions", username] });
