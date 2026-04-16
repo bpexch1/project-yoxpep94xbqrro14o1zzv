@@ -1,21 +1,41 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Trophy, Volleyball, Tent, Ticket, House, Dog, Book, Star, Globe, LayoutGrid, Gamepad2, Rocket, BarChart2, Laptop } from "lucide-react";
+import {
+  Volleyball,
+  Circle,
+  Sword,
+  Zap,
+  Dog,
+  BookOpen,
+  Star,
+  Globe,
+  Coins,
+  Gamepad2,
+  Layers,
+  Rocket,
+  LayoutGrid,
+  BarChart3,
+  List,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarItemProps {
   icon: React.ElementType;
   label: string;
   onClick?: () => void;
+  className?: string;
 }
 
-function SidebarItem({ icon: Icon, label, onClick }: SidebarItemProps) {
+function SidebarItem({ icon: Icon, label, onClick, className }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-4 py-3 text-white/90 hover:bg-white/10 border-b border-white/5 transition-colors group"
+      className={cn(
+        "flex items-center gap-4 w-full px-5 py-[15px] border-b border-white/10 hover:bg-white/10 transition-colors group",
+        className
+      )}
     >
-      <Icon className="w-4 h-4 text-white/50 group-hover:text-white" />
-      <span className="text-[13px] font-medium">{label}</span>
+      <Icon className="w-6 h-6 text-white/80 group-hover:text-white shrink-0" />
+      <span className="text-[15px] text-white font-medium tracking-wide">{label}</span>
     </button>
   );
 }
@@ -26,35 +46,41 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
-  const menuItems = [
+  // Main menu items
+  const mainItems = [
     { icon: Volleyball, label: "Soccer" },
-    { icon: Tent, label: "Tennis" },
-    { icon: Ticket, label: "Cricket" },
-    { icon: House, label: "Horse Race" },
+    { icon: Circle, label: "Tennis" },
+    { icon: Sword, label: "Cricket" },
+    { icon: Zap, label: "Horse Race" },
     { icon: Dog, label: "Greyhound" },
-    { icon: Book, label: "Sports Book" },
+    { icon: BookOpen, label: "Sports Book" },
     { icon: Star, label: "RoyalStar Casino" },
     { icon: Star, label: "Star Casino" },
     { icon: Globe, label: "World Casino" },
-    { icon: Laptop, label: "Royal Casino" },
+    { icon: Coins, label: "Royal Casino" },
     { icon: Gamepad2, label: "BetFairGames" },
-    { icon: Star, label: "TeenPatti Studio" },
+    { icon: Layers, label: "TeenPatti Studio" },
     { icon: Rocket, label: "Galaxy Casino" },
-    { icon: BarChart2, label: "Current Position" },
+  ];
+
+  // Bottom group (after divider)
+  const bottomItems = [
+    { icon: BarChart3, label: "Current Position" },
     { icon: LayoutGrid, label: "All Sports" },
+    { icon: List, label: "Results" },
   ];
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay */}
+          {/* Overlay - Lighter overlay as requested */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"
+            className="fixed inset-0 bg-black/40 z-[100]"
           />
 
           {/* Sidebar */}
@@ -63,28 +89,27 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 bottom-0 w-[280px] bg-[#1e3a5c] z-[101] shadow-2xl flex flex-col"
+            className="fixed top-0 left-0 bottom-0 w-[270px] bg-[#1e3a5c] z-[101] flex flex-col shadow-2xl"
           >
-            {/* Header */}
-            <div className="h-12 flex items-center justify-between px-4 border-b border-white/10 shrink-0">
-              <span className="text-white font-bold text-sm tracking-wide">Dashboard</span>
-              <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors">
-                <X className="w-5 h-5 text-white/70" />
-              </button>
-            </div>
+            {/* Top spacing / Divider */}
+            <div className="h-12 flex items-center shrink-0 border-b border-white/20" />
 
-            {/* Menu Items */}
+            {/* Menu Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar">
-              {menuItems.map((item, idx) => (
-                <SidebarItem key={idx} icon={item.icon} label={item.label} />
-              ))}
-            </div>
+              <div className="flex flex-col">
+                {mainItems.map((item, idx) => (
+                  <SidebarItem key={idx} icon={item.icon} label={item.label} />
+                ))}
+              </div>
 
-            {/* Footer / Branding */}
-            <div className="p-4 bg-black/20">
-              <div className="flex items-center gap-2 opacity-50">
-                <Trophy className="w-4 h-4 text-white" />
-                <span className="text-white text-[10px] font-black tracking-tighter uppercase">BETPRO EXCHANGE</span>
+              {/* Thicker divider gap */}
+              <div className="h-2 bg-black/10 border-t border-b border-white/10 my-0" />
+              <div className="border-t-2 border-white/20" />
+
+              <div className="flex flex-col">
+                {bottomItems.map((item, idx) => (
+                  <SidebarItem key={idx} icon={item.icon} label={item.label} />
+                ))}
               </div>
             </div>
           </motion.div>

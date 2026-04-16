@@ -1,6 +1,6 @@
 import { User } from "@/entities";
 import { Button } from "@/components/ui/button";
-import { Menu, ChevronDown, Bell } from "lucide-react";
+import { Menu, X, ChevronDown, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { clearClientSession } from "@/hooks/useClientAuth";
 
@@ -9,12 +9,19 @@ interface UserHeaderProps {
   clientBalance?: number;
   creditRemaining?: number;
   onMenuToggle: () => void;
+  sidebarOpen?: boolean;
   // Included as requested by plan but sport tabs move to main content
   activeFilter?: string;
   onFilterChange?: (f: string) => void;
 }
 
-export function UserHeader({ userEmail, clientBalance = 0, creditRemaining = 0, onMenuToggle }: UserHeaderProps) {
+export function UserHeader({ 
+  userEmail, 
+  clientBalance = 0, 
+  creditRemaining = 0, 
+  onMenuToggle,
+  sidebarOpen 
+}: UserHeaderProps) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -30,9 +37,13 @@ export function UserHeader({ userEmail, clientBalance = 0, creditRemaining = 0, 
         <div className="flex items-center gap-3">
           <button 
             onClick={onMenuToggle}
-            className="text-white hover:text-white/80 transition-colors"
+            className="text-white hover:text-white/80 transition-colors z-[110]"
           >
-            <Menu className="w-6 h-6" />
+            {sidebarOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
           <span className="text-white font-bold text-sm tracking-wide">Dashboard</span>
         </div>
@@ -86,5 +97,3 @@ export function UserHeader({ userEmail, clientBalance = 0, creditRemaining = 0, 
     </header>
   );
 }
-
-// Add marquee animation in index.css if not present, but for now using inline-ish

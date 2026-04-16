@@ -135,7 +135,8 @@ export default function UserDashboard() {
         userEmail={session.username} 
         clientBalance={clientBalance}
         creditRemaining={creditRemaining}
-        onMenuToggle={() => setSidebarOpen(true)}
+        sidebarOpen={sidebarOpen}
+        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
       <DashboardSidebar 
