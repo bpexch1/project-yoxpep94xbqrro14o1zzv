@@ -69,16 +69,16 @@ export default function Dashboard() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div className="bg-[#ececec] pb-16 min-h-screen" style={arialFont}>
+    <div className="bg-[#f5f5f5] pb-16 min-h-screen" style={arialFont}>
       <main className="px-3 pt-3 pb-8 max-w-4xl mx-auto">
 
         {/* Search Users Section */}
-        <section className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] shadow-none mb-3 overflow-hidden">
-          <div className="bg-[#ececec] px-3 py-2 border-b border-[#d4d4d4] flex items-center gap-2">
+        <section className="bg-white border border-[#d5d8dc] rounded-[10px] shadow-sm mb-4 overflow-hidden">
+          <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
             <Filter className="w-4 h-4 fill-[#333] text-[#333]" />
             <span className="font-bold text-[#333] text-sm">Search-Users</span>
           </div>
-          <div className="p-3 pb-6 flex gap-2">
+          <div className="p-4 flex gap-2">
             <input
               type="text"
               placeholder="Username"
@@ -89,7 +89,7 @@ export default function Dashboard() {
             />
             <button
               onClick={handleSearch}
-              className="bg-[#12b886] text-white px-4 h-[40px] rounded text-sm font-bold flex items-center gap-1.5 hover:bg-[#0ca678] transition-colors"
+              className="bg-[#12b886] text-white px-5 h-[40px] rounded-[7px] text-sm font-bold flex items-center gap-1.5 hover:bg-[#0ca678] transition-colors"
             >
               <Search className="w-3.5 h-3.5" />
               Search
@@ -98,8 +98,8 @@ export default function Dashboard() {
         </section>
 
         {/* Sport Highlights Card */}
-        <section className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] shadow-none overflow-hidden">
-          <div className="bg-[#ececec] px-3 py-2 border-b border-[#d4d4d4] flex items-center gap-3">
+        <section className="bg-white border border-[#d5d8dc] rounded-[10px] shadow-sm overflow-hidden">
+          <div className="bg-[#e8e8e8] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-3">
             <span className="font-bold text-[#333] text-sm">Sport Highlights</span>
             <button
               onClick={handleRefresh}
@@ -122,7 +122,7 @@ export default function Dashboard() {
                 <tbody>
                   {Object.entries(groupedMatches).map(([sport, sportMatches]) => (
                     <Fragment key={sport}>
-                      <tr className="bg-[#e8e8e8]">
+                      <tr className="bg-[#f5f5f5]">
                         <td className="border border-[#d0d0d0] px-3 py-2 font-bold text-[#333] text-[12px]">{sport}</td>
                         <td className="border border-[#d0d0d0] px-3 py-2 font-bold text-[#333] w-32 text-[12px] text-right">Amount</td>
                       </tr>

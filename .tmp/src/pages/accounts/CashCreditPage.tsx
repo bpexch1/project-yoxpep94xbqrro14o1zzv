@@ -154,7 +154,7 @@ export default function CashCreditPage() {
 
   if (isFetchingClient) {
     return (
-      <div className="min-h-screen bg-[#ececec] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#12b886]" />
       </div>
     );
@@ -162,7 +162,7 @@ export default function CashCreditPage() {
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#ececec] flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center p-4">
         <h1 className="text-xl font-bold text-[#333] mb-4">Client not found</h1>
         <button onClick={() => navigate(-1)} className="bg-white border border-[#cccccc] px-4 h-10 rounded-[4px] flex items-center gap-2 font-bold text-[#333]">
           <ChevronLeft className="w-4 h-4" /> Go Back
@@ -172,15 +172,15 @@ export default function CashCreditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#ececec] pb-12" style={arialFont}>
-      <main className="max-w-[420px] mx-auto p-3">
+    <div className="min-h-screen bg-[#f5f5f5] pb-12" style={arialFont}>
+      <main className="max-w-[480px] mx-auto p-3">
         
         {/* TAB SWITCHER */}
-        <div className="flex bg-[#ececec] rounded-[6px] border border-[#d4d4d4] overflow-hidden mb-4 p-1">
+        <div className="flex bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden mb-4 p-1 shadow-sm">
           <button
             onClick={() => setActiveTab('cash')}
             className={cn(
-              "flex-1 h-10 text-[14px] font-bold transition-all rounded-[4px]",
+              "flex-1 h-10 text-[14px] font-bold transition-all rounded-[7px]",
               activeTab === 'cash'
                 ? "bg-[#12b886] text-white"
                 : "bg-transparent text-[#333]"
@@ -191,7 +191,7 @@ export default function CashCreditPage() {
           <button
             onClick={() => setActiveTab('credit')}
             className={cn(
-              "flex-1 h-10 text-[14px] font-bold transition-all rounded-[4px]",
+              "flex-1 h-10 text-[14px] font-bold transition-all rounded-[7px]",
               activeTab === 'credit'
                 ? "bg-[#12b886] text-white"
                 : "bg-transparent text-[#333]"
@@ -202,16 +202,16 @@ export default function CashCreditPage() {
         </div>
 
         {/* CLIENT SUMMARY CARD */}
-        <div className="bg-[#f3f3f3] rounded-[6px] border border-[#d4d4d4] overflow-hidden mb-4 shadow-none">
-          <div className="bg-[#ececec] px-3 py-2 border-b border-[#d4d4d4] flex items-center justify-between">
+        <div className="bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden mb-4 shadow-sm">
+          <div className="bg-[#ecf0f1] px-3 py-2 border-b border-[#d5d8dc] flex items-center justify-between">
             <h2 className="text-[14px] font-bold text-[#333]">{client.username}</h2>
             <div className="text-[11px] font-bold text-[#12b886] uppercase">
               {activeTab} Mode
             </div>
           </div>
-          <div className="p-3">
-            <div className="grid grid-cols-3 gap-0 border border-[#d0d0d0] rounded-[4px] overflow-hidden text-center bg-white">
-              <div className="py-2 border-r border-[#d0d0d0]">
+          <div className="p-4">
+            <div className="grid grid-cols-3 gap-0 border border-[#d0d0d0] rounded-[7px] overflow-hidden text-center bg-[#f9f9f9]">
+              <div className="py-2.5 border-r border-[#d0d0d0]">
                 <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">
                   {activeTab === 'cash' ? 'Credit' : 'Limit'}
                 </p>
@@ -219,7 +219,7 @@ export default function CashCreditPage() {
                   {(client?.credit_remaining || 0).toLocaleString()}
                 </p>
               </div>
-              <div className="py-2 border-r border-[#d0d0d0]">
+              <div className="py-2.5 border-r border-[#d0d0d0]">
                 <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">
                   {activeTab === 'cash' ? 'Balance' : 'Credit'}
                 </p>
@@ -227,7 +227,7 @@ export default function CashCreditPage() {
                   {(activeTab === 'cash' ? client.cash : client.credit_remaining || 0).toLocaleString()}
                 </p>
               </div>
-              <div className="py-2">
+              <div className="py-2.5">
                 <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">
                   Available
                 </p>
@@ -240,12 +240,12 @@ export default function CashCreditPage() {
         </div>
 
         {/* DEPOSIT SECTION */}
-        <div className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] overflow-hidden mb-4">
-          <div className="bg-[#ececec] px-3 py-2 border-b border-[#d4d4d4] flex items-center gap-2">
+        <div className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden mb-4 shadow-sm">
+          <div className="bg-[#ecf0f1] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
             <ArrowUpCircle className="w-4 h-4 text-[#12b886]" />
             <span className="text-[13px] font-bold text-[#333]">DEPOSIT {activeTab.toUpperCase()}</span>
           </div>
-          <div className="p-3 space-y-3">
+          <div className="p-4 space-y-3">
             <div>
               <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Description</label>
               <input
@@ -268,7 +268,7 @@ export default function CashCreditPage() {
             <button
               onClick={handleDeposit}
               disabled={isSubmittingDeposit}
-              className="w-full bg-[#12b886] text-white font-bold h-10 rounded-[4px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-none"
+              className="w-full bg-[#12b886] text-white font-bold h-10 rounded-[7px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-sm"
             >
               {isSubmittingDeposit && <Loader2 className="w-4 h-4 animate-spin" />}
               Submit Deposit
@@ -277,12 +277,12 @@ export default function CashCreditPage() {
         </div>
 
         {/* WITHDRAW SECTION */}
-        <div className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] overflow-hidden mb-4">
-          <div className="bg-[#ececec] px-3 py-2 border-b border-[#d4d4d4] flex items-center gap-2">
+        <div className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden mb-4 shadow-sm">
+          <div className="bg-[#ecf0f1] px-3 py-2 border-b border-[#d5d8dc] flex items-center gap-2">
             <ArrowDownCircle className="w-4 h-4 text-[#e74c3c]" />
             <span className="text-[13px] font-bold text-[#333]">WITHDRAW {activeTab.toUpperCase()}</span>
           </div>
-          <div className="p-3 space-y-3">
+          <div className="p-4 space-y-3">
             <div>
               <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Description</label>
               <input
@@ -305,7 +305,7 @@ export default function CashCreditPage() {
             <button
               onClick={handleWithdraw}
               disabled={isSubmittingWithdraw}
-              className="w-full bg-[#e74c3c] text-white font-bold h-10 rounded-[4px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-none"
+              className="w-full bg-[#e74c3c] text-white font-bold h-10 rounded-[7px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-sm"
             >
               {isSubmittingWithdraw && <Loader2 className="w-4 h-4 animate-spin" />}
               Submit Withdrawal
@@ -314,8 +314,8 @@ export default function CashCreditPage() {
         </div>
 
         {/* RECENT HISTORY */}
-        <div className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] overflow-hidden mb-4">
-          <div className="px-3 py-2 border-b border-[#d4d4d4] bg-[#ececec] flex items-center justify-between">
+        <div className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden mb-4 shadow-sm">
+          <div className="px-3 py-2 border-b border-[#d5d8dc] bg-[#ecf0f1] flex items-center justify-between">
             <h3 className="font-bold text-[#333] text-[13px] flex items-center gap-2">
               <History className="w-4 h-4 text-[#12b886]" />
               {activeTab} History
@@ -330,7 +330,7 @@ export default function CashCreditPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[12px] border-collapse">
               <thead>
-                <tr className="bg-[#e8e8e8] border-b border-[#d0d0d0]">
+                <tr className="bg-[#f5f5f5] border-b border-[#d0d0d0]">
                   <th className="px-3 py-2 font-bold text-[#333] border-r border-[#d0d0d0]">Date</th>
                   <th className="px-3 py-2 font-bold text-[#333] border-r border-[#d0d0d0]">Desc</th>
                   <th className="px-3 py-2 font-bold text-[#333] text-right">Amount</th>
@@ -365,7 +365,7 @@ export default function CashCreditPage() {
         {/* BACK BUTTON */}
         <button
           onClick={() => navigate(-1)}
-          className="w-full flex items-center justify-center gap-2 bg-[#ececec] text-[#333] font-bold h-10 rounded-[4px] border border-[#cccccc] transition-all"
+          className="w-full flex items-center justify-center gap-2 bg-white text-[#333] font-bold h-10 rounded-[7px] border border-[#d5d8dc] transition-all hover:bg-gray-50 shadow-sm"
         >
           <ChevronLeft className="w-4 h-4" />
           Back

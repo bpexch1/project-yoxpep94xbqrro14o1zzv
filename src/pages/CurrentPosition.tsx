@@ -84,8 +84,8 @@ export default function CurrentPosition() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div className="bg-[#ececec] min-h-screen pb-16" style={arialFont}>
-      <main className="px-2 pt-4 pb-8 max-w-6xl mx-auto">
+    <div className="bg-[#f5f5f5] min-h-screen pb-16" style={arialFont}>
+      <main className="px-3 pt-4 pb-8 max-w-6xl mx-auto">
         
         <div className="mx-1 mb-4 flex items-end justify-between">
           <div>
@@ -100,12 +100,12 @@ export default function CurrentPosition() {
 
         {/* Filters Card */}
         <div className="mb-4">
-          <section className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] overflow-hidden shadow-none">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-[#d4d4d4] bg-[#ececec]">
+          <section className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden shadow-sm">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-[#d5d8dc] bg-[#ecf0f1]">
               <Filter className="w-4 h-4 text-[#333]" />
               <span className="font-bold text-[#333] text-sm">Filter Pending Bets</span>
             </div>
-            <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Match Name</label>
                 <input
@@ -129,7 +129,7 @@ export default function CurrentPosition() {
               <div className="flex gap-2">
                 <button 
                   onClick={handleRefresh}
-                  className="flex-1 bg-[#12b886] text-white h-[36px] rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0ca678]"
+                  className="flex-1 bg-[#12b886] text-white h-[36px] rounded-[7px] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0ca678]"
                 >
                   <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
                   Refresh
@@ -138,7 +138,7 @@ export default function CurrentPosition() {
                   <button
                     onClick={handleClearAllBets}
                     disabled={isClearingAll}
-                    className="bg-[#e74c3c] text-white h-[36px] px-3 rounded text-sm font-bold flex items-center justify-center hover:bg-red-700 disabled:opacity-60"
+                    className="bg-[#e74c3c] text-white h-[36px] px-3 rounded-[7px] text-sm font-bold flex items-center justify-center hover:bg-red-700 disabled:opacity-60"
                   >
                     {isClearingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                   </button>
@@ -156,7 +156,7 @@ export default function CurrentPosition() {
             { label: "Total Win", value: totalPotentialWin.toLocaleString(), color: "text-[#12b886]" },
             { label: "Markets", value: new Set(filteredBets?.map(b => b.match_id)).size, color: "text-[#333]" }
           ].map((stat, idx) => (
-            <div key={idx} className="bg-[#f3f3f3] p-2 border border-[#d4d4d4] rounded-[6px]">
+            <div key={idx} className="bg-white p-2 border border-[#d5d8dc] rounded-[10px] shadow-sm">
               <div className="text-[9px] text-gray-500 uppercase font-bold">{stat.label}</div>
               <div className={cn("text-[15px] font-bold", stat.color)}>{stat.value}</div>
             </div>
@@ -164,15 +164,15 @@ export default function CurrentPosition() {
         </div>
 
         {/* Report Table */}
-        <section className="bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] overflow-hidden shadow-none">
+        <section className="bg-white border border-[#d5d8dc] rounded-[10px] overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-[12px] border-collapse">
               <thead>
-                <tr className="bg-[#e8e8e8] text-[#333] border-b border-[#d0d0d0]">
-                  <th className="border-r border-[#d0d0d0] px-2 py-2 text-left font-bold">User</th>
-                  <th className="border-r border-[#d0d0d0] px-2 py-2 text-left font-bold">Match</th>
-                  <th className="border-r border-[#d0d0d0] px-2 py-2 text-center font-bold">B/L</th>
-                  <th className="border-r border-[#d0d0d0] px-2 py-2 text-center font-bold">Odds</th>
+                <tr className="bg-[#ecf0f1] text-[#333] border-b border-[#d5d8dc]">
+                  <th className="border-r border-[#d5d8dc] px-2 py-2 text-left font-bold">User</th>
+                  <th className="border-r border-[#d5d8dc] px-2 py-2 text-left font-bold">Match</th>
+                  <th className="border-r border-[#d5d8dc] px-2 py-2 text-center font-bold">B/L</th>
+                  <th className="border-r border-[#d5d8dc] px-2 py-2 text-center font-bold">Odds</th>
                   <th className="px-2 py-2 text-right font-bold">Stake</th>
                 </tr>
               </thead>
@@ -185,14 +185,14 @@ export default function CurrentPosition() {
                   </tr>
                 ) : filteredBets && filteredBets.length > 0 ? (
                   filteredBets.map((b, i) => (
-                    <tr key={b.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "border-b border-[#d0d0d0] h-[34px]")}>
-                      <td className="border-r border-[#d0d0d0] px-2 py-1 text-[#12b886] font-bold whitespace-nowrap">
+                    <tr key={b.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "border-b border-[#d5d8dc] h-[34px]")}>
+                      <td className="border-r border-[#d5d8dc] px-2 py-1 text-[#12b886] font-bold whitespace-nowrap">
                         {b.user_email?.split('@')[0]}
                       </td>
-                      <td className="border-r border-[#d0d0d0] px-2 py-1 text-[#333] font-medium truncate max-w-[120px]">
+                      <td className="border-r border-[#d5d8dc] px-2 py-1 text-[#333] font-medium truncate max-w-[120px]">
                         {b.match_title}
                       </td>
-                      <td className="border-r border-[#d0d0d0] px-2 py-1 text-center font-bold">
+                      <td className="border-r border-[#d5d8dc] px-2 py-1 text-center font-bold">
                         <span className={cn(
                           "px-1.5 py-0.5 rounded-[2px] text-[10px] uppercase inline-block min-w-[32px]",
                           b.bet_type === "back" ? "bg-[#3498db] text-white" : "bg-[#e74c3c] text-white"
@@ -200,7 +200,7 @@ export default function CurrentPosition() {
                           {b.bet_type}
                         </span>
                       </td>
-                      <td className="border-r border-[#d0d0d0] px-2 py-1 text-center font-bold text-[#333]">
+                      <td className="border-r border-[#d5d8dc] px-2 py-1 text-center font-bold text-[#333]">
                         {b.odds}
                       </td>
                       <td className="px-2 py-1 text-right font-bold text-[#333]">

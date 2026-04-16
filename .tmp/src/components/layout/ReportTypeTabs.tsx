@@ -26,21 +26,22 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
   return (
     <div style={{
-      background: "#f3f3f3",
-      borderRadius: 6,
-      border: "1px solid #d4d4d4",
-      marginBottom: 14,
+      background: "#fff",
+      borderRadius: 10,
+      border: "1px solid #d0d0d0",
+      marginBottom: 16,
       overflow: "hidden",
       fontFamily: arialFont,
+      boxShadow: "0 1px 3px rgba(0,0,0,.08)",
     }}>
       {/* Header bar */}
       <div style={{
         display: "flex",
         alignItems: "center",
         gap: 8,
-        padding: "8px 12px",
-        background: "#ececec",
-        borderBottom: "1px solid #d4d4d4",
+        padding: "10px 16px",
+        background: "#ecf0f1",
+        borderBottom: "1px solid #d0d0d0",
       }}>
         <Filter style={{ width: 14, height: 14, color: "#333", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 14, color: "#333" }}>Report Type</span>
@@ -50,8 +51,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "6px",
-        padding: "10px 10px",
+        gap: "8px",
+        padding: "10px 12px 12px",
       }}>
         {tabs.map((tab) => {
           const isActive = currentId === tab.id;
@@ -67,12 +68,12 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 maxHeight: "38px",
                 width: "100%",
                 border: `1.5px solid #12b886`,
-                borderRadius: "4px",
+                borderRadius: "7px",
                 background: isActive ? "#12b886" : "#fff",
                 color: isActive ? "#fff" : "#12b886",
                 fontFamily: arialFont,
-                fontSize: isCommission ? "11px" : "13px",
-                fontWeight: 600,
+                fontSize: isCommission ? "11px" : "12px",
+                fontWeight: 500,
                 cursor: "pointer",
                 transition: "background .15s, color .15s",
                 whiteSpace: "nowrap",

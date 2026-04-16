@@ -31,15 +31,15 @@ export default function AccountView() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div className="bg-[#ececec] min-h-screen pb-16" style={arialFont}>
+    <div className="bg-[#f5f5f5] min-h-screen pb-16" style={arialFont}>
       <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
         <div className="h-3" />
         
         {/* Breadcrumb / Back Bar */}
-        <div className="mx-3 mb-3 flex items-center gap-2 bg-[#f3f3f3] border border-[#d4d4d4] rounded-[6px] p-3 shadow-none">
+        <div className="mx-3 mb-3 flex items-center gap-2 bg-white border border-[#d4d4d4] rounded-[10px] p-3 shadow-sm">
           <button 
             onClick={() => navigate("/accounts")}
-            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
           >
             <ChevronLeft className="w-5 h-5 text-[#333]" />
           </button>

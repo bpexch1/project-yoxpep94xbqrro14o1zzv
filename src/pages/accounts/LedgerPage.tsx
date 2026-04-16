@@ -67,15 +67,15 @@ export default function LedgerPage() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div className="min-h-screen bg-[#ececec] pb-12" style={arialFont}>
-      <main className="max-w-[420px] mx-auto p-3">
+    <div className="min-h-screen bg-[#f5f5f5] pb-12" style={arialFont}>
+      <main className="max-w-[540px] mx-auto p-3">
         
         {/* Header Bar */}
-        <div className="flex items-center justify-between mb-3 bg-[#f3f3f3] p-3 rounded-[6px] border border-[#d4d4d4]">
+        <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-[10px] border border-[#d5d8dc] shadow-sm">
           <div className="flex items-center gap-2">
             <button 
               onClick={() => navigate(-1)}
-              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-[#333]" />
             </button>
@@ -86,22 +86,22 @@ export default function LedgerPage() {
               </p>
             </div>
           </div>
-          <button className="p-2 text-[#12b886]">
+          <button className="p-2 text-[#12b886] hover:bg-gray-50 rounded-full transition-colors">
             <Download className="w-5 h-5" />
           </button>
         </div>
 
         {/* Filters */}
-        <div className="flex bg-[#ececec] rounded-[6px] overflow-hidden mb-4 p-1">
+        <div className="flex bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden mb-4 p-1 shadow-sm">
           {(['all', 'cash', 'credit'] as const).map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
               className={cn(
-                "flex-1 h-9 text-[11px] font-bold uppercase tracking-widest transition-all rounded-[4px]",
+                "flex-1 h-9 text-[11px] font-bold uppercase tracking-widest transition-all rounded-[7px]",
                 filterType === type
                   ? "bg-[#12b886] text-white"
-                  : "text-[#7f8c8d]"
+                  : "text-[#7f8c8d] hover:bg-gray-50"
               )}
             >
               {type}
@@ -111,15 +111,15 @@ export default function LedgerPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="bg-[#f3f3f3] p-2 rounded-[6px] border border-[#d4d4d4]">
+          <div className="bg-white p-3 rounded-[10px] border border-[#d5d8dc] shadow-sm text-center">
             <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">Deposits</p>
             <p className="text-[13px] font-bold text-[#12b886]">{formatAmount(summary.deposits)}</p>
           </div>
-          <div className="bg-[#f3f3f3] p-2 rounded-[6px] border border-[#d4d4d4]">
+          <div className="bg-white p-3 rounded-[10px] border border-[#d5d8dc] shadow-sm text-center">
             <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">Withdraw</p>
             <p className="text-[13px] font-bold text-[#e74c3c]">{formatAmount(summary.withdrawals)}</p>
           </div>
-          <div className="bg-[#f3f3f3] p-2 rounded-[6px] border border-[#d4d4d4]">
+          <div className="bg-white p-3 rounded-[10px] border border-[#d5d8dc] shadow-sm text-center">
             <p className="text-[9px] font-bold text-gray-500 uppercase mb-0.5">Net</p>
             <p className={cn("text-[13px] font-bold", netBalance >= 0 ? "text-blue-600" : "text-[#e74c3c]")}>
               {formatAmount(netBalance)}
@@ -128,14 +128,14 @@ export default function LedgerPage() {
         </div>
 
         {/* Ledger Table Card */}
-        <div className="bg-[#f3f3f3] rounded-[6px] border border-[#d4d4d4] overflow-hidden">
-          <div className="px-3 py-2 bg-[#ececec] border-b border-[#d4d4d4] flex items-center justify-between">
+        <div className="bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden shadow-sm">
+          <div className="px-3 py-2 bg-[#ecf0f1] border-b border-[#d5d8dc] flex items-center justify-between">
             <h3 className="font-bold text-[#333] text-[13px]">Transactions</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[11px] border-collapse">
               <thead>
-                <tr className="bg-[#e8e8e8] border-b border-[#d0d0d0]">
+                <tr className="bg-[#f5f5f5] border-b border-[#d0d0d0]">
                   <th className="px-2 py-2 font-bold text-[#333] border-r border-[#d0d0d0]">Date</th>
                   <th className="px-2 py-2 font-bold text-[#333] border-r border-[#d0d0d0]">Desc</th>
                   <th className="px-2 py-2 font-bold text-[#12b886] text-right border-r border-[#d0d0d0]">Dep</th>
@@ -160,7 +160,7 @@ export default function LedgerPage() {
               </tbody>
             </table>
           </div>
-          <div className="bg-[#e8e8e8] px-3 py-2 border-t border-[#d0d0d0] flex justify-between items-center">
+          <div className="bg-[#f5f5f5] px-3 py-2 border-t border-[#d0d0d0] flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#333]">
               Entries: {filtered.length}
             </span>

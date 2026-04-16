@@ -53,8 +53,8 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'bg-primary': '#ececec',
-				'bg-card': '#f3f3f3',
+				'bg-primary': '#f5f5f5',
+				'bg-card': '#ffffff',
 				'accent-green': '#12b886',
 				'accent-blue': '#3d6b8b',
 				'accent-pink': '#e74c3c',
@@ -63,7 +63,7 @@ export default {
 				'border-green': '#20c997',
 				'brand-blue': '#2c3e50',
 				'brand-blue-dark': '#1e2d3d',
-				'brand-bg': '#ececec',
+				'brand-bg': '#f5f5f5',
 			},
 			borderRadius: {
 				xl: 'calc(var(--radius) + 4px)',

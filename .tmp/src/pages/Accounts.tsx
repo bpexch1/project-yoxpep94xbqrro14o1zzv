@@ -48,32 +48,33 @@ export default function Accounts() {
   const arialFont = { fontFamily: "Arial, Helvetica, sans-serif" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#ececec", ...arialFont }}>
-      <main style={{ maxWidth: 420, margin: "0 auto", padding: "12px 10px 80px" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f5", ...arialFont }}>
+      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
 
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
         <div style={{
-          background: "#f3f3f3",
-          borderRadius: 6,
-          border: "1px solid #d4d4d4",
-          marginBottom: 14,
+          background: "#fff",
+          borderRadius: 10,
+          border: "1px solid #d0d0d0",
+          marginBottom: 16,
           overflow: "hidden",
+          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
         }}>
           <div style={{
             display: "flex",
             alignItems: "center",
             gap: 8,
-            padding: "8px 12px",
-            background: "#ececec",
-            borderBottom: "1px solid #d4d4d4",
+            padding: "10px 16px",
+            background: "#ecf0f1",
+            borderBottom: "1px solid #d0d0d0",
           }}>
             <Filter style={{ width: 15, height: 15, color: "#333", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: 14, color: "#333" }}>Search-Users</span>
           </div>
-          <div style={{ padding: "10px 12px" }}>
+          <div style={{ padding: "12px 16px 16px" }}>
             <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
@@ -83,9 +84,9 @@ export default function Accounts() {
                 style={{
                   flex: 1,
                   height: "40px",
-                  border: "1px solid #cccccc",
+                  border: "1px solid #d1d5db",
                   borderRadius: "4px",
-                  padding: "0 10px",
+                  padding: "0 12px",
                   fontSize: "14px",
                   color: "#333",
                   outline: "none",
@@ -101,7 +102,7 @@ export default function Accounts() {
                   background: "#12b886",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "4px",
+                  borderRadius: "7px",
                   fontSize: "14px",
                   fontWeight: 600,
                   cursor: "pointer",

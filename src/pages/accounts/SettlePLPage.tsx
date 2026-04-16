@@ -104,7 +104,7 @@ export default function SettlePLPage() {
 
   if (isFetching) {
     return (
-      <div className="min-h-screen bg-[#ececec] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#12b886]" />
       </div>
     );
@@ -112,9 +112,9 @@ export default function SettlePLPage() {
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#ececec] flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center p-4">
         <h1 className="text-xl font-bold text-[#333] mb-4">Client not found</h1>
-        <button onClick={() => navigate(-1)} className="bg-white border border-[#cccccc] px-4 h-10 rounded-[4px] font-bold text-[#333]">
+        <button onClick={() => navigate(-1)} className="bg-white border border-[#cccccc] px-4 h-10 rounded-[7px] font-bold text-[#333]">
           Go Back
         </button>
       </div>
@@ -122,14 +122,14 @@ export default function SettlePLPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#ececec] pb-12" style={arialFont}>
-      <main className="max-w-[420px] mx-auto p-3">
+    <div className="min-h-screen bg-[#f5f5f5] pb-12" style={arialFont}>
+      <main className="max-w-[480px] mx-auto p-3">
         
         {/* Header Bar */}
-        <div className="flex items-center gap-3 mb-3 bg-[#f3f3f3] p-3 rounded-[6px] border border-[#d4d4d4]">
+        <div className="flex items-center gap-3 mb-4 bg-white p-3 rounded-[10px] border border-[#d5d8dc] shadow-sm">
           <button 
             onClick={() => navigate(-1)}
-            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
             <ChevronLeft className="w-5 h-5 text-[#333]" />
           </button>
@@ -142,17 +142,17 @@ export default function SettlePLPage() {
         </div>
 
         {/* Settlement Form Card */}
-        <form onSubmit={handleSubmit} className="bg-[#f3f3f3] rounded-[6px] border border-[#d4d4d4] overflow-hidden">
+        <form onSubmit={handleSubmit} className="bg-white rounded-[10px] border border-[#d5d8dc] overflow-hidden shadow-sm">
           <div className="p-4 space-y-4">
             
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white p-3 rounded-[4px] border border-[#d0d0d0] text-center">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#f9f9f9] p-3 rounded-[7px] border border-[#d5d8dc] text-center">
                 <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">P/L Balance</p>
                 <p className="text-[15px] font-bold text-[#12b886]">
                   {(client?.pl_downline || 0).toLocaleString()}
                 </p>
               </div>
-              <div className="bg-white p-3 rounded-[4px] border border-[#d0d0d0] text-center">
+              <div className="bg-[#f9f9f9] p-3 rounded-[7px] border border-[#d5d8dc] text-center">
                 <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Cash Balance</p>
                 <p className="text-[15px] font-bold text-[#3498db]">
                   {(client?.cash || 0).toLocaleString()}
@@ -183,11 +183,11 @@ export default function SettlePLPage() {
             </div>
           </div>
 
-          <div className="p-3 bg-[#ececec] flex justify-end">
+          <div className="p-4 bg-[#f5f5f5] flex justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#12b886] text-white font-bold px-8 h-[40px] rounded-[4px] flex items-center gap-2 active:scale-95 disabled:opacity-70"
+              className="bg-[#12b886] text-white font-bold px-8 h-[40px] rounded-[7px] flex items-center gap-2 active:scale-95 disabled:opacity-70 shadow-sm"
             >
               {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRightLeft className="w-4 h-4" />}
               Settle Now
