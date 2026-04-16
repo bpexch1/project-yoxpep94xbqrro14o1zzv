@@ -90,7 +90,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white flex items-center px-4 h-12 border-b border-[#e0e0e0]">
+    <header className="sticky top-0 z-40 bg-white flex items-center px-3 h-12 border-b border-[#e0e0e0]">
       {/* LEFT: Hamburger */}
       <div className="flex items-center shrink-0">
         <button
@@ -125,7 +125,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
-                <div className="px-3 py-2 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
+                <div className="px-2 py-1.5 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
                   Logged in as <span className="font-semibold">{session.username}</span>
                 </div>
                 <DropdownMenuItem
