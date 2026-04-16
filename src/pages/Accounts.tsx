@@ -131,7 +131,7 @@ export default function Accounts() {
           username={session?.username || 'Admin'}
           searchFilter={searchQuery}
           onRefresh={refetch}
-          autoLoadBalance={isAdminRole}
+          autoLoadBalance={false}
         />
 
       </main>
