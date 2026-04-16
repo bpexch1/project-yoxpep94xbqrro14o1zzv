@@ -14,6 +14,10 @@ export function BetSlip({ bet, onClose, onSubmit, isSubmitting }: BetSlipProps) 
 
   if (!bet) return null;
 
+  const isBack = bet.betType === 'back';
+  const panelBg = isBack ? '#dbeafe' : '#fde8e8';
+  const badgeBg = isBack ? '#72bbef' : '#faa9ba';
+
   const amountNum = parseFloat(amount) || 0;
   const profitLoss = amountNum > 0 ? ((amountNum * odds) - amountNum).toFixed(0) : 0;
 
@@ -41,12 +45,23 @@ export function BetSlip({ bet, onClose, onSubmit, isSubmitting }: BetSlipProps) 
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 350 }}
-          className="relative w-full max-w-sm bg-[#fde8e8] rounded-xl shadow-2xl p-6 z-10 border border-white/20"
+          className="relative w-full max-w-sm rounded-xl shadow-2xl p-6 z-10 border border-white/20"
+          style={{ backgroundColor: panelBg }}
         >
           {/* Team name */}
-          <h2 className="text-center font-black text-[18px] text-[#1e3a5c] mb-6 uppercase tracking-tight">
+          <h2 className="text-center font-black text-[18px] text-[#1e3a5c] mb-2 uppercase tracking-tight">
             {bet.selection}
           </h2>
+
+          {/* Bet Type Badge */}
+          <div className="flex justify-center mb-6">
+            <span 
+              className="px-4 py-1 rounded-full text-[11px] font-black text-white uppercase tracking-widest shadow-sm"
+              style={{ backgroundColor: badgeBg }}
+            >
+              {bet.betType}
+            </span>
+          </div>
 
           {/* ODDS row */}
           <div className="flex items-center gap-3 mb-4">
