@@ -111,7 +111,7 @@ export function ClientSummaryCard({
         </div>
       )}
 
-      <div className="space-y-4 pt-4">
+      <div className="space-y-2 pt-3">
         {/* Stats table */}
         <div className="px-4 overflow-x-auto">
           <table className="min-w-max text-left border-collapse border border-[#ccc]">
