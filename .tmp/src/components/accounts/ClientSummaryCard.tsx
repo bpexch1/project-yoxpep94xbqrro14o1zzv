@@ -114,23 +114,23 @@ export function ClientSummaryCard({
       <div className="space-y-4 pt-4">
         {/* Stats table */}
         <div className="px-4 overflow-x-auto">
-          <table className="w-full text-left border-collapse border border-[#ccc]">
+          <table className="min-w-max text-left border-collapse border border-[#ccc]">
             <thead>
               <tr className="bg-[#f8f9fa]">
                 {!isBalanceLoaded ? (
                   <>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center">Cash</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center">Users</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">Credit<br/>Remaining</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center min-w-[85px]">Cash</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">P/L<br/>Downline</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center min-w-[85px]">Users</th>
                   </>
                 ) : (
                   <>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Received</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Credit<br/>Remaining</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center">Cash</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">P/L<br/>Downline</th>
-                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight">Balance<br/>UpLine</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">Credit<br/>Received</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">Credit<br/>Remaining</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center min-w-[85px]">Cash</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">P/L<br/>Downline</th>
+                    <th className="py-2 px-1 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight min-w-[85px]">Balance<br/>UpLine</th>
                   </>
                 )}
               </tr>
@@ -139,28 +139,28 @@ export function ClientSummaryCard({
               <tr>
                 {!isBalanceLoaded ? (
                   <>
-                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center"><span className="text-[13px] font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
                   </>
                 ) : (
                   <>
-                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
                       <span className="text-[13px] font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
                     </td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
                       <span className="text-[13px] font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
                     </td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
                       <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.cash.toLocaleString()}</span>
                     </td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
                       <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
                         {totals.pl_downline.toLocaleString()}
                       </span>
                     </td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center">
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
                       <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.balance_upline.toLocaleString()}</span>
                     </td>
                   </>
