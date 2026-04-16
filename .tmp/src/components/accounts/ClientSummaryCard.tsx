@@ -200,7 +200,7 @@ export function ClientSummaryCard({
             <span>Edit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#3498db] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">L</div>
+            <div className="w-5 h-5 bg-[#73C2D7] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">L</div>
             <span>Ledger</span>
           </div>
           <div className="flex items-center gap-1">
@@ -374,7 +374,7 @@ export function ClientSummaryCard({
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
-                                    className="w-9 h-9 bg-[#3498db] hover:bg-blue-600 text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#73C2D7] hover:bg-[#5BAFC5] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Ledger"
                                   >
                                     L
