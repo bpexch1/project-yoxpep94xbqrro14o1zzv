@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -100,6 +100,7 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="p-0 max-w-sm w-[90vw] h-[90vh] overflow-hidden flex flex-col border-0 shadow-2xl [&>button]:hidden bg-white rounded-none sm:rounded-none">
+        <DialogTitle className="sr-only">Edit Client Account</DialogTitle>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <span className="text-gray-400 text-sm font-medium">Edit: @{client.username}</span>
