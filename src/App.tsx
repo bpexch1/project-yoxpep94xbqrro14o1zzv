@@ -19,6 +19,10 @@ import CurrentPosition from "./pages/CurrentPosition";
 import AccountView from "./pages/AccountView";
 import UserDashboard from "./pages/UserDashboard";
 import MatchDetail from "./pages/MatchDetail";
+import EditClientPage from "./pages/accounts/EditClientPage";
+import CashCreditPage from "./pages/accounts/CashCreditPage";
+import SettlePLPage from "./pages/accounts/SettlePLPage";
+import LedgerPage from "./pages/accounts/LedgerPage";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
 import { AppLayout } from "./components/layout/AppLayout";
@@ -49,6 +53,10 @@ const App = () => (
             <Route path="/reports/commission" element={<AppLayout><Accounts /></AppLayout>} />
             <Route path="/current-position" element={<AppLayout><CurrentPosition /></AppLayout>} />
             <Route path="/accounts/view/:username" element={<AppLayout><AccountView /></AppLayout>} />
+            <Route path="/accounts/edit/:username" element={<AppLayout><EditClientPage /></AppLayout>} />
+            <Route path="/accounts/cash-credit/:username" element={<AppLayout><CashCreditPage /></AppLayout>} />
+            <Route path="/accounts/settle-pl/:username" element={<AppLayout><SettlePLPage /></AppLayout>} />
+            <Route path="/accounts/ledger/:username" element={<AppLayout><LedgerPage /></AppLayout>} />
             <Route path="/play" element={<UserDashboard />} />
             <Route path="/play/match/:matchId" element={<MatchDetail />} />
             

@@ -1,11 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { Pencil, UserPlus, BookOpen, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { EditClientModal } from "./EditClientModal";
-import { CashCreditModal } from "./CashCreditModal";
-import { SettlePLModal } from "./SettlePLModal";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { Client } from "@/entities";
 
 interface ClientSummaryCardProps {
   clients: any[];
@@ -31,9 +29,6 @@ export function ClientSummaryCard({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
-  const [editingClient, setEditingClient] = useState<any | null>(null);
-  const [cashCreditClient, setCashCreditClient] = useState<any | null>(null);
-  const [settlePLClient, setSettlePLClient] = useState<any | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isBalanceLoaded, setIsBalanceLoaded] = useState(autoLoadBalance);
 
@@ -98,6 +93,18 @@ export function ClientSummaryCard({
       }
       return next;
     });
+  };
+
+  const toggleStatus = async (client: any) => {
+    try {
+      const newStatus = client.status === "active" ? "inactive" : "active";
+      await Client.update(client.id, { status: newStatus });
+      toast({ title: "Status Updated", description: `${client.username} is now ${newStatus}` });
+      onRefresh && onRefresh();
+    } catch (e) {
+      console.error(e);
+      toast({ variant: "destructive", title: "Update Failed" });
+    }
   };
 
   return (
@@ -181,6 +188,7 @@ export function ClientSummaryCard({
             </button>
           )}
           <button
+            onClick={() => navigate(`/reports/daily`)}
             className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
           >
             <BookOpen className="w-3.5 h-3.5" /> Account Ledger
@@ -360,26 +368,28 @@ export function ClientSummaryCard({
                                 <span className="font-semibold text-[#212529]">• Options</span>
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <button 
-                                    onClick={() => setCashCreditClient(client)}
+                                    onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
                                     className="w-9 h-9 bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Cash / Credit"
                                   >
                                     C
                                   </button>
                                   <button 
-                                    onClick={() => setEditingClient(client)}
+                                    onClick={() => navigate(`/accounts/edit/${client.username}`)}
                                     className="w-9 h-9 bg-[#1EB990] hover:bg-[#17a37d] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Edit"
                                   >
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
+                                    onClick={() => navigate(`/accounts/ledger/${client.username}`)}
                                     className="w-9 h-9 bg-[#63C2DE] hover:bg-[#4db0cc] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Ledger"
                                   >
                                     L
                                   </button>
                                   <button 
+                                    onClick={() => toggleStatus(client)}
                                     className={cn(
                                       "w-9 h-9 rounded-sm font-bold text-sm flex items-center justify-center transition-all shadow-sm",
                                       client.status === "active" 
@@ -394,7 +404,7 @@ export function ClientSummaryCard({
                                     <button 
                                       className="w-9 h-9 bg-[#e74c3c] hover:bg-[#c0392b] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                       title="Settle Account"
-                                      onClick={() => setSettlePLClient(client)}
+                                      onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
                                     >
                                       S
                                     </button>
@@ -416,10 +426,6 @@ export function ClientSummaryCard({
           Showing {filteredClients.length} entries
         </div>
       </div>
-
-      <EditClientModal isOpen={!!editingClient} onClose={() => setEditingClient(null)} client={editingClient} />
-      <CashCreditModal isOpen={!!cashCreditClient} onClose={() => setCashCreditClient(null)} client={cashCreditClient} />
-      <SettlePLModal isOpen={!!settlePLClient} onClose={() => setSettlePLClient(null)} client={settlePLClient} />
     </section>
   );
 }
