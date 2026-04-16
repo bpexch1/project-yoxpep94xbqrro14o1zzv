@@ -139,29 +139,29 @@ export function ClientSummaryCard({
               <tr>
                 {!isBalanceLoaded ? (
                   <>
-                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">0</span></td>
-                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#1a9e71]">{filteredClients.length}</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#256F39]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#256F39]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#256F39]">0</span></td>
+                    <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]"><span className="text-[13px] font-bold text-[#256F39]">{filteredClients.length}</span></td>
                   </>
                 ) : (
                   <>
                     <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
-                      <span className="text-[13px] font-bold text-[#1a9e71]">{totals.credit_received.toLocaleString()}</span>
+                      <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_received.toLocaleString()}</span>
                     </td>
                     <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
-                      <span className="text-[13px] font-bold text-[#1a9e71]">{totals.credit_remaining.toLocaleString()}</span>
+                      <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_remaining.toLocaleString()}</span>
                     </td>
                     <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
-                      <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.cash.toLocaleString()}</span>
+                      <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>{totals.cash.toLocaleString()}</span>
                     </td>
                     <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
-                      <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                      <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
                         {totals.pl_downline.toLocaleString()}
                       </span>
                     </td>
                     <td className="py-2 px-1 border border-[#ccc] text-center min-w-[85px]">
-                      <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>{totals.balance_upline.toLocaleString()}</span>
+                      <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>{totals.balance_upline.toLocaleString()}</span>
                     </td>
                   </>
                 )}
@@ -325,33 +325,33 @@ export function ClientSummaryCard({
                           <div className="relative">
                             <ul className="text-[13px] text-[#212529] space-y-2 relative z-10">
                               <li className="flex items-center gap-2">
-                                <span className="text-[#1a9e71] font-bold">•</span>
+                                <span className="text-[#256F39] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Balance:</span>
-                                <span className="font-bold">
+                                <span className="font-bold text-[#256F39]">
                                   {(client.balance_upline || 0).toLocaleString()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#1a9e71] font-bold">•</span>
+                                <span className="text-[#256F39] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Client (P/L):</span>
-                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#1a9e71]")}>
+                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
                                   {(client.pl_downline || 0).toLocaleString()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#1a9e71] font-bold">•</span>
+                                <span className="text-[#256F39] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Share:</span>
-                                <span className="font-bold">{client.downline_share || 0}</span>
+                                <span className="font-bold text-[#256F39]">{client.downline_share || 0}</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#1a9e71] font-bold">•</span>
+                                <span className="text-[#256F39] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Exposure:</span>
-                                <span className="font-bold">0</span>
+                                <span className="font-bold text-[#256F39]">0</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#1a9e71] font-bold">•</span>
+                                <span className="text-[#256F39] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Available Balance:</span>
-                                <span className="font-bold text-[#1a9e71]">
+                                <span className="font-bold text-[#256F39]">
                                   {(client.credit_remaining || 0).toLocaleString()}
                                 </span>
                               </li>
