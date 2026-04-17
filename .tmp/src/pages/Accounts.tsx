@@ -268,6 +268,17 @@ export default function Accounts() {
           autoLoadBalance={false}
         />
 
+        {/* News Ticker — only on Accounts page */}
+        <div className="mt-4 bg-[#2c3e50] overflow-hidden flex items-center border-t border-white/10 h-[25px]">
+          <div className="animate-marquee whitespace-nowrap flex">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <span key={i} style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+                <b>Welcome to Exchange.</b>
+              </span>
+            ))}
+          </div>
+        </div>
+
       </main>
     </div>
   );
