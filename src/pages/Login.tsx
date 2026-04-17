@@ -79,86 +79,112 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
+      className="min-h-screen flex flex-col items-center justify-center relative"
       style={{
         backgroundImage: `url('https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/7986783e-68fa-4708-bbea-abb3190b2f5f.png')`,
         backgroundRepeat: 'repeat',
         backgroundSize: '300px 300px',
-        backgroundColor: '#2a2a2a',
+        backgroundColor: '#2e2e2e',
       }}
     >
-      {/* Dark navy gradient card */}
+      {/* Blue gradient card */}
       <div
-        className="w-full max-w-[380px] rounded-2xl px-8 py-10 shadow-2xl"
+        className="relative z-10 w-full mx-4 rounded-2xl"
         style={{
-          background: 'linear-gradient(170deg, #2e6b8a 0%, #1a3d5c 40%, #0f2438 100%)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          maxWidth: '400px',
+          background: 'linear-gradient(180deg, #2e7a9a 0%, #1a4a6e 45%, #0d2640 100%)',
+          boxShadow: '0 12px 50px rgba(0,0,0,0.6)',
+          padding: '60px 32px 48px',
+          marginTop: '40px',
         }}
       >
-        {/* Teal BP Logo */}
-        <div className="flex justify-center mb-10">
+        {/* BP Logo — teal circle centered at top */}
+        <div className="flex justify-center" style={{ marginTop: '-100px', marginBottom: '32px' }}>
           <div
-            className="w-28 h-28 rounded-full flex items-center justify-center shadow-xl"
-            style={{ background: '#3dd6c8' }}
+            style={{
+              width: '120px',
+              height: '120px',
+              borderRadius: '50%',
+              background: '#3dd6c8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            }}
           >
-            <span
-              style={{
-                fontFamily: 'Pacifico, cursive',
-                fontSize: '3rem',
-                color: '#0f2438',
-                lineHeight: 1,
-                letterSpacing: '-1px',
-              }}
-            >
-              BP
-            </span>
+            <span style={{
+              fontFamily: 'Pacifico, cursive',
+              fontSize: '3.2rem',
+              color: '#0d2640',
+              lineHeight: 1,
+            }}>BP</span>
           </div>
         </div>
 
         <form onSubmit={handleLogin}>
-          {/* Username */}
-          <div className="mb-8" style={{ borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
+          {/* Username field */}
+          <div className="mb-8" style={{ borderBottom: '1px solid rgba(255,255,255,0.35)' }}>
             <div className="flex items-center gap-3 pb-3">
-              <User size={20} color="rgba(255,255,255,0.85)" />
+              <User size={20} color="rgba(255,255,255,0.75)" />
               <input
                 type="text"
                 placeholder="Username"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 required
-                className="flex-1 bg-transparent outline-none text-white placeholder-white/60 text-base"
-                style={{ border: 'none' }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'white',
+                  fontSize: '16px',
+                  width: '100%',
+                }}
+                className="placeholder-white/60"
               />
             </div>
           </div>
 
-          {/* Password */}
-          <div className="mb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
+          {/* Password field */}
+          <div className="mb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.35)' }}>
             <div className="flex items-center gap-3 pb-3">
-              <Lock size={20} color="rgba(255,255,255,0.85)" />
+              <Lock size={20} color="rgba(255,255,255,0.75)" />
               <input
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="flex-1 bg-transparent outline-none text-white placeholder-white/60 text-base"
-                style={{ border: 'none' }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'white',
+                  fontSize: '16px',
+                  width: '100%',
+                }}
+                className="placeholder-white/60"
               />
             </div>
           </div>
 
-          {/* Login Button — steel blue pill, centered */}
+          {/* Login button */}
           <div className="flex justify-center">
             <button
               type="submit"
               disabled={loading}
-              className="px-16 py-3 rounded-full text-white text-base font-semibold tracking-wide transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center"
+              className="flex items-center justify-center disabled:opacity-60 active:scale-95 transition-transform"
               style={{
-                background: 'linear-gradient(to bottom, #6aafd4, #3a7fa8)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                minWidth: '160px',
+                background: 'linear-gradient(180deg, #5a9ec0 0%, #2e6e90 100%)',
+                border: 'none',
+                borderRadius: '50px',
+                color: 'white',
+                fontSize: '17px',
+                fontWeight: '500',
+                padding: '13px 64px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
+                letterSpacing: '0.5px',
               }}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Login'}
@@ -166,6 +192,12 @@ export default function Login() {
           </div>
         </form>
       </div>
+
+      {/* Bottom blue bar */}
+      <div
+        className="absolute bottom-0 left-0 right-0"
+        style={{ height: '5px', background: '#1a5080' }}
+      />
     </div>
   );
 }
