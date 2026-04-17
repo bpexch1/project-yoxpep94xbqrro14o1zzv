@@ -7,8 +7,8 @@ import {
   TrendingUp, 
   TrendingDown,
   ArrowUpDown,
-  Download,
-  Search
+  Search,
+  Download
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -17,6 +17,7 @@ export default function LedgerPage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const [filterType, setFilterType] = useState<'all' | 'cash' | 'credit'>('all');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: clients } = useQuery({
     queryKey: ["client", username],
@@ -35,6 +36,17 @@ export default function LedgerPage() {
   const filtered = (transactions || []).filter(t => 
     filterType === 'all' ? true : t.type === filterType
   );
+
+  const displayed = searchQuery.trim()
+    ? filtered.filter(t => {
+        const q = searchQuery.toLowerCase();
+        return (
+          (t.description || "").toLowerCase().includes(q) ||
+          formatDate(t.created_at).toLowerCase().includes(q) ||
+          String(Math.abs(t.amount)).includes(q)
+        );
+      })
+    : filtered;
 
   const summary = filtered.reduce(
     (acc, t) => {
@@ -147,12 +159,15 @@ export default function LedgerPage() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-bold text-[#2c3e50] text-sm uppercase tracking-wider">Transaction Records</h3>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="bg-white border border-gray-200 rounded-lg pl-9 pr-3 py-1.5 text-xs outline-none focus:border-[#1a9e71] transition-colors"
+            <div className="flex items-center gap-1.5 text-[12px] text-[#212529]">
+              <label htmlFor="ledger-search" className="font-normal whitespace-nowrap">Search:</label>
+              <input
+                id="ledger-search"
+                type="search"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="border border-[#ced4da] rounded px-2 py-[3px] text-[12px] outline-none focus:border-[#1a9e71] w-[160px]"
+                aria-label="Search ledger"
               />
             </div>
           </div>
@@ -177,14 +192,14 @@ export default function LedgerPage() {
                       </div>
                     </td>
                   </tr>
-                ) : filtered.length === 0 ? (
+                ) : displayed.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-medium italic">
-                      No transaction history found for {filterType}
+                      No transaction history found {searchQuery ? `matching "${searchQuery}"` : `for ${filterType}`}
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((tx, idx) => (
+                  displayed.map((tx, idx) => (
                     <tr 
                       key={tx.id} 
                       className={cn(
@@ -215,7 +230,7 @@ export default function LedgerPage() {
           </div>
           <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#7f8c8d] uppercase tracking-widest">
-              Showing {filtered.length} entries
+              Showing {displayed.length} entries
             </span>
             <button 
               onClick={() => navigate(-1)}
