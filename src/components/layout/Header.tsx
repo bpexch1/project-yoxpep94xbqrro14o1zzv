@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, ChevronDown, LogOut } from "lucide-react";
+import { Menu, ChevronDown, LogOut, User } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
 import { Bet } from "@/entities";
@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
@@ -100,7 +101,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>
         <span className="hidden lg:block font-black italic text-xl ml-3" style={{fontFamily:'Georgia,serif'}}>
-          <span className="text-[#26c6da]">BPEXCH</span>
+          <span className="text-[#1a9e71]">BpExch</span>
         </span>
       </div>
 
@@ -129,6 +130,14 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                   Logged in as <span className="font-semibold">{session.username}</span>
                 </div>
                 <DropdownMenuItem
+                  onClick={() => navigate("/profile")}
+                  className="text-[#2c3e50] hover:bg-[#f5f5f5] cursor-pointer text-xs font-medium p-2"
+                >
+                  <User className="w-3 h-3 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-[#d5d8dc]" />
+                <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50 p-2"
                 >
@@ -139,11 +148,11 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             </DropdownMenu>
 
             <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
-              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
-                B: <span>0</span>
+              <span className="text-sm text-[#2c3e50] whitespace-nowrap">
+                <strong className="font-bold">B:</strong> <span>0</span>
               </span>
-              <span className="text-sm font-bold text-[#2c3e50] whitespace-nowrap">
-                Exp: <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#2c3e50]'}>
+              <span className="text-sm text-[#2c3e50] whitespace-nowrap">
+                <strong className="font-bold">Exp:</strong> <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#2c3e50]'}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
