@@ -30,7 +30,6 @@ export function ClientSummaryCard({
   const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [isBalanceLoaded, setIsBalanceLoaded] = useState(autoLoadBalance);
 
   React.useEffect(() => {
     if (autoLoadBalance && clients && clients.length > 0 && expandedIds.size === 0) {
@@ -38,14 +37,6 @@ export function ClientSummaryCard({
       setExpandedIds(allIds);
     }
   }, [autoLoadBalance, clients]);
-
-  const handleLoadBalance = () => {
-    onRefresh && onRefresh();
-    setIsBalanceLoaded(true);
-    // Auto-expand all clients
-    const allIds = new Set(clients.map((c: any) => c.id));
-    setExpandedIds(allIds);
-  };
 
   const getTypeLabel = (role: string) => {
     switch(role?.toLowerCase()) {
@@ -111,9 +102,9 @@ export function ClientSummaryCard({
     <section className="bg-white border border-[#d0d0d0] shadow-sm rounded-[10px] overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif", boxShadow: "0 1px 3px rgba(0,0,0,.07)" }}>
       {/* Card title */}
       {!hideHeader && (
-        <div className="px-4 py-2.5 bg-white border-b border-[#d0d0d0]">
-          <span className="font-bold text-[15px] text-[#212529]">
-            {username} - Clients List{!isBalanceLoaded ? " | Default" : ""}
+        <div style={{ background: '#ecf0f1', borderBottom: '1px solid #d0d0d0', padding: '8px 14px' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#212529' }}>
+            {username} - Clients List
           </span>
         </div>
       )}
@@ -129,34 +120,30 @@ export function ClientSummaryCard({
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Cash</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">P/L<br/>Downline</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Balance<br/>UpLine</th>
-                <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Users</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#256F39]">{isBalanceLoaded ? totals.credit_received.toLocaleString() : "0"}</span>
+                  <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_received.toLocaleString()}</span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#256F39]">{isBalanceLoaded ? totals.credit_remaining.toLocaleString() : "0"}</span>
+                  <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_remaining.toLocaleString()}</span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", isBalanceLoaded && totals.cash < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
-                    {isBalanceLoaded ? totals.cash.toLocaleString() : "0"}
+                  <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                    {totals.cash.toLocaleString()}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", isBalanceLoaded && totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
-                    {isBalanceLoaded ? totals.pl_downline.toLocaleString() : "0"}
+                  <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                    {totals.pl_downline.toLocaleString()}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", isBalanceLoaded && totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
-                    {isBalanceLoaded ? totals.balance_upline.toLocaleString() : "0"}
+                  <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                    {totals.balance_upline.toLocaleString()}
                   </span>
-                </td>
-                <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#256F39]">{filteredClients.length}</span>
                 </td>
               </tr>
             </tbody>
@@ -233,22 +220,13 @@ export function ClientSummaryCard({
             <tr className="bg-[#1a9e71] text-white">
               <td className="px-4 py-2.5 font-bold text-sm whitespace-nowrap">
                 Total
-                {!isBalanceLoaded && (
-                  <button
-                    type="button"
-                    onClick={handleLoadBalance}
-                    className="ml-4 bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-[11px] px-3 py-1.5 rounded transition-colors cursor-pointer"
-                  >
-                    Load Balance
-                  </button>
-                )}
               </td>
               <td className="px-4 py-2.5 text-sm"></td>
               <td className="px-4 py-2.5 font-bold text-sm text-right">
-                {isBalanceLoaded ? totals.credit_received.toLocaleString() : "-"}
+                {totals.credit_received.toLocaleString()}
               </td>
               <td className="px-4 py-2.5 font-bold text-sm text-right">
-                {isBalanceLoaded ? totals.balance_upline.toLocaleString() : "-"}
+                {totals.balance_upline.toLocaleString()}
               </td>
             </tr>
             <tr className="bg-[#ecf0f1] border-y border-[#d5d8dc]">
@@ -289,14 +267,14 @@ export function ClientSummaryCard({
                           onClick={() => {
                             if (isAdminType) {
                               navigate(`/accounts/view/${client.username}`);
-                            } else if (isBalanceLoaded) {
+                            } else {
                               toggleExpand(client.id);
                             }
                           }}
                           className={cn(
                             "font-bold text-left",
                             isAdminType ? "text-[#1a9e71] underline cursor-pointer" : "text-[#212529]",
-                            !isAdminType && isBalanceLoaded && "hover:underline cursor-pointer"
+                            !isAdminType && "hover:underline cursor-pointer"
                           )}
                         >
                           {client.username}
@@ -306,13 +284,13 @@ export function ClientSummaryCard({
                         {getTypeLabel(client.role)}
                       </td>
                       <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#212529] text-right font-semibold">
-                        {isBalanceLoaded ? (client.credit_received || 0).toLocaleString() : "-"}
+                        {(client.credit_received || 0).toLocaleString()}
                       </td>
                       <td className={cn(
                         "px-3 lg:px-4 py-3 text-right font-semibold",
-                        isBalanceLoaded && (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#256F39]"
+                        (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#256F39]"
                       )}>
-                        {isBalanceLoaded ? (client.balance_upline || 0).toLocaleString() : "-"}
+                        {(client.balance_upline || 0).toLocaleString()}
                       </td>
                     </tr>
 
