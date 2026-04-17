@@ -30,7 +30,7 @@ const mainMenuItems = [
 ];
 
 const sportsItems = [
-  { label: "Soccer", icon: CircleDot, link: "/sports/soccer", sportKey: "football" },
+  { label: "Soccer", icon: CircleDot, link: "/sports/football", sportKey: "football" },
   { label: "Tennis", icon: Crosshair, link: "/sports/tennis", sportKey: "tennis" },
   { label: "Cricket", icon: Swords, link: "/sports/cricket", sportKey: "cricket" },
   { label: "Horse Race", icon: Zap, link: "/sports/horse-race", sportKey: "horse-race" },
@@ -99,7 +99,7 @@ function SportDropdown({
         )} />
         {showLabels && (
           <>
-            <span className="flex-1 text-[15px] whitespace-nowrap font-normal">{label}</span>
+            <span className="flex-1 text-[16px] leading-6 whitespace-nowrap font-normal">{label}</span>
             <ChevronDown 
               className={cn(
                 "w-4 h-4 text-white/40 transition-transform duration-200",
@@ -117,7 +117,7 @@ function SportDropdown({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden bg-black/20"
+            className="overflow-visible bg-black/20"
           >
             {isLoading ? (
               <div className="py-3 px-10 flex items-center gap-2 text-white/40 text-[13px]">
@@ -187,7 +187,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         {showLabels && (
           <>
             <span className={cn(
-              "flex-1 text-[15px] whitespace-nowrap",
+              "flex-1 text-[16px] leading-6 whitespace-nowrap",
               isActive ? "font-medium" : "font-normal"
             )}>{item.label}</span>
             {showChevron && <ChevronLeft className="w-4 h-4 text-white/40 shrink-0" />}
@@ -231,7 +231,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
       {/* DESKTOP SIDEBAR */}
       <aside className={cn(
         "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#2c3e50] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
-        isCollapsed ? "w-[60px]" : "w-[220px]"
+        isCollapsed ? "w-[60px]" : "w-[200px]"
       )}>
         {/* Minimal collapse toggle at very top */}
         <div className={cn(
