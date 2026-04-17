@@ -13,6 +13,8 @@ export default function Accounts() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isSearchHovered, setIsSearchHovered] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const session = getClientSession();
@@ -90,6 +92,29 @@ export default function Accounts() {
     setSearchQuery(client.username);
     setShowSuggestions(false);
     setHighlightedIndex(-1);
+    setSelectedClient(client);
+
+    // Build parent chain using the loaded clients array
+    const chain: string[] = [];
+    let current = client;
+    const visited = new Set<string>();
+    while (current && !visited.has(current.username)) {
+      visited.add(current.username);
+      chain.unshift(current.username);
+      if (current.parent_username) {
+        const parent = (clients || []).find((c: any) => c.username === current.parent_username);
+        if (parent) {
+          current = parent;
+        } else {
+          // Parent not in loaded list (could be session user or higher)
+          chain.unshift(current.parent_username);
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+    setBreadcrumb(chain);
   };
 
   const handleSearchClick = () => {
@@ -126,134 +151,179 @@ export default function Accounts() {
             <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
           <div style={{ padding: "12px 16px" }}>
-            <div style={{ display: "flex", gap: 8 }}>
-              <div ref={dropdownRef} style={{ position: "relative", flex: 1 }}>
-                <div style={{ position: "relative" }}>
-                  <input
-                    ref={inputRef}
-                    type="search"
-                    autoComplete="off"
-                    placeholder="Username"
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setShowSuggestions(true);
-                      setHighlightedIndex(-1);
-                    }}
-                    onFocus={() => setShowSuggestions(true)}
-                    onKeyDown={handleKeyDown}
-                    style={{
-                      width: "100%",
-                      height: "40px",
-                      minHeight: "40px",
-                      maxHeight: "40px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "4px",
-                      padding: "0 32px 0 12px", // Added padding right for X button
-                      fontSize: "14px",
-                      color: "#374151",
-                      fontFamily: "Roboto, system-ui, sans-serif",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      background: "#fff",
-                    }}
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery("");
-                        setShowSuggestions(false);
-                        inputRef.current?.focus();
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+              <div style={{ flex: "0 0 60%", minWidth: "300px", display: "flex", gap: 8 }}>
+                <div ref={dropdownRef} style={{ position: "relative", flex: 1 }}>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      ref={inputRef}
+                      type="search"
+                      autoComplete="off"
+                      placeholder="Username"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setShowSuggestions(true);
+                        setHighlightedIndex(-1);
                       }}
+                      onFocus={() => setShowSuggestions(true)}
+                      onKeyDown={handleKeyDown}
                       style={{
-                        position: "absolute",
-                        right: "8px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "none",
-                        border: "none",
-                        padding: "4px",
-                        cursor: "pointer",
-                        color: "#6c757d",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
+                        width: "100%",
+                        height: "40px",
+                        minHeight: "40px",
+                        maxHeight: "40px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "4px",
+                        padding: "0 32px 0 12px",
+                        fontSize: "14px",
+                        color: "#374151",
+                        fontFamily: "Roboto, system-ui, sans-serif",
+                        outline: "none",
+                        boxSizing: "border-box",
+                        background: "#fff",
                       }}
-                    >
-                      <X style={{ width: 14, height: 14 }} />
-                    </button>
-                  )}
-                </div>
-
-                {showSuggestions && suggestions.length > 0 && (
-                  <div style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    right: 0,
-                    backgroundColor: "#fff",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "4px",
-                    marginTop: "4px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-                    zIndex: 50,
-                    maxHeight: "300px",
-                    overflowY: "auto"
-                  }}>
-                    {suggestions.map((client, index) => (
-                      <div
-                        key={client.id}
-                        onClick={() => selectSuggestion(client)}
-                        onMouseEnter={() => setHighlightedIndex(index)}
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setShowSuggestions(false);
+                          setSelectedClient(null);
+                          setBreadcrumb([]);
+                          inputRef.current?.focus();
+                        }}
                         style={{
-                          padding: "8px 12px",
+                          position: "absolute",
+                          right: "8px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          padding: "4px",
                           cursor: "pointer",
+                          color: "#6c757d",
                           display: "flex",
                           alignItems: "center",
-                          backgroundColor: highlightedIndex === index ? "#f0fdf4" : "#fff",
-                          color: highlightedIndex === index ? "#1a9e71" : "inherit",
+                          justifyContent: "center"
                         }}
                       >
-                        <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529" }}>
-                          {client.username}
-                        </span>
-                        <span style={{ fontSize: "11px", color: "#6c757d", marginLeft: "6px" }}>
-                          {client.full_name}
-                        </span>
-                      </div>
-                    ))}
+                        <X style={{ width: 14, height: 14 }} />
+                      </button>
+                    )}
                   </div>
+
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      right: 0,
+                      backgroundColor: "#fff",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "4px",
+                      marginTop: "4px",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+                      zIndex: 50,
+                      maxHeight: "300px",
+                      overflowY: "auto"
+                    }}>
+                      {suggestions.map((client, index) => (
+                        <div
+                          key={client.id}
+                          onClick={() => selectSuggestion(client)}
+                          onMouseEnter={() => setHighlightedIndex(index)}
+                          style={{
+                            padding: "8px 12px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            backgroundColor: highlightedIndex === index ? "#f0fdf4" : "#fff",
+                            color: highlightedIndex === index ? "#1a9e71" : "inherit",
+                          }}
+                        >
+                          <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529" }}>
+                            {client.username}
+                          </span>
+                          <span style={{ fontSize: "11px", color: "#6c757d", marginLeft: "6px" }}>
+                            {client.full_name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleSearchClick}
+                  onMouseEnter={() => setIsSearchHovered(true)}
+                  onMouseLeave={() => setIsSearchHovered(false)}
+                  style={{
+                    height: "40px",
+                    minHeight: "40px",
+                    maxHeight: "40px",
+                    padding: "0 18px",
+                    background: isSearchHovered ? "#158a60" : "#1a9e71",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    fontFamily: "Roboto, system-ui, sans-serif",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    boxSizing: "border-box",
+                    flexShrink: 0,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+                    transition: "background 0.15s",
+                  }}
+                >
+                  <Search style={{ width: 15, height: 15 }} />
+                  Search
+                </button>
+              </div>
+
+              <div style={{ flex: 1, overflowX: "auto" }}>
+                {breadcrumb.length > 0 && (
+                  <nav aria-label="Breadcrumb" style={{ height: "40px", display: "flex", alignItems: "center" }}>
+                    <ol style={{ display: "flex", listStyle: "none", margin: 0, padding: 0, alignItems: "center", whiteSpace: "nowrap" }}>
+                      {breadcrumb.map((item, index) => {
+                        const isLast = index === breadcrumb.length - 1;
+                        const clientInfo = (clients || []).find((c: any) => c.username === item);
+                        const isLeaf = isLast;
+                        
+                        // Rule: navigates to /accounts/view/${item} if it's an admin/agent, 
+                        // or /accounts/cash-credit/${item} if it's the leaf (selected client)
+                        const path = isLeaf ? `/accounts/cash-credit/${item}` : `/accounts/view/${item}`;
+
+                        return (
+                          <li key={item} style={{ display: "flex", alignItems: "center" }}>
+                            <a
+                              href={path}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigate(path);
+                              }}
+                              style={{
+                                fontSize: "12px",
+                                fontWeight: isLast ? 700 : 600,
+                                color: isLast ? "#1a9e71" : "#212529",
+                                textDecoration: "none",
+                              }}
+                            >
+                              {item}
+                            </a>
+                            {!isLast && (
+                              <span style={{ margin: "0 4px", color: "#6c757d", fontSize: "12px" }}>&gt;</span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </nav>
                 )}
               </div>
-              <button
-                onClick={handleSearchClick}
-                onMouseEnter={() => setIsSearchHovered(true)}
-                onMouseLeave={() => setIsSearchHovered(false)}
-                style={{
-                  height: "40px",
-                  minHeight: "40px",
-                  maxHeight: "40px",
-                  padding: "0 18px",
-                  background: isSearchHovered ? "#158a60" : "#1a9e71",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  fontFamily: "Roboto, system-ui, sans-serif",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  boxSizing: "border-box",
-                  flexShrink: 0,
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-                  transition: "background 0.15s",
-                }}
-              >
-                <Search style={{ width: 15, height: 15 }} />
-                Search
-              </button>
             </div>
           </div>
         </div>
