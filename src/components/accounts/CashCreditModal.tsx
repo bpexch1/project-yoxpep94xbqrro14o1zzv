@@ -92,7 +92,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       await refreshAll();
       toast({ title: "Deposit Successful ✓", description: `${amount.toLocaleString()} Rs. deposited to ${client.username}` });
       setDepositAmount('0');
-      onClose();
+      setTimeout(() => onClose(), 1500);
     } catch (err: any) {
       console.error('Deposit error:', err);
       const msg = err?.message || '';
@@ -158,7 +158,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       await refreshAll();
       toast({ title: "Withdraw Successful ✓", description: `${amount.toLocaleString()} Rs. withdrawn from ${client.username}` });
       setWithdrawAmount('0');
-      onClose();
+      setTimeout(() => onClose(), 1500);
     } catch (err: any) {
       console.error('Withdraw error:', err);
       const msg = err?.message || '';
