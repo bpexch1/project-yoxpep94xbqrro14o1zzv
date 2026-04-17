@@ -30,6 +30,17 @@ export function ClientSummaryCard({
   const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleLoadBalance = async () => {
+    if (!onRefresh) return;
+    setIsRefreshing(true);
+    try {
+      await onRefresh();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 600);
+    }
+  };
 
   React.useEffect(() => {
     if (autoLoadBalance && clients && clients.length > 0 && expandedIds.size === 0) {
@@ -219,7 +230,23 @@ export function ClientSummaryCard({
           <thead>
             <tr className="bg-[#00ab81] text-white">
               <td className="px-4 py-2.5 font-bold text-sm whitespace-nowrap">
-                Total
+                <button
+                  onClick={handleLoadBalance}
+                  disabled={isRefreshing}
+                  className={cn(
+                    "bg-[#ffc107] text-black font-bold text-[13px] py-1 px-3.5 rounded-[4px] border-none whitespace-nowrap transition-all",
+                    isRefreshing ? "opacity-70 cursor-not-allowed" : "hover:bg-[#e0a800] active:scale-95"
+                  )}
+                >
+                  {isRefreshing ? (
+                    <div className="flex items-center gap-1.5">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Loading...
+                    </div>
+                  ) : (
+                    "Load Balance"
+                  )}
+                </button>
               </td>
               <td className="px-4 py-2.5 text-sm"></td>
               <td className="px-4 py-2.5 font-bold text-sm text-right">
