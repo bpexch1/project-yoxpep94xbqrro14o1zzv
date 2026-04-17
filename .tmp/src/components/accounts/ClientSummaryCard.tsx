@@ -210,7 +210,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Search row */}
-        <div className="px-4 pb-1">
+        <div className="px-4 pb-1 mt-4">
           <div className="flex items-center gap-2">
             <label className="text-sm font-semibold text-[#212529] whitespace-nowrap">Search:</label>
             <input
