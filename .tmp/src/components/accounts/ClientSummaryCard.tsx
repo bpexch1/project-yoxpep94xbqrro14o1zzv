@@ -128,6 +128,7 @@ export function ClientSummaryCard({
           <table className="w-auto text-left border-collapse border border-[#ccc]">
             <thead>
               <tr className="bg-[#f8f9fa]">
+                <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Users</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Received</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Remaining</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Cash</th>
@@ -138,28 +139,33 @@ export function ClientSummaryCard({
             <tbody>
               <tr>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#28a745]">
-                    {balanceVisible ? totals.credit_received.toLocaleString() : "-"}
+                  <span className="text-[13px] font-bold text-[#17a2b8]">
+                    {filteredClients.length}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#28a745]">
-                    {balanceVisible ? totals.credit_remaining.toLocaleString() : "-"}
+                  <span className={cn("text-[13px] font-bold", balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
+                    {balanceVisible ? totals.credit_received.toLocaleString() : "0"}
+                  </span>
+                </td>
+                <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
+                  <span className={cn("text-[13px] font-bold", balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
+                    {balanceVisible ? totals.credit_remaining.toLocaleString() : "0"}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
                   <span className={cn("text-[13px] font-bold", balanceVisible && totals.cash < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
-                    {balanceVisible ? totals.cash.toLocaleString() : "-"}
+                    {balanceVisible ? totals.cash.toLocaleString() : "0"}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
                   <span className={cn("text-[13px] font-bold", balanceVisible && totals.pl_downline < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
-                    {balanceVisible ? totals.pl_downline.toLocaleString() : "-"}
+                    {balanceVisible ? totals.pl_downline.toLocaleString() : "0"}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
                   <span className={cn("text-[13px] font-bold", balanceVisible && totals.balance_upline < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
-                    {balanceVisible ? totals.balance_upline.toLocaleString() : "-"}
+                    {balanceVisible ? totals.balance_upline.toLocaleString() : "0"}
                   </span>
                 </td>
               </tr>
@@ -260,10 +266,10 @@ export function ClientSummaryCard({
               </td>
               <td className="px-4 py-2.5 text-sm"></td>
               <td className="px-4 py-2.5 font-bold text-sm text-right">
-                {balanceVisible ? totals.credit_received.toLocaleString() : "-"}
+                {balanceVisible ? totals.credit_received.toLocaleString() : "0"}
               </td>
               <td className="px-4 py-2.5 font-bold text-sm text-right">
-                {balanceVisible ? totals.balance_upline.toLocaleString() : "-"}
+                {balanceVisible ? totals.balance_upline.toLocaleString() : "0"}
               </td>
             </tr>
             <tr className="bg-[#ecf0f1] border-y border-[#d5d8dc]">
@@ -320,14 +326,14 @@ export function ClientSummaryCard({
                       <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#212529] font-semibold">
                         {getTypeLabel(client.role)}
                       </td>
-                      <td className="px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-[#212529] text-right font-semibold">
-                        {balanceVisible ? (client.credit_received || 0).toLocaleString() : "-"}
+                      <td className={cn("px-3 lg:px-4 py-3 border-r border-[#d5d8dc] text-right font-semibold", balanceVisible ? "text-[#212529]" : "text-[#212529]")}>
+                        {balanceVisible ? (client.credit_received || 0).toLocaleString() : "0"}
                       </td>
                       <td className={cn(
                         "px-3 lg:px-4 py-3 text-right font-semibold",
                         balanceVisible && (client.balance_upline || 0) < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]"
                       )}>
-                        {balanceVisible ? (client.balance_upline || 0).toLocaleString() : "-"}
+                        {balanceVisible ? (client.balance_upline || 0).toLocaleString() : "0"}
                       </td>
                     </tr>
 
@@ -341,7 +347,7 @@ export function ClientSummaryCard({
                                 <span className="text-[#28a745] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Client (P/L):</span>
                                 <span className={cn("font-bold", balanceVisible && (client.pl_downline || 0) < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
-                                  {balanceVisible ? (client.pl_downline || 0).toLocaleString() : "-"}
+                                  {balanceVisible ? (client.pl_downline || 0).toLocaleString() : "0"}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
@@ -357,8 +363,8 @@ export function ClientSummaryCard({
                               <li className="flex items-center gap-2">
                                 <span className="text-[#28a745] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Available Balance:</span>
-                                <span className="font-bold text-[#28a745]">
-                                  {balanceVisible ? (client.credit_remaining || 0).toLocaleString() : "-"}
+                                <span className={cn("font-bold", balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
+                                  {balanceVisible ? (client.credit_remaining || 0).toLocaleString() : "0"}
                                 </span>
                               </li>
                               
