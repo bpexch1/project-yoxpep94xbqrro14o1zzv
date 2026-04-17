@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Menu, ChevronDown, LogOut, User } from "lucide-react";
+import { Menu, ChevronDown, LogOut, User, RefreshCw } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
 import { Bet, Client } from "@/entities";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
 import {
   DropdownMenu,
@@ -49,10 +49,22 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     setSession(getClientSession());
   }, []);
+
+  const handleLoadBalance = async () => {
+    setIsRefreshing(true);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["header-balance"] }),
+      queryClient.invalidateQueries({ queryKey: ["header-exposure"] })
+    ]);
+    // small delay for UX feedback
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
 
   const { data: downlineUsernames } = useDownlineUsernames(session?.username, session?.role);
 
@@ -160,6 +172,15 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             </DropdownMenu>
 
             <div className="flex items-center gap-2 border-l border-[#dee2e6] pl-2 lg:pl-4">
+              <button
+                onClick={handleLoadBalance}
+                disabled={isRefreshing}
+                className="flex items-center gap-1 bg-[#00ab81] hover:bg-[#009973] text-white text-[11px] font-bold px-2 py-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 whitespace-nowrap shrink-0"
+                title="Refresh balance"
+              >
+                <RefreshCw className={cn("w-3 h-3", isRefreshing && "animate-spin")} />
+                <span className="hidden sm:inline">Load Balance</span>
+              </button>
               <span className="text-sm text-[#333] whitespace-nowrap">
                 <strong className="font-bold">B:</strong> <span className={cn(
                   liveBalance > 0 ? "text-[#28a745]" : liveBalance < 0 ? "text-[#dc3545]" : "text-[#333]"
