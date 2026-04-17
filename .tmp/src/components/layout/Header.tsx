@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, ChevronDown, LogOut, User } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
-import { Bet } from "@/entities";
+import { Bet, Client } from "@/entities";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
@@ -85,6 +85,18 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     enabled: !!session && downlineUsernames !== undefined,
   });
 
+  const { data: liveBalance = 0 } = useQuery({
+    queryKey: ["header-balance", session?.id],
+    queryFn: async () => {
+      if (!session?.id) return 0;
+      const clients = await Client.filter({ username: session.username }, "-created_at", 1);
+      return (clients as any)?.[0]?.cash ?? 0;
+    },
+    enabled: !!session?.id,
+    refetchInterval: 30000, // refresh every 30s
+    staleTime: 10000,
+  });
+
   const handleLogout = () => {
     clearClientSession();
     navigate("/login");
@@ -130,7 +142,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                   Logged in as <span className="font-semibold">{session.username}</span>
                 </div>
                 <DropdownMenuItem
-                  onClick={() => navigate("/profile")}
+                  onClick={() => navigate("/play/profile")}
                   className="text-[#2c3e50] hover:bg-[#f5f5f5] cursor-pointer text-xs font-medium p-2"
                 >
                   <User className="w-3 h-3 mr-2" />
@@ -149,7 +161,11 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
 
             <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
               <span className="text-sm text-[#2c3e50] whitespace-nowrap">
-                <strong className="font-bold">B:</strong> <span>0</span>
+                <strong className="font-bold">B:</strong> <span className={cn(
+                  liveBalance > 0 ? "text-[#1a9e71]" : liveBalance < 0 ? "text-[#e74c3c]" : "text-[#2c3e50]"
+                )}>
+                  {liveBalance.toLocaleString('en-IN')}
+                </span>
               </span>
               <span className="text-sm text-[#2c3e50] whitespace-nowrap">
                 <strong className="font-bold">Exp:</strong> <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#2c3e50]'}>
