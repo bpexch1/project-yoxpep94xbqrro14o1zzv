@@ -25,7 +25,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   return (
     <div style={{
       background: "#fff",
-      borderRadius: 10,
+      borderRadius: 4,
       border: "1px solid #d0d0d0",
       boxShadow: "0 1px 3px rgba(0,0,0,.08)",
       marginBottom: 16,
@@ -56,11 +56,11 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.id}
               onClick={() => go(tab)}
               style={{
-                background: isActive ? "#1a9e71" : "transparent",
-                border: "1.5px solid #1a9e71",
-                color: isActive ? "#fff" : "#1a9e71",
-                borderRadius: "5px",
-                padding: "5px 12px",
+                background: isActive ? "#00ab81" : "transparent",
+                border: isActive ? "1px solid #00ab81" : "1px solid #17a2b8",
+                color: isActive ? "#ffffff" : "#17a2b8",
+                borderRadius: "4px",
+                padding: "6px 12px",
                 fontSize: "13px",
                 fontWeight: 500,
                 cursor: "pointer",
@@ -72,14 +72,14 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.background = "#1a9e71";
+                  e.currentTarget.style.background = "#17a2b8";
                   e.currentTarget.style.color = "#fff";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
                   e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#1a9e71";
+                  e.currentTarget.style.color = "#17a2b8";
                 }
               }}
             >

@@ -103,17 +103,17 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white flex items-center px-3 h-12 border-b border-[#e0e0e0]">
+    <header className="sticky top-0 z-40 bg-[#f8f9fa] flex items-center px-3 h-12 border-b border-[#dee2e6]">
       {/* LEFT: Hamburger */}
       <div className="flex items-center shrink-0">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#bdc3c7] rounded bg-white hover:bg-[#f5f5f5] transition-colors"
+          className="p-1.5 border border-[#bdc3c7] rounded bg-[#f8f9fa] hover:bg-[#f5f5f5] transition-colors"
         >
           <Menu className="w-5 h-5 text-[#555555]" />
         </button>
         <span className="hidden lg:block font-black italic text-xl ml-3" style={{fontFamily:'Georgia,serif'}}>
-          <span className="text-[#1a9e71]">BpExch</span>
+          <span className="text-[#00ab81]">BpExch</span>
         </span>
       </div>
 
@@ -131,27 +131,27 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
-                  <span className="text-[#2c3e50] text-sm font-medium">
+                  <span className="text-[#333] text-sm font-medium">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
                   </span>
                   <ChevronDown className="w-3 h-3 text-[#555555]" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-[#d5d8dc] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-[#2c3e50] border-b border-[#d5d8dc] mb-1">
+              <DropdownMenuContent align="end" className="bg-white border border-[#dee2e6] shadow-lg rounded w-48 mt-1">
+                <div className="px-2 py-1.5 text-xs text-[#333] border-b border-[#dee2e6] mb-1">
                   Logged in as <span className="font-semibold">{session.username}</span>
                 </div>
                 <DropdownMenuItem
                   onClick={() => navigate("/play/profile")}
-                  className="text-[#2c3e50] hover:bg-[#f5f5f5] cursor-pointer text-xs font-medium p-2"
+                  className="text-[#333] hover:bg-[#f5f5f5] cursor-pointer text-xs font-medium p-2"
                 >
                   <User className="w-3 h-3 mr-2" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-[#d5d8dc]" />
+                <DropdownMenuSeparator className="bg-[#dee2e6]" />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-[#e74c3c] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#e74c3c] focus:bg-red-50 p-2"
+                  className="text-[#dc3545] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#dc3545] focus:bg-red-50 p-2"
                 >
                   <LogOut className="w-3 h-3 mr-2" />
                   Logout
@@ -159,16 +159,16 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex items-center gap-2 border-l border-[#e0e0e0] pl-2 lg:pl-4">
-              <span className="text-sm text-[#2c3e50] whitespace-nowrap">
+            <div className="flex items-center gap-2 border-l border-[#dee2e6] pl-2 lg:pl-4">
+              <span className="text-sm text-[#333] whitespace-nowrap">
                 <strong className="font-bold">B:</strong> <span className={cn(
-                  liveBalance > 0 ? "text-[#1a9e71]" : liveBalance < 0 ? "text-[#e74c3c]" : "text-[#2c3e50]"
+                  liveBalance > 0 ? "text-[#28a745]" : liveBalance < 0 ? "text-[#dc3545]" : "text-[#333]"
                 )}>
                   {liveBalance.toLocaleString('en-IN')}
                 </span>
               </span>
-              <span className="text-sm text-[#2c3e50] whitespace-nowrap">
-                <strong className="font-bold">Exp:</strong> <span className={totalExposure > 0 ? 'text-[#e74c3c]' : 'text-[#2c3e50]'}>
+              <span className="text-sm text-[#333] whitespace-nowrap">
+                <strong className="font-bold">Exp:</strong> <span className={totalExposure > 0 ? 'text-[#dc3545]' : 'text-[#333]'}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
@@ -177,7 +177,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#254465] hover:text-[#1a9e71] uppercase"
+            className="text-sm font-bold text-[#254465] hover:text-[#00ab81] uppercase"
           >
             Login
           </button>

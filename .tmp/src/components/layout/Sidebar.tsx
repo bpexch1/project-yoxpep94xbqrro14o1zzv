@@ -95,7 +95,7 @@ function SportDropdown({
         <Icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[22px] h-[22px]",
-          "text-[#4db6ac]/80"
+          "text-[#17a2b8]/80"
         )} />
         {showLabels && (
           <>
@@ -136,7 +136,7 @@ function SportDropdown({
                       {match.title || `${match.team1} v ${match.team2}`}
                     </span>
                     {match.status === "live" && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#28a745] ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(40,167,69,0.6)]" />
                     )}
                   </button>
                 ))}
@@ -182,7 +182,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         <item.icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[22px] h-[22px]",
-          isActive ? "text-[#4db6ac]" : "text-[#4db6ac]/80"
+          isActive ? "text-[#17a2b8]" : "text-[#17a2b8]/80"
         )} />
         {showLabels && (
           <>

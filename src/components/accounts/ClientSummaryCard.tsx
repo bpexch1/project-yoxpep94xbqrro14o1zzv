@@ -125,23 +125,23 @@ export function ClientSummaryCard({
             <tbody>
               <tr>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_received.toLocaleString()}</span>
+                  <span className="text-[13px] font-bold text-[#28a745]">{totals.credit_received.toLocaleString()}</span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#256F39]">{totals.credit_remaining.toLocaleString()}</span>
+                  <span className="text-[13px] font-bold text-[#28a745]">{totals.credit_remaining.toLocaleString()}</span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                  <span className={cn("text-[13px] font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
                     {totals.cash.toLocaleString()}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                  <span className={cn("text-[13px] font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
                     {totals.pl_downline.toLocaleString()}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                  <span className={cn("text-[13px] font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
                     {totals.balance_upline.toLocaleString()}
                   </span>
                 </td>
@@ -155,14 +155,14 @@ export function ClientSummaryCard({
           {!hideCreateButton && (
             <button
               onClick={() => navigate("/accounts/create")}
-              className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
+              className="bg-[#00ab81] hover:bg-[#009973] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap transition-colors"
             >
               <User className="w-3.5 h-3.5" /> New User
             </button>
           )}
           <button
             onClick={() => navigate(`/reports/daily`)}
-            className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
+            className="bg-[#00ab81] hover:bg-[#009973] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap transition-colors"
           >
             <Book className="w-3.5 h-3.5" /> Account Ledger
           </button>
@@ -171,29 +171,29 @@ export function ClientSummaryCard({
         {/* Legend row */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 text-[11px] font-semibold text-[#212529]">
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#f1c40f] text-black font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">C</div>
+            <div className="w-5 h-5 bg-[#ffc107] text-black font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">C</div>
             <span>Cash / Credit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#1EB990] text-white flex items-center justify-center rounded-sm shadow-sm">
+            <div className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded-sm shadow-sm">
               <Pencil className="w-3 h-3" />
             </div>
             <span>Edit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#63C2DE] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">L</div>
+            <div className="w-5 h-5 bg-[#17a2b8] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">L</div>
             <span>Ledger</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#42A665] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">A</div>
+            <div className="w-5 h-5 bg-[#28a745] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">A</div>
             <span>Active</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-white border border-[#e74c3c] text-[#e74c3c] font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">D</div>
+            <div className="w-5 h-5 bg-white border border-[#dc3545] text-[#dc3545] font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">D</div>
             <span>InActive</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-[#e74c3c] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">S</div>
+            <div className="w-5 h-5 bg-[#dc3545] text-white font-bold text-[10px] flex items-center justify-center rounded-sm shadow-sm">S</div>
             <span>Settle Account</span>
           </div>
         </div>
@@ -217,7 +217,7 @@ export function ClientSummaryCard({
       <div className="overflow-x-auto mt-4">
         <table className="w-full text-left text-[12px] border-collapse">
           <thead>
-            <tr className="bg-[#1a9e71] text-white">
+            <tr className="bg-[#00ab81] text-white">
               <td className="px-4 py-2.5 font-bold text-sm whitespace-nowrap">
                 Total
               </td>
@@ -241,7 +241,7 @@ export function ClientSummaryCard({
               <tr>
                 <td colSpan={4} className="px-3 py-8 text-center text-[#212529] bg-white">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71]" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#00ab81]" />
                     <span className="font-medium">Loading data...</span>
                   </div>
                 </td>
@@ -273,7 +273,7 @@ export function ClientSummaryCard({
                           }}
                           className={cn(
                             "font-bold text-left",
-                            isAdminType ? "text-[#1a9e71] underline cursor-pointer" : "text-[#212529]",
+                            isAdminType ? "text-[#00ab81] underline cursor-pointer" : "text-[#212529]",
                             !isAdminType && "hover:underline cursor-pointer"
                           )}
                         >
@@ -288,7 +288,7 @@ export function ClientSummaryCard({
                       </td>
                       <td className={cn(
                         "px-3 lg:px-4 py-3 text-right font-semibold",
-                        (client.balance_upline || 0) < 0 ? "text-[#e74c3c]" : "text-[#256F39]"
+                        (client.balance_upline || 0) < 0 ? "text-[#dc3545]" : "text-[#28a745]"
                       )}>
                         {(client.balance_upline || 0).toLocaleString()}
                       </td>
@@ -301,26 +301,26 @@ export function ClientSummaryCard({
                           <div className="relative">
                             <ul className="text-[13px] text-[#212529] space-y-2 relative z-10">
                               <li className="flex items-center gap-2">
-                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="text-[#28a745] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Client (P/L):</span>
-                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#e74c3c]" : "text-[#256F39]")}>
+                                <span className={cn("font-bold", (client.pl_downline || 0) < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
                                   {(client.pl_downline || 0).toLocaleString()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="text-[#28a745] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Share:</span>
-                                <span className="font-bold text-[#256F39]">{client.downline_share || 0}</span>
+                                <span className="font-bold text-[#28a745]">{client.downline_share || 0}</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="text-[#28a745] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Exposure:</span>
-                                <span className="font-bold text-[#256F39]">0</span>
+                                <span className="font-bold text-[#28a745]">0</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <span className="text-[#256F39] font-bold">•</span>
+                                <span className="text-[#28a745] font-bold">•</span>
                                 <span className="font-semibold text-[#212529]">Available Balance:</span>
-                                <span className="font-bold text-[#256F39]">
+                                <span className="font-bold text-[#28a745]">
                                   {(client.credit_remaining || 0).toLocaleString()}
                                 </span>
                               </li>
@@ -330,21 +330,21 @@ export function ClientSummaryCard({
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <button 
                                     onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                                    className="w-9 h-9 bg-[#f1c40f] hover:bg-yellow-400 text-black font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#ffc107] hover:bg-yellow-500 text-black font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Cash / Credit"
                                   >
                                     C
                                   </button>
                                   <button 
                                     onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                                    className="w-9 h-9 bg-[#1EB990] hover:bg-[#17a37d] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#28a745] hover:bg-[#218838] text-white flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Edit"
                                   >
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
                                     onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                                    className="w-9 h-9 bg-[#63C2DE] hover:bg-[#4db0cc] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                    className="w-9 h-9 bg-[#17a2b8] hover:bg-[#138496] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                     title="Ledger"
                                   >
                                     L
@@ -354,8 +354,8 @@ export function ClientSummaryCard({
                                     className={cn(
                                       "w-9 h-9 rounded-sm font-bold text-sm flex items-center justify-center transition-all shadow-sm",
                                       client.status === "active" 
-                                        ? "bg-[#42A665] hover:bg-[#379055] text-white" 
-                                        : "bg-white border border-[#e74c3c] text-[#e74c3c] hover:bg-red-50"
+                                        ? "bg-[#28a745] hover:bg-[#218838] text-white" 
+                                        : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
                                     )}
                                     title={client.status === "active" ? "Active" : "Inactive"}
                                   >
@@ -363,7 +363,7 @@ export function ClientSummaryCard({
                                   </button>
                                   {client.role !== 'client' && (
                                     <button 
-                                      className="w-9 h-9 bg-[#e74c3c] hover:bg-[#c0392b] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
+                                      className="w-9 h-9 bg-[#dc3545] hover:bg-[#c82333] text-white font-bold text-sm flex items-center justify-center rounded-sm transition-colors shadow-sm"
                                       title="Settle Account"
                                       onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
                                     >

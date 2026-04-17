@@ -124,7 +124,7 @@ export default function Accounts() {
   const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#e9ecef", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
 
         {/* 1. Report Type Card */}
@@ -239,7 +239,7 @@ export default function Accounts() {
                             display: "flex",
                             alignItems: "center",
                             backgroundColor: highlightedIndex === index ? "#f0fdf4" : "#fff",
-                            color: highlightedIndex === index ? "#1a9e71" : "inherit",
+                            color: highlightedIndex === index ? "#00ab81" : "inherit",
                           }}
                         >
                           <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529" }}>
@@ -262,7 +262,7 @@ export default function Accounts() {
                     minHeight: "40px",
                     maxHeight: "40px",
                     padding: "0 18px",
-                    background: isSearchHovered ? "#158a60" : "#1a9e71",
+                    background: isSearchHovered ? "#009973" : "#00ab81",
                     color: "#fff",
                     border: "none",
                     borderRadius: "5px",
@@ -308,7 +308,7 @@ export default function Accounts() {
                               style={{
                                 fontSize: "12px",
                                 fontWeight: isLast ? 700 : 600,
-                                color: isLast ? "#1a9e71" : "#212529",
+                                color: isLast ? "#00ab81" : "#212529",
                                 textDecoration: "none",
                               }}
                             >

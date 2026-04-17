@@ -68,7 +68,7 @@ export default function Dashboard() {
   const isLoading = isLoadingMatches || isLoadingBets;
 
   return (
-    <div className="bg-[#f0f2f5] pb-16 min-h-screen">
+    <div className="bg-[#e9ecef] pb-16 min-h-screen">
       <main className="px-0 pt-0 pb-8 max-w-4xl mx-auto">
 
         {/* Search Users Section */}
@@ -84,11 +84,11 @@ export default function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 border border-[#ced4da] rounded px-3 py-1.5 text-sm placeholder-gray-400 focus:outline-none focus:border-[#16a085] text-[#2c3e50] bg-white"
+              className="flex-1 border border-[#ced4da] rounded px-3 py-1.5 text-sm placeholder-gray-400 focus:outline-none focus:border-[#00ab81] text-[#2c3e50] bg-white"
             />
             <button
               onClick={handleSearch}
-              className="bg-[#1a9e71] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#158c61] transition-colors"
+              className="bg-[#00ab81] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#009973] transition-colors"
             >
               <Search className="w-3.5 h-3.5" />
               Search
@@ -102,7 +102,7 @@ export default function Dashboard() {
             <span className="font-bold text-[#2c3e50] text-sm">Sport Highlights</span>
             <button
               onClick={handleRefresh}
-              className="bg-[#1a9e71] text-white text-xs px-3 py-0.5 rounded hover:bg-[#158c61] transition-colors"
+              className="bg-[#00ab81] text-white text-xs px-3 py-0.5 rounded hover:bg-[#009973] transition-colors"
             >
               Refresh
             </button>
@@ -110,7 +110,7 @@ export default function Dashboard() {
           <div className="p-0 overflow-x-auto mt-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-[#16a085] animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#00ab81] animate-spin" />
               </div>
             ) : filteredMatches.length === 0 ? (
               <div className="py-8 text-center text-[#7f8c8d] text-sm border border-[#d5d8dc]">
@@ -130,13 +130,13 @@ export default function Dashboard() {
                         return (
                           <tr key={match.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9f9f9]'}>
                             <td className="border border-[#d5d8dc] px-3 py-2">
-                              <span className="text-[#1a9e71] text-sm font-normal cursor-pointer hover:underline">
+                              <span className="text-[#00ab81] text-sm font-normal cursor-pointer hover:underline">
                                 {match.title} / Match Odds
                               </span>
                               {match.status === 'live' && (
                                 <>
                                   <br />
-                                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1a9e71] mt-1" />
+                                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#00ab81] mt-1" />
                                 </>
                               )}
                             </td>
