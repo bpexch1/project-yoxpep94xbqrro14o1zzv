@@ -136,6 +136,7 @@ export default function Accounts() {
           borderRadius: 10,
           border: "1px solid #d0d0d0",
           boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+          marginTop: 16,
           marginBottom: 16,
           overflow: "visible", // Changed to visible for dropdown
         }}>
