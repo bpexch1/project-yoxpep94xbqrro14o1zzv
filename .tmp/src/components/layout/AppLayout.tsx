@@ -23,9 +23,46 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-[200px]"
       )}>
         <Header onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} />
-        <main className="flex-1 overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden pb-[25px]">
           {children}
         </main>
+        
+        {/* News Ticker Footer */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 h-[25px] bg-[#2c3e50] overflow-hidden flex items-center border-t border-white/10">
+          <div className="animate-marquee whitespace-nowrap flex">
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            {/* Repeat text so scroll feels continuous */}
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+            <span style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
+              <b>Welcome to Exchange.</b>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
