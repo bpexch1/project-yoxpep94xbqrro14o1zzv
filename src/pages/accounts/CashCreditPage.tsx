@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client, Transaction } from "@/entities";
-import { handleTransaction } from "@/functions";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ChevronLeft, 
@@ -75,23 +74,33 @@ export default function CashCreditPage() {
 
     setIsSubmittingDeposit(true);
     try {
-      const result = await handleTransaction({
-        clientId: client.id,
-        clientUsername: client.username,
-        tabType: activeTab,
-        transactionType: 'deposit',
-        amount,
-        description: depositDesc,
-        beforeCash: client.cash || 0,
-        beforeCreditReceived: client.credit_received || 0,
-        beforeCreditRemaining: client.credit_remaining || 0,
-        beforeBalanceUpline: client.balance_upline || 0,
-      });
+      let clientUpdateData: Record<string, number> = {};
+      let afterBalance: number;
+      let beforeBalance: number;
 
-      if (result?.error) {
-        toast({ variant: "destructive", title: "Deposit Failed", description: result.error });
-        return;
+      if (activeTab === 'cash') {
+        beforeBalance = client.cash || 0;
+        afterBalance = beforeBalance + amount;
+        const newBalanceUpline = (client.balance_upline || 0) + amount;
+        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline };
+      } else {
+        beforeBalance = client.credit_remaining || 0;
+        afterBalance = beforeBalance + amount;
+        clientUpdateData = {
+          credit_received: (client.credit_received || 0) + amount,
+          credit_remaining: afterBalance,
+        };
       }
+
+      await Client.update(client.id, clientUpdateData);
+      await Transaction.create({
+        client_username: client.username,
+        type: activeTab,
+        amount: amount,
+        description: depositDesc,
+        before_balance: beforeBalance,
+        after_balance: afterBalance,
+      });
 
       await refreshAll();
       toast({ title: "Deposit Successful ✓", description: `${amount.toLocaleString()} Rs. deposited to ${client.username}` });
@@ -112,29 +121,42 @@ export default function CashCreditPage() {
       return;
     }
 
+    // Insufficient balance check
+    if (activeTab === 'cash' && amount > (client.cash || 0)) {
+      toast({ variant: "destructive", title: "Insufficient Balance", description: `Available: ${(client.cash || 0).toLocaleString()} Rs.` });
+      return;
+    }
+    if (activeTab === 'credit' && amount > (client.credit_remaining || 0)) {
+      toast({ variant: "destructive", title: "Insufficient Balance", description: `Available: ${(client.credit_remaining || 0).toLocaleString()} Rs.` });
+      return;
+    }
+
     setIsSubmittingWithdraw(true);
     try {
-      const result = await handleTransaction({
-        clientId: client.id,
-        clientUsername: client.username,
-        tabType: activeTab,
-        transactionType: 'withdraw',
-        amount,
-        description: withdrawDesc,
-        beforeCash: client.cash || 0,
-        beforeCreditReceived: client.credit_received || 0,
-        beforeCreditRemaining: client.credit_remaining || 0,
-        beforeBalanceUpline: client.balance_upline || 0,
-      });
+      let clientUpdateData: Record<string, number> = {};
+      let afterBalance: number;
+      let beforeBalance: number;
 
-      if (result?.error) {
-        toast({ 
-          variant: "destructive", 
-          title: result.error === 'Insufficient Balance' ? "Insufficient Balance" : "Withdraw Failed", 
-          description: result.error === 'Insufficient Balance' ? `Available: ${(result.available || 0).toLocaleString()} Rs.` : result.error 
-        });
-        return;
+      if (activeTab === 'cash') {
+        beforeBalance = client.cash || 0;
+        afterBalance = Math.max(0, beforeBalance - amount);
+        const newBalanceUpline = Math.max(0, (client.balance_upline || 0) - amount);
+        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline };
+      } else {
+        beforeBalance = client.credit_remaining || 0;
+        afterBalance = Math.max(0, beforeBalance - amount);
+        clientUpdateData = { credit_remaining: afterBalance };
       }
+
+      await Client.update(client.id, clientUpdateData);
+      await Transaction.create({
+        client_username: client.username,
+        type: activeTab,
+        amount: -amount,
+        description: withdrawDesc,
+        before_balance: beforeBalance,
+        after_balance: afterBalance,
+      });
 
       await refreshAll();
       toast({ title: "Withdraw Successful ✓", description: `${amount.toLocaleString()} Rs. withdrawn from ${client.username}` });
