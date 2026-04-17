@@ -39,6 +39,9 @@ export function ClientSummaryCard({
     try {
       await onRefresh();
       setBalanceVisible(true);
+      // Auto-expand all rows so C, Edit, L, A buttons are visible
+      const allIds = new Set(filteredClients.map((c: any) => c.id));
+      setExpandedIds(allIds);
     } finally {
       setTimeout(() => setIsRefreshing(false), 600);
     }
