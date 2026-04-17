@@ -336,7 +336,7 @@ export default function Accounts() {
           username={session?.username || 'Admin'}
           searchFilter={searchQuery}
           onRefresh={refetch}
-          autoLoadBalance={true}
+          autoLoadBalance={false}
         />
 
         {/* News Ticker — only on Accounts page */}
