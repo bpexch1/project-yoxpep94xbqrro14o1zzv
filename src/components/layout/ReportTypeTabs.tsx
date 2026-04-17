@@ -45,43 +45,42 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
       </div>
 
-      {/* Button grid — 3 columns */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "8px",
-        padding: "10px 12px 12px",
+      {/* Button Row — Horizontal Flex Wrap */}
+      <div className="flex flex-wrap gap-2 justify-center md:justify-start" style={{
+        padding: "10px 12px 14px",
       }}>
         {tabs.map((tab) => {
           const isActive = currentId === tab.id;
-          const isCommission = tab.id === "Commission Report";
           return (
             <button
               key={tab.id}
               onClick={() => go(tab)}
               style={{
-                gridColumnStart: isCommission ? 2 : undefined,
-                height: "38px",
-                minHeight: "38px",
-                maxHeight: "38px",
-                width: "100%",
-                border: `1.5px solid ${isActive ? "#1a9e71" : "#14b8a6"}`,
-                borderRadius: "7px",
-                background: isActive ? "#1a9e71" : "#fff",
-                color: isActive ? "#fff" : "#14b8a6",
-                fontFamily: "Roboto, system-ui, sans-serif",
-                fontSize: isCommission ? "11px" : "12px",
+                background: isActive ? "#1a9e71" : "transparent",
+                border: "1.5px solid #1a9e71",
+                color: isActive ? "#fff" : "#1a9e71",
+                borderRadius: "5px",
+                padding: "5px 12px",
+                fontSize: "13px",
                 fontWeight: 500,
                 cursor: "pointer",
-                transition: "background .15s, color .15s",
+                transition: "background 0.15s, color 0.15s",
                 whiteSpace: "nowrap",
-                padding: "0 4px",
-                boxSizing: "border-box",
-                display: "flex",
+                display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                lineHeight: 1,
-                overflow: "hidden",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "#1a9e71";
+                  e.currentTarget.style.color = "#fff";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "#1a9e71";
+                }
               }}
             >
               {tab.label}
