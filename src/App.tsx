@@ -18,6 +18,7 @@ import FinalSheet from "./pages/reports/FinalSheet";
 import CurrentPosition from "./pages/CurrentPosition";
 import AccountView from "./pages/AccountView";
 import UserDashboard from "./pages/UserDashboard";
+import UserProfile from "./pages/UserProfile";
 import MatchDetail from "./pages/MatchDetail";
 import EditClientPage from "./pages/accounts/EditClientPage";
 import CashCreditPage from "./pages/accounts/CashCreditPage";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/accounts/settle-pl/:username" element={<AppLayout><SettlePLPage /></AppLayout>} />
             <Route path="/accounts/ledger/:username" element={<AppLayout><LedgerPage /></AppLayout>} />
             <Route path="/play" element={<UserDashboard />} />
+            <Route path="/play/profile" element={<UserProfile />} />
             <Route path="/play/match/:matchId" element={<MatchDetail />} />
             
             <Route path="*" element={<NotFound />} />

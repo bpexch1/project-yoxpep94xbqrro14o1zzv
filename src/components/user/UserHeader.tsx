@@ -87,7 +87,10 @@ export function UserHeader({
                 {menuItems.map(item => (
                   <button 
                     key={item} 
-                    onClick={() => setDropdownOpen(false)} 
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      if (item === "Profile") navigate("/play/profile");
+                    }} 
                     className="block w-full text-left px-4 py-3 text-[14px] text-gray-800 hover:bg-gray-100 border-b border-gray-100 transition-colors"
                   >
                     {item}
