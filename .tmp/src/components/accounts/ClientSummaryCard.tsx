@@ -131,44 +131,32 @@ export function ClientSummaryCard({
           <table className="w-auto text-left border-collapse border border-[#ccc]">
             <thead>
               <tr className="bg-[#f8f9fa]">
-                <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Users</th>
-                <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Received</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Credit<br/>Remaining</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Cash</th>
                 <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">P/L<br/>Downline</th>
-                <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center leading-tight whitespace-nowrap">Balance<br/>UpLine</th>
+                <th className="py-1.5 px-2 border border-[#ccc] font-bold text-[#212529] text-[11px] text-center whitespace-nowrap">Users</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className="text-[13px] font-bold text-[#17a2b8]">
-                    {filteredClients.length}
-                  </span>
-                </td>
-                <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
-                    {balanceVisible ? totals.credit_received.toLocaleString() : "0"}
-                  </span>
-                </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
                   <span className={cn("text-[13px] font-bold", balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
                     {balanceVisible ? totals.credit_remaining.toLocaleString() : "0"}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", balanceVisible && totals.cash < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
+                  <span className={cn("text-[13px] font-bold", balanceVisible && totals.cash < 0 ? "text-[#dc3545]" : balanceVisible && totals.cash > 0 ? "text-[#28a745]" : "text-[#212529]")}>
                     {balanceVisible ? totals.cash.toLocaleString() : "0"}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", balanceVisible && totals.pl_downline < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
+                  <span className={cn("text-[13px] font-bold", balanceVisible && totals.pl_downline < 0 ? "text-[#dc3545]" : balanceVisible && totals.pl_downline > 0 ? "text-[#28a745]" : "text-[#212529]")}>
                     {balanceVisible ? totals.pl_downline.toLocaleString() : "0"}
                   </span>
                 </td>
                 <td className="py-1.5 px-2 border border-[#ccc] text-center whitespace-nowrap">
-                  <span className={cn("text-[13px] font-bold", balanceVisible && totals.balance_upline < 0 ? "text-[#dc3545]" : balanceVisible ? "text-[#28a745]" : "text-[#212529]")}>
-                    {balanceVisible ? totals.balance_upline.toLocaleString() : "0"}
+                  <span className="text-[13px] font-bold text-[#17a2b8]">
+                    {filteredClients.length}
                   </span>
                 </td>
               </tr>
