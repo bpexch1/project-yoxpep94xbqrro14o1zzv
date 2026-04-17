@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
-import { Filter, Search, Loader2 } from "lucide-react";
-import { Transaction as TransactionEntity } from "@/entities";
+import { Filter, Search, Loader2, BookOpen } from "lucide-react";
+import { Transaction as TransactionEntity, Client } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ export default function BookDetail() {
   const today = new Date().toISOString().split('T')[0];
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
+  const [usernameFilter, setUsernameFilter] = useState("");
   const [searchTrigger, setSearchTrigger] = useState(0);
   
   const session = getClientSession();
@@ -26,25 +27,39 @@ export default function BookDetail() {
   }, [session, navigate]);
 
   const { data: transactions, isLoading } = useQuery({
-    queryKey: ["transactions", session?.username, fromDate, toDate, searchTrigger, downlineUsernames],
+    queryKey: ["transactions", session?.username, fromDate, toDate, searchTrigger, usernameFilter, downlineUsernames],
     queryFn: async () => {
-      if (!session) return [];
+      if (!session || searchTrigger === 0) return [];
       
       let all: any[];
-      if (downlineUsernames === null) {
-        // Company role: see all transactions
-        all = await TransactionEntity.query().sort("-created_at").exec();
-      } else if (session.role === 'client') {
-        all = await TransactionEntity.query().where("client_username", session.username).sort("-created_at").exec();
+      
+      // If a specific username is filtered
+      if (usernameFilter.trim() !== "") {
+        // Still check if the user is allowed to see this client
+        const isAllowed = downlineUsernames === null || (downlineUsernames && downlineUsernames.includes(usernameFilter)) || usernameFilter === session.username;
+        
+        if (!isAllowed) {
+          return [];
+        }
+        
+        all = await TransactionEntity.query().where("client_username", usernameFilter).sort("-created_at").exec();
       } else {
-        // Admin/agent: see downline transactions
-        if (!downlineUsernames || downlineUsernames.length === 0) {
-          // Also show own transactions
+        // No username filter, use default visibility logic
+        if (downlineUsernames === null) {
+          // Company role: see all transactions
+          all = await TransactionEntity.query().sort("-created_at").exec();
+        } else if (session.role === 'client') {
           all = await TransactionEntity.query().where("client_username", session.username).sort("-created_at").exec();
         } else {
-          const allTxns = await TransactionEntity.query().sort("-created_at").exec();
-          const allAllowed = [session.username, ...downlineUsernames];
-          all = allTxns.filter((t: any) => allAllowed.includes(t.client_username));
+          // Admin/agent: see downline transactions
+          if (!downlineUsernames || downlineUsernames.length === 0) {
+            // Also show own transactions
+            all = await TransactionEntity.query().where("client_username", session.username).sort("-created_at").exec();
+          } else {
+            const allTxns = await TransactionEntity.query().sort("-created_at").exec();
+            const allAllowed = [session.username, ...downlineUsernames];
+            all = allTxns.filter((t: any) => allAllowed.includes(t.client_username));
+          }
         }
       }
       
@@ -54,7 +69,7 @@ export default function BookDetail() {
         return date >= fromDate && date <= toDate;
       }).reverse(); // Reverse to chronological for running balance calculation
     },
-    enabled: !!session && downlineUsernames !== undefined,
+    enabled: !!session && downlineUsernames !== undefined && searchTrigger > 0,
   });
 
   const handleSearch = () => {
@@ -63,10 +78,7 @@ export default function BookDetail() {
 
   // Calculate running balance starting from the first transaction in the period
   let runningBalance = 0;
-  const processedTransactions = transactions?.map((t, index) => {
-    // In a real system, the balance would be cumulative. 
-    // Here we use the before/after balance from the entity if available.
-    // If not, we simulate.
+  const processedTransactions = transactions?.map((t) => {
     const amount = t.amount || 0;
     const isCredit = amount > 0;
     const dr = isCredit ? 0 : Math.abs(amount);
@@ -87,98 +99,132 @@ export default function BookDetail() {
   const totalCr = processedTransactions?.reduce((acc, t) => acc + t.cr, 0) || 0;
 
   return (
-    <div className="bg-[#f4f6f7] pb-16">
-      <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
+    <div className="bg-[#f4f6f7] min-h-screen pb-16">
+      <main className="max-w-5xl mx-auto font-sans">
         <div className="h-2" />
         
-        <div className="mx-4 mb-3">
+        <div className="mx-4 mt-2 mb-3">
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
-        {/* Date Filter Card */}
+        {/* Filters Card */}
         <div className="mx-4 mb-3">
-          <section className="bg-white border border-[#d5d8dc] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#d5d8dc] bg-[#ecf0f1]">
+          <section className="bg-white border border-[#d0d0d0] rounded-[4px] overflow-hidden shadow-sm">
+            <div className="bg-[#ecf0f1] border-b border-[#d0d0d0] px-3 py-2 flex items-center gap-2">
               <Filter className="w-4 h-4 fill-[#2c3e50] text-[#2c3e50]" />
-              <span className="font-bold text-[#2c3e50] text-sm">Filters</span>
+              <strong className="text-[13px] text-[#2c3e50]">Filters</strong>
             </div>
-            <div className="p-4 flex flex-col gap-3">
-              <div className="flex gap-2">
+            <div className="p-3">
+              {/* Row 1: Username */}
+              <div className="mb-3">
+                <label className="text-[11px] font-bold text-[#555] uppercase mb-1 block">Client Username</label>
+                <input
+                  type="text"
+                  placeholder="Enter username or leave blank for all"
+                  list="downline-users-list"
+                  value={usernameFilter}
+                  onChange={(e) => setUsernameFilter(e.target.value)}
+                  className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors"
+                />
+                <datalist id="downline-users-list">
+                  {downlineUsernames?.map((name: string) => (
+                    <option key={name} value={name} />
+                  ))}
+                  <option value={session?.username} />
+                </datalist>
+              </div>
+
+              {/* Row 2: From/To Dates */}
+              <div className="flex gap-3 mb-3">
                 <div className="flex-1">
-                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">From Date</label>
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded px-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                  <label className="text-[11px] font-bold text-[#555] uppercase mb-1 block">From Date</label>
+                  <input 
+                    type="date" 
+                    value={fromDate} 
+                    onChange={(e) => setFromDate(e.target.value)} 
+                    className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors" 
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">To Date</label>
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded px-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                  <label className="text-[11px] font-bold text-[#555] uppercase mb-1 block">To Date</label>
+                  <input 
+                    type="date" 
+                    value={toDate} 
+                    onChange={(e) => setToDate(e.target.value)} 
+                    className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors" 
                   />
                 </div>
               </div>
-              <button 
+
+              {/* Get Report button */}
+              <button
                 onClick={handleSearch}
-                className="bg-[#00b181] text-white w-full py-2 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4dbd74] transition-colors"
+                className="w-full h-[34px] bg-[#1a9e71] hover:bg-[#158a60] text-white text-[13px] font-bold rounded flex items-center justify-center gap-2 transition-colors"
               >
-                <Search className="w-4 h-4" />
-                Get Report
+                <Search className="w-4 h-4" /> Get Report
               </button>
             </div>
           </section>
         </div>
 
-        {/* Report Table */}
+        {/* Results Card */}
         <div className="mx-4">
-          <section className="bg-white border border-[#d5d8dc] overflow-hidden">
+          <section className="bg-white border border-[#d0d0d0] rounded-[4px] overflow-hidden shadow-sm">
+            <div className="bg-[#ecf0f1] border-b border-[#d0d0d0] px-3 py-2 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#2c3e50]" />
+              <strong className="text-[13px] text-[#2c3e50]">
+                {usernameFilter ? `${usernameFilter} — Book Detail` : "Book Detail"}
+              </strong>
+            </div>
+
             <div className="overflow-x-auto">
-              <table className="w-full text-xs border-collapse">
+              <table className="w-full text-[12px] border-collapse">
                 <thead>
                   <tr className="bg-[#254465] text-white">
-                    <th className="border border-[#1a3550] px-2 py-2 text-left font-medium">S.No</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-left font-medium">Date/Time</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-left font-medium">Description</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Dr</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Cr</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Balance</th>
+                    <th className="border border-[#1a3550] px-3 py-2 text-left font-medium">S.No</th>
+                    <th className="border border-[#1a3550] px-3 py-2 text-left font-medium">Date/Time</th>
+                    <th className="border border-[#1a3550] px-3 py-2 text-left font-medium">Description</th>
+                    <th className="border border-[#1a3550] px-3 py-2 text-right font-medium">Dr</th>
+                    <th className="border border-[#1a3550] px-3 py-2 text-right font-medium">Cr</th>
+                    <th className="border border-[#1a3550] px-3 py-2 text-right font-medium">Balance</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoading ? (
+                  {searchTrigger === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto" />
+                      <td colSpan={6} className="py-10 text-center text-[#888] text-[13px] italic">
+                        Use the filters above and click <strong>Get Report</strong> to load data.
+                      </td>
+                    </tr>
+                  ) : isLoading ? (
+                    <tr>
+                      <td colSpan={6} className="py-10 text-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71] mx-auto" />
                       </td>
                     </tr>
                   ) : processedTransactions && processedTransactions.length > 0 ? (
                     processedTransactions.map((t, i) => (
-                      <tr key={t.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]")}>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700">{i + 1}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700">
+                      <tr key={t.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa]")}>
+                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057]">{i + 1}</td>
+                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057]">
                           {new Date(t.created_at).toLocaleDateString()}<br/>
                           <span className="text-[10px] text-gray-400">{new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 min-w-[100px]">{t.description}</td>
-                        <td className={cn("border border-[#d5d8dc] px-2 py-1.5 text-right font-bold", t.dr > 0 ? "text-[#e74c3c]" : "text-gray-400")}>
+                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057] min-w-[150px]">{t.description}</td>
+                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", t.dr > 0 ? "text-[#e74c3c]" : "text-gray-400")}>
                           {t.dr > 0 ? t.dr.toFixed(2) : "0.00"}
                         </td>
-                        <td className={cn("border border-[#d5d8dc] px-2 py-1.5 text-right font-bold", t.cr > 0 ? "text-[#00b181]" : "text-gray-400")}>
+                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", t.cr > 0 ? "text-[#1a9e71]" : "text-gray-400")}>
                           {t.cr > 0 ? t.cr.toFixed(2) : "0.00"}
                         </td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-bold text-[#254465]">
+                        <td className="border border-[#dee2e6] px-3 py-1.5 text-right font-bold text-[#254465]">
                           {t.balance.toFixed(2)}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-gray-500 italic">
+                      <td colSpan={6} className="py-10 text-center text-[#888] text-[13px] italic">
                         No records found for selected period.
                       </td>
                     </tr>
@@ -187,10 +233,10 @@ export default function BookDetail() {
                 {processedTransactions && processedTransactions.length > 0 && (
                   <tfoot>
                     <tr className="bg-[#ecf0f1] font-bold">
-                      <td colSpan={3} className="border border-[#d5d8dc] px-2 py-2 text-right text-[#2c3e50]">Total:</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#e74c3c]">{totalDr.toFixed(2)}</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#00b181]">{totalCr.toFixed(2)}</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#254465]">
+                      <td colSpan={3} className="border border-[#dee2e6] px-3 py-2 text-right text-[#2c3e50]">Total:</td>
+                      <td className="border border-[#dee2e6] px-3 py-2 text-right text-[#e74c3c]">{totalDr.toFixed(2)}</td>
+                      <td className="border border-[#dee2e6] px-3 py-2 text-right text-[#1a9e71]">{totalCr.toFixed(2)}</td>
+                      <td className="border border-[#dee2e6] px-3 py-2 text-right text-[#254465]">
                         {(totalCr - totalDr).toFixed(2)}
                       </td>
                     </tr>
@@ -198,6 +244,12 @@ export default function BookDetail() {
                 )}
               </table>
             </div>
+
+            {searchTrigger > 0 && !isLoading && (
+              <div className="px-3 py-2 text-[11px] text-[#555] bg-[#f8f9fa] border-t border-[#d0d0d0]">
+                Showing {processedTransactions?.length || 0} entries
+              </div>
+            )}
           </section>
         </div>
       </main>
