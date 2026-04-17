@@ -22,20 +22,6 @@ export default function Accounts() {
 
   useEffect(() => {
     if (!session) navigate("/login");
-    async function fixBookRole() {
-      try {
-        const results = await ClientEntity.filter({ username: "Book" }, "-created_at", 1);
-        if (results && results.length > 0) {
-          const book = results[0];
-          if (book.role === "superadmin") {
-            await ClientEntity.update(book.id, { role: "company" });
-          }
-        }
-      } catch (e) {
-        console.error("Book role fix error:", e);
-      }
-    }
-    fixBookRole();
   }, [session, navigate]);
 
   useEffect(() => {
