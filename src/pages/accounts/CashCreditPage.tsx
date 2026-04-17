@@ -103,8 +103,19 @@ export default function CashCreditPage() {
       });
 
       await refreshAll();
-      toast({ title: "Deposit Successful ✓", description: `${amount.toLocaleString()} Rs. deposited to ${client.username}` });
-      setDepositAmount('0');
+      
+      navigate(`/accounts/transaction-statement`, { 
+        state: {
+          type: 'deposit',
+          tab: activeTab,
+          clientUsername: client.username,
+          amount: amount,
+          description: depositDesc,
+          beforeBalance: beforeBalance,
+          afterBalance: afterBalance,
+          timestamp: new Date().toISOString(),
+        }
+      });
     } catch (err: any) {
       console.error('Deposit error:', err);
       toast({ variant: "destructive", title: "Deposit Failed", description: err?.message || "Please try again" });
@@ -159,8 +170,19 @@ export default function CashCreditPage() {
       });
 
       await refreshAll();
-      toast({ title: "Withdraw Successful ✓", description: `${amount.toLocaleString()} Rs. withdrawn from ${client.username}` });
-      setWithdrawAmount('0');
+      
+      navigate(`/accounts/transaction-statement`, { 
+        state: {
+          type: 'withdrawal',
+          tab: activeTab,
+          clientUsername: client.username,
+          amount: amount,
+          description: withdrawDesc,
+          beforeBalance: beforeBalance,
+          afterBalance: afterBalance,
+          timestamp: new Date().toISOString(),
+        }
+      });
     } catch (err: any) {
       console.error('Withdraw error:', err);
       toast({ variant: "destructive", title: "Withdraw Failed", description: err?.message || "Please try again" });

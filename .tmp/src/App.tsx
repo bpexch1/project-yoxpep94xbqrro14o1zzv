@@ -24,6 +24,7 @@ import EditClientPage from "./pages/accounts/EditClientPage";
 import CashCreditPage from "./pages/accounts/CashCreditPage";
 import SettlePLPage from "./pages/accounts/SettlePLPage";
 import LedgerPage from "./pages/accounts/LedgerPage";
+import TransactionStatement from "./pages/accounts/TransactionStatement";
 import BetLock from "./pages/BetLock";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/accounts/cash-credit/:username" element={<AppLayout><CashCreditPage /></AppLayout>} />
             <Route path="/accounts/settle-pl/:username" element={<AppLayout><SettlePLPage /></AppLayout>} />
             <Route path="/accounts/ledger/:username" element={<AppLayout><LedgerPage /></AppLayout>} />
+            <Route path="/accounts/transaction-statement" element={<AppLayout><TransactionStatement /></AppLayout>} />
             <Route path="/bet-lock" element={<AppLayout><BetLock /></AppLayout>} />
             <Route path="/play" element={<UserDashboard />} />
             <Route path="/play/profile" element={<UserProfile />} />
