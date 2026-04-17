@@ -12,6 +12,7 @@ export default function Accounts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const session = getClientSession();
@@ -226,15 +227,17 @@ export default function Accounts() {
               </div>
               <button
                 onClick={handleSearchClick}
+                onMouseEnter={() => setIsSearchHovered(true)}
+                onMouseLeave={() => setIsSearchHovered(false)}
                 style={{
                   height: "40px",
                   minHeight: "40px",
                   maxHeight: "40px",
                   padding: "0 18px",
-                  background: "#1a9e71",
+                  background: isSearchHovered ? "#158a60" : "#1a9e71",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "7px",
+                  borderRadius: "5px",
                   fontSize: "14px",
                   fontWeight: 600,
                   fontFamily: "Roboto, system-ui, sans-serif",
@@ -244,6 +247,8 @@ export default function Accounts() {
                   gap: 6,
                   boxSizing: "border-box",
                   flexShrink: 0,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+                  transition: "background 0.15s",
                 }}
               >
                 <Search style={{ width: 15, height: 15 }} />
