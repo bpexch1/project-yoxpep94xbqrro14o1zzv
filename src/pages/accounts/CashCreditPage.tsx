@@ -85,7 +85,8 @@ export default function CashCreditPage() {
       if (activeTab === 'cash') {
         beforeBalance = beforeCash;
         newBalance = beforeCash + amount;
-        clientUpdateData = { cash: newBalance };
+        const newBalanceUpline = (client.balance_upline || 0) + amount;
+        clientUpdateData = { cash: newBalance, balance_upline: newBalanceUpline };
       } else {
         beforeBalance = beforeCreditRemaining;
         newBalance = beforeCreditRemaining + amount;
@@ -155,7 +156,8 @@ export default function CashCreditPage() {
       if (activeTab === 'cash') {
         beforeBalance = beforeCash;
         newBalance = Math.max(0, beforeCash - amount);
-        clientUpdateData = { cash: newBalance };
+        const newBalanceUpline = Math.max(0, (client.balance_upline || 0) - amount);
+        clientUpdateData = { cash: newBalance, balance_upline: newBalanceUpline };
       } else {
         beforeBalance = beforeCreditRemaining;
         newBalance = Math.max(0, beforeCreditRemaining - amount);
