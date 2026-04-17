@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Pencil, User, BookOpen, Loader2 } from "lucide-react";
+import { Pencil, User, Book, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -177,7 +177,7 @@ export function ClientSummaryCard({
             onClick={() => navigate(`/reports/daily`)}
             className="bg-[#1a9e71] text-white font-bold text-[13px] py-1.5 px-3.5 rounded-[5px] flex items-center gap-1.5 whitespace-nowrap"
           >
-            <BookOpen className="w-3.5 h-3.5" /> Account Ledger
+            <Book className="w-3.5 h-3.5" /> Account Ledger
           </button>
         </div>
 
