@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Pencil, User, Book, Loader2, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/entities";
+import { DataTablePagination } from "./DataTablePagination";
 
 interface ClientSummaryCardProps {
   clients: any[];
@@ -37,6 +38,13 @@ export function ClientSummaryCard({
   
   // Feature 3 state
   const [mobileExpandedIds, setMobileExpandedIds] = useState<Set<string>>(new Set());
+
+  // DataTable states
+  const [pageSize, setPageSize] = useState(25);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [tableSearch, setTableSearch] = useState("");
 
   const toggleMobileExpand = (id: string) => {
     const next = new Set(mobileExpandedIds);
@@ -79,6 +87,70 @@ export function ClientSummaryCard({
     ),
     [filteredClients]
   );
+
+  // DataTable Logic
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredClients.length, tableSearch]);
+
+  const tableFilteredClients = useMemo(() => {
+    if (!tableSearch) return filteredClients;
+    const query = tableSearch.toLowerCase();
+    return filteredClients.filter(
+      (c) =>
+        c.username?.toLowerCase().includes(query) ||
+        c.full_name?.toLowerCase().includes(query)
+    );
+  }, [filteredClients, tableSearch]);
+
+  const sortedClients = useMemo(() => {
+    if (!sortColumn) return tableFilteredClients;
+
+    return [...tableFilteredClients].sort((a, b) => {
+      let valA: any = a[sortColumn];
+      let valB: any = b[sortColumn];
+
+      // Handle specific numeric columns
+      const numericCols = ['credit_received', 'cash', 'pl_downline', 'downline_share', 'credit_remaining'];
+      if (numericCols.includes(sortColumn)) {
+        valA = Number(valA) || 0;
+        valB = Number(valB) || 0;
+      } else {
+        valA = String(valA || "").toLowerCase();
+        valB = String(valB || "").toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [tableFilteredClients, sortColumn, sortDirection]);
+
+  const paginatedClients = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedClients.slice(start, start + pageSize);
+  }, [sortedClients, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(sortedClients.length / pageSize);
+  const startRecord = (currentPage - 1) * pageSize + 1;
+  const endRecord = Math.min(currentPage * pageSize, sortedClients.length);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortColumn !== column) return <i className="fas fa-sort text-gray-400 ml-1 text-[10px]" />;
+    return sortDirection === 'asc' 
+      ? <i className="fas fa-sort-up text-white ml-1 text-[10px]" />
+      : <i className="fas fa-sort-down text-white ml-1 text-[10px]" />;
+  };
 
   const handleLoadBalance = async () => {
     setIsRefreshing(true);
@@ -202,18 +274,24 @@ export function ClientSummaryCard({
           </div>
         </div>
 
-        {/* Search row */}
+        {/* DataTable Top Controls */}
         <div className="mb-4">
-          <div className="flex items-center gap-2 max-w-xs">
-            <label className="text-[11px] font-bold text-[#212529] whitespace-nowrap">SEARCH:</label>
-            <input
-              type="text"
-              placeholder="Username..."
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-              className="w-full h-8 border border-[#ccc] rounded-[4px] px-2 text-[12px] outline-none"
-            />
-          </div>
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalRecords={sortedClients.length}
+            pageSize={pageSize}
+            startRecord={startRecord}
+            endRecord={endRecord}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
+            searchValue={tableSearch}
+            onSearchChange={setTableSearch}
+            showBottomControls={false}
+          />
         </div>
 
         {/* Load Balance Header (Shared) */}
@@ -235,14 +313,94 @@ export function ClientSummaryCard({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-[#ecf0f1] text-[#212529] text-[11px] font-black uppercase whitespace-nowrap">
-                <th className="px-2 py-2 border border-[#d5d8dc] text-left">Username</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-left">Type</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Credit</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Balance</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Client (P/L)</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Share</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Exposure</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Available Balance</th>
+                <th 
+                  onClick={() => handleSort('username')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-left cursor-pointer select-none transition-colors",
+                    sortColumn === 'username' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    Username {getSortIcon('username')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('role')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-left cursor-pointer select-none transition-colors",
+                    sortColumn === 'role' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    Type {getSortIcon('role')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('credit_received')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
+                    sortColumn === 'credit_received' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-end">
+                    Credit {getSortIcon('credit_received')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('cash')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
+                    sortColumn === 'cash' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-end">
+                    Balance {getSortIcon('cash')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('pl_downline')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
+                    sortColumn === 'pl_downline' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-end">
+                    Client (P/L) {getSortIcon('pl_downline')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('downline_share')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
+                    sortColumn === 'downline_share' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-end">
+                    Share {getSortIcon('downline_share')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('exposure')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
+                    sortColumn === 'exposure' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-end">
+                    Exposure {getSortIcon('exposure')}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => handleSort('credit_remaining')}
+                  className={cn(
+                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
+                    sortColumn === 'credit_remaining' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
+                  )}
+                >
+                  <div className="flex items-center justify-end">
+                    Available Balance {getSortIcon('credit_remaining')}
+                  </div>
+                </th>
                 <th className="px-2 py-2 border border-[#d5d8dc] text-center">Options</th>
               </tr>
             </thead>
@@ -254,14 +412,14 @@ export function ClientSummaryCard({
                     <span className="font-bold">Loading clients data...</span>
                   </td>
                 </tr>
-              ) : filteredClients.length === 0 ? (
+              ) : paginatedClients.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-3 py-12 text-center text-[#212529] bg-white font-bold">
                     No users found
                   </td>
                 </tr>
               ) : (
-                filteredClients.map((client, idx) => {
+                paginatedClients.map((client, idx) => {
                   const roleLower = client.role?.toLowerCase();
                   const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
                   const display = getClientDisplayData(client);
@@ -381,12 +539,12 @@ export function ClientSummaryCard({
               <Loader2 className="w-6 h-6 animate-spin text-[#00ab81] mx-auto mb-2" />
               <span className="font-bold text-xs uppercase">Loading clients...</span>
             </div>
-          ) : filteredClients.length === 0 ? (
+          ) : paginatedClients.length === 0 ? (
             <div className="px-3 py-12 text-center text-[#212529] bg-white font-bold text-xs uppercase">
               No users found
             </div>
           ) : (
-            filteredClients.map((client, idx) => {
+            paginatedClients.map((client, idx) => {
               const roleLower = client.role?.toLowerCase();
               const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
               const display = getClientDisplayData(client);
@@ -492,9 +650,24 @@ export function ClientSummaryCard({
           )}
         </div>
 
-        <div className="mt-3 text-[10px] font-bold text-[#6c757d] flex items-center justify-between px-1 uppercase">
-          <span>Showing {filteredClients.length} entries</span>
-          <span>Records: {clients?.length || 0}</span>
+        {/* DataTable Bottom Controls */}
+        <div className="mt-2">
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalRecords={sortedClients.length}
+            pageSize={pageSize}
+            startRecord={startRecord}
+            endRecord={endRecord}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
+            searchValue={tableSearch}
+            onSearchChange={setTableSearch}
+            showTopControls={false}
+          />
         </div>
       </div>
     </section>
