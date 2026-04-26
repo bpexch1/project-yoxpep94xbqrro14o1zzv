@@ -64,7 +64,7 @@ export default function Accounts() {
 
   const suggestions = (clients || [])
     .filter(c => 
-      searchQuery.length > 0 && 
+      searchQuery.length >= 3 && 
       (c.username?.toLowerCase().includes(searchQuery.toLowerCase()) || 
        c.full_name?.toLowerCase().includes(searchQuery.toLowerCase()))
     )
@@ -184,6 +184,19 @@ export default function Accounts() {
                         background: "#fff",
                       }}
                     />
+                    {searchQuery.length > 0 && searchQuery.length < 3 && (
+                      <div style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        fontSize: "10px",
+                        color: "#6c757d",
+                        marginTop: "2px",
+                        fontWeight: "bold"
+                      }}>
+                        Type at least 3 characters to search
+                      </div>
+                    )}
                     {searchQuery && (
                       <button
                         onClick={() => {
