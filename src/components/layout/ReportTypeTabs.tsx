@@ -2,6 +2,8 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import { Filter } from "lucide-react";
+
 interface ReportTypeTabsProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
@@ -38,17 +40,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         background: "#ecf0f1",
         borderBottom: "1px solid #d0d0d0"
       }}>
-        <div style={{
-          width: 16,
-          height: 16,
-          background: "#000",
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}>
-          <div style={{ width: 8, height: 8, background: "#fff", borderRadius: "50%" }} />
-        </div>
+        <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
       </div>
       <div style={{ padding: "12px 16px" }}>

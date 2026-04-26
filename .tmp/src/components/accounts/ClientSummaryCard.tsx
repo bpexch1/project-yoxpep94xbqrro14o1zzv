@@ -212,7 +212,7 @@ export function ClientSummaryCard({
       {!hideHeader && (
         <div className="bg-[#ecf0f1] border-b border-[#d0d0d0] px-[14px] py-2">
           <span className="font-bold text-sm text-[#212529]">
-            {username} - Clients List | Default
+            {username} - Clients List
           </span>
         </div>
       )}
@@ -328,23 +328,29 @@ export function ClientSummaryCard({
           </div>
         </div>
 
-        {/* DataTable Top Controls */}
-        <div className="mb-4">
-          <DataTablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalRecords={sortedClients.length}
-            pageSize={pageSize}
-            startRecord={startRecord}
-            endRecord={endRecord}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
+        {/* Simple Search box - matching original design */}
+        <div style={{ textAlign: "center", marginBottom: 12, marginTop: 4 }}>
+          <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#212529", marginBottom: 6 }}>
+            Search:
+          </label>
+          <input
+            type="search"
+            value={tableSearch}
+            onChange={(e) => {
+              setTableSearch(e.target.value);
               setCurrentPage(1);
             }}
-            searchValue={tableSearch}
-            onSearchChange={setTableSearch}
-            showBottomControls={false}
+            style={{
+              width: "calc(100% - 32px)",
+              maxWidth: 400,
+              border: "1px solid #d1d5db",
+              borderRadius: 4,
+              padding: "6px 12px",
+              fontSize: 14,
+              outline: "none",
+              fontFamily: "Roboto, system-ui, sans-serif"
+            }}
+            placeholder=""
           />
         </div>
 
