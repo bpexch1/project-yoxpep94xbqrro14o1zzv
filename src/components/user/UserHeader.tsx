@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { RefreshCw, User, ChevronDown } from "lucide-react";
+import { User, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
 import { Client } from "@/entities";
@@ -16,7 +16,6 @@ export function UserHeader() {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const s = getClientSession();
@@ -37,12 +36,6 @@ export function UserHeader() {
     enabled: !!session?.id,
     refetchInterval: 30000,
   });
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ["user-balance"] });
-    setTimeout(() => setIsRefreshing(false), 800);
-  };
 
   const handleLogout = () => {
     clearClientSession();
@@ -69,14 +62,6 @@ export function UserHeader() {
               {balance.toLocaleString('en-IN')}
             </span>
           </div>
-          <button 
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="flex items-center gap-1 bg-[#3DCCC8] hover:bg-[#2db8b4] active:scale-95 text-white text-[10px] font-bold px-2 py-1 rounded-sm transition-all whitespace-nowrap shrink-0"
-          >
-            <RefreshCw className={cn("w-2.5 h-2.5", isRefreshing && "animate-spin")} />
-            REFRESH
-          </button>
         </div>
 
         {/* User Profile */}

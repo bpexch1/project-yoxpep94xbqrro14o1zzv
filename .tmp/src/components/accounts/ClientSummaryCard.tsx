@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Pencil, User, Book, Loader2, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { Pencil, User, Book, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -151,13 +151,6 @@ export function ClientSummaryCard({
     return sortDirection === 'asc' 
       ? <i className="fas fa-sort-up text-white ml-1 text-[10px]" />
       : <i className="fas fa-sort-down text-white ml-1 text-[10px]" />;
-  };
-
-  const handleLoadBalance = async () => {
-    setIsRefreshing(true);
-    if (onRefresh) await onRefresh();
-    setBalancesLoaded(true);
-    setTimeout(() => setIsRefreshing(false), 800);
   };
 
   const handleRowRefresh = async (client: any) => {
@@ -455,19 +448,11 @@ export function ClientSummaryCard({
                   const roleLower = client.role?.toLowerCase();
                   const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
                   const display = getClientDisplayData(client);
-                  const isRefreshingRow = rowRefreshingMap[client.id];
                   
                   return (
                     <tr key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "hover:bg-green-50/50 transition-colors whitespace-nowrap")}>
                       <td className="px-2 py-2 border border-[#d5d8dc]">
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleRowRefresh(client)}
-                            disabled={isRefreshingRow}
-                            className="text-[#6c757d] hover:text-[#00a65a] transition-colors"
-                          >
-                            <RefreshCw className={cn("w-3 h-3", isRefreshingRow && "animate-spin text-[#00a65a]")} />
-                          </button>
                           <button
                             onClick={() => {
                               if (isAdminType) {
@@ -553,7 +538,6 @@ export function ClientSummaryCard({
           ) : paginatedClients.map((client) => {
             const display = getClientDisplayData(client);
             const isExpanded = mobileExpandedIds.has(client.id);
-            const isRefreshingRow = rowRefreshingMap[client.id];
 
             return (
               <div key={client.id} className="border border-[#d5d8dc] rounded-lg overflow-hidden bg-white shadow-sm">
@@ -562,16 +546,6 @@ export function ClientSummaryCard({
                   onClick={() => toggleMobileExpand(client.id)}
                 >
                   <div className="flex items-center gap-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRowRefresh(client);
-                      }}
-                      disabled={isRefreshingRow}
-                      className="text-[#6c757d] hover:text-[#00a65a]"
-                    >
-                      <RefreshCw className={cn("w-3.5 h-3.5", isRefreshingRow && "animate-spin text-[#00a65a]")} />
-                    </button>
                     <div className="flex flex-col">
                       <span className="font-black text-[#254465]">{client.username}</span>
                       <span className="text-[10px] text-gray-500 uppercase font-bold">{getTypeLabel(client.role)}</span>

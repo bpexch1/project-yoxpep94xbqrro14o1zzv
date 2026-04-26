@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, ChevronDown, LogOut, User, RefreshCw } from "lucide-react";
+import { Menu, ChevronDown, LogOut, User } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
 import { Bet, Client } from "@/entities";
@@ -34,21 +34,11 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setSession(getClientSession());
   }, []);
-
-  const handleLoadBalance = async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["header-balance"] }),
-      queryClient.invalidateQueries({ queryKey: ["header-exposure"] })
-    ]);
-    setTimeout(() => setIsRefreshing(false), 800);
-  };
 
   const { data: downlineUsernames } = useDownlineUsernames(session?.username, session?.role);
 
@@ -164,14 +154,6 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
-              <button
-                onClick={handleLoadBalance}
-                disabled={isRefreshing}
-                className="bg-[#00a65a] hover:bg-[#008d4c] text-white p-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 ml-1"
-                title="Refresh balance"
-              >
-                <RefreshCw className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")} />
-              </button>
             </div>
 
             <DropdownMenu>
