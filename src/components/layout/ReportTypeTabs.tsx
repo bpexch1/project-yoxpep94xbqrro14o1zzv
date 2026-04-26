@@ -45,23 +45,24 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       </div>
       <div style={{ padding: "12px 16px" }}>
         <div style={{ 
-          display: "flex", 
-          flexWrap: "wrap", 
-          gap: 8,
-          justifyContent: "flex-start"
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 8
         }}>
-          {tabs.map((tab) => {
+          {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
+            // If this is the last button AND it would be alone in its row (tabs.length % 3 === 1)
+            // place it in the middle column (gridColumn: 2) to center it
+            const isLastAlone = index === tabs.length - 1 && tabs.length % 3 === 1;
+
             return (
               <button
                 key={tab.label}
                 onClick={() => navigate(tab.path)}
                 style={{
-                  flex: "0 0 calc(33.333% - 6px)",
-                  maxWidth: "calc(33.333% - 6px)",
-                  boxSizing: "border-box",
-                  padding: "7px 4px",
+                  gridColumn: isLastAlone ? 2 : undefined,
+                  padding: "7px 6px",
                   borderRadius: 4,
                   fontSize: 13,
                   fontWeight: isActive ? 700 : 500,
@@ -73,7 +74,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                   textAlign: "center",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
-                  textOverflow: "ellipsis"
+                  textOverflow: "ellipsis",
+                  minWidth: 0
                 }}
               >
                 {tab.label}
