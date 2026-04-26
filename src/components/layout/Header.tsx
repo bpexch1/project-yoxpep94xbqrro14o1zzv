@@ -123,7 +123,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         </button>
         <Link to="/dashboard" className="flex items-center gap-1 ml-1 lg:ml-0">
           <span className="font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>
-            <span className="text-white">Bp</span><span className="text-[#00ab81]">Exch</span>
+            <span className="text-white">Bp</span><span className="text-[#3DCCC8]">Exch</span>
           </span>
         </Link>
       </div>
@@ -167,7 +167,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
               <span className="text-[13px] text-white whitespace-nowrap">
                 <span className="font-bold opacity-80">B:</span> <span className={cn(
                   "font-bold",
-                  liveBalance >= 0 ? "text-[#00ab81]" : "text-[#dc3545]"
+                  liveBalance >= 0 ? "text-[#3DCCC8]" : "text-[#dc3545]"
                 )}>
                   {liveBalance.toLocaleString('en-IN')}
                 </span>
@@ -183,7 +183,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
               <button
                 onClick={handleLoadBalance}
                 disabled={isRefreshing}
-                className="bg-[#00ab81] hover:bg-[#009973] text-white p-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 ml-1"
+                className="bg-[#3DCCC8] hover:bg-[#2db8b4] text-white p-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 ml-1"
                 title="Refresh balance"
               >
                 <RefreshCw className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")} />
@@ -227,7 +227,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-white hover:text-[#00ab81] uppercase"
+            className="text-sm font-bold text-white hover:text-[#3DCCC8] uppercase"
           >
             Login
           </button>

@@ -295,7 +295,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Load Balance Header (Shared) */}
-        <div className="bg-[#00ab81] text-white border-t border-x border-[#d5d8dc]">
+        <div className="bg-[#3DCCC8] text-white border-t border-x border-[#d5d8dc]">
           <div className="px-3 py-1.5 flex items-center">
             <button
               onClick={handleLoadBalance}
@@ -408,7 +408,7 @@ export function ClientSummaryCard({
               {isLoading ? (
                 <tr>
                   <td colSpan={9} className="px-3 py-12 text-center text-[#212529] bg-white">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#00ab81] mx-auto mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#3DCCC8] mx-auto mb-2" />
                     <span className="font-bold">Loading clients data...</span>
                   </td>
                 </tr>
@@ -432,9 +432,9 @@ export function ClientSummaryCard({
                           <button
                             onClick={() => handleRowRefresh(client)}
                             disabled={isRefreshingRow}
-                            className="text-[#6c757d] hover:text-[#00ab81] transition-colors"
+                            className="text-[#6c757d] hover:text-[#3DCCC8] transition-colors"
                           >
-                            <RefreshCw className={cn("w-3 h-3", isRefreshingRow && "animate-spin text-[#00ab81]")} />
+                            <RefreshCw className={cn("w-3 h-3", isRefreshingRow && "animate-spin text-[#3DCCC8]")} />
                           </button>
                           <button
                             onClick={() => {
@@ -536,7 +536,7 @@ export function ClientSummaryCard({
         <div className="lg:hidden flex flex-col border-x border-b border-[#d5d8dc]">
           {isLoading ? (
             <div className="px-3 py-12 text-center text-[#212529] bg-white">
-              <Loader2 className="w-6 h-6 animate-spin text-[#00ab81] mx-auto mb-2" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#3DCCC8] mx-auto mb-2" />
               <span className="font-bold text-xs uppercase">Loading clients...</span>
             </div>
           ) : paginatedClients.length === 0 ? (
@@ -563,7 +563,7 @@ export function ClientSummaryCard({
                         disabled={isRefreshingRow}
                         className="text-[#6c757d] p-1"
                       >
-                        <RefreshCw className={cn("w-3.5 h-3.5", isRefreshingRow && "animate-spin text-[#00ab81]")} />
+                        <RefreshCw className={cn("w-3.5 h-3.5", isRefreshingRow && "animate-spin text-[#3DCCC8]")} />
                       </button>
                       <button
                         onClick={() => {

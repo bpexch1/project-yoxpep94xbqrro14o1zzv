@@ -252,7 +252,7 @@ export default function Accounts() {
                             display: "flex",
                             alignItems: "center",
                             backgroundColor: highlightedIndex === index ? "#f0fdf4" : "#fff",
-                            color: highlightedIndex === index ? "#00ab81" : "inherit",
+                            color: highlightedIndex === index ? "#3DCCC8" : "inherit",
                           }}
                         >
                           <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529" }}>
@@ -275,7 +275,7 @@ export default function Accounts() {
                     minHeight: "40px",
                     maxHeight: "40px",
                     padding: "0 18px",
-                    background: isSearchHovered ? "#009973" : "#00ab81",
+                    background: isSearchHovered ? "#2db8b4" : "#3DCCC8",
                     color: "#fff",
                     border: "none",
                     borderRadius: "5px",
@@ -321,7 +321,7 @@ export default function Accounts() {
                               style={{
                                 fontSize: "12px",
                                 fontWeight: isLast ? 700 : 600,
-                                color: isLast ? "#00ab81" : "#212529",
+                                color: isLast ? "#3DCCC8" : "#212529",
                                 textDecoration: "none",
                               }}
                             >
@@ -352,7 +352,7 @@ export default function Accounts() {
         />
 
         {/* News Ticker — only on Accounts page */}
-        <div className="mt-4 bg-[#2c3e50] overflow-hidden flex items-center border-t border-white/10 h-[25px]">
+        <div className="mt-4 bg-[#1f3044] overflow-hidden flex items-center border-t border-white/10 h-[25px]">
           <div className="animate-marquee whitespace-nowrap flex">
             {Array.from({ length: 10 }).map((_, i) => (
               <span key={i} style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>

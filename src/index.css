@@ -5,8 +5,8 @@
 :root {
   --bg-primary: #e9ecef;
   --bg-card: #ffffff;
-  --accent-green: #00ab81;
-  --accent-green-hover: #009973;
+  --accent-green: #3DCCC8;
+  --accent-green-hover: #2db8b4;
   --sidebar-bg: #254465;
   --accent-blue: #3d6b8b;
   --text-primary: #212529;
@@ -20,19 +20,19 @@
   --card-foreground: 210 11% 15%;
   --popover: 0 0% 100%;
   --popover-foreground: 210 11% 15%;
-  --primary: 165 100% 34%;         /* #00ab81 */
+  --primary: 177 57% 52%;         /* #3DCCC8 */
   --primary-foreground: 0 0% 100%;
   --secondary: 210 17% 91%;
   --secondary-foreground: 210 11% 15%;
   --muted: 210 17% 91%;
   --muted-foreground: 210 8% 45%;
-  --accent: 165 100% 34%;
+  --accent: 177 57% 52%;
   --accent-foreground: 0 0% 100%;
   --destructive: 354 70% 54%;       /* #dc3545 */
   --destructive-foreground: 0 0% 100%;
   --border: 210 14% 89%;
   --input: 210 14% 89%;
-  --ring: 165 100% 34%;
+  --ring: 177 57% 52%;
   --radius: 0.5rem;
   --teal: 188 78% 41%;             /* #17a2b8 */
 }
@@ -67,10 +67,10 @@ html {
 }
 
 a {
-  color: #00ab81;
+  color: #3DCCC8;
 }
 a:hover {
-  color: #009973;
+  color: #2db8b4;
 }
 
 @keyframes marquee {

@@ -1,149 +1,107 @@
-import { useState, useRef, useEffect } from "react";
-import { User } from "@/entities";
-import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Bell, RefreshCw } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { clearClientSession } from "@/hooks/useClientAuth";
+import React, { useState, useEffect } from "react";
+import { RefreshCw, User, ChevronDown } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
+import { Client } from "@/entities";
+import { cn } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-interface UserHeaderProps {
-  userEmail: string;
-  clientBalance?: number;
-  creditRemaining?: number;
-  onMenuToggle: () => void;
-  sidebarOpen?: boolean;
-  onLoadBalance?: () => void;
-  // Included as requested by plan but sport tabs move to main content
-  activeFilter?: string;
-  onFilterChange?: (f: string) => void;
-}
-
-export function UserHeader({ 
-  userEmail, 
-  clientBalance = 0, 
-  creditRemaining = 0, 
-  onMenuToggle,
-  sidebarOpen,
-  onLoadBalance
-}: UserHeaderProps) {
+export function UserHeader() {
+  const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
+    const s = getClientSession();
+    if (!s) {
+      navigate("/login");
+    } else {
+      setSession(s);
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownRef]);
+  }, [navigate]);
 
-  const handleLogout = async () => {
-    await User.logout();
+  const { data: balance = 0 } = useQuery({
+    queryKey: ["user-balance", session?.id],
+    queryFn: async () => {
+      if (!session?.id) return 0;
+      const clients = await Client.filter({ username: session.username }, "-created_at", 1);
+      return (clients as any)?.[0]?.cash ?? 0;
+    },
+    enabled: !!session?.id,
+    refetchInterval: 30000,
+  });
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["user-balance"] });
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
+
+  const handleLogout = () => {
     clearClientSession();
     navigate("/login");
   };
 
-  const menuItems = ["Statement", "Result", "Profit Loss", "Bet History", "Profile"];
+  if (!session) return null;
 
   return (
-    <header className="flex flex-col w-full z-50 sticky top-0">
-      {/* Top Navy Bar */}
-      <div className="bg-[#1e3a5c] h-12 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
+    <header className="bg-[#2c3e50] h-[50px] flex items-center px-3 sticky top-0 z-50 shadow-md">
+      {/* Logo */}
+      <Link to="/play" className="flex items-center gap-1 shrink-0">
+        <span className="font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>
+          <span className="text-white">Bp</span><span className="text-[#3DCCC8]">Exch</span>
+        </span>
+      </Link>
+
+      <div className="ml-auto flex items-center gap-2">
+        {/* Balance Display */}
+        <div className="bg-[#1f3044] rounded px-2 py-1 flex items-center gap-2 border border-white/5">
+          <div className="flex flex-col">
+            <span className="text-[9px] text-white/60 font-bold leading-tight uppercase">Coins</span>
+            <span className="text-[13px] text-[#3DCCC8] font-black leading-tight">
+              {balance.toLocaleString('en-IN')}
+            </span>
+          </div>
           <button 
-            onClick={onMenuToggle}
-            className="text-white hover:text-white/80 transition-colors z-[110]"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-1 bg-[#3DCCC8] hover:bg-[#2db8b4] active:scale-95 text-white text-[10px] font-bold px-2 py-1 rounded-sm transition-all whitespace-nowrap shrink-0"
           >
-            {sidebarOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
+            <RefreshCw className={cn("w-2.5 h-2.5", isRefreshing && "animate-spin")} />
+            REFRESH
           </button>
-          <span className="text-white font-bold text-sm tracking-wide">Dashboard</span>
         </div>
 
-        <div className="flex-1 max-w-md mx-4 hidden md:flex overflow-hidden relative">
-          <div className="whitespace-nowrap animate-marquee flex items-center gap-2 text-white text-[12px] font-medium">
-            <span>Welcome to Exchange.</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-1 text-white hover:opacity-80 transition-opacity"
-            >
-              <span className="text-[12px] font-bold">B: Rs. {clientBalance.toLocaleString('en-IN')} | L: 0</span>
-              <span className="text-[12px] font-bold ml-1">{userEmail}</span>
-              <ChevronDown className="w-3 h-3 text-white/70" />
-            </button>
-
-            {dropdownOpen && (
-              <div className="absolute top-full right-0 mt-1 z-[200] bg-white shadow-lg border border-gray-200 min-w-[160px] rounded-sm py-1">
-                {menuItems.map(item => (
-                  <button 
-                    key={item} 
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      if (item === "Profile") navigate("/play/profile");
-                    }} 
-                    className="block w-full text-left px-4 py-3 text-[14px] text-gray-800 hover:bg-gray-100 border-b border-gray-100 transition-colors"
-                  >
-                    {item}
-                  </button>
-                ))}
-                <button 
-                  onClick={handleLogout} 
-                  className="block w-full text-left px-4 py-3 text-[14px] text-red-600 font-medium hover:bg-gray-100 transition-colors"
-                >
-                  Logout
-                </button>
+        {/* User Profile */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1 hover:bg-white/5 p-1.5 rounded transition-colors border border-white/5">
+              <div className="w-7 h-7 rounded-full bg-[#3DCCC8]/20 flex items-center justify-center text-[#3DCCC8]">
+                <User className="w-4 h-4" />
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="bg-[#254465] h-10 border-t border-white/5 flex items-center justify-center">
-        <div className="container mx-auto px-4 flex items-center justify-between text-white font-bold text-[10px] md:text-[11px] uppercase tracking-widest whitespace-nowrap overflow-x-auto no-scrollbar gap-4">
-          
-          <button
-            onClick={onLoadBalance}
-            className="flex items-center gap-1 bg-[#00ab81] hover:bg-[#009973] active:scale-95 text-white text-[10px] font-bold px-2 py-1 rounded-sm transition-all whitespace-nowrap shrink-0"
-          >
-            <RefreshCw className="w-3 h-3" />
-            Load Balance
-          </button>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <span className="text-white/60">Credit:</span>
-              <span>{creditRemaining.toLocaleString('en-IN')}</span>
+              <ChevronDown className="w-3 h-3 text-white/40" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-[#2c3e50] border border-white/10 shadow-xl min-w-[160px] p-1">
+            <div className="px-3 py-2 border-b border-white/5 mb-1">
+              <p className="text-[10px] text-white/40 font-bold uppercase">Account</p>
+              <p className="text-white text-xs font-bold truncate">{session.username}</p>
             </div>
-            <div className="w-px h-3 bg-white/20" />
-            <div className="flex items-center gap-1">
-              <span className="text-white/60">Balance:</span>
-              <span>{clientBalance.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="w-px h-3 bg-white/20" />
-            <div className="flex items-center gap-1">
-              <span className="text-white/60">Liable:</span>
-              <span className="text-red-400">0</span>
-            </div>
-            <div className="w-px h-3 bg-white/20" />
-            <div className="flex items-center gap-1">
-              <span className="text-white/60">Active Bets:</span>
-              <span>0</span>
-            </div>
-          </div>
-        </div>
+            <DropdownMenuItem onClick={() => navigate("/play/profile")} className="text-white/80 hover:text-white hover:bg-white/5 cursor-pointer text-xs focus:bg-white/5 focus:text-white">
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer text-xs focus:bg-red-500/5 focus:text-red-300">
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
