@@ -51,6 +51,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     setSession(getClientSession());
@@ -62,7 +63,6 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       queryClient.invalidateQueries({ queryKey: ["header-balance"] }),
       queryClient.invalidateQueries({ queryKey: ["header-exposure"] })
     ]);
-    // small delay for UX feedback
     setTimeout(() => setIsRefreshing(false), 800);
   };
 
@@ -76,19 +76,16 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       
       const role = session.role?.toLowerCase();
       
-      // Company sees all
       if (role === 'company' || downlineUsernames === null) {
         return pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
       
-      // Client sees only own bets
       if (role === 'client') {
         return pendingBets
           .filter((b: any) => b.user_email === session.username)
           .reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
       
-      // Others: only downline bets
       if (!downlineUsernames || downlineUsernames.length === 0) return 0;
       return pendingBets
         .filter((b: any) => downlineUsernames.includes(b.user_email))
@@ -105,7 +102,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       return (clients as any)?.[0]?.cash ?? 0;
     },
     enabled: !!session?.id,
-    refetchInterval: 30000, // refresh every 30s
+    refetchInterval: 30000,
     staleTime: 10000,
   });
 
@@ -115,90 +112,122 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#f8f9fa] flex items-center px-3 h-12 border-b border-[#dee2e6]">
-      {/* LEFT: Hamburger */}
+    <header className="sticky top-0 z-40 bg-[#3c4b64] flex items-center px-3 h-[50px] border-b border-[#2f3b4c]">
+      {/* LEFT: Hamburger + Logo */}
       <div className="flex items-center shrink-0">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-1.5 border border-[#bdc3c7] rounded bg-[#f8f9fa] hover:bg-[#f5f5f5] transition-colors"
+          className="p-1.5 text-white/80 hover:text-white transition-colors lg:hidden"
         >
-          <Menu className="w-5 h-5 text-[#555555]" />
+          <Menu className="w-5 h-5" />
         </button>
-        <span className="hidden lg:block font-black italic text-xl ml-3" style={{fontFamily:'Georgia,serif'}}>
-          <span className="text-[#00ab81]">BpExch</span>
-        </span>
+        <Link to="/dashboard" className="flex items-center gap-1 ml-1 lg:ml-0">
+          <span className="font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>
+            <span className="text-white">Bp</span><span className="text-[#00ab81]">Exch</span>
+          </span>
+        </Link>
       </div>
 
       {/* CENTER: Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-1 ml-6 flex-1">
-        <NavLink to="/dashboard" label="Dashboard" />
-        <NavLink to="/accounts" label="Users" />
-        <NavLink to="/reports/daily-pl" label="Reports" />
+      <nav className="hidden lg:flex items-center gap-4 ml-8 flex-1">
+        <Link 
+          to="/dashboard" 
+          className={cn(
+            "text-sm font-medium transition-all hover:underline",
+            location.pathname === "/dashboard" ? "text-white underline" : "text-white/80"
+          )}
+        >
+          Dashboard
+        </Link>
+        <Link 
+          to="/accounts" 
+          className={cn(
+            "text-sm font-medium transition-all hover:underline",
+            location.pathname.startsWith("/accounts") ? "text-white underline" : "text-white/80"
+          )}
+        >
+          Users
+        </Link>
+        <Link 
+          to="/reports/daily-pl" 
+          className={cn(
+            "text-sm font-medium transition-all hover:underline",
+            location.pathname.startsWith("/reports") ? "text-white underline" : "text-white/80"
+          )}
+        >
+          Reports
+        </Link>
       </nav>
 
       {/* RIGHT: User + Stats */}
-      <div className="flex-1 lg:flex-none overflow-x-auto no-scrollbar flex items-center justify-end ml-auto gap-2">
+      <div className="flex items-center justify-end ml-auto gap-2 sm:gap-4">
         {session ? (
-          <div className="flex items-center gap-2 lg:gap-4 min-w-max">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-[#f5f5f5] px-2 py-1 rounded transition-colors">
-                  <span className="text-[#333] text-sm font-medium">
-                    {session.username} ({session.role ? formatRole(session.role) : ''})
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-[#555555]" />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-[#dee2e6] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-xs text-[#333] border-b border-[#dee2e6] mb-1">
-                  Logged in as <span className="font-semibold">{session.username}</span>
-                </div>
-                <DropdownMenuItem
-                  onClick={() => navigate("/play/profile")}
-                  className="text-[#333] hover:bg-[#f5f5f5] cursor-pointer text-xs font-medium p-2"
-                >
-                  <User className="w-3 h-3 mr-2" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-[#dee2e6]" />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-[#dc3545] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#dc3545] focus:bg-red-50 p-2"
-                >
-                  <LogOut className="w-3 h-3 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <div className="flex items-center gap-2 border-l border-[#dee2e6] pl-2 lg:pl-4">
-              <button
-                onClick={handleLoadBalance}
-                disabled={isRefreshing}
-                className="flex items-center gap-1 bg-[#00ab81] hover:bg-[#009973] text-white text-[11px] font-bold px-2 py-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 whitespace-nowrap shrink-0"
-                title="Refresh balance"
-              >
-                <RefreshCw className={cn("w-3 h-3", isRefreshing && "animate-spin")} />
-                <span className="hidden sm:inline">Load Balance</span>
-              </button>
-              <span className="text-sm text-[#333] whitespace-nowrap">
-                <strong className="font-bold">B:</strong> <span className={cn(
-                  liveBalance > 0 ? "text-[#28a745]" : liveBalance < 0 ? "text-[#dc3545]" : "text-[#333]"
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 border-r border-white/10 pr-2 sm:pr-4">
+              <span className="text-[13px] text-white whitespace-nowrap">
+                <span className="font-bold opacity-80">B:</span> <span className={cn(
+                  "font-bold",
+                  liveBalance >= 0 ? "text-[#00ab81]" : "text-[#dc3545]"
                 )}>
                   {liveBalance.toLocaleString('en-IN')}
                 </span>
               </span>
-              <span className="text-sm text-[#333] whitespace-nowrap">
-                <strong className="font-bold">Exp:</strong> <span className={totalExposure > 0 ? 'text-[#dc3545]' : 'text-[#333]'}>
+              <span className="text-[13px] text-white whitespace-nowrap">
+                <span className="font-bold opacity-80">Exp:</span> <span className={cn(
+                  "font-bold",
+                  totalExposure > 0 ? "text-[#dc3545]" : "text-white"
+                )}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>
+              <button
+                onClick={handleLoadBalance}
+                disabled={isRefreshing}
+                className="bg-[#00ab81] hover:bg-[#009973] text-white p-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 ml-1"
+                title="Refresh balance"
+              >
+                <RefreshCw className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")} />
+              </button>
             </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-white/5 px-2 py-1 rounded transition-colors">
+                  <span className="text-white text-sm font-medium hidden sm:inline">
+                    {session.username} ({session.role ? formatRole(session.role) : ''})
+                  </span>
+                  <span className="text-white text-sm font-medium sm:hidden">
+                    {session.username}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-[#3c4b64] border border-[#2f3b4c] shadow-lg rounded w-48 mt-1">
+                <div className="px-2 py-1.5 text-[11px] text-white/60 border-b border-white/10 mb-1">
+                  Logged in as <span className="font-semibold text-white">{session.username}</span>
+                </div>
+                <DropdownMenuItem
+                  onClick={() => navigate("/play/profile")}
+                  className="text-white hover:bg-white/10 cursor-pointer text-xs font-medium p-2 focus:bg-white/10 focus:text-white"
+                >
+                  <User className="w-3.5 h-3.5 mr-2 opacity-70" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-[#dc3545] hover:bg-red-500/10 cursor-pointer text-xs font-medium focus:text-[#dc3545] focus:bg-red-500/10 p-2"
+                >
+                  <LogOut className="w-3.5 h-3.5 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#254465] hover:text-[#00ab81] uppercase"
+            className="text-sm font-bold text-white hover:text-[#00ab81] uppercase"
           >
             Login
           </button>
@@ -207,3 +236,4 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     </header>
   );
 }
+
