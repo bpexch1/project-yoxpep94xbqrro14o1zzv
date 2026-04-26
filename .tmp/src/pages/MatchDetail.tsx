@@ -9,6 +9,7 @@ import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Info, Volume2, Clock, CheckSquare, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
