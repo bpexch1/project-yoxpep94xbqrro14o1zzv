@@ -28,8 +28,18 @@ export function ClientSummaryCard({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
-  const [balancesLoaded, setBalancesLoaded] = useState(true);
+  const [balancesLoaded, setBalancesLoaded] = useState(false);
+  const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Load Balance handler
+  const handleLoadBalance = async () => {
+    setIsLoadingBalances(true);
+    // Small delay to show loading effect, then reveal data
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setBalancesLoaded(true);
+    setIsLoadingBalances(false);
+  };
   
   // Feature 2 states
   const [rowLoadedMap, setRowLoadedMap] = useState<Record<string, boolean>>({});
@@ -210,40 +220,69 @@ export function ClientSummaryCard({
       <div className="p-3">
         {/* Summary Stats Table — matches original exactly */}
         <div className="mb-3 overflow-x-auto">
-          <table className="w-full border-collapse border border-[#dee2e6] text-[13px]">
-            <thead>
-              <tr className="bg-white">
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Received</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance UpLine</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="bg-white">
-                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                  {totals.credit_received.toLocaleString()}
-                </td>
-                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                  {totals.credit_remaining.toLocaleString()}
-                </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                  {totals.cash.toLocaleString()}
-                </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                  {totals.pl_downline.toLocaleString()}
-                </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                  {totals.balance_upline.toLocaleString()}
-                </td>
-                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
-                  {filteredClients.length}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {!balancesLoaded ? (
+            <table className="border-collapse border border-[#dee2e6] text-[13px]" style={{ minWidth: 300 }}>
+              <thead>
+                <tr className="bg-white">
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-white">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                    {totals.credit_remaining.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                    {totals.cash.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                    {totals.pl_downline.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                    {filteredClients.length}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full border-collapse border border-[#dee2e6] text-[13px]">
+              <thead>
+                <tr className="bg-white">
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Received</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance UpLine</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-white">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                    {totals.credit_received.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                    {totals.credit_remaining.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                    {totals.cash.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                    {totals.pl_downline.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                    {totals.balance_upline.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                    {filteredClients.length}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Action bar */}
@@ -411,22 +450,45 @@ export function ClientSummaryCard({
               {/* Green Total Row */}
               {!isLoading && tableFilteredClients.length > 0 && (
                 <tr className="bg-[#00a65a] text-white font-black whitespace-nowrap">
-                  <td className="px-2 py-2 border border-[#008d4c]" colSpan={2}>Total</td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-right">
-                    {balancesLoaded ? totals.credit_received.toLocaleString() : "-"}
-                  </td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-right">
-                    {balancesLoaded ? totals.cash.toLocaleString() : "-"}
-                  </td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-right">
-                    {balancesLoaded ? totals.pl_downline.toLocaleString() : "-"}
-                  </td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-right">-</td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-right">0</td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-right">
-                    {balancesLoaded ? totals.credit_remaining.toLocaleString() : "-"}
-                  </td>
-                  <td className="px-2 py-2 border border-[#008d4c] text-center"></td>
+                  {!balancesLoaded ? (
+                    <td className="px-2 py-2 border border-[#008d4c]" colSpan={9}>
+                      <button
+                        onClick={handleLoadBalance}
+                        disabled={isLoadingBalances}
+                        style={{
+                          background: "#ffc107",
+                          color: "#000",
+                          border: "none",
+                          padding: "4px 14px",
+                          fontWeight: 700,
+                          fontSize: 13,
+                          borderRadius: 3,
+                          cursor: "pointer"
+                        }}
+                      >
+                        {isLoadingBalances ? "Loading..." : "Load Balance"}
+                      </button>
+                    </td>
+                  ) : (
+                    <>
+                      <td className="px-2 py-2 border border-[#008d4c]" colSpan={2}>Total</td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                        {totals.credit_received.toLocaleString()}
+                      </td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                        {totals.cash.toLocaleString()}
+                      </td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                        {totals.pl_downline.toLocaleString()}
+                      </td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-right">-</td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-right">0</td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                        {totals.credit_remaining.toLocaleString()}
+                      </td>
+                      <td className="px-2 py-2 border border-[#008d4c] text-center"></td>
+                    </>
+                  )}
                 </tr>
               )}
 
@@ -466,6 +528,14 @@ export function ClientSummaryCard({
                           >
                             {client.username}
                           </button>
+                          {!balancesLoaded && (
+                            <span style={{
+                              display: "inline-flex", alignItems: "center", justifyContent: "center",
+                              width: 16, height: 16, borderRadius: "50%", 
+                              background: "#555", color: "#fff", fontSize: 10, fontWeight: 700,
+                              marginLeft: 4, flexShrink: 0
+                            }}>i</span>
+                          )}
                         </div>
                       </td>
                       <td className="px-2 py-2 border border-[#d5d8dc] font-bold text-[#6c757d]">
@@ -518,6 +588,18 @@ export function ClientSummaryCard({
                           >
                             L
                           </button>
+                          <button 
+                            onClick={() => toggleStatus(client)}
+                            className={cn(
+                              "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded-[2px] transition-colors shadow-sm",
+                              client.status === "active" 
+                                ? "bg-[#28a745] hover:bg-[#218838] text-white" 
+                                : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
+                            )}
+                            title={client.status === "active" ? "Deactivate" : "Activate"}
+                          >
+                            {client.status === "active" ? "A" : "D"}
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -528,91 +610,167 @@ export function ClientSummaryCard({
           </table>
         </div>
 
-        {/* Mobile View */}
-        <div className="lg:hidden flex flex-col gap-3">
-          {isLoading ? (
-            <div className="py-20 text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-[#00a65a] mx-auto mb-4" />
-              <p className="font-bold text-gray-500">Loading clients...</p>
-            </div>
-          ) : paginatedClients.map((client) => {
-            const display = getClientDisplayData(client);
-            const isExpanded = mobileExpandedIds.has(client.id);
-
-            return (
-              <div key={client.id} className="border border-[#d5d8dc] rounded-lg overflow-hidden bg-white shadow-sm">
-                <div 
-                  className="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => toggleMobileExpand(client.id)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col">
-                      <span className="font-black text-[#254465]">{client.username}</span>
-                      <span className="text-[10px] text-gray-500 uppercase font-bold">{getTypeLabel(client.role)}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-end">
-                      <span className={cn(
-                        "font-black text-sm",
-                        display.balance !== null ? (display.balance >= 0 ? "text-[#28a745]" : "text-[#dc3545]") : "text-gray-400"
-                      )}>
-                        {display.balance !== null ? display.balance.toLocaleString() : "-"}
-                      </span>
-                      <span className="text-[9px] text-gray-400 font-bold uppercase">Balance</span>
-                    </div>
-                    {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-                  </div>
-                </div>
-
-                {isExpanded && (
-                  <div className="px-3 pb-3 border-t border-gray-100 bg-gray-50/50">
-                    <div className="grid grid-cols-2 gap-4 py-3">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 font-bold uppercase">Credit</span>
-                        <span className="font-black text-[#28a745]">{display.credit?.toLocaleString() ?? "-"}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 font-bold uppercase">Client P/L</span>
-                        <span className={cn(
-                          "font-black",
-                          display.plDownline !== null ? (display.plDownline >= 0 ? "text-[#28a745]" : "text-[#dc3545]") : "text-gray-400"
-                        )}>{display.plDownline?.toLocaleString() ?? "-"}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 font-bold uppercase">Share</span>
-                        <span className="font-black">{display.share !== null ? `${display.share}%` : "-"}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 font-bold uppercase">Available</span>
-                        <span className="font-black text-[#28a745]">{display.available?.toLocaleString() ?? "-"}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+        {/* Mobile View - flat table */}
+        <div className="lg:hidden overflow-x-auto">
+          <table className="w-full border-collapse text-[13px]">
+            {/* Green total row */}
+            <tbody>
+              {!isLoading && tableFilteredClients.length > 0 && (
+                <tr className="bg-[#00a65a] text-white font-black">
+                  <td className="px-2 py-2 border border-[#008d4c]" colSpan={3}>
+                    {!balancesLoaded ? (
                       <button 
-                        onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                        className="flex-1 bg-[#ffc107] text-black font-black text-xs py-2 rounded flex items-center justify-center gap-2"
+                        onClick={handleLoadBalance} 
+                        style={{
+                          background: "#ffc107", 
+                          color: "#000", 
+                          border: "none", 
+                          padding: "4px 14px", 
+                          fontWeight: 700, 
+                          fontSize: 13, 
+                          borderRadius: 3, 
+                          cursor: "pointer"
+                        }}
                       >
-                        CASH/CREDIT
+                        {isLoadingBalances ? "Loading..." : "Load Balance"}
                       </button>
-                      <button 
-                        onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                        className="flex-1 bg-[#254465] text-white font-black text-xs py-2 rounded flex items-center justify-center gap-2"
-                      >
-                        <Pencil className="w-3.5 h-3.5" /> EDIT
-                      </button>
-                      <button 
-                        onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                        className="flex-1 bg-[#17a2b8] text-white font-black text-xs py-2 rounded flex items-center justify-center gap-2"
-                      >
-                        LEDGER
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                    ) : (
+                      <span>Total</span>
+                    )}
+                  </td>
+                </tr>
+              )}
+              
+              {/* Column headers */}
+              <tr className="bg-[#ecf0f1] text-[#212529] text-[11px] font-black uppercase">
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left">Username</th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left">Type</th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-right">Credit</th>
+              </tr>
+              
+              {/* Data rows */}
+              {isLoading ? (
+                <tr>
+                  <td colSpan={3} className="py-10 text-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto" />
+                  </td>
+                </tr>
+              ) : paginatedClients.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="py-8 text-center font-bold text-gray-500">No users found</td>
+                </tr>
+              ) : paginatedClients.map((client, idx) => {
+                const display = getClientDisplayData(client);
+                const roleLower = client.role?.toLowerCase();
+                const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
+                
+                return (
+                  <React.Fragment key={client.id}>
+                    {/* Main row */}
+                    <tr className={idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]"}>
+                      <td className="px-2 py-2 border border-[#d5d8dc]">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => isAdminType && navigate(`/accounts/view/${client.username}`)}
+                            className={cn(
+                              "font-black text-left text-[13px]", 
+                              isAdminType ? "text-[#00a65a] hover:underline" : "text-[#212529]"
+                            )}
+                          >
+                            {client.username}
+                          </button>
+                          {!balancesLoaded && (
+                            <span style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: 16,
+                              height: 16,
+                              borderRadius: "50%",
+                              background: "#555",
+                              color: "#fff",
+                              fontSize: 10,
+                              fontWeight: 700,
+                              flexShrink: 0
+                            }}>i</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-2 py-2 border border-[#d5d8dc] text-[#6c757d] font-bold text-[12px]">
+                        {getTypeLabel(client.role)}
+                      </td>
+                      <td className="px-2 py-2 border border-[#d5d8dc] text-right font-black text-[#28a745] text-[13px]">
+                        {display.credit !== null ? display.credit.toLocaleString() : "-"}
+                      </td>
+                    </tr>
+                    
+                    {/* Sub-row with details - only when balancesLoaded */}
+                    {balancesLoaded && (
+                      <tr className={idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]"}>
+                        <td colSpan={3} className="px-3 pb-3 border-b border-[#d5d8dc]">
+                          <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12 }}>
+                            <li style={{ padding: "2px 0" }}>
+                              • Balance {display.balance !== null ? (
+                                <span className={display.balance >= 0 ? "text-[#28a745]" : "text-[#dc3545]"}>
+                                  {display.balance.toLocaleString()}
+                                </span>
+                              ) : "-"}
+                            </li>
+                            <li style={{ padding: "2px 0" }}>
+                              • Client (P/L) {display.plDownline !== null ? (
+                                <span className={display.plDownline >= 0 ? "text-[#28a745]" : "text-[#dc3545]"}>
+                                  {display.plDownline.toLocaleString()}
+                                </span>
+                              ) : "-"}
+                            </li>
+                            <li style={{ padding: "2px 0" }}>
+                              • Share {display.share !== null ? `${display.share}%` : "-"}
+                            </li>
+                            <li style={{ padding: "2px 0" }}>• Exposure 0</li>
+                            <li style={{ padding: "2px 0" }}>
+                              • Available Balance {display.available !== null ? (
+                                <span className="text-[#28a745]">{display.available.toLocaleString()}</span>
+                              ) : "-"}
+                            </li>
+                            <li style={{ padding: "4px 0", display: "flex", alignItems: "center", gap: 4 }}>
+                              • Options
+                              <button 
+                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)} 
+                                className="w-6 h-6 bg-[#ffc107] text-black font-black text-[11px] flex items-center justify-center rounded-[2px]"
+                              >
+                                C
+                              </button>
+                              <button 
+                                onClick={() => navigate(`/accounts/edit/${client.username}`)} 
+                                className="w-6 h-6 bg-[#254465] text-white flex items-center justify-center rounded-[2px]"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                              <button 
+                                onClick={() => navigate(`/accounts/ledger/${client.username}`)} 
+                                className="w-6 h-6 bg-[#17a2b8] text-white font-black text-[11px] flex items-center justify-center rounded-[2px]"
+                              >
+                                L
+                              </button>
+                              <button 
+                                onClick={() => toggleStatus(client)} 
+                                className={cn(
+                                  "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded-[2px]", 
+                                  client.status === "active" ? "bg-[#28a745] text-white" : "bg-white border border-[#dc3545] text-[#dc3545]"
+                                )}
+                              >
+                                {client.status === "active" ? "A" : "D"}
+                              </button>
+                            </li>
+                          </ul>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
         {/* DataTable Bottom Controls */}
