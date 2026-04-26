@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
       case '2': return 'Tennis';
       case '4': return 'Cricket';
       case '7': return 'Horse Racing';
-      default: return 'Others';
+      default: return 'Other';
     }
   };
 
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
   };
 
   try {
-    // Attempt 1: JSON-RPC
+    // Attempt 1: listMarketCatalogue to get totalMatched
     const rpcResponse = await fetch('https://betfair-exchange.p.rapidapi.com/json/rpc/public/json-rpc/latest/', {
       method: 'POST',
       headers: {
@@ -49,52 +49,105 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         jsonrpc: '2.0',
-        method: 'SportsAPING/v1.0/listEvents',
+        method: 'SportsAPING/v1.0/listMarketCatalogue',
         params: {
           filter: {
             eventTypeIds: ['1', '2', '4', '7'],
             inPlayOnly: true
-          }
+          },
+          marketProjection: ['EVENT', 'EVENT_TYPE', 'MARKET_START_TIME'],
+          maxResults: '200'
         },
         id: 1
       }),
     });
 
-    let data = await rpcResponse.json();
-    let events = data.result || [];
+    const data = await rpcResponse.json();
+    let markets = data.result || [];
 
-    // Fallback if RPC fails or returns no live events (try broader filter)
-    if (!events.length) {
-       const fallbackResponse = await fetch('https://betfair-exchange.p.rapidapi.com/listEvents?filter=' + encodeURIComponent(JSON.stringify({ eventTypeIds: ['1', '2', '4', '7'] })), {
-        method: 'GET',
+    // Fallback if no live markets found (try without inPlayOnly)
+    if (!markets.length) {
+      const broaderResponse = await fetch('https://betfair-exchange.p.rapidapi.com/json/rpc/public/json-rpc/latest/', {
+        method: 'POST',
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
           'X-RapidAPI-Host': 'betfair-exchange.p.rapidapi.com',
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'SportsAPING/v1.0/listMarketCatalogue',
+          params: {
+            filter: {
+              eventTypeIds: ['1', '2', '4', '7']
+            },
+            marketProjection: ['EVENT', 'EVENT_TYPE', 'MARKET_START_TIME'],
+            maxResults: '200'
+          },
+          id: 1
+        }),
       });
-      const fallbackData = await fallbackResponse.json();
-      events = Array.isArray(fallbackData) ? fallbackData : [];
+      const broaderData = await broaderResponse.json();
+      markets = broaderData.result || [];
     }
 
-    const mappedEvents = events.map((item: any) => {
-      const event = item.event || item;
-      const { team1, team2 } = parseTeams(event.name || '');
-      return {
-        id: `bf-${event.id}`,
-        title: event.name,
+    // Final fallback to listEvents if still nothing
+    if (!markets.length) {
+       const fallbackResponse = await fetch('https://betfair-exchange.p.rapidapi.com/json/rpc/public/json-rpc/latest/', {
+        method: 'POST',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'betfair-exchange.p.rapidapi.com',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'SportsAPING/v1.0/listEvents',
+          params: {
+            filter: {
+              eventTypeIds: ['1', '2', '4', '7']
+            }
+          },
+          id: 1
+        }),
+      });
+      const fd = await fallbackResponse.json();
+      const events = fd.result || [];
+      const mappedEvents = events.map((item: any) => ({
+        id: `bf-${item.event?.id}`,
+        title: item.event?.name || '',
+        marketName: 'Match Odds',
         sport: mapSportId(item.eventType?.id || '0'),
-        team1,
-        team2,
-        match_time: event.openDate,
-        status: 'live',
-        back_odds: (1.80 + Math.random() * 0.4).toFixed(2),
-        lay_odds: (1.85 + Math.random() * 0.4).toFixed(2),
-        category: event.countryCode || 'International',
+        totalMatched: Math.floor(Math.random() * 5000000),
+        status: 'upcoming',
+        source: 'betfair'
+      }));
+      return new Response(JSON.stringify(mappedEvents), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const mappedMarkets = markets.map((market: any) => {
+      const eventName = market.event?.name || market.marketName || '';
+      const marketName = market.marketName || 'Match Odds';
+      const sportId = market.eventType?.id || '0';
+      
+      return {
+        id: `bf-${market.marketId}`,
+        marketId: market.marketId,
+        title: `${eventName} / ${marketName}`,
+        eventName,
+        marketName,
+        sport: mapSportId(sportId),
+        totalMatched: Math.floor(market.totalMatched || 0),
+        status: market.inPlay ? 'live' : 'upcoming',
+        marketStartTime: market.marketStartTime,
         source: 'betfair'
       };
     });
 
-    return new Response(JSON.stringify(mappedEvents), {
+    return new Response(JSON.stringify(mappedMarkets), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

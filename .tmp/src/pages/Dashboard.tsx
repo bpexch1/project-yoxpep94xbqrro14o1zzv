@@ -1,149 +1,221 @@
-import { useQuery } from "@tanstack/react-query";
-import { Client, Bet } from "@/entities";
-import { Users, TrendingUp, TrendingDown, Clock, Search, ExternalLink, Loader2 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getClientSession } from "@/hooks/useClientAuth";
-import { cn } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Filter, Search } from "lucide-react";
+import { fetchBetfairEvents } from "@/functions";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const session = getClientSession();
-  const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
+  const [searchUsername, setSearchUsername] = useState("");
 
-  const { data: clients, isLoading: isClientsLoading } = useQuery({
-    queryKey: ["dashboard-clients"],
-    queryFn: () => Client.list("-created_at"),
+  const { data: markets = [], isLoading, refetch } = useQuery({
+    queryKey: ["dashboard-markets"],
+    queryFn: () => fetchBetfairEvents({}),
+    staleTime: 60000,
   });
 
-  const { data: recentBets, isLoading: isBetsLoading } = useQuery({
-    queryKey: ["dashboard-recent-bets"],
-    queryFn: () => Bet.list("-created_at", 10),
-  });
-
-  const stats = [
-    { label: "Total Users", value: clients?.filter(c => c.role !== 'company').length || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Active Bets", value: recentBets?.filter(b => b.status === 'pending').length || 0, icon: Clock, color: "text-[#3DCCC8]", bg: "bg-[#3DCCC8]/10" },
-    { label: "Settled Today", value: 0, icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
-    { label: "Pending P/L", value: "₹ 0", icon: TrendingDown, color: "text-red-600", bg: "bg-red-50" },
-  ];
-
-  const handleUserSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery) navigate(`/accounts?search=${searchQuery}`);
+    if (searchUsername.trim()) navigate(`/accounts?search=${searchUsername.trim()}`);
   };
 
+  // Group markets by sport
+  const grouped = (markets as any[]).reduce((acc: Record<string, any[]>, m) => {
+    const sport = m.sport || 'Other';
+    if (!acc[sport]) acc[sport] = [];
+    acc[sport].push(m);
+    return acc;
+  }, {});
+
+  const sportOrder = ['Soccer', 'Cricket', 'Tennis', 'Horse Racing'];
+  const sortedSports = [
+    ...sportOrder.filter(s => grouped[s]),
+    ...Object.keys(grouped).filter(s => !sportOrder.includes(s))
+  ];
+
   return (
-    <div className="p-4 lg:p-8 min-h-screen bg-[#e9ecef]" style={{ fontFamily: "Roboto, sans-serif" }}>
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-2xl font-bold text-[#212529] mb-2">Welcome Back, {session?.username}</h1>
-          <p className="text-[#6c757d]">Here's what's happening in your exchange today.</p>
-        </header>
+    <div style={{ minHeight: "100vh", background: "#e9ecef", fontFamily: "Roboto, system-ui, sans-serif" }}>
+      <main style={{ width: "100%", padding: "16px 16px 80px" }}>
 
-        {/* Quick Search */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-[#dee2e6] mb-8">
-          <form onSubmit={handleUserSearch} className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Quickly find a user by username..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 border border-[#ced4da] rounded px-3 py-1.5 text-sm placeholder-gray-400 focus:outline-none focus:border-[#3DCCC8] text-[#2c3e50] bg-white"
+        {/* 1. Search-Users Card */}
+        <div style={{
+          background: "#fff",
+          borderRadius: 10,
+          border: "1px solid #d0d0d0",
+          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+          marginBottom: 16,
+          overflow: "hidden"
+        }}>
+          {/* Card header */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 16px",
+            background: "#ecf0f1",
+            borderBottom: "1px solid #d0d0d0"
+          }}>
+            <Filter size={14} color="#555" />
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#212529" }}>Search-Users</span>
+          </div>
+          <div style={{ padding: "14px 16px" }}>
+            <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                type="text"
+                placeholder="Username"
+                value={searchUsername}
+                onChange={e => setSearchUsername(e.target.value)}
+                style={{
+                  width: 280,
+                  border: "1px solid #ccc",
+                  borderRadius: 4,
+                  padding: "6px 10px",
+                  fontSize: 13,
+                  outline: "none",
+                  color: "#333"
+                }}
               />
-            </div>
-            <button 
-              type="submit"
-              className="bg-[#3DCCC8] text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 hover:bg-[#2db8b4] transition-colors"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat, i) => (
-            <div key={i} className="bg-white p-6 rounded-lg shadow-sm border border-[#dee2e6] flex items-center gap-4 hover:shadow-md transition-shadow">
-              <div className={cn("w-12 h-12 rounded-full flex items-center justify-center", stat.bg)}>
-                <stat.icon className={cn("w-6 h-6", stat.color)} />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-[#6c757d] uppercase mb-1">{stat.label}</p>
-                <p className="text-xl font-black text-[#212529]">{stat.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Activity */}
-          <div className="bg-white rounded-lg shadow-sm border border-[#dee2e6] overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#dee2e6] flex items-center justify-between">
-              <h2 className="font-bold text-[#212529]">Recent Bets</h2>
-              <button 
-                onClick={() => navigate("/reports/book-detail")}
-                className="bg-[#3DCCC8] text-white text-xs px-3 py-0.5 rounded hover:bg-[#2db8b4] transition-colors"
+              <button
+                type="submit"
+                style={{
+                  background: "#00a65a",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 4,
+                  padding: "6px 14px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
               >
-                View All
+                <Search size={13} />
+                Search
               </button>
-            </div>
-            <div className="p-0">
-              {isBetsLoading ? (
-                <div className="flex flex-col items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 text-[#3DCCC8] animate-spin" />
-                  <p className="text-xs font-bold text-[#6c757d] mt-2 uppercase">Loading Activity...</p>
-                </div>
-              ) : recentBets && recentBets.length > 0 ? (
-                <div className="divide-y divide-[#f1f1f1]">
-                  {recentBets.map((bet: any) => (
-                    <div key={bet.id} className="px-6 py-4 hover:bg-gray-50 flex items-center justify-between transition-colors">
-                      <div>
-                        <p className="text-sm font-bold text-[#212529]">{bet.match_title}</p>
-                        <p className="text-[11px] text-[#6c757d]">User: <span className="font-bold">{bet.user_email}</span> • {new Date(bet.created_at).toLocaleTimeString()}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className={cn("text-sm font-black", bet.type === 'back' ? "text-blue-600" : "text-pink-600")}>
-                          {bet.type === 'back' ? 'BACK' : 'LAY'} • {bet.stake}
-                        </p>
-                        <p className="text-[10px] text-[#6c757d] uppercase font-bold">{bet.status}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-20 text-center">
-                  <p className="text-sm font-bold text-[#6c757d] uppercase">No recent activity</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* User Status */}
-          <div className="bg-white rounded-lg shadow-sm border border-[#dee2e6] overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#dee2e6] flex items-center justify-between">
-              <h2 className="font-bold text-[#212529]">Top Users</h2>
-              <span 
-                onClick={() => navigate("/accounts")}
-                className="text-[#3DCCC8] text-sm font-normal cursor-pointer hover:underline"
-              >
-                Manage All
-              </span>
-            </div>
-            <div className="p-6">
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-[#e9ecef]">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#3DCCC8] mt-1" />
-                <div>
-                  <h3 className="text-sm font-bold text-[#212529] mb-1">Exchange Status: Normal</h3>
-                  <p className="text-xs text-[#6c757d]">All systems are operational. Real-time odds and settlements are running normally across all sports markets.</p>
-                </div>
-              </div>
-            </div>
+            </form>
           </div>
         </div>
-      </div>
+
+        {/* 2. Sport Highlights Card */}
+        <div style={{
+          background: "#fff",
+          borderRadius: 10,
+          border: "1px solid #d0d0d0",
+          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
+          overflow: "hidden"
+        }}>
+          {/* Card header */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "10px 16px",
+            background: "#fff",
+            borderBottom: "1px solid #d0d0d0"
+          }}>
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Sport Highlights</span>
+            <button
+              onClick={() => refetch()}
+              style={{
+                background: "#00a65a",
+                color: "#fff",
+                border: "none",
+                borderRadius: 4,
+                padding: "3px 10px",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+            >
+              Refresh
+            </button>
+          </div>
+
+          {/* Table */}
+          {isLoading ? (
+            <div style={{ padding: "40px", textAlign: "center", color: "#6c757d", fontSize: 13 }}>
+              Loading...
+            </div>
+          ) : markets.length === 0 ? (
+            <div style={{ padding: "40px", textAlign: "center", color: "#6c757d", fontSize: 13 }}>
+              No data available
+            </div>
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <tbody>
+                {sortedSports.map(sport => (
+                  <React.Fragment key={`group-${sport}`}>
+                    {/* Sport section header row */}
+                    <tr>
+                      <td style={{
+                        background: "#f4f4f4",
+                        borderBottom: "1px solid #ddd",
+                        borderTop: "1px solid #ddd",
+                        padding: "7px 14px",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        color: "#333"
+                      }}>{sport}</td>
+                      <td style={{
+                        background: "#f4f4f4",
+                        borderBottom: "1px solid #ddd",
+                        borderTop: "1px solid #ddd",
+                        padding: "7px 14px",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        color: "#333",
+                        width: 180,
+                        textAlign: "right"
+                      }}>Amount</td>
+                    </tr>
+                    {/* Match rows */}
+                    {grouped[sport].map((market: any, idx: number) => (
+                      <tr
+                        key={market.id}
+                        style={{ background: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}
+                      >
+                        <td style={{
+                          padding: "7px 14px",
+                          borderBottom: "1px solid #f0f0f0"
+                        }}>
+                          <span
+                            onClick={() => navigate(`/play/match/${market.id}`)}
+                            style={{
+                              color: "#00a65a",
+                              cursor: "pointer",
+                              textDecoration: "none"
+                            }}
+                            onMouseEnter={e => (e.target as HTMLElement).style.textDecoration = "underline"}
+                            onMouseLeave={e => (e.target as HTMLElement).style.textDecoration = "none"}
+                          >
+                            {market.title}
+                          </span>
+                          {market.status === 'live' && (
+                            <span style={{ color: "#00a65a", marginLeft: 6, fontSize: 10 }}>●</span>
+                          )}
+                        </td>
+                        <td style={{
+                          padding: "7px 14px",
+                          borderBottom: "1px solid #f0f0f0",
+                          textAlign: "right",
+                          color: "#333",
+                          fontWeight: 500
+                        }}>
+                          {market.totalMatched > 0 ? market.totalMatched.toLocaleString() : "0"}
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+      </main>
     </div>
   );
 }
