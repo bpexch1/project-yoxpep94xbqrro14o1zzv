@@ -125,7 +125,7 @@ export default function Accounts() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#e9ecef", fontFamily: "Roboto, system-ui, sans-serif" }}>
-      <main style={{ maxWidth: 680, margin: "0 auto", padding: "16px 12px 80px" }}>
+      <main style={{ width: "100%", padding: "16px 16px 80px" }}>
 
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />

@@ -28,7 +28,7 @@ export function ClientSummaryCard({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
-  const [balancesLoaded, setBalancesLoaded] = useState(false);
+  const [balancesLoaded, setBalancesLoaded] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Feature 2 states
@@ -82,8 +82,9 @@ export function ClientSummaryCard({
         credit_remaining: acc.credit_remaining + (c.credit_remaining || 0),
         cash: acc.cash + (c.cash || 0),
         pl_downline: acc.pl_downline + (c.pl_downline || 0),
+        balance_upline: acc.balance_upline + (c.balance_upline || 0),
       }),
-      { credit_received: 0, credit_remaining: 0, cash: 0, pl_downline: 0 }
+      { credit_received: 0, credit_remaining: 0, cash: 0, pl_downline: 0, balance_upline: 0 }
     ),
     [filteredClients]
   );
@@ -214,21 +215,42 @@ export function ClientSummaryCard({
       )}
 
       <div className="p-3">
-        {/* Summary top table */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 mb-4 border border-[#ccc]">
-          {[
-            { label: "Credit Remaining", value: totals.credit_remaining, color: "text-[#28a745]" },
-            { label: "Cash", value: totals.cash, color: totals.cash >= 0 ? "text-[#28a745]" : "text-[#dc3545]" },
-            { label: "P/L Downline", value: totals.pl_downline, color: totals.pl_downline >= 0 ? "text-[#28a745]" : "text-[#dc3545]" },
-            { label: "Users", value: filteredClients.length, color: "text-[#212529]" },
-          ].map((item, i) => (
-            <div key={i} className="flex flex-col border-r border-b sm:border-b-0 last:border-r-0 border-[#ccc] p-2 hover:bg-[#f0fff4] transition-colors cursor-pointer">
-              <span className="text-[10px] font-bold text-[#212529] uppercase opacity-80 leading-tight">{item.label}</span>
-              <span className={cn("text-[16px] font-black leading-tight mt-1", item.color)}>
-                {balancesLoaded ? item.value.toLocaleString() : "-"}
-              </span>
-            </div>
-          ))}
+        {/* Summary Stats Table — matches original exactly */}
+        <div className="mb-3 overflow-x-auto">
+          <table className="w-full border-collapse border border-[#dee2e6] text-[13px]">
+            <thead>
+              <tr className="bg-white">
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Received</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance UpLine</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="bg-white">
+                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                  {totals.credit_received.toLocaleString()}
+                </td>
+                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                  {totals.credit_remaining.toLocaleString()}
+                </td>
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  {totals.cash.toLocaleString()}
+                </td>
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                  {totals.pl_downline.toLocaleString()}
+                </td>
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                  {totals.balance_upline.toLocaleString()}
+                </td>
+                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  {filteredClients.length}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {/* Action bar */}
@@ -294,19 +316,7 @@ export function ClientSummaryCard({
           />
         </div>
 
-        {/* Load Balance Header (Shared) */}
-        <div className="bg-[#00a65a] text-white border-t border-x border-[#d5d8dc]">
-          <div className="px-3 py-1.5 flex items-center">
-            <button
-              onClick={handleLoadBalance}
-              disabled={isRefreshing}
-              className="bg-[#ffc107] hover:bg-[#e0a800] text-black px-3 py-1 rounded-[2px] font-black text-[11px] flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
-            >
-              {isRefreshing && <Loader2 className="w-3 h-3 animate-spin" />}
-              LOAD BALANCE
-            </button>
-          </div>
-        </div>
+
 
         {/* Desktop Table View */}
         <div className="hidden lg:block overflow-x-auto border-x border-b border-[#d5d8dc]">
