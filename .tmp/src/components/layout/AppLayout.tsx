@@ -22,7 +22,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         "flex flex-col min-h-screen transition-all duration-200",
         sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-[200px]"
       )}>
-        <Header onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} />
+        <Header 
+          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} 
+          onToggleDesktopSidebar={() => setSidebarCollapsed(prev => !prev)}
+        />
         <main className="flex-1 overflow-x-hidden">
           {children}
         </main>

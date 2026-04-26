@@ -16,6 +16,7 @@ import {
 
 interface HeaderProps {
   onOpenMobileSidebar: () => void;
+  onToggleDesktopSidebar: () => void;
 }
 
 function formatRole(role: string): string {
@@ -30,7 +31,7 @@ function formatRole(role: string): string {
   return roleMap[role?.toLowerCase()] ?? role;
 }
 
-export function Header({ onOpenMobileSidebar }: HeaderProps) {
+export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -85,21 +86,29 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     navigate("/login");
   };
 
+  const handleHamburgerClick = () => {
+    if (window.innerWidth >= 1024) {
+      onToggleDesktopSidebar();
+    } else {
+      onOpenMobileSidebar();
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white flex items-center px-3 h-[50px] border-b border-[#d2d6de]">
-      {/* LEFT: Hamburger + Logo */}
+      {/* LEFT: Logo + Hamburger */}
       <div className="flex items-center shrink-0">
-        <button
-          onClick={onOpenMobileSidebar}
-          className="p-1.5 text-gray-600 hover:text-gray-800 transition-colors lg:hidden"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <Link to="/dashboard" className="flex items-center gap-1 ml-1 lg:ml-0">
+        <Link to="/dashboard" className="flex items-center gap-1">
           <span className="font-bold italic text-xl uppercase text-[#00a65a]" style={{fontFamily:'Georgia,serif'}}>
             BPEXCH
           </span>
         </Link>
+        <button
+          onClick={handleHamburgerClick}
+          className="p-1.5 text-gray-600 hover:text-gray-800 transition-colors ml-2"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       </div>
 
       {/* CENTER: Desktop Nav */}

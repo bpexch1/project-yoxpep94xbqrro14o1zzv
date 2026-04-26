@@ -233,20 +233,6 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
         "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#222d32] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
         isCollapsed ? "w-[60px]" : "w-[200px]"
       )}>
-        {/* Minimal collapse toggle at very top */}
-        <div className={cn(
-          "flex items-center h-[40px] bg-[#1a2226] border-b border-white/[0.06] shrink-0",
-          isCollapsed ? "justify-center" : "justify-end px-3"
-        )}>
-          <button 
-            onClick={onToggleCollapse} 
-            className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors shrink-0"
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? <ChevronRight className="w-4 h-4 text-white/40" /> : <ChevronLeft className="w-4 h-4 text-white/40" />}
-          </button>
-        </div>
-        
         <SidebarNavItems onNavigate={() => {}} isCollapsed={isCollapsed} />
       </aside>
 
