@@ -150,9 +150,9 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
               <span className="text-[13px] text-[#555] whitespace-nowrap">
                 <span className="font-bold">B:</span> <span className={cn(
                   "font-bold",
-                  liveBalance >= 0 ? "text-[#00a65a]" : "text-[#dc3545]"
+                  liveBalance > 0 ? "text-[#00a65a]" : "text-[#333]"
                 )}>
-                  {liveBalance.toLocaleString('en-IN')}
+                  {Math.max(0, liveBalance).toLocaleString('en-IN')}
                 </span>
               </span>
               <span className="text-[13px] text-[#555] whitespace-nowrap">
