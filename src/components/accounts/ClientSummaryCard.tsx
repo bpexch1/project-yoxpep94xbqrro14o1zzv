@@ -28,7 +28,7 @@ export function ClientSummaryCard({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [localSearch, setLocalSearch] = useState("");
-  const [balancesLoaded, setBalancesLoaded] = useState(true);
+  const [balancesLoaded, setBalancesLoaded] = useState(false);
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 

@@ -44,7 +44,12 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
       </div>
       <div style={{ padding: "12px 16px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ 
+          display: "flex", 
+          flexWrap: "wrap", 
+          gap: 8,
+          justifyContent: "flex-start"
+        }}>
           {tabs.map((tab) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
@@ -52,12 +57,24 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               <button
                 key={tab.label}
                 onClick={() => navigate(tab.path)}
-                className={cn(
-                  "px-[14px] py-[6px] rounded-[4px] text-[13px] transition-all duration-150 border",
-                  isActive 
-                    ? "bg-[#00a65a] text-white border-[#00a65a] font-bold shadow-[0_2px_4px_rgba(0,166,90,0.25)]" 
-                    : "bg-transparent text-[#17a2b8] border-[#17a2b8] font-medium hover:bg-[#f0faff]"
-                )}
+                style={{
+                  flex: "0 0 calc(33.333% - 6px)",
+                  maxWidth: "calc(33.333% - 6px)",
+                  boxSizing: "border-box",
+                  padding: "7px 4px",
+                  borderRadius: 4,
+                  fontSize: 13,
+                  fontWeight: isActive ? 700 : 500,
+                  border: `1px solid ${isActive ? "#00a65a" : "#17a2b8"}`,
+                  background: isActive ? "#00a65a" : "transparent",
+                  color: isActive ? "#fff" : "#17a2b8",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis"
+                }}
               >
                 {tab.label}
               </button>
