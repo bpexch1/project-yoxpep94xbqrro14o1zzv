@@ -9,6 +9,7 @@ import { BetSlip } from "@/components/user/BetSlip";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { GameBanners } from "@/components/user/GameBanners";
 import { RaceSection } from "@/components/user/RaceSection";
+import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
@@ -42,7 +43,8 @@ export default function UserDashboard() {
   // Fetch matches
   const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ['matches'],
-    queryFn: () => Match.list()
+    queryFn: () => Match.list(),
+    refetchInterval: 5000 // Refresh odds every 5 seconds
   });
 
   // Fetch real-time client data for balance and credits
@@ -119,6 +121,7 @@ export default function UserDashboard() {
     { id: "Cricket", label: "Cricket", icon: Ticket, count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
     { id: "Tennis", label: "Tennis", icon: Tent, count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
     { id: "Soccer", label: "Soccer", icon: Rocket, count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
+    { id: "Casino", label: "Casino", icon: Gamepad2, count: 12 },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -193,7 +196,7 @@ export default function UserDashboard() {
         <RaceSection title="Grey Hound" icon={Disc} slots={greyhoundSlots} />
 
         {/* Sport Category Tabs */}
-        <div className="grid grid-cols-4 w-full bg-[#254465]">
+        <div className="grid grid-cols-5 w-full bg-[#254465]">
           {categories.map((cat) => {
             const Icon = cat.icon;
             const isActive = activeFilter === cat.id;
@@ -206,9 +209,14 @@ export default function UserDashboard() {
                   getTabBg(cat.id, isActive)
                 )}
               >
-                <span className="text-white font-black text-[13px] leading-none mb-0.5">
-                  {cat.count}
-                </span>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <span className="text-white font-black text-[13px] leading-none">
+                    {cat.count}
+                  </span>
+                  {cat.id === 'Inplay' && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#16a085] animate-pulse" />
+                  )}
+                </div>
                 <Icon className={cn("w-5 h-5 mb-0.5", isActive ? "text-white" : "text-white/60")} />
                 <span className={cn("text-[9px] font-bold uppercase tracking-widest", isActive ? "text-white" : "text-white/60")}>
                   {cat.label}
@@ -218,47 +226,51 @@ export default function UserDashboard() {
           })}
         </div>
         
-        {/* Match List grouped by sport */}
-        <div className="flex flex-col pb-20">
-          {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
-            // Pick an icon based on sport name
-            let SportIcon = Volleyball;
-            if (sport.toLowerCase().includes('cricket')) SportIcon = Trophy;
-            if (sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer')) SportIcon = Gamepad2;
+        {/* Content Area */}
+        {activeFilter === "Casino" ? (
+          <CasinoSection />
+        ) : (
+          <div className="flex flex-col pb-20">
+            {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
+              // Pick an icon based on sport name
+              let SportIcon = Volleyball;
+              if (sport.toLowerCase().includes('cricket')) SportIcon = Trophy;
+              if (sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer')) SportIcon = Gamepad2;
 
-            return (
-              <div key={sport} className="flex flex-col">
-                <div className="bg-[#e8f0f5] border-b border-[#ccd9e5] px-3 py-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <SportIcon className="w-5 h-5 text-[#1e3a5c]" />
-                    <span className="text-[#1e3a5c] font-bold text-[13px]">{sport}</span>
+              return (
+                <div key={sport} className="flex flex-col">
+                  <div className="bg-[#e8f0f5] border-b border-[#ccd9e5] px-3 py-2.5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <SportIcon className="w-5 h-5 text-[#1e3a5c]" />
+                      <span className="text-[#1e3a5c] font-bold text-[13px]">{sport}</span>
+                    </div>
+                    <span className="text-[#1e3a5c]/50 font-bold text-[11px] uppercase tracking-wider">Matched</span>
                   </div>
-                  <span className="text-[#1e3a5c]/50 font-bold text-[11px] uppercase tracking-wider">Matched</span>
+                  <div className="flex flex-col">
+                    {sportMatches.map((match: any) => (
+                      <BettingMatchCard 
+                        key={match.id} 
+                        match={match} 
+                        onSelectBet={handleSelectBet} 
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  {sportMatches.map((match: any) => (
-                    <BettingMatchCard 
-                      key={match.id} 
-                      match={match} 
-                      onSelectBet={handleSelectBet} 
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
-          {/* Empty state */}
-          {filteredMatches.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-              <div className="w-16 h-16 bg-[#1e3a5c]/5 rounded-full flex items-center justify-center mb-4">
-                <Trophy className="w-8 h-8 text-[#1e3a5c]/20" />
+            {/* Empty state */}
+            {filteredMatches.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+                <div className="w-16 h-16 bg-[#1e3a5c]/5 rounded-full flex items-center justify-center mb-4">
+                  <Trophy className="w-8 h-8 text-[#1e3a5c]/20" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#1e3a5c]/40">No Matches Found</h3>
+                <p className="text-xs text-[#1e3a5c]/30 mt-1">There are currently no active matches for this category.</p>
               </div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-[#1e3a5c]/40">No Matches Found</h3>
-              <p className="text-xs text-[#1e3a5c]/30 mt-1">There are currently no active matches for this category.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </main>
       
       {/* BetSlip modal overlay */}
