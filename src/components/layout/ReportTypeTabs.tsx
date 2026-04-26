@@ -56,7 +56,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                   "px-[14px] py-[6px] rounded-[4px] text-[13px] transition-all duration-150 border",
                   isActive 
                     ? "bg-[#00a65a] text-white border-[#00a65a] font-bold shadow-[0_2px_4px_rgba(0,166,90,0.25)]" 
-                    : "bg-transparent text-[#00a65a] border-[#00a65a] font-medium hover:bg-[#f0fff4]"
+                    : "bg-transparent text-[#17a2b8] border-[#17a2b8] font-medium hover:bg-[#f0faff]"
                 )}
               >
                 {tab.label}
