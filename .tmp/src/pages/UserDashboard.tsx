@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { Match, Bet, Client } from "@/entities";
+import { fetchBetfairEvents } from "@/functions";
 import { UserHeader } from "@/components/user/UserHeader";
 import { BettingMatchCard } from "@/components/user/BettingMatchCard";
 import { BetSlip } from "@/components/user/BetSlip";
@@ -45,6 +46,14 @@ export default function UserDashboard() {
     queryKey: ['matches'],
     queryFn: () => Match.list(),
     refetchInterval: 5000 // Refresh odds every 5 seconds
+  });
+
+  // Fetch live Betfair events
+  const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
+    queryKey: ['betfair-events'],
+    queryFn: () => fetchBetfairEvents({}),
+    refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 1
   });
 
   // Fetch real-time client data for balance and credits
@@ -106,7 +115,7 @@ export default function UserDashboard() {
 
   if (!session) return null;
 
-  if (matchesLoading || clientLoading) {
+  if ((matchesLoading && !matches) || clientLoading) {
     return (
       <div className="min-h-screen bg-[#d6e4f0] flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-[#1e3a5c] animate-spin" />
@@ -114,7 +123,12 @@ export default function UserDashboard() {
     );
   }
 
-  const matchesList = matches || [];
+  const matchesList = [
+    ...(betfairEvents || []),
+    ...(matches || []).filter((m: any) => 
+      !(betfairEvents || []).some((bf: any) => bf.title === (m.title || `${m.team1} v ${m.team2}`))
+    )
+  ];
   
   const categories = [
     { id: "Inplay", label: "Inplay", icon: Clock, count: matchesList.filter((m: any) => m.status === 'live').length },

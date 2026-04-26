@@ -11,7 +11,6 @@ import {
   PlayCircle 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 
 const CASINO_GAMES = [
   {
@@ -21,7 +20,8 @@ const CASINO_GAMES = [
     category: "Roulette",
     gradient: "from-red-600 via-red-500 to-orange-500",
     icon: Zap,
-    players: 452
+    players: 452,
+    gameUrl: "https://www.betfair.com/casino/games/lightning-roulette"
   },
   {
     id: "speed-baccarat",
@@ -30,7 +30,8 @@ const CASINO_GAMES = [
     category: "Baccarat",
     gradient: "from-emerald-600 via-emerald-500 to-teal-400",
     icon: Coins,
-    players: 321
+    players: 321,
+    gameUrl: "https://www.betfair.com/casino/games/speed-baccarat"
   },
   {
     id: "teen-patti-live",
@@ -39,7 +40,8 @@ const CASINO_GAMES = [
     category: "Teen Patti",
     gradient: "from-purple-700 via-purple-600 to-fuchsia-500",
     icon: Dice5,
-    players: 892
+    players: 892,
+    gameUrl: "https://www.betfair.com/casino/live-casino"
   },
   {
     id: "dragon-tiger",
@@ -48,7 +50,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-orange-600 via-orange-500 to-yellow-400",
     icon: Gamepad2,
-    players: 156
+    players: 156,
+    gameUrl: "https://www.betfair.com/casino/games/dragon-tiger"
   },
   {
     id: "andar-bahar",
@@ -57,7 +60,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-blue-700 via-blue-600 to-cyan-500",
     icon: Dice3,
-    players: 643
+    players: 643,
+    gameUrl: "https://www.betfair.com/casino/live-casino"
   },
   {
     id: "crazy-time",
@@ -66,7 +70,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-yellow-500 via-orange-400 to-red-400",
     icon: Zap,
-    players: 1240
+    players: 1240,
+    gameUrl: "https://www.betfair.com/casino/games/crazy-time"
   },
   {
     id: "sicbo",
@@ -75,7 +80,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-teal-600 via-teal-500 to-emerald-400",
     icon: Dice1,
-    players: 89
+    players: 89,
+    gameUrl: "https://www.betfair.com/casino/live-casino"
   },
   {
     id: "speed-blackjack",
@@ -84,7 +90,8 @@ const CASINO_GAMES = [
     category: "Blackjack",
     gradient: "from-green-800 via-green-700 to-emerald-600",
     icon: Coins,
-    players: 215
+    players: 215,
+    gameUrl: "https://www.betfair.com/casino/games/speed-blackjack"
   },
   {
     id: "indian-poker",
@@ -93,7 +100,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-indigo-800 via-purple-700 to-pink-600",
     icon: Dice5,
-    players: 432
+    players: 432,
+    gameUrl: "https://www.betfair.com/casino/live-casino"
   },
   {
     id: "32-cards",
@@ -102,7 +110,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-blue-900 via-blue-800 to-indigo-700",
     icon: Gamepad2,
-    players: 124
+    players: 124,
+    gameUrl: "https://www.betfair.com/casino/live-casino"
   },
   {
     id: "roulette-live",
@@ -111,7 +120,8 @@ const CASINO_GAMES = [
     category: "Roulette",
     gradient: "from-rose-700 via-rose-600 to-pink-500",
     icon: Dice5,
-    players: 567
+    players: 567,
+    gameUrl: "https://www.betfair.com/casino/games/roulette"
   },
   {
     id: "live-poker",
@@ -120,7 +130,8 @@ const CASINO_GAMES = [
     category: "Others",
     gradient: "from-indigo-700 via-blue-600 to-cyan-600",
     icon: Coins,
-    players: 198
+    players: 198,
+    gameUrl: "https://www.betfair.com/casino/live-casino"
   }
 ];
 
@@ -128,17 +139,13 @@ const CATEGORIES = ["All", "Roulette", "Baccarat", "Teen Patti", "Blackjack", "O
 
 export function CasinoSection() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const { toast } = useToast();
 
   const filteredGames = CASINO_GAMES.filter(
     game => activeCategory === "All" || game.category === activeCategory
   );
 
-  const handleGameClick = (name: string) => {
-    toast({
-      title: "Opening Game",
-      description: `${name} is loading... Please wait.`,
-    });
+  const handleGameClick = (game: any) => {
+    window.open(game.gameUrl, '_blank');
   };
 
   return (
@@ -188,7 +195,7 @@ export function CasinoSection() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: idx * 0.03 }}
-                onClick={() => handleGameClick(game.name)}
+                onClick={() => handleGameClick(game)}
                 className="relative aspect-square group cursor-pointer overflow-hidden bg-[#0a0f14]"
               >
                 {/* Gradient Background */}
@@ -231,8 +238,9 @@ export function CasinoSection() {
                 </div>
 
                 {/* Hover Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
-                  <PlayCircle className="w-10 h-10 text-white animate-pulse" />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center backdrop-blur-[2px]">
+                  <PlayCircle className="w-10 h-10 text-white mb-2" />
+                  <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] animate-pulse bg-red-600 px-3 py-1 rounded-full shadow-lg">PLAY NOW →</span>
                 </div>
               </motion.div>
             );

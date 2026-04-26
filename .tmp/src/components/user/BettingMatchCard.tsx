@@ -48,6 +48,9 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
                 </span>
               </div>
             )}
+            {match.source === 'betfair' && (
+              <span className="text-[8px] font-black bg-[#1e3a5c] text-white px-1 rounded-sm leading-tight shrink-0">BF</span>
+            )}
           </div>
           <span className="text-[13px] font-bold text-[#1e3a5c] leading-snug line-clamp-2">
             {matchTitle}
