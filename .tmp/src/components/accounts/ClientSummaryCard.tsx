@@ -222,7 +222,7 @@ export function ClientSummaryCard({
             { label: "P/L Downline", value: totals.pl_downline, color: totals.pl_downline >= 0 ? "text-[#28a745]" : "text-[#dc3545]" },
             { label: "Users", value: filteredClients.length, color: "text-[#212529]" },
           ].map((item, i) => (
-            <div key={i} className="flex flex-col border-r border-b sm:border-b-0 last:border-r-0 border-[#ccc] p-2 hover:bg-gray-50 transition-colors cursor-pointer">
+            <div key={i} className="flex flex-col border-r border-b sm:border-b-0 last:border-r-0 border-[#ccc] p-2 hover:bg-[#f0fff4] transition-colors cursor-pointer">
               <span className="text-[10px] font-bold text-[#212529] uppercase opacity-80 leading-tight">{item.label}</span>
               <span className={cn("text-[16px] font-black leading-tight mt-1", item.color)}>
                 {balancesLoaded ? item.value.toLocaleString() : "-"}
@@ -237,14 +237,14 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#254465] hover:bg-[#1d354f] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors"
+                className="bg-[#00a65a] hover:bg-[#008d4c] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
               >
                 <User className="w-4 h-4" /> New User
               </button>
             )}
             <button
               onClick={() => navigate(`/reports/daily`)}
-              className="bg-[#254465] hover:bg-[#1d354f] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors"
+              className="bg-[#00a65a] hover:bg-[#008d4c] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
             >
               <Book className="w-4 h-4" /> Account Ledger
             </button>
@@ -295,7 +295,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Load Balance Header (Shared) */}
-        <div className="bg-[#3DCCC8] text-white border-t border-x border-[#d5d8dc]">
+        <div className="bg-[#00a65a] text-white border-t border-x border-[#d5d8dc]">
           <div className="px-3 py-1.5 flex items-center">
             <button
               onClick={handleLoadBalance}
@@ -405,10 +405,32 @@ export function ClientSummaryCard({
               </tr>
             </thead>
             <tbody className="text-[12px]">
+              {/* Green Total Row */}
+              {!isLoading && tableFilteredClients.length > 0 && (
+                <tr className="bg-[#00a65a] text-white font-black whitespace-nowrap">
+                  <td className="px-2 py-2 border border-[#008d4c]" colSpan={2}>Total</td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-right">
+                    {balancesLoaded ? totals.credit_received.toLocaleString() : "-"}
+                  </td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-right">
+                    {balancesLoaded ? totals.cash.toLocaleString() : "-"}
+                  </td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-right">
+                    {balancesLoaded ? totals.pl_downline.toLocaleString() : "-"}
+                  </td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-right">-</td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-right">0</td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-right">
+                    {balancesLoaded ? totals.credit_remaining.toLocaleString() : "-"}
+                  </td>
+                  <td className="px-2 py-2 border border-[#008d4c] text-center"></td>
+                </tr>
+              )}
+
               {isLoading ? (
                 <tr>
                   <td colSpan={9} className="px-3 py-12 text-center text-[#212529] bg-white">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#3DCCC8] mx-auto mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto mb-2" />
                     <span className="font-bold">Loading clients data...</span>
                   </td>
                 </tr>
@@ -426,15 +448,15 @@ export function ClientSummaryCard({
                   const isRefreshingRow = rowRefreshingMap[client.id];
                   
                   return (
-                    <tr key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "hover:bg-blue-50/50 transition-colors whitespace-nowrap")}>
+                    <tr key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "hover:bg-green-50/50 transition-colors whitespace-nowrap")}>
                       <td className="px-2 py-2 border border-[#d5d8dc]">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleRowRefresh(client)}
                             disabled={isRefreshingRow}
-                            className="text-[#6c757d] hover:text-[#3DCCC8] transition-colors"
+                            className="text-[#6c757d] hover:text-[#00a65a] transition-colors"
                           >
-                            <RefreshCw className={cn("w-3 h-3", isRefreshingRow && "animate-spin text-[#3DCCC8]")} />
+                            <RefreshCw className={cn("w-3 h-3", isRefreshingRow && "animate-spin text-[#00a65a]")} />
                           </button>
                           <button
                             onClick={() => {
@@ -501,27 +523,6 @@ export function ClientSummaryCard({
                           >
                             L
                           </button>
-                          <button 
-                            onClick={() => toggleStatus(client)}
-                            className={cn(
-                              "w-6 h-6 rounded-[2px] font-black text-[11px] flex items-center justify-center transition-all shadow-sm",
-                              client.status === "active" 
-                                ? "bg-[#28a745] hover:bg-[#218838] text-white" 
-                                : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
-                            )}
-                            title={client.status === "active" ? "Active" : "Inactive"}
-                          >
-                            {client.status === "active" ? "A" : "D"}
-                          </button>
-                          {client.role !== 'client' && (
-                            <button 
-                              onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                              className="w-6 h-6 bg-[#dc3545] hover:bg-[#c82333] text-white font-black text-[11px] flex items-center justify-center rounded-[2px] transition-colors shadow-sm"
-                              title="Settle Account"
-                            >
-                              S
-                            </button>
-                          )}
                         </div>
                       </td>
                     </tr>
@@ -532,126 +533,106 @@ export function ClientSummaryCard({
           </table>
         </div>
 
-        {/* Mobile Card View */}
-        <div className="lg:hidden flex flex-col border-x border-b border-[#d5d8dc]">
+        {/* Mobile View */}
+        <div className="lg:hidden flex flex-col gap-3">
           {isLoading ? (
-            <div className="px-3 py-12 text-center text-[#212529] bg-white">
-              <Loader2 className="w-6 h-6 animate-spin text-[#3DCCC8] mx-auto mb-2" />
-              <span className="font-bold text-xs uppercase">Loading clients...</span>
+            <div className="py-20 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-[#00a65a] mx-auto mb-4" />
+              <p className="font-bold text-gray-500">Loading clients...</p>
             </div>
-          ) : paginatedClients.length === 0 ? (
-            <div className="px-3 py-12 text-center text-[#212529] bg-white font-bold text-xs uppercase">
-              No users found
-            </div>
-          ) : (
-            paginatedClients.map((client, idx) => {
-              const roleLower = client.role?.toLowerCase();
-              const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
-              const display = getClientDisplayData(client);
-              const isExpanded = mobileExpandedIds.has(client.id);
-              const isRefreshingRow = rowRefreshingMap[client.id];
+          ) : paginatedClients.map((client) => {
+            const display = getClientDisplayData(client);
+            const isExpanded = mobileExpandedIds.has(client.id);
+            const isRefreshingRow = rowRefreshingMap[client.id];
 
-              return (
-                <div key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "border-b border-[#d5d8dc] last:border-b-0")}>
-                  <div className="p-2 flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRowRefresh(client);
-                        }}
-                        disabled={isRefreshingRow}
-                        className="text-[#6c757d] p-1"
-                      >
-                        <RefreshCw className={cn("w-3.5 h-3.5", isRefreshingRow && "animate-spin text-[#3DCCC8]")} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (isAdminType) {
-                            navigate(`/accounts/view/${client.username}`);
-                          } else {
-                            toggleMobileExpand(client.id);
-                          }
-                        }}
-                        className={cn(
-                          "font-black text-[13px] text-left flex items-center gap-1",
-                          isAdminType ? "text-[#254465]" : "text-[#212529]"
-                        )}
-                      >
-                        {client.username}
-                        {!isAdminType && (isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                      </button>
-                      <span className="text-[10px] font-bold text-[#6c757d] uppercase bg-gray-100 px-1 rounded">
-                        {getTypeLabel(client.role)}
-                      </span>
+            return (
+              <div key={client.id} className="border border-[#d5d8dc] rounded-lg overflow-hidden bg-white shadow-sm">
+                <div 
+                  className="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => toggleMobileExpand(client.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRowRefresh(client);
+                      }}
+                      disabled={isRefreshingRow}
+                      className="text-[#6c757d] hover:text-[#00a65a]"
+                    >
+                      <RefreshCw className={cn("w-3.5 h-3.5", isRefreshingRow && "animate-spin text-[#00a65a]")} />
+                    </button>
+                    <div className="flex flex-col">
+                      <span className="font-black text-[#254465]">{client.username}</span>
+                      <span className="text-[10px] text-gray-500 uppercase font-bold">{getTypeLabel(client.role)}</span>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-end">
+                      <span className={cn(
+                        "font-black text-sm",
+                        display.balance !== null ? (display.balance >= 0 ? "text-[#28a745]" : "text-[#dc3545]") : "text-gray-400"
+                      )}>
+                        {display.balance !== null ? display.balance.toLocaleString() : "-"}
+                      </span>
+                      <span className="text-[9px] text-gray-400 font-bold uppercase">Balance</span>
+                    </div>
+                    {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                  </div>
+                </div>
 
-                    <div className="flex items-center gap-1 ml-auto">
+                {isExpanded && (
+                  <div className="px-3 pb-3 border-t border-gray-100 bg-gray-50/50">
+                    <div className="grid grid-cols-2 gap-4 py-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase">Credit</span>
+                        <span className="font-black text-[#28a745]">{display.credit?.toLocaleString() ?? "-"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase">Client P/L</span>
+                        <span className={cn(
+                          "font-black",
+                          display.plDownline !== null ? (display.plDownline >= 0 ? "text-[#28a745]" : "text-[#dc3545]") : "text-gray-400"
+                        )}>{display.plDownline?.toLocaleString() ?? "-"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase">Share</span>
+                        <span className="font-black">{display.share !== null ? `${display.share}%` : "-"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase">Available</span>
+                        <span className="font-black text-[#28a745]">{display.available?.toLocaleString() ?? "-"}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                       <button 
                         onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                        className="w-7 h-7 bg-[#ffc107] text-black font-black text-[11px] flex items-center justify-center rounded-[2px]"
+                        className="flex-1 bg-[#ffc107] text-black font-black text-xs py-2 rounded flex items-center justify-center gap-2"
                       >
-                        C
+                        CASH/CREDIT
                       </button>
                       <button 
                         onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                        className="w-7 h-7 bg-[#254465] text-white flex items-center justify-center rounded-[2px]"
+                        className="flex-1 bg-[#254465] text-white font-black text-xs py-2 rounded flex items-center justify-center gap-2"
                       >
-                        <Pencil className="w-3.5 h-3.5" />
+                        <Pencil className="w-3.5 h-3.5" /> EDIT
                       </button>
                       <button 
                         onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                        className="w-7 h-7 bg-[#17a2b8] text-white font-black text-[11px] flex items-center justify-center rounded-[2px]"
+                        className="flex-1 bg-[#17a2b8] text-white font-black text-xs py-2 rounded flex items-center justify-center gap-2"
                       >
-                        L
+                        LEDGER
                       </button>
-                      <button 
-                        onClick={() => toggleStatus(client)}
-                        className={cn(
-                          "w-7 h-7 rounded-[2px] font-black text-[11px] flex items-center justify-center",
-                          client.status === "active" ? "bg-[#28a745] text-white" : "bg-white border border-[#dc3545] text-[#dc3545]"
-                        )}
-                      >
-                        {client.status === "active" ? "A" : "D"}
-                      </button>
-                      {client.role !== 'client' && (
-                        <button 
-                          onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                          className="w-7 h-7 bg-[#dc3545] text-white font-black text-[11px] flex items-center justify-center rounded-[2px]"
-                        >
-                          S
-                        </button>
-                      )}
                     </div>
                   </div>
-
-                  {isExpanded && !isAdminType && (
-                    <div className="bg-[#f0f3f5] p-3 border-t border-[#d5d8dc] grid grid-cols-2 gap-y-3 gap-x-4 animate-in slide-in-from-top-1 duration-200">
-                      {[
-                        { label: "Credit", value: display.credit?.toLocaleString(), color: "text-[#28a745]" },
-                        { label: "Balance", value: display.balance?.toLocaleString(), color: display.balance && display.balance >= 0 ? "text-[#28a745]" : "text-[#dc3545]" },
-                        { label: "Client (P/L)", value: display.plDownline?.toLocaleString(), color: display.plDownline && display.plDownline >= 0 ? "text-[#28a745]" : "text-[#dc3545]" },
-                        { label: "Share", value: display.share !== null ? `${display.share}%` : "-", color: "text-[#212529]" },
-                        { label: "Exposure", value: display.isLoaded ? "0" : "-", color: "text-[#dc3545]" },
-                        { label: "Available", value: display.available?.toLocaleString(), color: "text-[#28a745]" },
-                      ].map((item, i) => (
-                        <div key={i} className="flex flex-col">
-                          <span className="text-[10px] font-bold text-[#6c757d] uppercase mb-0.5">{item.label}</span>
-                          <span className={cn("text-sm font-black", item.value === undefined ? "text-gray-400" : item.color)}>
-                            {item.value || "-"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* DataTable Bottom Controls */}
-        <div className="mt-2">
+        <div className="mt-4">
           <DataTablePagination
             currentPage={currentPage}
             totalPages={totalPages}

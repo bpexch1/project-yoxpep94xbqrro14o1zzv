@@ -251,8 +251,8 @@ export default function Accounts() {
                             cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
-                            backgroundColor: highlightedIndex === index ? "#f0fdf4" : "#fff",
-                            color: highlightedIndex === index ? "#3DCCC8" : "inherit",
+                            backgroundColor: highlightedIndex === index ? "#f0fff4" : "#fff",
+                            color: highlightedIndex === index ? "#00a65a" : "inherit",
                           }}
                         >
                           <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529" }}>
@@ -275,7 +275,7 @@ export default function Accounts() {
                     minHeight: "40px",
                     maxHeight: "40px",
                     padding: "0 18px",
-                    background: isSearchHovered ? "#2db8b4" : "#3DCCC8",
+                    background: isSearchHovered ? "#008d4c" : "#00a65a",
                     color: "#fff",
                     border: "none",
                     borderRadius: "5px",
@@ -321,7 +321,7 @@ export default function Accounts() {
                               style={{
                                 fontSize: "12px",
                                 fontWeight: isLast ? 700 : 600,
-                                color: isLast ? "#3DCCC8" : "#212529",
+                                color: isLast ? "#00a65a" : "#212529",
                                 textDecoration: "none",
                               }}
                             >

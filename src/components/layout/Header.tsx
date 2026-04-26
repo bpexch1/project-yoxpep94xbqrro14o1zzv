@@ -30,22 +30,6 @@ function formatRole(role: string): string {
   return roleMap[role?.toLowerCase()] ?? role;
 }
 
-const NavLink = ({ to, label }: { to: string; label: string }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || (to !== "/dashboard" && location.pathname.startsWith(to.split('?')[0]));
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "px-3 py-1.5 text-sm rounded transition-colors font-medium whitespace-nowrap",
-        isActive ? "bg-[#e8f0f5] text-[#254465] font-bold" : "text-[#555555] hover:bg-[#f5f5f5]"
-      )}
-    >
-      {label}
-    </Link>
-  );
-};
-
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const navigate = useNavigate();
@@ -112,29 +96,29 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#3c4b64] flex items-center px-3 h-[50px] border-b border-[#2f3b4c]">
+    <header className="sticky top-0 z-40 bg-white flex items-center px-3 h-[50px] border-b border-[#d2d6de]">
       {/* LEFT: Hamburger + Logo */}
       <div className="flex items-center shrink-0">
         <button
           onClick={onOpenMobileSidebar}
-          className="p-1.5 text-white/80 hover:text-white transition-colors lg:hidden"
+          className="p-1.5 text-gray-600 hover:text-gray-800 transition-colors lg:hidden"
         >
           <Menu className="w-5 h-5" />
         </button>
         <Link to="/dashboard" className="flex items-center gap-1 ml-1 lg:ml-0">
-          <span className="font-black italic text-xl" style={{fontFamily:'Georgia,serif'}}>
-            <span className="text-white">Bp</span><span className="text-[#3DCCC8]">Exch</span>
+          <span className="font-bold italic text-xl uppercase text-[#00a65a]" style={{fontFamily:'Georgia,serif'}}>
+            BPEXCH
           </span>
         </Link>
       </div>
 
       {/* CENTER: Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-4 ml-8 flex-1">
+      <nav className="hidden lg:flex items-center gap-6 ml-8 flex-1">
         <Link 
           to="/dashboard" 
           className={cn(
-            "text-sm font-medium transition-all hover:underline",
-            location.pathname === "/dashboard" ? "text-white underline" : "text-white/80"
+            "text-sm transition-all hover:text-[#00a65a]",
+            location.pathname === "/dashboard" ? "text-[#00a65a] font-bold" : "text-[#333]"
           )}
         >
           Dashboard
@@ -142,8 +126,8 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         <Link 
           to="/accounts" 
           className={cn(
-            "text-sm font-medium transition-all hover:underline",
-            location.pathname.startsWith("/accounts") ? "text-white underline" : "text-white/80"
+            "text-sm transition-all hover:text-[#00a65a]",
+            location.pathname.startsWith("/accounts") ? "text-[#00a65a] font-bold" : "text-[#333]"
           )}
         >
           Users
@@ -151,8 +135,8 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         <Link 
           to="/reports/daily-pl" 
           className={cn(
-            "text-sm font-medium transition-all hover:underline",
-            location.pathname.startsWith("/reports") ? "text-white underline" : "text-white/80"
+            "text-sm transition-all hover:text-[#00a65a]",
+            location.pathname.startsWith("/reports") ? "text-[#00a65a] font-bold" : "text-[#333]"
           )}
         >
           Reports
@@ -163,19 +147,19 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
       <div className="flex items-center justify-end ml-auto gap-2 sm:gap-4">
         {session ? (
           <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-2 border-r border-white/10 pr-2 sm:pr-4">
-              <span className="text-[13px] text-white whitespace-nowrap">
-                <span className="font-bold opacity-80">B:</span> <span className={cn(
+            <div className="flex items-center gap-2 border-r border-[#d2d6de] pr-2 sm:pr-4">
+              <span className="text-[13px] text-[#555] whitespace-nowrap">
+                <span className="font-bold">B:</span> <span className={cn(
                   "font-bold",
-                  liveBalance >= 0 ? "text-[#3DCCC8]" : "text-[#dc3545]"
+                  liveBalance >= 0 ? "text-[#00a65a]" : "text-[#dc3545]"
                 )}>
                   {liveBalance.toLocaleString('en-IN')}
                 </span>
               </span>
-              <span className="text-[13px] text-white whitespace-nowrap">
-                <span className="font-bold opacity-80">Exp:</span> <span className={cn(
+              <span className="text-[13px] text-[#555] whitespace-nowrap">
+                <span className="font-bold">Exp:</span> <span className={cn(
                   "font-bold",
-                  totalExposure > 0 ? "text-[#dc3545]" : "text-white"
+                  totalExposure > 0 ? "text-[#dc3545]" : "text-[#333]"
                 )}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
@@ -183,7 +167,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
               <button
                 onClick={handleLoadBalance}
                 disabled={isRefreshing}
-                className="bg-[#3DCCC8] hover:bg-[#2db8b4] text-white p-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 ml-1"
+                className="bg-[#00a65a] hover:bg-[#008d4c] text-white p-1 rounded-sm transition-all active:scale-95 disabled:opacity-70 ml-1"
                 title="Refresh balance"
               >
                 <RefreshCw className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")} />
@@ -192,31 +176,31 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-white/5 px-2 py-1 rounded transition-colors">
-                  <span className="text-white text-sm font-medium hidden sm:inline">
+                <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-colors group">
+                  <span className="text-[#333] text-sm font-medium hidden sm:inline group-hover:text-[#00a65a]">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
                   </span>
-                  <span className="text-white text-sm font-medium sm:hidden">
+                  <span className="text-[#333] text-sm font-medium sm:hidden group-hover:text-[#00a65a]">
                     {session.username}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#00a65a]" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-[#3c4b64] border border-[#2f3b4c] shadow-lg rounded w-48 mt-1">
-                <div className="px-2 py-1.5 text-[11px] text-white/60 border-b border-white/10 mb-1">
-                  Logged in as <span className="font-semibold text-white">{session.username}</span>
+              <DropdownMenuContent align="end" className="bg-white border border-[#d2d6de] shadow-lg rounded w-48 mt-1">
+                <div className="px-2 py-1.5 text-[11px] text-gray-500 border-b border-gray-100 mb-1">
+                  Logged in as <span className="font-semibold text-[#333]">{session.username}</span>
                 </div>
                 <DropdownMenuItem
                   onClick={() => navigate("/play/profile")}
-                  className="text-white hover:bg-white/10 cursor-pointer text-xs font-medium p-2 focus:bg-white/10 focus:text-white"
+                  className="text-[#333] hover:bg-gray-50 hover:text-[#00a65a] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00a65a]"
                 >
                   <User className="w-3.5 h-3.5 mr-2 opacity-70" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuSeparator className="bg-gray-100" />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-[#dc3545] hover:bg-red-500/10 cursor-pointer text-xs font-medium focus:text-[#dc3545] focus:bg-red-500/10 p-2"
+                  className="text-[#dc3545] hover:bg-red-50 cursor-pointer text-xs font-medium focus:text-[#dc3545] focus:bg-red-50 p-2"
                 >
                   <LogOut className="w-3.5 h-3.5 mr-2" />
                   Logout
@@ -227,7 +211,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-white hover:text-[#3DCCC8] uppercase"
+            className="text-sm font-bold text-[#333] hover:text-[#00a65a] uppercase transition-colors"
           >
             Login
           </button>
@@ -236,4 +220,3 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
     </header>
   );
 }
-

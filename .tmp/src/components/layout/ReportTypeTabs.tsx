@@ -1,14 +1,26 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface ReportTypeTabsProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
-const tabs = ["Accounts", "SuperAdmin", "SuperMaster", "Admin", "Bettor"];
+const tabs = [
+  { label: "Book Detail", path: "/reports/book-detail" },
+  { label: "Book Detail 2", path: "/reports/book-detail-2" },
+  { label: "Daily PL", path: "/reports/daily-pl" },
+  { label: "Daily Report", path: "/reports/daily" },
+  { label: "Final Sheet", path: "/reports/final-sheet" },
+  { label: "Accounts", path: "/accounts" },
+  { label: "Commission Report", path: "/reports/commission" },
+];
 
 export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <div style={{
       background: "#fff",
@@ -42,25 +54,20 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div style={{ padding: "12px 16px" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {tabs.map((tab) => {
-            const isActive = activeTab === tab;
+            const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
+            
             return (
               <button
-                key={tab}
-                onClick={() => onTabChange(tab)}
-                style={{
-                  padding: "6px 14px",
-                  borderRadius: 4,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                  background: isActive ? "#3DCCC8" : "transparent",
-                  color: isActive ? "#fff" : "#212529",
-                  border: isActive ? "1px solid #3DCCC8" : "1px solid #17a2b8",
-                  boxShadow: isActive ? "0 2px 4px rgba(61, 204, 200, 0.25)" : "none",
-                }}
+                key={tab.label}
+                onClick={() => navigate(tab.path)}
+                className={cn(
+                  "px-[14px] py-[6px] rounded-[4px] text-[13px] transition-all duration-150 border",
+                  isActive 
+                    ? "bg-[#00a65a] text-white border-[#00a65a] font-bold shadow-[0_2px_4px_rgba(0,166,90,0.25)]" 
+                    : "bg-transparent text-[#00a65a] border-[#00a65a] font-medium hover:bg-[#f0fff4]"
+                )}
               >
-                {tab}
+                {tab.label}
               </button>
             );
           })}
