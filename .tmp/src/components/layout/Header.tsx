@@ -99,7 +99,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
       {/* LEFT: Logo + Hamburger */}
       <div className="flex items-center shrink-0">
         <Link to="/dashboard" className="flex items-center gap-1">
-          <span className="font-bold italic text-xl uppercase text-[#00a65a]" style={{fontFamily:'Georgia,serif'}}>
+          <span className="font-bold italic text-xl uppercase text-[#00a65a] hidden lg:inline" style={{fontFamily:'Georgia,serif'}}>
             BPEXCH
           </span>
         </Link>
@@ -146,33 +146,11 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
       <div className="flex items-center justify-end ml-auto gap-2 sm:gap-4">
         {session ? (
           <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-2 border-r border-[#d2d6de] pr-2 sm:pr-4">
-              <span className="text-[13px] text-[#555] whitespace-nowrap">
-                <span className="font-bold">B:</span> <span className={cn(
-                  "font-bold",
-                  liveBalance > 0 ? "text-[#00a65a]" : "text-[#333]"
-                )}>
-                  {Math.max(0, liveBalance).toLocaleString('en-IN')}
-                </span>
-              </span>
-              <span className="text-[13px] text-[#555] whitespace-nowrap">
-                <span className="font-bold">Exp:</span> <span className={cn(
-                  "font-bold",
-                  totalExposure > 0 ? "text-[#dc3545]" : "text-[#333]"
-                )}>
-                  {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
-                </span>
-              </span>
-            </div>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-colors group">
-                  <span className="text-[#333] text-sm font-medium hidden sm:inline group-hover:text-[#00a65a]">
+                  <span className="text-[#333] text-sm font-medium group-hover:text-[#00a65a]">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
-                  </span>
-                  <span className="text-[#333] text-sm font-medium sm:hidden group-hover:text-[#00a65a]">
-                    {session.username}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#00a65a]" />
                 </div>
@@ -198,6 +176,25 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] text-[#555] whitespace-nowrap">
+                <span className="font-bold">B:</span> <span className={cn(
+                  "font-bold",
+                  liveBalance > 0 ? "text-[#00a65a]" : "text-[#333]"
+                )}>
+                  {Math.max(0, liveBalance).toLocaleString('en-IN')}
+                </span>
+              </span>
+              <span className="text-[13px] text-[#555] whitespace-nowrap">
+                <span className="font-bold">Exp:</span> <span className={cn(
+                  "font-bold",
+                  totalExposure > 0 ? "text-[#dc3545]" : "text-[#333]"
+                )}>
+                  {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
+                </span>
+              </span>
+            </div>
           </div>
         ) : (
           <button
