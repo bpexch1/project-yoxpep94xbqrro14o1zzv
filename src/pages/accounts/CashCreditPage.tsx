@@ -5,12 +5,7 @@ import { Client, Transaction } from "@/entities";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ChevronLeft, 
-  Loader2, 
-  ArrowUpCircle, 
-  ArrowDownCircle,
-  History,
-  TrendingUp,
-  TrendingDown
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -189,245 +184,174 @@ export default function CashCreditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] font-roboto pb-12">
-      <main className="max-w-[720px] mx-auto p-4 lg:p-6">
+    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, sans-serif" }}>
+      <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0" }}>
         
-        {/* TAB SWITCHER */}
-        <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <button
+        {/* 1. TAB SWITCHER - full width flat buttons, no border-radius */}
+        <div style={{ display: "flex", background: "#fff", marginBottom: "0" }}>
+          <button 
             onClick={() => setActiveTab('cash')}
-            className={cn(
-              "flex-1 py-4 text-base font-bold transition-all",
-              activeTab === 'cash'
-                ? "bg-[#3498db] text-white shadow-inner"
-                : "bg-white text-[#16a085] hover:bg-gray-50"
-            )}
+            style={{
+              flex: 1, padding: "12px", fontSize: "14px", fontWeight: 700,
+              background: activeTab === 'cash' ? "#3498db" : "#fff",
+              color: activeTab === 'cash' ? "#fff" : "#16a085",
+              border: "none", cursor: "pointer"
+            }}
           >
             Cash
           </button>
           <button
             onClick={() => setActiveTab('credit')}
-            className={cn(
-              "flex-1 py-4 text-base font-bold transition-all",
-              activeTab === 'credit'
-                ? "bg-[#3498db] text-white shadow-inner"
-                : "bg-white text-[#16a085] hover:bg-gray-50"
-            )}
+            style={{
+              flex: 1, padding: "12px", fontSize: "14px", fontWeight: 700,
+              background: activeTab === 'credit' ? "#3498db" : "#fff",
+              color: activeTab === 'credit' ? "#fff" : "#16a085",
+              border: "none", cursor: "pointer"
+            }}
           >
             Credit
           </button>
         </div>
-
-        {/* CLIENT SUMMARY CARD */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-[#2c3e50]">{client.username}</h2>
-            <div className="px-3 py-1 bg-emerald-50 text-[#16a085] rounded-full text-xs font-bold uppercase tracking-wider">
-              {activeTab} Mode
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-0 border border-[#d5d8dc] rounded-lg overflow-hidden text-center">
-            <div className="bg-gray-50 py-3 border-r border-[#d5d8dc]">
-              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">
-                {activeTab === 'cash' ? 'Credit' : 'Credit Limit'}
-              </p>
-              <p className="text-sm font-bold text-[#16a085]">
-                {(client?.credit_remaining || 0).toLocaleString()} Rs.
-              </p>
-            </div>
-            <div className="bg-white py-3 border-r border-[#d5d8dc]">
-              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">
-                {activeTab === 'cash' ? 'Balance' : `${client.username} Credit`}
-              </p>
-              <p className="text-sm font-bold text-[#16a085]">
-                {(activeTab === 'cash' ? client.cash : client.credit_remaining || 0).toLocaleString()} Rs.
-              </p>
-            </div>
-            <div className="bg-gray-50 py-3">
-              <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">
-                {activeTab === 'cash' ? 'Max Withdraw' : 'Available'}
-              </p>
-              <p className="text-sm font-bold text-[#16a085]">
-                {Math.max(0, activeTab === 'cash' ? (client.cash || 0) : (client.credit_remaining || 0)).toLocaleString()} Rs.
-              </p>
-            </div>
-          </div>
+        
+        {/* 2. CLIENT NAME */}
+        <div style={{ background: "#fff", padding: "16px 16px 8px", fontWeight: 700, fontSize: "15px", color: "#212529" }}>
+          {client.username}
         </div>
-
-        {/* DEPOSIT SECTION */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <div className="bg-[#16a085] px-6 py-3 flex items-center justify-between">
-            <p className="text-white text-sm font-bold flex items-center gap-2">
-              <ArrowUpCircle className="w-5 h-5" />
-              DEPOSIT {activeTab.toUpperCase()}
-            </p>
+        
+        {/* 3. INFO TABLE: Credit | Balance | Max Withdraw */}
+        <div style={{ background: "#fff", padding: "0 16px 16px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #dee2e6", fontSize: "13px" }}>
+            <thead>
+              <tr>
+                <th style={{ border: "1px solid #dee2e6", padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "#212529" }}>Credit</th>
+                <th style={{ border: "1px solid #dee2e6", padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "#212529" }}>Balance</th>
+                <th style={{ border: "1px solid #dee2e6", padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "#212529" }}>Max Withdraw</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ border: "1px solid #dee2e6", padding: "8px 12px", color: "#212529" }}>
+                  {(client.credit_remaining || 0).toLocaleString()} Rs.
+                </td>
+                <td style={{ border: "1px solid #dee2e6", padding: "8px 12px", color: "#212529" }}>
+                  {(client.cash || 0).toLocaleString()} Rs.
+                </td>
+                <td style={{ border: "1px solid #dee2e6", padding: "8px 12px", color: "#212529" }}>
+                  {Math.max(0, client.cash || 0).toLocaleString()} Rs.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        {/* 4. DEPOSIT SECTION */}
+        <div style={{ background: "#fff", marginTop: "16px", border: "1px solid #dee2e6" }}>
+          {/* Green header */}
+          <div style={{ background: "#00a65a", padding: "10px 16px", fontSize: "13px", color: "#fff", fontWeight: 700 }}>
+            Deposit {activeTab === 'cash' ? 'Cash' : 'Credit'} in <strong>{client.username}</strong> account
           </div>
-          <div className="p-6 space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Description</label>
+          {/* Form body */}
+          <div style={{ padding: "16px" }}>
+            {/* Description row */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
+              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Description</div>
               <input
                 type="text"
                 value={depositDesc}
                 onChange={(e) => setDepositDesc(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16a085]/10 focus:border-[#16a085] transition-all bg-gray-50"
+                style={{ flex: 1, border: "1px solid #ccc", borderRadius: "3px", padding: "5px 8px", fontSize: "13px", outline: "none" }}
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Amount (Rs.)</label>
-              <div className="relative">
+            {/* Amount row */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
+              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Amount</div>
+              <div style={{ display: "flex", alignItems: "center", flex: 1, border: "1px solid #ccc", borderRadius: "3px" }}>
+                <span style={{ padding: "5px 8px", fontSize: "13px", color: "#555", background: "#f9f9f9", borderRight: "1px solid #ccc" }}>Rs.</span>
                 <input
                   type="number"
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 pl-12 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#16a085]/10 focus:border-[#16a085] transition-all bg-gray-50"
                   min="0"
+                  style={{ flex: 1, border: "none", padding: "5px 8px", fontSize: "13px", outline: "none" }}
                 />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7f8c8d] font-bold">Rs.</span>
               </div>
             </div>
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={handleDeposit}
-                disabled={isSubmittingDeposit}
-                className="bg-[#16a085] hover:bg-[#138d75] text-white font-bold px-10 py-3 rounded-lg shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
-              >
-                {isSubmittingDeposit && <Loader2 className="w-4 h-4 animate-spin" />}
-                Submit Deposit
-              </button>
-            </div>
+            {/* Submit */}
+            <button
+              onClick={handleDeposit}
+              disabled={isSubmittingDeposit}
+              style={{
+                background: "#00a65a", color: "#fff", border: "none", borderRadius: "3px",
+                padding: "6px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer"
+              }}
+            >
+              {isSubmittingDeposit ? "Submitting..." : "Submit"}
+            </button>
           </div>
         </div>
-
-        {/* WITHDRAW SECTION */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-          <div className="bg-[#e74c3c] px-6 py-3 flex items-center justify-between">
-            <p className="text-white text-sm font-bold flex items-center gap-2">
-              <ArrowDownCircle className="w-5 h-5" />
-              WITHDRAW {activeTab.toUpperCase()}
-            </p>
+        
+        {/* 5. WITHDRAW SECTION */}
+        <div style={{ background: "#fff", marginTop: "16px", border: "1px solid #dee2e6" }}>
+          {/* Red header */}
+          <div style={{ background: "#dd4b39", padding: "10px 16px", fontSize: "13px", color: "#fff", fontWeight: 700 }}>
+            Withdraw {activeTab === 'cash' ? 'cash' : 'credit'} from <strong>{client.username}</strong> account
           </div>
-          <div className="p-6 space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Description</label>
+          {/* Form body */}
+          <div style={{ padding: "16px" }}>
+            {/* Description row */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
+              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Description</div>
               <input
                 type="text"
                 value={withdrawDesc}
                 onChange={(e) => setWithdrawDesc(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/10 focus:border-[#e74c3c] transition-all bg-gray-50"
+                style={{ flex: 1, border: "1px solid #ccc", borderRadius: "3px", padding: "5px 8px", fontSize: "13px", outline: "none" }}
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-[#7f8c8d] uppercase mb-2">Amount (Rs.)</label>
-              <div className="relative flex gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="number"
-                    value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 pl-12 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/10 focus:border-[#e74c3c] transition-all bg-gray-50"
-                    min="0"
-                  />
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7f8c8d] font-bold">Rs.</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const available = activeTab === 'cash' ? (client?.cash || 0) : (client?.credit_remaining || 0);
-                    setWithdrawAmount(Math.max(0, available).toString());
-                  }}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#2c3e50] font-bold rounded-lg text-xs uppercase transition-colors whitespace-nowrap"
-                >
-                  Max
-                </button>
+            {/* Amount row */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
+              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Amount</div>
+              <div style={{ display: "flex", alignItems: "center", flex: 1, border: "1px solid #ccc", borderRadius: "3px" }}>
+                <span style={{ padding: "5px 8px", fontSize: "13px", color: "#555", background: "#f9f9f9", borderRight: "1px solid #ccc" }}>Rs.</span>
+                <input
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  min="0"
+                  style={{ flex: 1, border: "none", padding: "5px 8px", fontSize: "13px", outline: "none" }}
+                />
               </div>
             </div>
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={handleWithdraw}
-                disabled={isSubmittingWithdraw}
-                className="bg-[#e74c3c] hover:bg-red-600 text-white font-bold px-10 py-3 rounded-lg shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
-              >
-                {isSubmittingWithdraw && <Loader2 className="w-4 h-4 animate-spin" />}
-                Submit Withdrawal
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* RECENT TRANSACTIONS SECTION */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="font-bold text-[#2c3e50] flex items-center gap-2">
-              <History className="w-5 h-5 text-[#16a085]" />
-              Recent {activeTab} History
-            </h3>
-            <button 
-              onClick={() => navigate(`/accounts/ledger/${username}`)}
-              className="text-xs font-bold text-[#1a9e71] hover:underline"
+            {/* Submit */}
+            <button
+              onClick={handleWithdraw}
+              disabled={isSubmittingWithdraw}
+              style={{
+                background: "#dd4b39", color: "#fff", border: "none", borderRadius: "3px",
+                padding: "6px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer"
+              }}
             >
-              View Full Ledger
+              {isSubmittingWithdraw ? "Submitting..." : "Submit"}
             </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase">Date</th>
-                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase">Description</th>
-                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase text-right">Amount</th>
-                  <th className="px-6 py-3 font-bold text-[#7f8c8d] uppercase text-right">Balance</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isFetchingTx ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-10 text-center">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#16a085] mx-auto" />
-                    </td>
-                  </tr>
-                ) : transactions?.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-10 text-center text-gray-400 font-medium italic">
-                      No transactions found
-                    </td>
-                  </tr>
-                ) : (
-                  transactions?.map((tx: any) => (
-                    <tr key={tx.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-3 text-[#7f8c8d] whitespace-nowrap">
-                        {new Date(tx.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-                      </td>
-                      <td className="px-6 py-3 font-medium text-[#2c3e50]">{tx.description}</td>
-                      <td className={cn(
-                        "px-6 py-3 font-bold text-right",
-                        tx.amount >= 0 ? "text-[#16a085]" : "text-[#e74c3c]"
-                      )}>
-                        {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-3 font-bold text-[#2c3e50] text-right">
-                        {(tx.after_balance || 0).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
           </div>
         </div>
 
         {/* BACK BUTTON */}
-        <div className="flex justify-center">
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "24px", paddingBottom: "40px" }}>
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 bg-white hover:bg-gray-50 text-[#2c3e50] font-bold px-8 py-3 rounded-lg border border-gray-200 shadow-sm transition-all active:scale-95"
+            style={{
+              background: "#fff", color: "#2c3e50", border: "1px solid #dee2e6",
+              padding: "8px 24px", fontSize: "13px", fontWeight: 700, borderRadius: "4px",
+              cursor: "pointer", display: "flex", alignItems: "center", gap: "8px"
+            }}
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft style={{ width: "16px", height: "16px" }} />
             Back to Accounts
           </button>
         </div>
-          
-      </main>
+        
+      </div>
     </div>
   );
 }
