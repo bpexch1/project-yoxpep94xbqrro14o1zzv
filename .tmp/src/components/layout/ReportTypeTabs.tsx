@@ -37,11 +37,11 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         alignItems: "center",
         gap: 8,
         padding: "10px 16px",
-        backgroundColor: "#343a40",
-        borderBottom: "1px solid #23282d"
+        backgroundColor: "#ecf0f1",
+        borderBottom: "1px solid #d0d0d0"
       }}>
-        <Filter style={{ width: 16, height: 16, color: "#fff", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>Report Type</span>
+        <Filter style={{ width: 16, height: 16, color: "#2c3e50", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#2c3e50" }}>Report Type</span>
       </div>
       <div style={{ padding: "14px 16px" }}>
         <div style={{ 
