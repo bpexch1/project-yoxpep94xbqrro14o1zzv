@@ -25,7 +25,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
   return (
     <div style={{
-      background: "#fff",
+      backgroundColor: "#fff",
       borderRadius: 4,
       border: "1px solid #d0d0d0",
       boxShadow: "0 1px 3px rgba(0,0,0,.08)",
@@ -37,7 +37,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         alignItems: "center",
         gap: 8,
         padding: "10px 16px",
-        background: "#343a40",
+        backgroundColor: "#343a40",
         borderBottom: "1px solid #23282d"
       }}>
         <Filter style={{ width: 16, height: 16, color: "#fff", flexShrink: 0 }} />
