@@ -26,7 +26,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   return (
     <div style={{
       background: "#fff",
-      borderRadius: 10,
+      borderRadius: 4,
       border: "1px solid #d0d0d0",
       boxShadow: "0 1px 3px rgba(0,0,0,.08)",
       marginBottom: 16,
@@ -37,13 +37,13 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         alignItems: "center",
         gap: 8,
         padding: "10px 16px",
-        background: "#ecf0f1",
-        borderBottom: "1px solid #d0d0d0"
+        background: "#343a40",
+        borderBottom: "1px solid #23282d"
       }}>
-        <Filter style={{ width: 16, height: 16, fill: "#000", color: "#000", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
+        <Filter style={{ width: 16, height: 16, color: "#fff", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>Report Type</span>
       </div>
-      <div style={{ padding: "12px 16px" }}>
+      <div style={{ padding: "14px 16px" }}>
         <div style={{ 
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
@@ -62,8 +62,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 onClick={() => navigate(tab.path)}
                 style={{
                   gridColumn: isLastAlone ? 2 : undefined,
-                  padding: "7px 6px",
-                  borderRadius: 4,
+                  padding: "8px 6px",
+                  borderRadius: 3,
                   fontSize: 13,
                   fontWeight: isActive ? 700 : 500,
                   border: `1px solid ${isActive ? "#00a65a" : "#17a2b8"}`,
