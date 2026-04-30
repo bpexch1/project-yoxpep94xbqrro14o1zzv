@@ -220,35 +220,38 @@ export function ClientSummaryCard({
       )}
 
       <div className="p-3">
-        {/* Summary Stats Table — always shows real totals */}
+        {/* Summary Stats Table — use balancesLoaded to show 0 vs real totals */}
         <div className="mb-3 overflow-x-auto">
           <table className="border-collapse border border-[#dee2e6] text-[13px]">
             <thead>
               <tr className="bg-white">
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Received</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Received</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Remaining</th>
                 <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance UpLine</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L<br/>Downline</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance<br/>UpLine</th>
                 <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
               </tr>
             </thead>
             <tbody>
               <tr className="bg-white">
                 <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                  {totals.credit_received.toLocaleString()}
+                  {balancesLoaded ? totals.credit_received.toLocaleString() : "0"}
                 </td>
                 <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                  {totals.credit_remaining.toLocaleString()}
+                  {balancesLoaded ? totals.credit_remaining.toLocaleString() : "0"}
                 </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                  {totals.cash.toLocaleString()}
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
+                  balancesLoaded && totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  {balancesLoaded ? totals.cash.toLocaleString() : "0"}
                 </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                  {totals.pl_downline.toLocaleString()}
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
+                  balancesLoaded && totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  {balancesLoaded ? totals.pl_downline.toLocaleString() : "0"}
                 </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                  {totals.balance_upline.toLocaleString()}
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
+                  balancesLoaded && totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                  {balancesLoaded ? totals.balance_upline.toLocaleString() : "0"}
                 </td>
                 <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                   {filteredClients.length}
