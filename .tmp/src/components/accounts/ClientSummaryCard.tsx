@@ -306,26 +306,30 @@ export function ClientSummaryCard({
             </button>
           </div>
 
-          <div className="flex items-center gap-x-2 text-[10px] font-bold text-[#212529] uppercase flex-wrap">
+          <div className="flex items-center gap-x-2 text-[10px] font-bold text-[#212529] uppercase flex-wrap gap-y-1">
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#ffc107] text-black flex items-center justify-center rounded-full">C</span>
-              <span>Cash/Credit</span>
+              <span className="w-5 h-5 bg-[#ffc107] text-black flex items-center justify-center rounded text-[11px] font-black">C</span>
+              <span>Cash / Credit</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#28a745] text-white flex items-center justify-center rounded-full"><Pencil className="w-2.5 h-2.5" /></span>
+              <span className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded"><Pencil className="w-3 h-3" /></span>
               <span>Edit</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#17a2b8] text-white flex items-center justify-center rounded-full">L</span>
+              <span className="w-5 h-5 bg-[#17a2b8] text-white flex items-center justify-center rounded text-[11px] font-black">L</span>
               <span>Ledger</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#28a745] text-white flex items-center justify-center rounded-full">A</span>
+              <span className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded text-[11px] font-black">A</span>
               <span>Active</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded-full">D</span>
+              <span className="w-5 h-5 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded text-[11px] font-black">D</span>
               <span>InActive</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-5 h-5 bg-[#6f42c1] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
+              <span>Settle Account</span>
             </div>
           </div>
         </div>
@@ -577,21 +581,21 @@ export function ClientSummaryCard({
                         <div className="flex items-center justify-center gap-1">
                           <button 
                             onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                            className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black text-[11px] flex items-center justify-center rounded-full transition-colors shadow-sm"
+                            className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm"
                             title="Cash / Credit"
                           >
                             C
                           </button>
                           <button 
                             onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                            className="w-6 h-6 bg-[#28a745] hover:bg-[#218838] text-white flex items-center justify-center rounded-full transition-colors shadow-sm"
+                            className="w-6 h-6 bg-[#28a745] hover:bg-[#218838] text-white flex items-center justify-center rounded transition-colors shadow-sm"
                             title="Edit"
                           >
                             <Pencil className="w-3 h-3" />
                           </button>
                           <button 
                             onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                            className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black text-[11px] flex items-center justify-center rounded-full transition-colors shadow-sm"
+                            className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm"
                             title="Ledger"
                           >
                             L
@@ -599,7 +603,7 @@ export function ClientSummaryCard({
                           <button 
                             onClick={() => toggleStatus(client)}
                             className={cn(
-                              "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded-full transition-colors shadow-sm",
+                              "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm",
                               client.status === "active" 
                                 ? "bg-[#28a745] hover:bg-[#218838] text-white" 
                                 : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
@@ -608,6 +612,15 @@ export function ClientSummaryCard({
                           >
                             {client.status === "active" ? "A" : "D"}
                           </button>
+                          {client.can_settle_pl && (
+                            <button 
+                              onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
+                              className="w-6 h-6 bg-[#6f42c1] hover:bg-[#5a32a3] text-white font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm"
+                              title="Settle Account"
+                            >
+                              S
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -877,6 +890,27 @@ export function ClientSummaryCard({
                               >
                                 {isActive ? "A" : "D"}
                               </button>
+                              {/* S button — only shown when can_settle_pl is true */}
+                              {client.can_settle_pl && (
+                                <button
+                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
+                                  title="Settle Account"
+                                  style={{
+                                    width: 38, height: 38,
+                                    backgroundColor: "#6f42c1",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: 6,
+                                    fontWeight: 900,
+                                    fontSize: 16,
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                  }}
+                                >S</button>
+                              )}
                             </li>
                           </ul>
                         </td>
