@@ -217,14 +217,14 @@ export function ClientSummaryCard({
     <section className="bg-white border border-[#d0d0d0] shadow-sm rounded-[10px] overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
       {/* Card title */}
       {!hideHeader && (
-        <div className="bg-[#ecf0f1] border-b border-[#d0d0d0] px-[14px] py-2">
+        <div className="bg-[#ecf0f1] border-b border-[#d0d0d0]" style={{ padding: "6px 8px" }}>
           <span className="font-bold text-sm text-[#212529]">
             {username} - Clients List{!balancesLoaded ? " | Default" : ""}
           </span>
         </div>
       )}
 
-      <div className="p-3">
+      <div style={{ padding: "8px 6px" }}>
         {/* Summary Stats Table — use balancesLoaded to show 0 vs real totals */}
         <div className="mb-3 overflow-x-auto">
           {!balancesLoaded ? (
