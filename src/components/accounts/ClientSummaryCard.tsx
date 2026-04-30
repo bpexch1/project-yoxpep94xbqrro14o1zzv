@@ -250,7 +250,7 @@ export function ClientSummaryCard({
                   {balancesLoaded ? totals.pl_downline.toLocaleString() : "0"}
                 </td>
                 <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                  balancesLoaded && totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                  balancesLoaded && totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
                   {balancesLoaded ? totals.balance_upline.toLocaleString() : "0"}
                 </td>
                 <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
@@ -637,10 +637,10 @@ export function ClientSummaryCard({
 
               {/* COLUMN HEADERS */}
               <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Username</th>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Credit</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd" }}>Balance</th>
+                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Username</th>
+                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
+                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Credit</th>
+                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd" }}>Balance</th>
               </tr>
 
               {/* LOADING STATE */}
@@ -727,15 +727,15 @@ export function ClientSummaryCard({
                           </button>
                         </div>
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#555", borderRight: "1px solid #e5e5e5" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", fontWeight: 400, color: "#6c757d", borderRight: "1px solid #e5e5e5" }}>
                         {getTypeLabel(client.role)}
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#212529", textAlign: "right", borderRight: "1px solid #e5e5e5" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", fontWeight: 700, color: !balancesLoaded ? "#212529" : "#28a745", textAlign: "right", borderRight: "1px solid #e5e5e5" }}>
                         {/* Show "-" before load balance, actual value after */}
                         {!balancesLoaded ? "-" : creditVal.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", 
-                        color: balancesLoaded ? (balanceVal >= 0 ? "#28a745" : "#dc3545") : "#212529", 
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", fontWeight: 700,
+                        color: !balancesLoaded ? "#212529" : (balanceVal >= 0 ? "#28a745" : "#dc3545"), 
                         textAlign: "right" }}>
                         {!balancesLoaded ? "-" : balanceVal.toLocaleString()}
                       </td>
