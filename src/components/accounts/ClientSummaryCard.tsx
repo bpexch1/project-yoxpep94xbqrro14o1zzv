@@ -620,7 +620,7 @@ export function ClientSummaryCard({
 
         {/* MOBILE TABLE VIEW — exact clone of screenshot */}
         <div className="lg:hidden overflow-x-auto">
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 16 }}>
             <tbody>
               {/* GREEN TOTAL ROW */}
               {!isLoading && tableFilteredClients.length > 0 && (
@@ -648,9 +648,9 @@ export function ClientSummaryCard({
                   </tr>
                 ) : (
                   <tr style={{ backgroundColor: "#00b181" }}>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15 }}>Total</td>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16 }}>Total</td>
                     <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c" }}></td>
-                    <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c", color: "#fff", fontWeight: 700, textAlign: "right" }}>
+                    <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right" }}>
                       {totals.credit_received.toLocaleString()}
                     </td>
                   </tr>
@@ -659,9 +659,9 @@ export function ClientSummaryCard({
 
               {/* COLUMN HEADERS */}
               <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 13, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Username</th>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 13, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 13, color: "#333", borderBottom: "2px solid #ddd" }}>Credit</th>
+                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Username</th>
+                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
+                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd" }}>Credit</th>
               </tr>
 
               {/* LOADING STATE */}
@@ -669,7 +669,7 @@ export function ClientSummaryCard({
                 <tr>
                   <td colSpan={3} style={{ padding: "40px 0", textAlign: "center" }}>
                     <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto mb-2" />
-                    <span style={{ fontSize: 13, fontWeight: 700 }}>Loading...</span>
+                    <span style={{ fontSize: 16, fontWeight: 700 }}>Loading...</span>
                   </td>
                 </tr>
               )}
@@ -677,7 +677,7 @@ export function ClientSummaryCard({
               {/* EMPTY STATE */}
               {!isLoading && paginatedClients.length === 0 && (
                 <tr>
-                  <td colSpan={3} style={{ padding: "32px 0", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#6c757d" }}>
+                  <td colSpan={3} style={{ padding: "32px 0", textAlign: "center", fontSize: 16, fontWeight: 700, color: "#6c757d" }}>
                     No users found
                   </td>
                 </tr>
@@ -710,7 +710,8 @@ export function ClientSummaryCard({
                             onClick={() => isAdminType && navigate(`/accounts/view/${client.username}`)}
                             style={{
                               fontWeight: 700,
-                              fontSize: 15,
+                              fontSize: 16,
+                              lineHeight: "24px",
                               color: isAdminType ? "#00b181" : "#212529",
                               background: "none",
                               border: "none",
@@ -747,10 +748,10 @@ export function ClientSummaryCard({
                           </button>
                         </div>
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 14, color: "#555", borderRight: "1px solid #e5e5e5" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#555", borderRight: "1px solid #e5e5e5" }}>
                         {getTypeLabel(client.role)}
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 14, color: "#212529", textAlign: "right" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#212529", textAlign: "right" }}>
                         {/* Show "-" before load balance, actual value after */}
                         {!balancesLoaded ? "-" : creditVal.toLocaleString()}
                       </td>
@@ -761,31 +762,31 @@ export function ClientSummaryCard({
                       <tr style={{ backgroundColor: rowBg, borderBottom: "1px solid #e5e5e5" }}>
                         <td colSpan={3} style={{ padding: "8px 16px 14px 16px" }}>
                           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
                               <span>Balance </span>
                               <span style={{ fontWeight: 600, color: balanceVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
                                 {balanceVal.toLocaleString()}
                               </span>
                             </li>
-                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
                               <span>Client (P/L) </span>
                               <span style={{ fontWeight: 600, color: plVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
                                 {plVal.toLocaleString()}
                               </span>
                             </li>
-                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
                               <span>Share </span>
                               <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>{shareVal}</span>
                             </li>
-                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
                               <span>Exposure </span>
                               <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>0</span>
                             </li>
-                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
                               <span>Available Balance </span>
                               <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>
@@ -793,10 +794,10 @@ export function ClientSummaryCard({
                               </span>
                             </li>
                             {/* Options row with inline buttons */}
-                            <li style={{ padding: "6px 0 2px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            <li style={{ padding: "6px 0 2px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                               <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
                                 <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                                <span>Options</span>
+                                <span style={{ fontSize: 16, lineHeight: "24px" }}>Options</span>
                               </span>
                               {/* C button */}
                               <button
@@ -809,7 +810,7 @@ export function ClientSummaryCard({
                                   border: "none",
                                   borderRadius: 6,
                                   fontWeight: 900,
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   cursor: "pointer",
                                   display: "flex",
                                   alignItems: "center",
@@ -847,7 +848,7 @@ export function ClientSummaryCard({
                                   border: "none",
                                   borderRadius: 6,
                                   fontWeight: 900,
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   cursor: "pointer",
                                   display: "flex",
                                   alignItems: "center",
@@ -866,7 +867,7 @@ export function ClientSummaryCard({
                                   border: isActive ? "none" : "2px solid #dc3545",
                                   borderRadius: 6,
                                   fontWeight: 900,
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   cursor: "pointer",
                                   display: "flex",
                                   alignItems: "center",
