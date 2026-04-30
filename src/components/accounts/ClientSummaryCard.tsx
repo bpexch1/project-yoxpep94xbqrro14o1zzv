@@ -233,13 +233,13 @@ export function ClientSummaryCard({
               <tbody>
                 <tr className="bg-white">
                   <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                    {totals.credit_remaining.toLocaleString()}
+                    0
                   </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                    {totals.cash.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                    0
                   </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                    {totals.pl_downline.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                    0
                   </td>
                   <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {filteredClients.length}
@@ -622,13 +622,37 @@ export function ClientSummaryCard({
             <tbody>
               {/* GREEN TOTAL ROW */}
               {!isLoading && tableFilteredClients.length > 0 && (
-                <tr style={{ backgroundColor: "#00b181" }}>
-                  <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15 }}>Total</td>
-                  <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c" }}></td>
-                  <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c", color: "#fff", fontWeight: 700, textAlign: "right" }}>
-                    {totals.credit_received.toLocaleString()}
-                  </td>
-                </tr>
+                !balancesLoaded ? (
+                  <tr style={{ backgroundColor: "#00b181" }}>
+                    <td colSpan={3} style={{ padding: "10px 12px" }}>
+                      <button
+                        onClick={handleLoadBalance}
+                        disabled={isLoadingBalances}
+                        style={{
+                          backgroundColor: "#ffc107",
+                          color: "#000",
+                          border: "none",
+                          padding: "8px 20px",
+                          fontWeight: 900,
+                          fontSize: 15,
+                          borderRadius: 5,
+                          cursor: "pointer",
+                          letterSpacing: 0.3
+                        }}
+                      >
+                        {isLoadingBalances ? "Loading..." : "Load Balance"}
+                      </button>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr style={{ backgroundColor: "#00b181" }}>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15 }}>Total</td>
+                    <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c" }}></td>
+                    <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c", color: "#fff", fontWeight: 700, textAlign: "right" }}>
+                      {totals.credit_received.toLocaleString()}
+                    </td>
+                  </tr>
+                )
               )}
 
               {/* COLUMN HEADERS */}
@@ -665,12 +689,13 @@ export function ClientSummaryCard({
                 const isActive = client.status === "active";
                 const rowBg = idx % 2 === 0 ? "#ffffff" : "#f9f9f9";
 
-                // Always show values (default 0 if not loaded)
-                const balanceVal = display.balance !== null ? display.balance : (client.cash ?? 0);
-                const plVal = display.plDownline !== null ? display.plDownline : (client.pl_downline ?? 0);
-                const shareVal = display.share !== null ? display.share : (client.downline_share ?? 0);
-                const availVal = display.available !== null ? display.available : (client.credit_remaining ?? 0);
-                const creditVal = display.credit !== null ? display.credit : (client.credit_received ?? 0);
+                // BEFORE load: show 0 for all financial values
+                // AFTER load: show actual values
+                const balanceVal = balancesLoaded ? (display.balance !== null ? display.balance : (client.cash ?? 0)) : 0;
+                const plVal = balancesLoaded ? (display.plDownline !== null ? display.plDownline : (client.pl_downline ?? 0)) : 0;
+                const shareVal = balancesLoaded ? (display.share !== null ? display.share : (client.downline_share ?? 0)) : 0;
+                const availVal = balancesLoaded ? (display.available !== null ? display.available : (client.credit_remaining ?? 0)) : 0;
+                const creditVal = balancesLoaded ? (display.credit !== null ? display.credit : (client.credit_received ?? 0)) : 0;
 
                 return (
                   <React.Fragment key={client.id}>
