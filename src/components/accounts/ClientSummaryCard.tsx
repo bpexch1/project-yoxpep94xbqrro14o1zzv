@@ -47,7 +47,7 @@ export function ClientSummaryCard({
   const [refreshedData, setRefreshedData] = useState<Record<string, any>>({});
   
   // Feature 3 state
-  const [mobileExpandedIds, setMobileExpandedIds] = useState<Set<string>>(new Set());
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // DataTable states
   const [pageSize, setPageSize] = useState(25);
@@ -56,11 +56,13 @@ export function ClientSummaryCard({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [tableSearch, setTableSearch] = useState("");
 
-  const toggleMobileExpand = (id: string) => {
-    const next = new Set(mobileExpandedIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setMobileExpandedIds(next);
+  const toggleExpand = (id: string) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const getTypeLabel = (role: string) => {
@@ -632,9 +634,9 @@ export function ClientSummaryCard({
                           backgroundColor: "#ffc107",
                           color: "#000",
                           border: "none",
-                          padding: "8px 20px",
+                          padding: "5px 14px",
                           fontWeight: 900,
-                          fontSize: 15,
+                          fontSize: 13,
                           borderRadius: 5,
                           cursor: "pointer",
                           letterSpacing: 0.3
@@ -699,156 +701,186 @@ export function ClientSummaryCard({
 
                 return (
                   <React.Fragment key={client.id}>
-                    {/* ROW A: Username | Type | Credit */}
+                    {/* ROW A: Username + info icon | Type | Credit/dash */}
                     <tr style={{ backgroundColor: rowBg, borderTop: "1px solid #e5e5e5" }}>
                       <td style={{ padding: "10px 12px", borderRight: "1px solid #e5e5e5" }}>
-                        <button
-                          onClick={() => isAdminType && navigate(`/accounts/view/${client.username}`)}
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 15,
-                            color: isAdminType ? "#00b181" : "#212529",
-                            background: "none",
-                            border: "none",
-                            padding: 0,
-                            cursor: isAdminType ? "pointer" : "default",
-                            textAlign: "left"
-                          }}
-                        >
-                          {client.username}
-                        </button>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          {/* Username */}
+                          <button
+                            onClick={() => isAdminType && navigate(`/accounts/view/${client.username}`)}
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 15,
+                              color: isAdminType ? "#00b181" : "#212529",
+                              background: "none",
+                              border: "none",
+                              padding: 0,
+                              cursor: isAdminType ? "pointer" : "default",
+                              textAlign: "left"
+                            }}
+                          >
+                            {client.username}
+                          </button>
+                          {/* Black circular info toggle button */}
+                          <button
+                            onClick={() => toggleExpand(client.id)}
+                            title="Show details"
+                            style={{
+                              width: 26,
+                              height: 26,
+                              minWidth: 26,
+                              backgroundColor: "#222",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "50%",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 13,
+                              fontWeight: 900,
+                              lineHeight: 1,
+                              flexShrink: 0
+                            }}
+                          >
+                            ℹ
+                          </button>
+                        </div>
                       </td>
                       <td style={{ padding: "10px 12px", fontSize: 14, color: "#555", borderRight: "1px solid #e5e5e5" }}>
                         {getTypeLabel(client.role)}
                       </td>
                       <td style={{ padding: "10px 12px", fontSize: 14, color: "#212529", textAlign: "right" }}>
-                        {creditVal.toLocaleString()}
+                        {/* Show "-" before load balance, actual value after */}
+                        {!balancesLoaded ? "-" : creditVal.toLocaleString()}
                       </td>
                     </tr>
 
-                    {/* ROW B: Bullet details + action buttons */}
-                    <tr style={{ backgroundColor: rowBg, borderBottom: "1px solid #e5e5e5" }}>
-                      <td colSpan={3} style={{ padding: "8px 16px 14px 16px" }}>
-                        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                          <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                            <span>Balance </span>
-                            <span style={{ fontWeight: 600, color: balanceVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
-                              {balanceVal.toLocaleString()}
-                            </span>
-                          </li>
-                          <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                            <span>Client (P/L) </span>
-                            <span style={{ fontWeight: 600, color: plVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
-                              {plVal.toLocaleString()}
-                            </span>
-                          </li>
-                          <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                            <span>Share </span>
-                            <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>{shareVal}</span>
-                          </li>
-                          <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                            <span>Exposure </span>
-                            <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>0</span>
-                          </li>
-                          <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                            <span>Available Balance </span>
-                            <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>
-                              {availVal.toLocaleString()}
-                            </span>
-                          </li>
-                          {/* Options row with inline buttons */}
-                          <li style={{ padding: "6px 0 2px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    {/* ROW B: Detail section — only visible when info button clicked */}
+                    {expandedIds.has(client.id) && (
+                      <tr style={{ backgroundColor: rowBg, borderBottom: "1px solid #e5e5e5" }}>
+                        <td colSpan={3} style={{ padding: "8px 16px 14px 16px" }}>
+                          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                              <span>Options</span>
-                            </span>
-                            {/* C button */}
-                            <button
-                              onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                              title="Cash / Credit"
-                              style={{
-                                width: 38, height: 38,
-                                backgroundColor: "#ffc107",
-                                color: "#212529",
-                                border: "none",
-                                borderRadius: 6,
-                                fontWeight: 900,
-                                fontSize: 15,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                              }}
-                            >C</button>
-                            {/* Edit button */}
-                            <button
-                              onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                              title="Edit"
-                              style={{
-                                width: 38, height: 38,
-                                backgroundColor: "#28a745",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: 6,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                              }}
-                            >
-                              <Pencil style={{ width: 16, height: 16 }} />
-                            </button>
-                            {/* L button */}
-                            <button
-                              onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                              title="Ledger"
-                              style={{
-                                width: 38, height: 38,
-                                backgroundColor: "#17a2b8",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: 6,
-                                fontWeight: 900,
-                                fontSize: 15,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                              }}
-                            >L</button>
-                            {/* A/D button */}
-                            <button
-                              onClick={() => toggleStatus(client)}
-                              title={isActive ? "Deactivate" : "Activate"}
-                              style={{
-                                width: 38, height: 38,
-                                backgroundColor: isActive ? "#28a745" : "#fff",
-                                color: isActive ? "#fff" : "#dc3545",
-                                border: isActive ? "none" : "2px solid #dc3545",
-                                borderRadius: 6,
-                                fontWeight: 900,
-                                fontSize: 15,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                              }}
-                            >
-                              {isActive ? "A" : "D"}
-                            </button>
-                          </li>
-                        </ul>
-                      </td>
-                    </tr>
+                              <span>Balance </span>
+                              <span style={{ fontWeight: 600, color: balanceVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
+                                {balanceVal.toLocaleString()}
+                              </span>
+                            </li>
+                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
+                              <span>Client (P/L) </span>
+                              <span style={{ fontWeight: 600, color: plVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
+                                {plVal.toLocaleString()}
+                              </span>
+                            </li>
+                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
+                              <span>Share </span>
+                              <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>{shareVal}</span>
+                            </li>
+                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
+                              <span>Exposure </span>
+                              <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>0</span>
+                            </li>
+                            <li style={{ padding: "3px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
+                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
+                              <span>Available Balance </span>
+                              <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>
+                                {availVal.toLocaleString()}
+                              </span>
+                            </li>
+                            {/* Options row with inline buttons */}
+                            <li style={{ padding: "6px 0 2px 0", fontSize: 14, color: "#333", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                <span style={{ color: "#555", marginRight: 2 }}>•</span>
+                                <span>Options</span>
+                              </span>
+                              {/* C button */}
+                              <button
+                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
+                                title="Cash / Credit"
+                                style={{
+                                  width: 38, height: 38,
+                                  backgroundColor: "#ffc107",
+                                  color: "#212529",
+                                  border: "none",
+                                  borderRadius: 6,
+                                  fontWeight: 900,
+                                  fontSize: 15,
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                }}
+                              >C</button>
+                              {/* Edit button */}
+                              <button
+                                onClick={() => navigate(`/accounts/edit/${client.username}`)}
+                                title="Edit"
+                                style={{
+                                  width: 38, height: 38,
+                                  backgroundColor: "#28a745",
+                                  color: "#fff",
+                                  border: "none",
+                                  borderRadius: 6,
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                }}
+                              >
+                                <Pencil style={{ width: 16, height: 16 }} />
+                              </button>
+                              {/* L button */}
+                              <button
+                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}
+                                title="Ledger"
+                                style={{
+                                  width: 38, height: 38,
+                                  backgroundColor: "#17a2b8",
+                                  color: "#fff",
+                                  border: "none",
+                                  borderRadius: 6,
+                                  fontWeight: 900,
+                                  fontSize: 15,
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                }}
+                              >L</button>
+                              {/* A/D button */}
+                              <button
+                                onClick={() => toggleStatus(client)}
+                                title={isActive ? "Deactivate" : "Activate"}
+                                style={{
+                                  width: 38, height: 38,
+                                  backgroundColor: isActive ? "#28a745" : "#fff",
+                                  color: isActive ? "#fff" : "#dc3545",
+                                  border: isActive ? "none" : "2px solid #dc3545",
+                                  borderRadius: 6,
+                                  fontWeight: 900,
+                                  fontSize: 15,
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                }}
+                              >
+                                {isActive ? "A" : "D"}
+                              </button>
+                            </li>
+                          </ul>
+                        </td>
+                      </tr>
+                    )}
                   </React.Fragment>
                 );
               })}
