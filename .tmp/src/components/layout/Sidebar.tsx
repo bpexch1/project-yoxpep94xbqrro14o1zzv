@@ -88,21 +88,21 @@ function SportDropdown({
         className={cn(
           "flex items-center w-full text-left transition-colors group",
           isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-3 px-4",
-          "text-[#b8c7ce] hover:bg-[#1e282c] hover:text-white"
+          "text-[#b8c7ce] hover:bg-[#353c47] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? label : undefined}
       >
         <Icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[18px] h-[18px]",
-          "text-[#b8c7ce] group-hover:text-white"
+          "text-[#3bc8c8] group-hover:text-white"
         )} />
         {showLabels && (
           <>
             <span className="flex-1 text-[14px] leading-6 whitespace-nowrap font-normal">{label}</span>
             <ChevronDown 
               className={cn(
-                "w-4 h-4 text-[#b8c7ce]/60 transition-transform duration-200",
+                "w-4 h-4 text-[#3bc8c8]/60 transition-transform duration-200",
                 isOpen && "rotate-180"
               )} 
             />
@@ -117,7 +117,7 @@ function SportDropdown({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-visible bg-[#1a2226]"
+            className="overflow-visible bg-[#242a33]"
           >
             {isLoading ? (
               <div className="py-2 px-10 flex items-center gap-2 text-[#b8c7ce]/60 text-[12px]">
@@ -174,15 +174,15 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
           "flex items-center w-full text-left transition-colors group border-b border-white/[0.04]",
           isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-3 px-4",
           isActive
-            ? "bg-[#1a2226] text-white font-medium border-l-[3px] border-[#00a65a]"
-            : "text-[#b8c7ce] hover:bg-[#1e282c] hover:text-white"
+            ? "bg-[#242a33] text-white font-medium border-l-[3px] border-[#00a65a]"
+            : "text-[#b8c7ce] hover:bg-[#353c47] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? item.label : undefined}
       >
         <item.icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[18px] h-[18px]",
-          isActive ? "text-[#00a65a]" : "text-[#b8c7ce] group-hover:text-white"
+          isActive ? "text-[#00a65a]" : "text-[#3bc8c8] group-hover:text-white"
         )} />
         {showLabels && (
           <>
@@ -230,7 +230,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
     <>
       {/* DESKTOP SIDEBAR */}
       <aside className={cn(
-        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#222d32] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
+        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#2d323e] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
         isCollapsed ? "w-[60px]" : "w-[200px]"
       )}>
         <SidebarNavItems onNavigate={() => {}} isCollapsed={isCollapsed} />
@@ -255,7 +255,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "tween", duration: 0.2 }}
-              className="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#222d32] flex flex-col overflow-y-auto lg:hidden"
+              className="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#2d323e] flex flex-col overflow-y-auto lg:hidden"
             >
               {/* Header for mobile sidebar */}
               <div className="flex items-center justify-end px-4 h-14 border-b border-white/10 shrink-0">

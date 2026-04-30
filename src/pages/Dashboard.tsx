@@ -144,7 +144,7 @@ export default function Dashboard() {
               No data available
             </div>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, border: "1px solid #ddd" }}>
               <tbody>
                 {sortedSports.map(sport => (
                   <React.Fragment key={`group-${sport}`}>
@@ -186,7 +186,8 @@ export default function Dashboard() {
                             style={{
                               color: "#00a65a",
                               cursor: "pointer",
-                              textDecoration: "none"
+                              textDecoration: "none",
+                              fontWeight: 500
                             }}
                             onMouseEnter={e => (e.target as HTMLElement).style.textDecoration = "underline"}
                             onMouseLeave={e => (e.target as HTMLElement).style.textDecoration = "none"}
