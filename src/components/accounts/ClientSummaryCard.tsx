@@ -194,6 +194,11 @@ export function ClientSummaryCard({
     }
   };
 
+  const isAdminType = (role: string) => {
+    const adminRoles = ['admin', 'superadmin', 'supermaster', 'company'];
+    return adminRoles.includes(role?.toLowerCase());
+  };
+
   const getClientDisplayData = (client: any) => {
     const fresh = refreshedData[client.id] || client;
     const isLoaded = balancesLoaded || rowLoadedMap[client.id];
@@ -514,38 +519,37 @@ export function ClientSummaryCard({
                   </td>
                 </tr>
               ) : (
-                paginatedClients.map((client, idx) => {
-                  const roleLower = client.role?.toLowerCase();
-                  const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
-                  const display = getClientDisplayData(client);
-                  
-                  return (
-                    <tr key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "hover:bg-green-50/50 transition-colors whitespace-nowrap")}>
-                      <td className="px-2 py-2 border border-[#d5d8dc]">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              if (isAdminType) {
-                                navigate(`/accounts/view/${client.username}`);
-                              }
-                            }}
-                            className={cn(
-                              "font-black text-left",
-                              isAdminType ? "text-[#254465] hover:underline" : "text-[#212529]"
+                  paginatedClients.map((client, idx) => {
+                    const isClientAdmin = isAdminType(client.role);
+                    const display = getClientDisplayData(client);
+                    
+                    return (
+                      <tr key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "hover:bg-green-50/50 transition-colors whitespace-nowrap")}>
+                        <td className="px-2 py-2 border border-[#d5d8dc]">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                if (isClientAdmin) {
+                                  navigate(`/accounts/view/${client.username}`);
+                                }
+                              }}
+                              className={cn(
+                                "font-black text-left",
+                                isClientAdmin ? "text-[#254465] hover:underline" : "text-[#212529]"
+                              )}
+                            >
+                              {client.username}
+                            </button>
+                            {!balancesLoaded && (
+                              <span style={{
+                                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                                width: 16, height: 16, borderRadius: "50%", 
+                                background: "#333", color: "#fff", fontSize: 10, fontWeight: 700,
+                                marginLeft: 4, flexShrink: 0
+                              }}>i</span>
                             )}
-                          >
-                            {client.username}
-                          </button>
-                          {!balancesLoaded && (
-                            <span style={{
-                              display: "inline-flex", alignItems: "center", justifyContent: "center",
-                              width: 16, height: 16, borderRadius: "50%", 
-                              background: "#555", color: "#fff", fontSize: 10, fontWeight: 700,
-                              marginLeft: 4, flexShrink: 0
-                            }}>i</span>
-                          )}
-                        </div>
-                      </td>
+                          </div>
+                        </td>
                       <td className="px-2 py-2 border border-[#d5d8dc] font-bold text-[#6c757d]">
                         {getTypeLabel(client.role)}
                       </td>
@@ -629,14 +633,13 @@ export function ClientSummaryCard({
 
         {/* MOBILE TABLE VIEW — exact clone of screenshot */}
         <div className="lg:hidden overflow-x-auto">
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
-              {/* COLUMN HEADERS */}
               <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 110 }}>Username</th>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Credit</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd" }}>Balance</th>
+                <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 120 }}>Username</th>
+                <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 75 }}>Type</th>
+                <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 80 }}>Credit</th>
+                <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", minWidth: 80 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -645,8 +648,11 @@ export function ClientSummaryCard({
                 !balancesLoaded ? (
                   <tr style={{ backgroundColor: "#00a65a" }}>
                     <td colSpan={4} style={{ padding: "10px 12px" }}>
-                      <button onClick={handleLoadBalance} disabled={isLoadingBalances}
-                        style={{ backgroundColor: "#ffc107", color: "#000", border: "none", padding: "6px 20px", fontWeight: 900, fontSize: 14, borderRadius: 5, cursor: "pointer" }}>
+                      <button
+                        onClick={handleLoadBalance}
+                        disabled={isLoadingBalances}
+                        style={{ backgroundColor: "#ffc107", color: "#000", border: "none", padding: "8px 24px", fontWeight: 900, fontSize: 15, borderRadius: 5, cursor: "pointer", letterSpacing: 0.3 }}
+                      >
                         {isLoadingBalances ? "Loading..." : "Load Balance"}
                       </button>
                     </td>
@@ -686,96 +692,78 @@ export function ClientSummaryCard({
               {/* USER ROWS — each user = 2 rows */}
               {!isLoading && paginatedClients.map((client, idx) => {
                 const display = getClientDisplayData(client);
-                const roleLower = client.role?.toLowerCase();
-                const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
                 
                 return (
                   <React.Fragment key={client.id}>
-                    {/* ROW A - 4 columns: Username | Type | Credit | Balance */}
-                    <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9", borderBottom: "1px solid #e5e5e5" }}>
-                      {/* Username cell */}
-                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", borderRight: "1px solid #e5e5e5" }}>
+                    {/* ROW A - 4 columns: Username | Type | Credit | Balance (partial) */}
+                    <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 14, borderBottom: "1px solid #e5e5e5", borderRight: "1px solid #e5e5e5" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <span
-                            style={{ 
-                              fontWeight: 700, 
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 14,
                               cursor: "pointer",
-                              color: isAdminType ? "#00a65a" : "#212529"
+                              color: isAdminType(client.role) ? "#00a65a" : "#212529"
                             }}
                             onClick={() => navigate(`/accounts/view/${client.username}`)}
                           >
                             {client.username}
                           </span>
-                          {/* Show ℹ expand button only before load */}
                           {!balancesLoaded && (
                             <button
                               onClick={() => toggleExpand(client.id)}
-                              style={{ width: 22, height: 22, borderRadius: "50%", backgroundColor: "#333", color: "#fff", border: "none", fontSize: 12, fontWeight: 900, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                              style={{
+                                width: 22, height: 22, borderRadius: "50%",
+                                backgroundColor: "#333", color: "#fff",
+                                border: "none", fontSize: 12, fontWeight: 900,
+                                cursor: "pointer", lineHeight: "22px", textAlign: "center",
+                                flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center"
+                              }}
                             >i</button>
                           )}
                         </div>
                       </td>
                       
-                      {/* Type cell */}
-                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", fontWeight: 400, color: "#6c757d", borderRight: "1px solid #e5e5e5" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 14, color: "#6c757d", fontWeight: 400, borderBottom: "1px solid #e5e5e5", borderRight: "1px solid #e5e5e5" }}>
                         {getTypeLabel(client.role)}
                       </td>
                       
-                      {/* Credit cell — dark text, not green */}
-                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", fontWeight: 700, textAlign: "right", color: "#212529", borderRight: "1px solid #e5e5e5" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 700, textAlign: "right", color: "#212529", borderBottom: "1px solid #e5e5e5", borderRight: "1px solid #e5e5e5" }}>
                         {!balancesLoaded ? "-" : (display.credit ?? 0).toLocaleString()}
                       </td>
-
-                      {/* Balance cell — dark text */}
-                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", fontWeight: 700, textAlign: "right", color: "#212529" }}>
-                        {!balancesLoaded ? "-" : (display.balance ?? 0).toLocaleString()}
+                      
+                      <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 400, textAlign: "right", color: "#212529", borderBottom: "1px solid #e5e5e5" }}>
+                        {!balancesLoaded ? "" : (display.balance ?? 0).toLocaleString()}
                       </td>
                     </tr>
 
-                    {/* ROW B - expanded bullet card */}
+                    {/* ROW B - expanded bullet card (auto-show after load) */}
                     {(balancesLoaded || expandedIds.has(client.id)) && (
                       <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}>
-                        <td colSpan={4} style={{ padding: "4px 14px 14px 14px", borderBottom: "1px solid #e5e5e5" }}>
-                          <ul style={{ listStyle: "none", margin: 0, padding: 0, fontSize: 14, color: "#212529" }}>
-                            
-                            <li style={{ padding: "2px 0" }}>
-                              • Balance {balancesLoaded ? (display.balance ?? 0).toLocaleString() : "-"}
-                            </li>
-                            
-                            <li style={{ padding: "2px 0" }}>
-                              • Client (P/L) {balancesLoaded ? (display.plDownline ?? 0).toLocaleString() : "-"}
-                            </li>
-                            
-                            <li style={{ padding: "2px 0" }}>
-                              • Share {balancesLoaded ? (display.share ?? 0) : "-"}
-                            </li>
-                            
-                            <li style={{ padding: "2px 0" }}>
-                              • Exposure 0
-                            </li>
-                            
-                            <li style={{ padding: "2px 0" }}>
-                              • Available Balance {balancesLoaded ? (display.available ?? 0).toLocaleString() : "-"}
-                            </li>
-                            
-                            {/* Options buttons */}
-                            <li style={{ padding: "4px 0", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                              <span>• Options </span>
-                              
-                              <button style={{ width: 32, height: 32, backgroundColor: "#ffc107", color: "#000", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 14, cursor: "pointer" }}
+                        <td colSpan={4} style={{ padding: "0 14px 12px 14px", borderBottom: "1px solid #e5e5e5" }}>
+                          <ul style={{ listStyle: "none", margin: 0, padding: 0, fontSize: 14, color: "#212529", lineHeight: "1.9" }}>
+                            <li>• Balance <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.balance ?? 0).toLocaleString() : "-"}</span></li>
+                            <li>• Client (P/L) <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.plDownline ?? 0).toLocaleString() : "-"}</span></li>
+                            <li>• Share <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.share ?? 0) : "-"}</span></li>
+                            <li>• Exposure <span style={{ fontWeight: 600 }}>0</span></li>
+                            <li>• Available Balance <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.available ?? 0).toLocaleString() : "-"}</span></li>
+                            <li style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                              <span>• Options</span>
+                              <button style={{ width: 32, height: 32, backgroundColor: "#ffc107", color: "#000", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
                                 onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}>C</button>
                               
                               <button style={{ width: 32, height: 32, backgroundColor: "#28a745", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                                 onClick={() => navigate(`/accounts/edit/${client.username}`)}>
-                                <Pencil style={{ width: 14, height: 14 }} />
+                                <Pencil style={{ width: 15, height: 15 }} />
                               </button>
                               
-                              <button style={{ width: 32, height: 32, backgroundColor: "#17a2b8", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 14, cursor: "pointer" }}
+                              <button style={{ width: 32, height: 32, backgroundColor: "#17a2b8", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
                                 onClick={() => navigate(`/accounts/ledger/${client.username}`)}>L</button>
                               
                               <button
-                                style={{ 
-                                  width: 32, height: 32, borderRadius: 4, fontWeight: 900, fontSize: 14, cursor: "pointer",
+                                style={{
+                                  width: 32, height: 32, borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer",
                                   backgroundColor: client.status === "active" ? "#28a745" : "#fff",
                                   color: client.status === "active" ? "#fff" : "#dc3545",
                                   border: client.status === "active" ? "none" : "2px solid #dc3545"
@@ -785,7 +773,7 @@ export function ClientSummaryCard({
                               </button>
                               
                               {client.can_settle_pl && (
-                                <button style={{ width: 32, height: 32, backgroundColor: "#e74c3c", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 14, cursor: "pointer" }}
+                                <button style={{ width: 32, height: 32, backgroundColor: "#e74c3c", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
                                   onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}>S</button>
                               )}
                             </li>
