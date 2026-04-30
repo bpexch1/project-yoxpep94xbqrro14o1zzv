@@ -178,19 +178,13 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
             </DropdownMenu>
 
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-[#212529] whitespace-nowrap">
-                <span className="font-bold">B:</span> <span className={cn(
-                  "font-black text-[13px]",
-                  liveBalance > 0 ? "text-[#00a65a]" : "text-[#212529]"
-                )}>
+              <span className="text-[13px] text-[#212529] whitespace-nowrap font-bold">
+                B: <span className={cn(liveBalance > 0 ? "text-[#00a65a]" : "text-[#212529]")}>
                   {Math.max(0, liveBalance).toLocaleString('en-IN')}
                 </span>
               </span>
-              <span className="text-[13px] text-[#212529] whitespace-nowrap">
-                <span className="font-bold">Exp:</span> <span className={cn(
-                  "font-black text-[13px]",
-                  totalExposure > 0 ? "text-[#dc3545]" : "text-[#212529]"
-                )}>
+              <span className="text-[13px] text-[#212529] whitespace-nowrap font-bold">
+                Exp: <span className={cn(totalExposure > 0 ? "text-[#dc3545]" : "text-[#212529]")}>
                   {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
                 </span>
               </span>

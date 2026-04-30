@@ -222,43 +222,64 @@ export function ClientSummaryCard({
       <div className="p-3">
         {/* Summary Stats Table — use balancesLoaded to show 0 vs real totals */}
         <div className="mb-3 overflow-x-auto">
-          <table className="border-collapse border border-[#dee2e6] text-[13px]">
-            <thead>
-              <tr className="bg-white">
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Received</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Remaining</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L<br/>Downline</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance<br/>UpLine</th>
-                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="bg-white">
-                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                  {balancesLoaded ? totals.credit_received.toLocaleString() : "0"}
-                </td>
-                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                  {balancesLoaded ? totals.credit_remaining.toLocaleString() : "0"}
-                </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                  balancesLoaded && totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                  {balancesLoaded ? totals.cash.toLocaleString() : "0"}
-                </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                  balancesLoaded && totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                  {balancesLoaded ? totals.pl_downline.toLocaleString() : "0"}
-                </td>
-                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                  balancesLoaded && totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                  {balancesLoaded ? totals.balance_upline.toLocaleString() : "0"}
-                </td>
-                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
-                  {filteredClients.length}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {!balancesLoaded ? (
+            <table className="border-collapse border border-[#dee2e6] text-[13px]">
+              <thead>
+                <tr className="bg-white">
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Remaining</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L<br/>Downline</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-white">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">{filteredClients.length}</td>
+                </tr>
+              </tbody>
+            </table>
+          ) : (
+            <table className="border-collapse border border-[#dee2e6] text-[13px]">
+              <thead>
+                <tr className="bg-white">
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Received</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Remaining</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L<br/>Downline</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance<br/>UpLine</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-white">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                    {totals.credit_received.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                    {totals.credit_remaining.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
+                    totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                    {totals.cash.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
+                    totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                    {totals.pl_downline.toLocaleString()}
+                  </td>
+                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
+                    totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                    {totals.balance_upline.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                    {filteredClients.length}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Action bar */}
@@ -303,6 +324,10 @@ export function ClientSummaryCard({
             </div>
             <div className="flex items-center gap-1">
               <span className="w-5 h-5 bg-[#6f42c1] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
+              <span>Settle Account</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-5 h-5 bg-[#e74c3c] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
               <span>Settle Account</span>
             </div>
           </div>
@@ -607,48 +632,43 @@ export function ClientSummaryCard({
 
         {/* MOBILE TABLE VIEW — exact clone of screenshot */}
         <div className="lg:hidden overflow-x-auto">
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 16 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+            <thead>
+              {/* COLUMN HEADERS */}
+              <tr style={{ backgroundColor: "#f5f5f5" }}>
+                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 120 }}>Username</th>
+                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
+                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 15, color: "#212529", borderBottom: "2px solid #ddd" }}>Credit</th>
+              </tr>
+            </thead>
             <tbody>
               {/* GREEN TOTAL ROW */}
               {!isLoading && tableFilteredClients.length > 0 && (
                 !balancesLoaded ? (
                   <tr style={{ backgroundColor: "#00a65a" }}>
-                    <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16 }}>
+                    <td colSpan={3} style={{ padding: "10px 12px" }}>
                       <button onClick={handleLoadBalance} disabled={isLoadingBalances}
-                        style={{ backgroundColor: "#ffc107", color: "#000", border: "none", padding: "5px 14px", fontWeight: 900, fontSize: 13, borderRadius: 5, cursor: "pointer" }}>
+                        style={{ backgroundColor: "#ffc107", color: "#000", border: "none", padding: "6px 20px", fontWeight: 900, fontSize: 14, borderRadius: 5, cursor: "pointer" }}>
                         {isLoadingBalances ? "Loading..." : "Load Balance"}
                       </button>
                     </td>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>0</td>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>0</td>
                   </tr>
                 ) : (
                   <tr style={{ backgroundColor: "#00a65a" }}>
-                    <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16 }}>Total</td>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>
+                    <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15 }}>Total</td>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15, textAlign: "right", borderLeft: "1px solid rgba(255,255,255,0.2)" }}>
                       {totals.credit_received.toLocaleString()}
-                    </td>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>
-                      {totals.cash.toLocaleString()}
                     </td>
                   </tr>
                 )
               )}
 
-              {/* COLUMN HEADERS */}
-              <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Username</th>
-                <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Credit</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#212529", borderBottom: "2px solid #ddd" }}>Balance</th>
-              </tr>
-
               {/* LOADING STATE */}
               {isLoading && (
                 <tr>
-                  <td colSpan={4} style={{ padding: "40px 0", textAlign: "center" }}>
+                  <td colSpan={3} style={{ padding: "40px 0", textAlign: "center" }}>
                     <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto mb-2" />
-                    <span style={{ fontSize: 16, fontWeight: 700 }}>Loading...</span>
+                    <span style={{ fontSize: 15, fontWeight: 700 }}>Loading...</span>
                   </td>
                 </tr>
               )}
@@ -656,7 +676,7 @@ export function ClientSummaryCard({
               {/* EMPTY STATE */}
               {!isLoading && paginatedClients.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: "32px 0", textAlign: "center", fontSize: 16, fontWeight: 700, color: "#6c757d" }}>
+                  <td colSpan={3} style={{ padding: "32px 0", textAlign: "center", fontSize: 15, fontWeight: 700, color: "#6c757d" }}>
                     No users found
                   </td>
                 </tr>
@@ -667,220 +687,124 @@ export function ClientSummaryCard({
                 const display = getClientDisplayData(client);
                 const roleLower = client.role?.toLowerCase();
                 const isAdminType = ['admin', 'supermaster', 'superadmin', 'company'].includes(roleLower);
-                const isActive = client.status === "active";
-                const rowBg = idx % 2 === 0 ? "#ffffff" : "#f9f9f9";
-
-                // BEFORE load: show 0 for all financial values
-                // AFTER load: show actual values
-                const balanceVal = balancesLoaded ? (display.balance !== null ? display.balance : (client.cash ?? 0)) : 0;
-                const plVal = balancesLoaded ? (display.plDownline !== null ? display.plDownline : (client.pl_downline ?? 0)) : 0;
-                const shareVal = balancesLoaded ? (display.share !== null ? display.share : (client.downline_share ?? 0)) : 0;
-                const availVal = balancesLoaded ? (display.available !== null ? display.available : (client.credit_remaining ?? 0)) : 0;
-                const creditVal = balancesLoaded ? (display.credit !== null ? display.credit : (client.credit_received ?? 0)) : 0;
-
+                
                 return (
                   <React.Fragment key={client.id}>
-                    {/* ROW A: Username + info icon | Type | Credit/dash */}
-                    <tr style={{ backgroundColor: rowBg, borderTop: "1px solid #e5e5e5" }}>
-                      <td style={{ padding: "10px 12px", borderRight: "1px solid #e5e5e5" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          {/* Username */}
-                          <button
-                            onClick={() => isAdminType && navigate(`/accounts/view/${client.username}`)}
-                            style={{
-                              fontWeight: 700,
-                              fontSize: 16,
-                              lineHeight: "24px",
-                              color: isAdminType ? "#00b181" : "#212529",
-                              background: "none",
-                              border: "none",
-                              padding: 0,
-                              cursor: isAdminType ? "pointer" : "default",
-                              textAlign: "left"
+                    {/* ROW A - 3 columns: Username | Type | Credit */}
+                    <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9", borderBottom: "1px solid #e5e5e5" }}>
+                      {/* Username cell */}
+                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", borderRight: "1px solid #e5e5e5" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span
+                            style={{ 
+                              fontWeight: 700, 
+                              cursor: "pointer",
+                              color: isAdminType ? "#00a65a" : "#212529"
                             }}
+                            onClick={() => navigate(`/accounts/view/${client.username}`)}
                           >
                             {client.username}
-                          </button>
-                          {/* Black circular info toggle button */}
-                          <button
-                            onClick={() => toggleExpand(client.id)}
-                            title="Show details"
-                            style={{
-                              width: 26,
-                              height: 26,
-                              minWidth: 26,
-                              backgroundColor: "#222",
-                              color: "#fff",
-                              border: "none",
-                              borderRadius: "50%",
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: 13,
-                              fontWeight: 900,
-                              lineHeight: 1,
-                              flexShrink: 0
-                            }}
-                          >
-                            ℹ
-                          </button>
+                          </span>
+                          {/* Show ℹ expand button only before load */}
+                          {!balancesLoaded && (
+                            <button
+                              onClick={() => toggleExpand(client.id)}
+                              style={{ width: 22, height: 22, borderRadius: "50%", backgroundColor: "#333", color: "#fff", border: "none", fontSize: 12, fontWeight: 900, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                            >i</button>
+                          )}
                         </div>
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", fontWeight: 400, color: "#6c757d", borderRight: "1px solid #e5e5e5" }}>
+                      
+                      {/* Type cell */}
+                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", fontWeight: 400, color: "#6c757d", borderRight: "1px solid #e5e5e5" }}>
                         {getTypeLabel(client.role)}
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", fontWeight: 700, color: !balancesLoaded ? "#212529" : "#28a745", textAlign: "right", borderRight: "1px solid #e5e5e5" }}>
-                        {/* Show "-" before load balance, actual value after */}
-                        {!balancesLoaded ? "-" : creditVal.toLocaleString()}
-                      </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", fontWeight: 700,
-                        color: !balancesLoaded ? "#212529" : (balanceVal >= 0 ? "#28a745" : "#dc3545"), 
-                        textAlign: "right" }}>
-                        {!balancesLoaded ? "-" : balanceVal.toLocaleString()}
+                      
+                      {/* Credit cell */}
+                      <td style={{ padding: "10px 12px", fontSize: 15, lineHeight: "22px", fontWeight: 700, textAlign: "right",
+                        color: !balancesLoaded ? "#212529" : "#28a745" }}>
+                        {!balancesLoaded ? "-" : (display.credit ?? 0).toLocaleString()}
                       </td>
                     </tr>
 
-                    {/* ROW B: Detail section — only visible when info button clicked */}
-                    {expandedIds.has(client.id) && (
-                      <tr style={{ backgroundColor: rowBg, borderBottom: "1px solid #e5e5e5" }}>
-                        <td colSpan={4} style={{ padding: "8px 16px 14px 16px" }}>
-                          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                              <span>Balance </span>
-                              <span style={{ fontWeight: 600, color: balanceVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
-                                {balanceVal.toLocaleString()}
+                    {/* ROW B - expanded bullet card */}
+                    {(balancesLoaded || expandedIds.has(client.id)) && (
+                      <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}>
+                        <td colSpan={3} style={{ padding: "4px 14px 14px 14px", borderBottom: "1px solid #e5e5e5" }}>
+                          <ul style={{ listStyle: "none", margin: 0, padding: 0, fontSize: 14, color: "#212529" }}>
+                            
+                            {/* Balance */}
+                            <li style={{ padding: "2px 0" }}>
+                              <span style={{ color: "#555" }}>• Balance </span>
+                              <span style={{ fontWeight: 700, color: balancesLoaded ? ((display.balance ?? 0) >= 0 ? "#28a745" : "#dc3545") : "#212529" }}>
+                                {balancesLoaded ? (display.balance ?? 0).toLocaleString() : "-"}
                               </span>
                             </li>
-                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                              <span>Client (P/L) </span>
-                              <span style={{ fontWeight: 600, color: plVal >= 0 ? "#212529" : "#dc3545", marginLeft: 4 }}>
-                                {plVal.toLocaleString()}
+                            
+                            {/* Client P/L */}
+                            <li style={{ padding: "2px 0" }}>
+                              <span style={{ color: "#555" }}>• Client (P/L) </span>
+                              <span style={{ fontWeight: 700, color: balancesLoaded ? ((display.plDownline ?? 0) >= 0 ? "#28a745" : "#dc3545") : "#212529" }}>
+                                {balancesLoaded ? (display.plDownline ?? 0).toLocaleString() : "-"}
                               </span>
                             </li>
-                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                              <span>Share </span>
-                              <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>{shareVal}</span>
-                            </li>
-                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                              <span>Exposure </span>
-                              <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>0</span>
-                            </li>
-                            <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                              <span>Available Balance </span>
-                              <span style={{ fontWeight: 600, color: "#212529", marginLeft: 4 }}>
-                                {availVal.toLocaleString()}
+                            
+                            {/* Share */}
+                            <li style={{ padding: "2px 0" }}>
+                              <span style={{ color: "#555" }}>• Share </span>
+                              <span style={{ fontWeight: 700, color: "#212529" }}>
+                                {balancesLoaded ? (display.share !== null ? `${display.share}%` : "0%") : "-"}
                               </span>
                             </li>
-                            {/* Options row with inline buttons */}
-                            <li style={{ padding: "6px 0 2px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                <span style={{ color: "#555", marginRight: 2 }}>•</span>
-                                <span style={{ fontSize: 16, lineHeight: "24px" }}>Options</span>
+                            
+                            {/* Exposure */}
+                            <li style={{ padding: "2px 0" }}>
+                              <span style={{ color: "#555" }}>• Exposure </span>
+                              <span style={{ fontWeight: 700, color: "#212529" }}>0</span>
+                            </li>
+                            
+                            {/* Available Balance */}
+                            <li style={{ padding: "2px 0" }}>
+                              <span style={{ color: "#555" }}>• Available Balance </span>
+                              <span style={{ fontWeight: 700, color: balancesLoaded ? ((display.available ?? 0) >= 0 ? "#28a745" : "#dc3545") : "#212529" }}>
+                                {balancesLoaded ? (display.available ?? 0).toLocaleString() : "-"}
                               </span>
-                              {/* C button */}
-                              <button
-                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                                title="Cash / Credit"
-                                style={{
-                                  width: 38, height: 38,
-                                  backgroundColor: "#ffc107",
-                                  color: "#212529",
-                                  border: "none",
-                                  borderRadius: 6,
-                                  fontWeight: 900,
-                                  fontSize: 16,
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                                }}
-                              >C</button>
-                              {/* Edit button */}
-                              <button
-                                onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                                title="Edit"
-                                style={{
-                                  width: 38, height: 38,
-                                  backgroundColor: "#28a745",
-                                  color: "#fff",
-                                  border: "none",
-                                  borderRadius: 6,
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                                }}
-                              >
-                                <Pencil style={{ width: 16, height: 16 }} />
+                            </li>
+                            
+                            {/* Options */}
+                            <li style={{ padding: "4px 0", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                              <span style={{ color: "#555" }}>• Options </span>
+                              
+                              {/* C - Cash/Credit */}
+                              <button style={{ width: 30, height: 30, backgroundColor: "#ffc107", color: "#000", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
+                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}>C</button>
+                              
+                              {/* Edit */}
+                              <button style={{ width: 30, height: 30, backgroundColor: "#28a745", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                onClick={() => navigate(`/accounts/edit/${client.username}`)}>
+                                <Pencil style={{ width: 14, height: 14 }} />
                               </button>
-                              {/* L button */}
+                              
+                              {/* L - Ledger */}
+                              <button style={{ width: 30, height: 30, backgroundColor: "#17a2b8", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
+                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}>L</button>
+                              
+                              {/* A/D - Active/Inactive toggle */}
                               <button
-                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                                title="Ledger"
-                                style={{
-                                  width: 38, height: 38,
-                                  backgroundColor: "#17a2b8",
-                                  color: "#fff",
-                                  border: "none",
-                                  borderRadius: 6,
-                                  fontWeight: 900,
-                                  fontSize: 16,
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                style={{ 
+                                  width: 30, height: 30, borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer",
+                                  backgroundColor: client.status === "active" ? "#28a745" : "#fff",
+                                  color: client.status === "active" ? "#fff" : "#dc3545",
+                                  border: client.status === "active" ? "none" : "2px solid #dc3545"
                                 }}
-                              >L</button>
-                              {/* A/D button */}
-                              <button
-                                onClick={() => toggleStatus(client)}
-                                title={isActive ? "Deactivate" : "Activate"}
-                                style={{
-                                  width: 38, height: 38,
-                                  backgroundColor: isActive ? "#28a745" : "#fff",
-                                  color: isActive ? "#fff" : "#dc3545",
-                                  border: isActive ? "none" : "2px solid #dc3545",
-                                  borderRadius: 6,
-                                  fontWeight: 900,
-                                  fontSize: 16,
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                                }}
-                              >
-                                {isActive ? "A" : "D"}
+                                onClick={() => toggleStatus(client)}>
+                                {client.status === "active" ? "A" : "D"}
                               </button>
-                              {/* S button — only shown when can_settle_pl is true */}
+                              
+                              {/* S - Settle PL (only if can_settle_pl) */}
                               {client.can_settle_pl && (
-                                <button
-                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                                  title="Settle Account"
-                                  style={{
-                                    width: 38, height: 38,
-                                    backgroundColor: "#6f42c1",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: 6,
-                                    fontWeight: 900,
-                                    fontSize: 16,
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
-                                  }}
-                                >S</button>
+                                <button style={{ width: 30, height: 30, backgroundColor: "#e74c3c", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
+                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}>S</button>
                               )}
                             </li>
                           </ul>
