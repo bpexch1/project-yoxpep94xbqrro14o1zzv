@@ -220,71 +220,42 @@ export function ClientSummaryCard({
       )}
 
       <div className="p-3">
-        {/* Summary Stats Table — matches original exactly */}
+        {/* Summary Stats Table — always shows real totals */}
         <div className="mb-3 overflow-x-auto">
-          {!balancesLoaded ? (
-            <table className="border-collapse border border-[#dee2e6] text-[13px]" style={{ minWidth: 300 }}>
-              <thead>
-                <tr className="bg-white">
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                    0
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                    0
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
-                    0
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
-                    {filteredClients.length}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          ) : (
-            <table className="w-full border-collapse border border-[#dee2e6] text-[13px]">
-              <thead>
-                <tr className="bg-white">
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Received</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance UpLine</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                    {totals.credit_received.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
-                    {totals.credit_remaining.toLocaleString()}
-                  </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
-                    {totals.cash.toLocaleString()}
-                  </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                    {totals.pl_downline.toLocaleString()}
-                  </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                    {totals.balance_upline.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
-                    {filteredClients.length}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          )}
+          <table className="border-collapse border border-[#dee2e6] text-[13px]">
+            <thead>
+              <tr className="bg-white">
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Received</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit Remaining</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L Downline</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance UpLine</th>
+                <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="bg-white">
+                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                  {totals.credit_received.toLocaleString()}
+                </td>
+                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                  {totals.credit_remaining.toLocaleString()}
+                </td>
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  {totals.cash.toLocaleString()}
+                </td>
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  {totals.pl_downline.toLocaleString()}
+                </td>
+                <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#212529]")}>
+                  {totals.balance_upline.toLocaleString()}
+                </td>
+                <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  {filteredClients.length}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {/* Action bar */}
@@ -638,33 +609,24 @@ export function ClientSummaryCard({
               {/* GREEN TOTAL ROW */}
               {!isLoading && tableFilteredClients.length > 0 && (
                 !balancesLoaded ? (
-                  <tr style={{ backgroundColor: "#00b181" }}>
-                    <td colSpan={3} style={{ padding: "10px 12px" }}>
-                      <button
-                        onClick={handleLoadBalance}
-                        disabled={isLoadingBalances}
-                        style={{
-                          backgroundColor: "#ffc107",
-                          color: "#000",
-                          border: "none",
-                          padding: "5px 14px",
-                          fontWeight: 900,
-                          fontSize: 13,
-                          borderRadius: 5,
-                          cursor: "pointer",
-                          letterSpacing: 0.3
-                        }}
-                      >
+                  <tr style={{ backgroundColor: "#00a65a" }}>
+                    <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16 }}>
+                      <button onClick={handleLoadBalance} disabled={isLoadingBalances}
+                        style={{ backgroundColor: "#ffc107", color: "#000", border: "none", padding: "5px 14px", fontWeight: 900, fontSize: 13, borderRadius: 5, cursor: "pointer" }}>
                         {isLoadingBalances ? "Loading..." : "Load Balance"}
                       </button>
                     </td>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>0</td>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>0</td>
                   </tr>
                 ) : (
-                  <tr style={{ backgroundColor: "#00b181" }}>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16 }}>Total</td>
-                    <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c" }}></td>
-                    <td style={{ padding: "10px 12px", borderLeft: "1px solid #00956c", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right" }}>
+                  <tr style={{ backgroundColor: "#00a65a" }}>
+                    <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16 }}>Total</td>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>
                       {totals.credit_received.toLocaleString()}
+                    </td>
+                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 16, textAlign: "right", borderLeft: "1px solid #00956c" }}>
+                      {totals.cash.toLocaleString()}
                     </td>
                   </tr>
                 )
@@ -674,13 +636,14 @@ export function ClientSummaryCard({
               <tr style={{ backgroundColor: "#f5f5f5" }}>
                 <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Username</th>
                 <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Type</th>
-                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd" }}>Credit</th>
+                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd" }}>Credit</th>
+                <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, fontSize: 16, color: "#333", borderBottom: "2px solid #ddd" }}>Balance</th>
               </tr>
 
               {/* LOADING STATE */}
               {isLoading && (
                 <tr>
-                  <td colSpan={3} style={{ padding: "40px 0", textAlign: "center" }}>
+                  <td colSpan={4} style={{ padding: "40px 0", textAlign: "center" }}>
                     <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto mb-2" />
                     <span style={{ fontSize: 16, fontWeight: 700 }}>Loading...</span>
                   </td>
@@ -690,7 +653,7 @@ export function ClientSummaryCard({
               {/* EMPTY STATE */}
               {!isLoading && paginatedClients.length === 0 && (
                 <tr>
-                  <td colSpan={3} style={{ padding: "32px 0", textAlign: "center", fontSize: 16, fontWeight: 700, color: "#6c757d" }}>
+                  <td colSpan={4} style={{ padding: "32px 0", textAlign: "center", fontSize: 16, fontWeight: 700, color: "#6c757d" }}>
                     No users found
                   </td>
                 </tr>
@@ -764,16 +727,21 @@ export function ClientSummaryCard({
                       <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#555", borderRight: "1px solid #e5e5e5" }}>
                         {getTypeLabel(client.role)}
                       </td>
-                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#212529", textAlign: "right" }}>
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", color: "#212529", textAlign: "right", borderRight: "1px solid #e5e5e5" }}>
                         {/* Show "-" before load balance, actual value after */}
                         {!balancesLoaded ? "-" : creditVal.toLocaleString()}
+                      </td>
+                      <td style={{ padding: "10px 12px", fontSize: 16, lineHeight: "24px", 
+                        color: balancesLoaded ? (balanceVal >= 0 ? "#28a745" : "#dc3545") : "#212529", 
+                        textAlign: "right" }}>
+                        {!balancesLoaded ? "-" : balanceVal.toLocaleString()}
                       </td>
                     </tr>
 
                     {/* ROW B: Detail section — only visible when info button clicked */}
                     {expandedIds.has(client.id) && (
                       <tr style={{ backgroundColor: rowBg, borderBottom: "1px solid #e5e5e5" }}>
-                        <td colSpan={3} style={{ padding: "8px 16px 14px 16px" }}>
+                        <td colSpan={4} style={{ padding: "8px 16px 14px 16px" }}>
                           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                             <li style={{ padding: "3px 0", fontSize: 16, lineHeight: "24px", color: "#333", display: "flex", alignItems: "center", gap: 4 }}>
                               <span style={{ color: "#555", marginRight: 2 }}>•</span>
