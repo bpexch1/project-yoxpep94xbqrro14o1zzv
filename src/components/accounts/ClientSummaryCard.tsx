@@ -306,23 +306,23 @@ export function ClientSummaryCard({
 
           <div className="flex items-center gap-x-2 text-[10px] font-bold text-[#212529] uppercase flex-wrap">
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#ffc107] text-black flex items-center justify-center rounded-[2px]">C</span>
+              <span className="w-4 h-4 bg-[#ffc107] text-black flex items-center justify-center rounded-full">C</span>
               <span>Cash/Credit</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#254465] text-white flex items-center justify-center rounded-[2px]"><Pencil className="w-2.5 h-2.5" /></span>
+              <span className="w-4 h-4 bg-[#28a745] text-white flex items-center justify-center rounded-full"><Pencil className="w-2.5 h-2.5" /></span>
               <span>Edit</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#17a2b8] text-white flex items-center justify-center rounded-[2px]">L</span>
+              <span className="w-4 h-4 bg-[#17a2b8] text-white flex items-center justify-center rounded-full">L</span>
               <span>Ledger</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-[#28a745] text-white flex items-center justify-center rounded-[2px]">A</span>
+              <span className="w-4 h-4 bg-[#28a745] text-white flex items-center justify-center rounded-full">A</span>
               <span>Active</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded-[2px]">D</span>
+              <span className="w-4 h-4 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded-full">D</span>
               <span>InActive</span>
             </div>
           </div>
@@ -575,21 +575,21 @@ export function ClientSummaryCard({
                         <div className="flex items-center justify-center gap-1">
                           <button 
                             onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                            className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black text-[11px] flex items-center justify-center rounded-[2px] transition-colors shadow-sm"
+                            className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black text-[11px] flex items-center justify-center rounded-full transition-colors shadow-sm"
                             title="Cash / Credit"
                           >
                             C
                           </button>
                           <button 
                             onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                            className="w-6 h-6 bg-[#254465] hover:bg-[#1d354f] text-white flex items-center justify-center rounded-[2px] transition-colors shadow-sm"
+                            className="w-6 h-6 bg-[#28a745] hover:bg-[#218838] text-white flex items-center justify-center rounded-full transition-colors shadow-sm"
                             title="Edit"
                           >
                             <Pencil className="w-3 h-3" />
                           </button>
                           <button 
                             onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                            className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black text-[11px] flex items-center justify-center rounded-[2px] transition-colors shadow-sm"
+                            className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black text-[11px] flex items-center justify-center rounded-full transition-colors shadow-sm"
                             title="Ledger"
                           >
                             L
@@ -597,7 +597,7 @@ export function ClientSummaryCard({
                           <button 
                             onClick={() => toggleStatus(client)}
                             className={cn(
-                              "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded-[2px] transition-colors shadow-sm",
+                              "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded-full transition-colors shadow-sm",
                               client.status === "active" 
                                 ? "bg-[#28a745] hover:bg-[#218838] text-white" 
                                 : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
@@ -765,13 +765,13 @@ export function ClientSummaryCard({
                         </tr>
                         <tr>
                           <td style={{ padding: "3px 0", color: "#555", fontWeight: 600 }}>• Share</td>
-                          <td style={{ padding: "3px 0", textAlign: "right", fontWeight: 700, color: "#212529" }}>
+                          <td style={{ padding: "3px 0", textAlign: "right", fontWeight: 800, color: "#212529" }}>
                             {display.share !== null ? `${display.share}%` : "—"}
                           </td>
                         </tr>
                         <tr>
                           <td style={{ padding: "3px 0", color: "#555", fontWeight: 600 }}>• Exposure</td>
-                          <td style={{ padding: "3px 0", textAlign: "right", fontWeight: 700, color: "#dc3545" }}>
+                          <td style={{ padding: "3px 0", textAlign: "right", fontWeight: 800, color: "#dc3545" }}>
                             {display.isLoaded ? "0" : "—"}
                           </td>
                         </tr>
@@ -802,32 +802,34 @@ export function ClientSummaryCard({
                     <button
                       onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
                       style={{
-                        width: 28, height: 28,
+                        width: 30, height: 30,
                         backgroundColor: "#ffc107",
-                        color: "#000",
+                        color: "#212529",
                         border: "none",
-                        borderRadius: 3,
+                        borderRadius: "50%",
                         fontWeight: 900,
                         fontSize: 12,
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
                       }}
                       title="Cash / Credit"
                     >C</button>
                     <button
                       onClick={() => navigate(`/accounts/edit/${client.username}`)}
                       style={{
-                        width: 28, height: 28,
-                        backgroundColor: "#254465",
+                        width: 30, height: 30,
+                        backgroundColor: "#28a745",
                         color: "#fff",
                         border: "none",
-                        borderRadius: 3,
+                        borderRadius: "50%",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
                       }}
                       title="Edit"
                     >
@@ -836,34 +838,36 @@ export function ClientSummaryCard({
                     <button
                       onClick={() => navigate(`/accounts/ledger/${client.username}`)}
                       style={{
-                        width: 28, height: 28,
+                        width: 30, height: 30,
                         backgroundColor: "#17a2b8",
                         color: "#fff",
                         border: "none",
-                        borderRadius: 3,
+                        borderRadius: "50%",
                         fontWeight: 900,
                         fontSize: 12,
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
                       }}
                       title="Ledger"
                     >L</button>
                     <button
                       onClick={() => toggleStatus(client)}
                       style={{
-                        width: 28, height: 28,
+                        width: 30, height: 30,
                         backgroundColor: isActive ? "#28a745" : "#fff",
                         color: isActive ? "#fff" : "#dc3545",
-                        border: isActive ? "none" : "1px solid #dc3545",
-                        borderRadius: 3,
+                        border: isActive ? "none" : "2px solid #dc3545",
+                        borderRadius: "50%",
                         fontWeight: 900,
                         fontSize: 12,
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
                       }}
                       title={isActive ? "Deactivate" : "Activate"}
                     >
