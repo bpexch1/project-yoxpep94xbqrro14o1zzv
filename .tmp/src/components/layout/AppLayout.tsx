@@ -8,7 +8,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   return (
-    <div className="min-h-screen bg-[#e9ecef]">
+    <div className="min-h-screen bg-[#e6f2fc]">
       {/* Sidebar handles both desktop and mobile modes */}
       <Sidebar 
         isMobileOpen={isMobileSidebarOpen} 

@@ -35,7 +35,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#e9ecef", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#e6f2fc", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ width: "100%", padding: "16px 16px 80px" }}>
 
         {/* 1. Search-Users Card */}
@@ -79,7 +79,7 @@ export default function Dashboard() {
               <button
                 type="submit"
                 style={{
-                  background: "#00a65a",
+                  background: "#00b181",
                   color: "#fff",
                   border: "none",
                   borderRadius: 4,
@@ -120,7 +120,7 @@ export default function Dashboard() {
             <button
               onClick={() => refetch()}
               style={{
-                background: "#00a65a",
+                background: "#00b181",
                 color: "#fff",
                 border: "none",
                 borderRadius: 4,
@@ -184,7 +184,7 @@ export default function Dashboard() {
                           <span
                             onClick={() => navigate(`/play/match/${market.id}`)}
                             style={{
-                              color: "#00a65a",
+                              color: "#00b181",
                               cursor: "pointer",
                               textDecoration: "none",
                               fontWeight: 500
@@ -195,7 +195,7 @@ export default function Dashboard() {
                             {market.title}
                           </span>
                           {market.status === 'live' && (
-                            <span style={{ color: "#00a65a", marginLeft: 6, fontSize: 10 }}>●</span>
+                            <span style={{ color: "#00b181", marginLeft: 6, fontSize: 10 }}>●</span>
                           )}
                         </td>
                         <td style={{

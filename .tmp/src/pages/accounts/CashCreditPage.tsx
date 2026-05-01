@@ -247,7 +247,7 @@ export default function CashCreditPage() {
         {/* 4. DEPOSIT SECTION */}
         <div style={{ background: "#fff", marginTop: "16px", border: "1px solid #dee2e6" }}>
           {/* Green header */}
-          <div style={{ background: "#00a65a", padding: "10px 16px", fontSize: "13px", color: "#fff", fontWeight: 700 }}>
+          <div style={{ background: "#00b181", padding: "10px 16px", fontSize: "13px", color: "#fff", fontWeight: 700 }}>
             Deposit {activeTab === 'cash' ? 'Cash' : 'Credit'} in <strong>{client.username}</strong> account
           </div>
           {/* Form body */}
@@ -281,7 +281,7 @@ export default function CashCreditPage() {
               onClick={handleDeposit}
               disabled={isSubmittingDeposit}
               style={{
-                background: "#00a65a", color: "#fff", border: "none", borderRadius: "3px",
+                background: "#00b181", color: "#fff", border: "none", borderRadius: "3px",
                 padding: "6px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer"
               }}
             >

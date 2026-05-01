@@ -49,7 +49,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
         {isLive ? (
           <span
             style={{
-              backgroundColor: "#00a65a",
+              backgroundColor: "#00b181",
               color: "#fff",
               fontSize: 10,
               fontWeight: 700,
@@ -74,14 +74,14 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
             Today
           </span>
         )}
-        <span style={{ fontSize: 11, color: "#1e3a5c", fontWeight: 700 }}>
+        <span style={{ fontSize: 11, color: "#254465", fontWeight: 700 }}>
           {timeDisplay}
         </span>
       </div>
 
       {/* Center: match info */}
       <div style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
-        <span style={{ fontWeight: 700, fontSize: 14, color: "#1e3a5c", lineHeight: 1.3 }}>
+        <span style={{ fontWeight: 700, fontSize: 14, color: "#254465", lineHeight: 1.3 }}>
           {matchTitle}
         </span>
         {/* Icons row: TV + BM + F using sprite icons */}
@@ -92,7 +92,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
           {match.source === 'betfair' && (
             <span
               style={{
-                backgroundColor: "#1e3a5c",
+                backgroundColor: "#254465",
                 color: "#fff",
                 fontSize: 9,
                 fontWeight: 700,

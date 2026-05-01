@@ -110,8 +110,8 @@ export default function UserDashboard() {
 
   if ((matchesLoading && !matches) || clientLoading) {
     return (
-      <div className="min-h-screen bg-[#d6e4f0] flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-[#1e3a5c] animate-spin" />
+      <div className="min-h-screen bg-[#e6f2fc] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
       </div>
     );
   }
@@ -172,7 +172,7 @@ export default function UserDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#d6e4f0] text-[#1e3a5c]">
+    <div className="min-h-screen bg-[#e6f2fc] text-[#254465]">
       <UserHeader 
         sidebarOpen={sidebarOpen}
         onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -181,7 +181,7 @@ export default function UserDashboard() {
       {/* Account Info Bar */}
       <div
         style={{
-          backgroundColor: "#1e3a5c",
+          backgroundColor: "#254465",
           padding: "8px 14px",
           display: "flex",
           alignItems: "center",
@@ -227,7 +227,7 @@ export default function UserDashboard() {
                   alignItems: "center",
                   justifyContent: "center",
                   padding: "8px 4px",
-                  backgroundColor: isActive ? "#00a65a" : "#254465",
+                  backgroundColor: isActive ? "#00b181" : "#254465",
                   borderRight: "1px solid rgba(255,255,255,0.08)",
                   border: "none",
                   cursor: "pointer",
@@ -261,7 +261,7 @@ export default function UserDashboard() {
                   {/* Sport section header */}
                   <div
                     style={{
-                      backgroundColor: "#e8f0f5",
+                      backgroundColor: "#e6f2fc",
                       borderBottom: "1px solid #ccd9e5",
                       padding: "8px 14px",
                       display: "flex",
@@ -279,7 +279,7 @@ export default function UserDashboard() {
                       ) : (
                         <span style={{ fontSize: 14 }}>🏅</span>
                       )}
-                      <span style={{ fontWeight: 700, fontSize: 14, color: "#1e3a5c" }}>{sport}</span>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "#254465" }}>{sport}</span>
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#6c757d" }}>Matched</span>
                   </div>
@@ -299,11 +299,11 @@ export default function UserDashboard() {
             {/* Empty state */}
             {filteredMatches.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-                <div className="w-16 h-16 bg-[#1e3a5c]/5 rounded-full flex items-center justify-center mb-4">
-                  <Trophy className="w-8 h-8 text-[#1e3a5c]/20" />
+                <div className="w-16 h-16 bg-[#254465]/5 rounded-full flex items-center justify-center mb-4">
+                  <Trophy className="w-8 h-8 text-[#254465]/20" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-widest text-[#1e3a5c]/40">No Matches Found</h3>
-                <p className="text-xs text-[#1e3a5c]/30 mt-1">There are currently no active matches for this category.</p>
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/40">No Matches Found</h3>
+                <p className="text-xs text-[#254465]/30 mt-1">There are currently no active matches for this category.</p>
               </div>
             )}
           </div>

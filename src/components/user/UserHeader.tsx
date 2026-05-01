@@ -44,7 +44,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
   return (
     <header
       style={{
-        backgroundColor: "#1e3a5c",
+        backgroundColor: "#254465",
         position: "sticky",
         top: 0,
         zIndex: 50,

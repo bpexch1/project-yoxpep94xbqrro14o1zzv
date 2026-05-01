@@ -62,7 +62,7 @@ export default function BetLock() {
   };
 
   return (
-    <div className="min-h-screen bg-[#e9ecef]" style={{ fontFamily: "Roboto, sans-serif" }}>
+    <div className="min-h-screen bg-[#e6f2fc]" style={{ fontFamily: "Roboto, sans-serif" }}>
       <div style={{ padding: "10px 16px" }}>
         <p style={{ fontSize: "13px", fontWeight: 600, marginBottom: "10px", color: "#212529" }}>
           Allowed Market Types ({username})
@@ -89,7 +89,7 @@ export default function BetLock() {
                       checked={catChecked}
                       ref={el => el && (el.indeterminate = someChecked)}
                       onChange={() => handleCategoryToggle(cat.id, cat.label)}
-                      style={{ accentColor: "#00a65a", width: "14px", height: "14px" }}
+                      style={{ accentColor: "#00b181", width: "14px", height: "14px" }}
                     />
                     {cat.label}
                   </label>
@@ -101,7 +101,7 @@ export default function BetLock() {
                           type="checkbox"
                           checked={settings[cat.id]?.[item] || false}
                           onChange={() => handleItemToggle(cat.id, item)}
-                          style={{ accentColor: "#00a65a", width: "14px", height: "14px" }}
+                          style={{ accentColor: "#00b181", width: "14px", height: "14px" }}
                         />
                         {item}
                       </label>
@@ -116,7 +116,7 @@ export default function BetLock() {
             <button
               onClick={handleSave}
               style={{
-                backgroundColor: "#00a65a",
+                backgroundColor: "#00b181",
                 color: "#fff",
                 border: "none",
                 borderRadius: "3px",

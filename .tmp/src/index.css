@@ -3,38 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #e9ecef;
+  --bg-primary: #e6f2fc;
   --bg-card: #ffffff;
-  --accent-green: #00a65a;
-  --accent-green-hover: #008d4c;
-  --sidebar-bg: #222d32;
+  --accent-green: #00b181;
+  --accent-green-hover: #4dbd74;
+  --sidebar-bg: #254465;
   --accent-blue: #3d6b8b;
   --text-primary: #212529;
   --text-secondary: #6c757d;
   --border-color: #dee2e6;
 
   /* Shadcn CSS variable mappings */
-  --background: 210 17% 93%;        /* #e9ecef */
+  --background: 200 50% 93%;
   --foreground: 210 11% 15%;
   --card: 0 0% 100%;
   --card-foreground: 210 11% 15%;
   --popover: 0 0% 100%;
   --popover-foreground: 210 11% 15%;
-  --primary: 145 100% 32%;         /* #00a65a */
+  --primary: 161 100% 35%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 17% 91%;
+  --secondary: 200 50% 91%;
   --secondary-foreground: 210 11% 15%;
-  --muted: 210 17% 91%;
+  --muted: 200 50% 91%;
   --muted-foreground: 210 8% 45%;
-  --accent: 145 100% 32%;
+  --accent: 161 100% 35%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 354 70% 54%;       /* #dc3545 */
+  --destructive: 354 70% 54%;
   --destructive-foreground: 0 0% 100%;
-  --border: 210 14% 89%;
-  --input: 210 14% 89%;
-  --ring: 145 100% 32%;
+  --border: 200 30% 87%;
+  --input: 200 30% 87%;
+  --ring: 161 100% 35%;
   --radius: 0.5rem;
-  --teal: 188 78% 41%;             /* #17a2b8 */
+  --teal: 188 78% 41%;
 }
 
 @layer base {
@@ -54,7 +54,7 @@ html {
 }
 
 .app-container {
-  background-color: #e9ecef;
+  background-color: #e6f2fc;
   min-height: 100vh;
 }
 
@@ -67,10 +67,10 @@ html {
 }
 
 a {
-  color: #00a65a;
+  color: #00b181;
 }
 a:hover {
-  color: #008d4c;
+  color: #4dbd74;
 }
 
 @keyframes marquee {

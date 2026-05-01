@@ -126,7 +126,7 @@ export default function CreateUser() {
                 name="type"
                 checked={formData.type === "admin_type"}
                 onChange={() => setFormData({ ...formData, type: "admin_type" })}
-                style={{ accentColor: "#00a65a" }}
+                style={{ accentColor: "#00b181" }}
               />
               {creatableRole.label}
             </label>
@@ -136,7 +136,7 @@ export default function CreateUser() {
                 name="type"
                 checked={formData.type === "bettor"}
                 onChange={() => setFormData({ ...formData, type: "bettor" })}
-                style={{ accentColor: "#00a65a" }}
+                style={{ accentColor: "#00b181" }}
               />
               Bettor
             </label>
@@ -166,7 +166,7 @@ export default function CreateUser() {
               type="checkbox"
               checked={formData.isActive}
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              style={{ accentColor: "#00a65a", width: "16px", height: "16px" }}
+              style={{ accentColor: "#00b181", width: "16px", height: "16px" }}
             />
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function CreateUser() {
               onClick={handleSubmit}
               disabled={isSubmitting}
               style={{
-                backgroundColor: "#00a65a",
+                backgroundColor: "#00b181",
                 color: "#fff",
                 border: "none",
                 borderRadius: "3px",

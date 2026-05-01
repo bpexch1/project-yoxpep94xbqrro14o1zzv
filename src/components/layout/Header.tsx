@@ -99,7 +99,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
       {/* LEFT: Logo + Hamburger */}
       <div className="flex items-center shrink-0">
         <Link to="/dashboard" className="flex items-center gap-1">
-          <span className="font-bold italic text-xl uppercase text-[#00a65a] hidden lg:inline" style={{fontFamily:'Georgia,serif'}}>
+          <span className="font-bold italic text-xl uppercase text-[#00b181] hidden lg:inline" style={{fontFamily:'Georgia,serif'}}>
             BPEXCH
           </span>
         </Link>
@@ -116,8 +116,8 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         <Link 
           to="/dashboard" 
           className={cn(
-            "text-sm transition-all hover:text-[#00a65a]",
-            location.pathname === "/dashboard" ? "text-[#00a65a] font-bold" : "text-[#333]"
+            "text-sm transition-all hover:text-[#00b181]",
+            location.pathname === "/dashboard" ? "text-[#00b181] font-bold" : "text-[#333]"
           )}
         >
           Dashboard
@@ -125,8 +125,8 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         <Link 
           to="/accounts" 
           className={cn(
-            "text-sm transition-all hover:text-[#00a65a]",
-            location.pathname.startsWith("/accounts") ? "text-[#00a65a] font-bold" : "text-[#333]"
+            "text-sm transition-all hover:text-[#00b181]",
+            location.pathname.startsWith("/accounts") ? "text-[#00b181] font-bold" : "text-[#333]"
           )}
         >
           Users
@@ -134,8 +134,8 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         <Link 
           to="/reports/daily-pl" 
           className={cn(
-            "text-sm transition-all hover:text-[#00a65a]",
-            location.pathname.startsWith("/reports") ? "text-[#00a65a] font-bold" : "text-[#333]"
+            "text-sm transition-all hover:text-[#00b181]",
+            location.pathname.startsWith("/reports") ? "text-[#00b181] font-bold" : "text-[#333]"
           )}
         >
           Reports
@@ -149,10 +149,10 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-colors group">
-                  <span className="text-[#333] text-sm font-medium group-hover:text-[#00a65a]">
+                  <span className="text-[#333] text-sm font-medium group-hover:text-[#00b181]">
                     {session.username} ({session.role ? formatRole(session.role) : ''})
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#00a65a]" />
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#00b181]" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d2d6de] shadow-lg rounded w-48 mt-1">
@@ -161,7 +161,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
                 </div>
                 <DropdownMenuItem
                   onClick={() => navigate("/play/profile")}
-                  className="text-[#333] hover:bg-gray-50 hover:text-[#00a65a] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00a65a]"
+                  className="text-[#333] hover:bg-gray-50 hover:text-[#00b181] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00b181]"
                 >
                   <User className="w-3.5 h-3.5 mr-2 opacity-70" />
                   Profile
@@ -179,7 +179,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
 
             <div className="flex items-center gap-2">
               <span className="text-[13px] text-[#212529] whitespace-nowrap font-bold">
-                B: <span className={cn(liveBalance > 0 ? "text-[#00a65a]" : "text-[#212529]")}>
+                B: <span className={cn(liveBalance > 0 ? "text-[#00b181]" : "text-[#212529]")}>
                   {Math.max(0, liveBalance).toLocaleString('en-IN')}
                 </span>
               </span>
@@ -193,7 +193,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#333] hover:text-[#00a65a] uppercase transition-colors"
+            className="text-sm font-bold text-[#333] hover:text-[#00b181] uppercase transition-colors"
           >
             Login
           </button>

@@ -124,10 +124,7 @@ export default function Login() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#2b2b2b",
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23505050' fill-opacity='0.25'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        backgroundRepeat: "repeat",
-        backgroundSize: "60px 60px",
+        background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
         display: "flex",
         flexDirection: "column",
         paddingBottom: "8px",
@@ -236,7 +233,7 @@ export default function Login() {
               style={{
                 width: "65%",
                 borderRadius: 50,
-                background: "linear-gradient(180deg, #6090b0 0%, #3d6e8c 100%)",
+                background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
                 border: "none",
                 color: "#fff",
                 fontSize: 18,

@@ -136,7 +136,7 @@ function SportDropdown({
                       {match.title || `${match.team1} v ${match.team2}`}
                     </span>
                     {match.status === "live" && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00a65a] ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(0,166,90,0.6)]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00b181] ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(0,166,90,0.6)]" />
                     )}
                   </button>
                 ))}
@@ -174,7 +174,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
           "flex items-center w-full text-left transition-colors group border-b border-white/[0.04]",
           isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-3 px-4",
           isActive
-            ? "bg-[#242a33] text-white font-medium border-l-[3px] border-[#00a65a]"
+            ? "bg-[#242a33] text-white font-medium border-l-[3px] border-[#00b181]"
             : "text-[#b8c7ce] hover:bg-[#353c47] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? item.label : undefined}
@@ -182,7 +182,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         <item.icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[18px] h-[18px]",
-          isActive ? "text-[#00a65a]" : "text-[#3bc8c8] group-hover:text-white"
+          isActive ? "text-[#00b181]" : "text-[#3bc8c8] group-hover:text-white"
         )} />
         {showLabels && (
           <>

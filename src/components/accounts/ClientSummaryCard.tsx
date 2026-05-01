@@ -293,14 +293,14 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#00a65a] hover:bg-[#008d4c] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
+                className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
               >
                 <User className="w-4 h-4" /> New User
               </button>
             )}
             <button
               onClick={() => navigate(`/reports/daily`)}
-              className="bg-[#00a65a] hover:bg-[#008d4c] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
+              className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
             >
               <Book className="w-4 h-4" /> Account Ledger
             </button>
@@ -462,9 +462,9 @@ export function ClientSummaryCard({
             <tbody className="text-[12px]">
               {/* Green Total Row */}
               {!isLoading && tableFilteredClients.length > 0 && (
-                <tr className="bg-[#00a65a] text-white font-black whitespace-nowrap">
+                <tr className="bg-[#00b181] text-white font-black whitespace-nowrap">
                   {!balancesLoaded ? (
-                    <td className="px-2 py-2 border border-[#008d4c]" colSpan={9}>
+                    <td className="px-2 py-2 border border-[#4dbd74]" colSpan={9}>
                       <button
                         onClick={handleLoadBalance}
                         disabled={isLoadingBalances}
@@ -484,22 +484,22 @@ export function ClientSummaryCard({
                     </td>
                   ) : (
                     <>
-                      <td className="px-2 py-2 border border-[#008d4c]" colSpan={2}>Total</td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                      <td className="px-2 py-2 border border-[#4dbd74]" colSpan={2}>Total</td>
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
                         {totals.credit_received.toLocaleString()}
                       </td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
                         {totals.cash.toLocaleString()}
                       </td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
                         {totals.pl_downline.toLocaleString()}
                       </td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-right">-</td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-right">0</td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-right">
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right">-</td>
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right">0</td>
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
                         {totals.credit_remaining.toLocaleString()}
                       </td>
-                      <td className="px-2 py-2 border border-[#008d4c] text-center"></td>
+                      <td className="px-2 py-2 border border-[#4dbd74] text-center"></td>
                     </>
                   )}
                 </tr>
@@ -508,7 +508,7 @@ export function ClientSummaryCard({
               {isLoading ? (
                 <tr>
                   <td colSpan={9} className="px-3 py-12 text-center text-[#212529] bg-white">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto mb-2" />
                     <span className="font-bold">Loading clients data...</span>
                   </td>
                 </tr>
@@ -646,7 +646,7 @@ export function ClientSummaryCard({
               {/* GREEN TOTAL ROW */}
               {!isLoading && tableFilteredClients.length > 0 && (
                 !balancesLoaded ? (
-                  <tr style={{ backgroundColor: "#00a65a" }}>
+                  <tr style={{ backgroundColor: "#00b181" }}>
                     <td colSpan={4} style={{ padding: "10px 12px" }}>
                       <button
                         onClick={handleLoadBalance}
@@ -658,7 +658,7 @@ export function ClientSummaryCard({
                     </td>
                   </tr>
                 ) : (
-                  <tr style={{ backgroundColor: "#00a65a" }}>
+                  <tr style={{ backgroundColor: "#00b181" }}>
                     <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15 }}>Total</td>
                     <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15, textAlign: "right", borderLeft: "1px solid rgba(255,255,255,0.2)" }}>
                       {totals.credit_received.toLocaleString()}
@@ -674,7 +674,7 @@ export function ClientSummaryCard({
               {isLoading && (
                 <tr>
                   <td colSpan={4} style={{ padding: "40px 0", textAlign: "center" }}>
-                    <Loader2 className="w-6 h-6 animate-spin text-[#00a65a] mx-auto mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto mb-2" />
                     <span style={{ fontSize: 15, fontWeight: 700 }}>Loading...</span>
                   </td>
                 </tr>
@@ -704,7 +704,7 @@ export function ClientSummaryCard({
                               fontWeight: 700,
                               fontSize: 14,
                               cursor: "pointer",
-                              color: isAdminType(client.role) ? "#00a65a" : "#212529"
+                              color: isAdminType(client.role) ? "#00b181" : "#212529"
                             }}
                             onClick={() => navigate(`/accounts/view/${client.username}`)}
                           >
