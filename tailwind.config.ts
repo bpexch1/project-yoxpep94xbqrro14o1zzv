@@ -72,7 +72,7 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Roboto', 'system-ui', 'sans-serif'],
+				sans: ['"Roboto Condensed"', 'Roboto', 'HelveticaNeue', '"Helvetica Neue"', 'Helvetica', 'Arial', '"Lucida Grande"', 'sans-serif'],
 			},
 		}
 	},

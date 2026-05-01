@@ -193,7 +193,7 @@ export default function Login() {
                   outline: "none",
                   color: "#fff",
                   fontSize: 17,
-                  fontFamily: "Roboto, sans-serif",
+                  fontFamily: '"Roboto Condensed", sans-serif',
                 }}
               />
             </div>
@@ -218,7 +218,7 @@ export default function Login() {
                   outline: "none",
                   color: "#fff",
                   fontSize: 17,
-                  fontFamily: "Roboto, sans-serif",
+                  fontFamily: '"Roboto Condensed", sans-serif',
                 }}
               />
             </div>
@@ -246,7 +246,7 @@ export default function Login() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                fontFamily: "Roboto, sans-serif",
+                fontFamily: '"Roboto Condensed", sans-serif',
                 letterSpacing: 0.3,
                 transition: "opacity 0.2s",
               }}
