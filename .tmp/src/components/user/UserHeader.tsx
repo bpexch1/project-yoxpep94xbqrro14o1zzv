@@ -77,7 +77,12 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
             <span style={{ display: "block", width: 22, height: 2, backgroundColor: "white" }} />
             <span style={{ display: "block", width: 22, height: 2, backgroundColor: "white" }} />
           </button>
-          <span style={{ color: "white", fontWeight: 700, fontSize: 16 }}>Dashboard</span>
+          <span 
+            onClick={() => navigate('/play')}
+            style={{ color: "white", fontWeight: 700, fontSize: 16, cursor: "pointer" }}
+          >
+            Dashboard
+          </span>
         </div>
 
         {/* Right: Welcome + Balance + Username */}
