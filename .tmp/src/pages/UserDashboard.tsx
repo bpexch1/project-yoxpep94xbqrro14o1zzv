@@ -17,37 +17,6 @@ import {
   Trophy, 
 } from "lucide-react";
 
-function SportIcon({ type, size = 24 }: { type: string; size?: number }) {
-  const s = size;
-  if (type === 'inplay') return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </svg>
-  );
-  if (type === 'cricket') return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19.07 4.93a1 1 0 0 0-1.41 0L4.93 17.66a1 1 0 0 0 1.41 1.41L19.07 6.34a1 1 0 0 0 0-1.41z"/>
-      <path d="M7 17l-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="17" cy="7" r="2" fill="currentColor"/>
-    </svg>
-  );
-  if (type === 'tennis') return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M6.3 6.3a9.9 9.9 0 0 0 0 11.4"/>
-      <path d="M17.7 6.3a9.9 9.9 0 0 1 0 11.4"/>
-    </svg>
-  );
-  if (type === 'soccer') return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"/>
-      <polygon points="12,5 14.5,9.5 19.5,9.5 15.8,13 17.3,18 12,15 6.7,18 8.2,13 4.5,9.5 9.5,9.5" fill="currentColor" stroke="none"/>
-    </svg>
-  );
-  return null;
-}
-
 export default function UserDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -149,10 +118,10 @@ export default function UserDashboard() {
   ];
   
   const categories = [
-    { id: "Inplay", label: "Inplay", iconType: "inplay", count: matchesList.filter((m: any) => m.status === 'live').length },
-    { id: "Cricket", label: "Cricket", iconType: "cricket", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
-    { id: "Tennis", label: "Tennis", iconType: "tennis", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
-    { id: "Soccer", label: "Soccer", iconType: "soccer", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
+    { id: "Inplay", label: "Inplay", emoji: "⏱️", count: matchesList.filter((m: any) => m.status === 'live').length },
+    { id: "Cricket", label: "Cricket", emoji: "🏏", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
+    { id: "Tennis", label: "Tennis", emoji: "🎾", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
+    { id: "Soccer", label: "Soccer", emoji: "⚽", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -272,18 +241,8 @@ export default function UserDashboard() {
                   opacity: 0.9,
                 }}>{cat.count}</span>
 
-                {/* Sport icon - inline SVG */}
-                <span
-                  style={{
-                    color: "white",
-                    marginBottom: 3,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <SportIcon type={cat.iconType} size={24} />
-                </span>
+                {/* Sport emoji */}
+                <span style={{ fontSize: 22, lineHeight: 1, marginBottom: 3 }}>{cat.emoji}</span>
 
                 {/* Label */}
                 <span style={{
