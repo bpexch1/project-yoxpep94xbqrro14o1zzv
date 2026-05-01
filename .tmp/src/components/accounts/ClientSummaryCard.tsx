@@ -39,6 +39,10 @@ export function ClientSummaryCard({
     await new Promise(resolve => setTimeout(resolve, 500));
     setBalancesLoaded(true);
     setIsLoadingBalances(false);
+    
+    // Auto-expand ALL client rows after balance loads
+    const allIds = new Set((filteredClients || []).map((c: any) => c.id));
+    setExpandedIds(allIds);
   };
   
   // Feature 2 states
