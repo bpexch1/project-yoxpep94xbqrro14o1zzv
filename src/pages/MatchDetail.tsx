@@ -295,9 +295,66 @@ export default function MatchDetail() {
           </div>
         )}
 
-        {/* === MEDIA BOX (TV/Scorecard content) === */}
-        <div style={{ backgroundColor: "#1a1a2e", padding: "12px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13, minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {activeMediaTab === 'tv' ? 'Live stream unavailable' : 'Scorecard details loading...'}
+        {/* === TV / SCORE CARD INLINE SECTION === */}
+        <div style={{ marginTop: 4 }}>
+          {/* Toggle buttons row */}
+          <div style={{ display: "flex" }}>
+            <button 
+              onClick={() => setActiveMediaTab('tv')}
+              style={{ 
+                flex: 1, 
+                padding: "11px 0", 
+                backgroundColor: activeMediaTab === 'tv' ? "#00b181" : "#00a070", 
+                color: "white", 
+                fontWeight: 700, 
+                fontSize: 15, 
+                border: "none", 
+                cursor: "pointer",
+                borderRight: "1px solid rgba(255,255,255,0.25)",
+                letterSpacing: 0.3,
+              }}
+            >
+              Tv
+            </button>
+            <button 
+              onClick={() => setActiveMediaTab('scorecard')}
+              style={{ 
+                flex: 1, 
+                padding: "11px 0", 
+                backgroundColor: activeMediaTab === 'scorecard' ? "#00b181" : "#00a070",
+                color: "white", 
+                fontWeight: 700, 
+                fontSize: 15, 
+                border: "none", 
+                cursor: "pointer",
+                letterSpacing: 0.3,
+              }}
+            >
+              Score Card
+            </button>
+          </div>
+
+          {/* Content area below buttons */}
+          <div style={{ 
+            backgroundColor: "#111", 
+            minHeight: 120, 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center",
+            borderBottom: "3px solid #00b181",
+          }}>
+            {activeMediaTab === 'tv' ? (
+              <div style={{ textAlign: "center", padding: 20 }}>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>📺 Live stream unavailable</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Stream will appear when match is live</div>
+              </div>
+            ) : (
+              <div style={{ textAlign: "center", padding: 20 }}>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>📊 Score Card</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Live scorecard will appear here</div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* === OPEN BETS === */}
@@ -357,35 +414,7 @@ export default function MatchDetail() {
 
       </main>
 
-      {/* === STICKY TV / SCORE CARD BAR === */}
-      <div style={{ 
-        position: "sticky", bottom: 0, zIndex: 20,
-        display: "flex", borderTop: "2px solid rgba(255,255,255,0.2)"
-      }}>
-        <button 
-          onClick={() => setActiveMediaTab('tv')}
-          style={{ 
-            flex: 1, padding: "12px 0", 
-            backgroundColor: activeMediaTab === 'tv' ? "#00b181" : "#1e3a5c", 
-            color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
-            letterSpacing: 0.5
-          }}
-        >
-          Tv
-        </button>
-        <div style={{ width: 1, backgroundColor: "rgba(255,255,255,0.2)" }} />
-        <button 
-          onClick={() => setActiveMediaTab('scorecard')}
-          style={{ 
-            flex: 1, padding: "12px 0", 
-            backgroundColor: activeMediaTab === 'scorecard' ? "#00b181" : "#1e3a5c",
-            color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
-            letterSpacing: 0.5
-          }}
-        >
-          Score Card
-        </button>
-      </div>
+
 
       <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake) => placeBet(stake)} isSubmitting={isSubmitting} />
     </div>
