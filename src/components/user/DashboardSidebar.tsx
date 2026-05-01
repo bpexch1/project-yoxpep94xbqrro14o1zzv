@@ -1,41 +1,36 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Volleyball,
-  Circle,
-  Sword,
-  Zap,
-  Dog,
+  X,
   BookOpen,
-  Star,
   Globe,
-  Coins,
+  Gem,
   Gamepad2,
-  Layers,
-  Rocket,
   LayoutGrid,
+  Rocket,
   BarChart3,
   List,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarItemProps {
-  icon: React.ElementType;
+  iconEl: React.ReactNode;
   label: string;
   onClick?: () => void;
-  className?: string;
 }
 
-function SidebarItem({ icon: Icon, label, onClick, className }: SidebarItemProps) {
+function SidebarItem({ iconEl, label, onClick }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "flex items-center gap-4 w-full px-5 py-[15px] border-b border-white/10 hover:bg-white/10 transition-colors group",
-        className
-      )}
+      className="flex items-center gap-4 w-full px-5 py-[16px] border-b border-white/10 bg-transparent hover:bg-white/10 transition-colors text-left"
     >
-      <Icon className="w-6 h-6 text-white/80 group-hover:text-white shrink-0" />
-      <span className="text-[15px] text-white font-medium tracking-wide">{label}</span>
+      <div className="w-[28px] flex items-center justify-center shrink-0">
+        {iconEl}
+      </div>
+      <span className="text-[15px] text-white font-normal tracking-wide">
+        {label}
+      </span>
     </button>
   );
 }
@@ -46,35 +41,11 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
-  // Main menu items
-  const mainItems = [
-    { icon: Volleyball, label: "Soccer" },
-    { icon: Circle, label: "Tennis" },
-    { icon: Sword, label: "Cricket" },
-    { icon: Zap, label: "Horse Race" },
-    { icon: Dog, label: "Greyhound" },
-    { icon: BookOpen, label: "Sports Book" },
-    { icon: Star, label: "RoyalStar Casino" },
-    { icon: Star, label: "Star Casino" },
-    { icon: Globe, label: "World Casino" },
-    { icon: Coins, label: "Royal Casino" },
-    { icon: Gamepad2, label: "BetFairGames" },
-    { icon: Layers, label: "TeenPatti Studio" },
-    { icon: Rocket, label: "Galaxy Casino" },
-  ];
-
-  // Bottom group (after divider)
-  const bottomItems = [
-    { icon: BarChart3, label: "Current Position" },
-    { icon: LayoutGrid, label: "All Sports" },
-    { icon: List, label: "Results" },
-  ];
-
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay - Lighter overlay as requested */}
+          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -91,25 +62,44 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed top-0 left-0 bottom-0 w-[270px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
           >
-            {/* Top spacing / Divider */}
-            <div className="h-12 flex items-center shrink-0 border-b border-white/20" />
+            {/* Close Button Header */}
+            <div className="p-4">
+              <button
+                onClick={onClose}
+                className="w-9 h-9 flex items-center justify-center border border-white/20 bg-black/20 hover:bg-black/40 transition-colors rounded-sm"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            {/* Top Separator */}
+            <div className="border-t border-white/15 w-full" />
 
             {/* Menu Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar">
               <div className="flex flex-col">
-                {mainItems.map((item, idx) => (
-                  <SidebarItem key={idx} icon={item.icon} label={item.label} />
-                ))}
+                <SidebarItem iconEl={<span className="svg-soccer" />} label="Soccer" />
+                <SidebarItem iconEl={<span className="svg-tennis" />} label="Tennis" />
+                <SidebarItem iconEl={<span className="svg-cricket" />} label="Cricket" />
+                <SidebarItem iconEl={<span className="svg-horse" />} label="Horse Race" />
+                <SidebarItem iconEl={<span className="svg-greyhound-racing" />} label="Greyhound" />
+                <SidebarItem iconEl={<BookOpen className="w-5 h-5 text-white" />} label="Sports Book" />
+                <SidebarItem iconEl={<span className="svg-live-casino" />} label="RoyalStar Casino" />
+                <SidebarItem iconEl={<span className="svg-Casino" />} label="Star Casino" />
+                <SidebarItem iconEl={<Globe className="w-5 h-5 text-white" />} label="World Casino" />
+                <SidebarItem iconEl={<Gem className="w-5 h-5 text-white" />} label="Royal Casino" />
+                <SidebarItem iconEl={<Gamepad2 className="w-5 h-5 text-white" />} label="BetFairGames" />
+                <SidebarItem iconEl={<LayoutGrid className="w-5 h-5 text-white" />} label="TeenPatti Studio" />
+                <SidebarItem iconEl={<Rocket className="w-5 h-5 text-white" />} label="Galaxy Casino" />
               </div>
 
-              {/* Thicker divider gap */}
-              <div className="h-2 bg-black/10 border-t border-b border-white/10 my-0" />
-              <div className="border-t-2 border-white/20" />
+              {/* Divider between Galaxy Casino and Current Position */}
+              <div className="h-[1px] bg-white/20 my-1 w-full" />
 
               <div className="flex flex-col">
-                {bottomItems.map((item, idx) => (
-                  <SidebarItem key={idx} icon={item.icon} label={item.label} />
-                ))}
+                <SidebarItem iconEl={<BarChart3 className="w-5 h-5 text-white" />} label="Current Position" />
+                <SidebarItem iconEl={<Trophy className="w-5 h-5 text-white" />} label="All Sports" />
+                <SidebarItem iconEl={<List className="w-5 h-5 text-white" />} label="Results" />
               </div>
             </div>
           </motion.div>
@@ -118,3 +108,4 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
     </AnimatePresence>
   );
 }
+
