@@ -80,6 +80,12 @@ export function ClientSummaryCard({
     }
   };
 
+  const getAmountColor = (value: number) => {
+    if (value > 0) return "#00b181";
+    if (value < 0) return "#dc3545";
+    return "#212529";
+  };
+
   const filteredClients = useMemo(() => {
     if (!clients) return [];
     const list = [...clients];
@@ -265,19 +271,19 @@ export function ClientSummaryCard({
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.credit_received) }}>
                     {totals.credit_received.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.credit_remaining) }}>
                     {totals.credit_remaining.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.cash) }}>
                     {totals.cash.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.pl_downline) }}>
                     {totals.pl_downline.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.balance_upline) }}>
                     {totals.balance_upline.toLocaleString()}
                   </td>
                   <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
