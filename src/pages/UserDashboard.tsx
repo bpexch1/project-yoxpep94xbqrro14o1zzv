@@ -236,8 +236,8 @@ export default function UserDashboard() {
         <GameBanners />
 
         {/* Race Sections */}
-        <RaceSection title="Horse Race" iconClass="svg-horse" slots={horseRaceSlots} />
-        <RaceSection title="Grey Hound" iconClass="svg-greyhound-racing" slots={greyhoundSlots} />
+        <RaceSection title="Horse Race" iconType="horse" slots={horseRaceSlots} />
+        <RaceSection title="Grey Hound" iconType="greyhound" slots={greyhoundSlots} />
 
         {/* Bottom Tabs - Inline Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
