@@ -58,8 +58,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 key={tab.label}
                 onClick={() => navigate(tab.path)}
                 style={{
-                  padding: "8px 6px",
-                  fontSize: "13px",
+                  padding: "4px 6px",
+                  fontSize: "11px",
                   fontWeight: isActive ? "700" : "500",
                   borderRadius: "4px",
                   border: isActive ? "1px solid #00b181" : "1px solid #17a2b8",

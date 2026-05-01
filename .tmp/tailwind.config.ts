@@ -63,7 +63,7 @@ export default {
 				'brand-teal': '#00b181',
 				'brand-blue': '#254465',
 				'brand-blue-dark': '#3d6b8b',
-				'brand-bg': '#e6f2fc',
+				'brand-bg': '#ecf0f1',
 			},
 			borderRadius: {
 				xl: 'calc(var(--radius) + 4px)',

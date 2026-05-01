@@ -35,7 +35,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#e6f2fc", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#ecf0f1", fontFamily: "Roboto, system-ui, sans-serif" }}>
       {/* Scrolling Welcome Ticker */}
       <div style={{
         backgroundColor: "#254465",

@@ -95,7 +95,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center px-3 h-[50px] border-b border-[#d2d6de]" style={{ backgroundColor: "#e6f2fc" }}>
+    <header className="sticky top-0 z-40 flex items-center px-3 h-[50px] border-b border-[#d2d6de]" style={{ backgroundColor: "#ffffff" }}>
       {/* LEFT: Logo + Hamburger */}
       <div className="flex items-center shrink-0">
         <button

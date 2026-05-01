@@ -29,7 +29,7 @@ export function RaceSection({ title, iconType, slots }: RaceSectionProps) {
   return (
     <div className="flex flex-col w-full">
       {/* Section Header */}
-      <div className="bg-[#e6f2fc] border-b border-[#ccd9e5] px-3 py-2 flex items-center gap-2">
+      <div className="bg-[#ecf0f1] border-b border-[#ccd9e5] px-3 py-2 flex items-center gap-2">
         <span style={{ fontSize: 18 }}>
           {iconType === "horse" ? "🐎" : "🐕"}
         </span>

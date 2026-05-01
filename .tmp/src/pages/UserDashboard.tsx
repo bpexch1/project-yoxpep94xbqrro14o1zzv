@@ -104,7 +104,7 @@ export default function UserDashboard() {
 
   if ((matchesLoading && !matches) || clientLoading) {
     return (
-      <div className="min-h-screen bg-[#e6f2fc] flex items-center justify-center">
+      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
       </div>
     );

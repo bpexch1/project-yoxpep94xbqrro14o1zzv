@@ -130,7 +130,7 @@ export default function Accounts() {
   const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
 
   return (
-    <div style={{ minHeight: "100vh", background: "#e6f2fc", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#ecf0f1", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ width: "100%", padding: "8px 6px 80px" }}>
 
         {/* 1. Report Type Card */}

@@ -62,7 +62,7 @@ export default function BetLock() {
   };
 
   return (
-    <div className="min-h-screen bg-[#e6f2fc]" style={{ fontFamily: "Roboto, sans-serif" }}>
+    <div className="min-h-screen bg-[#ecf0f1]" style={{ fontFamily: "Roboto, sans-serif" }}>
       <div style={{ padding: "10px 16px" }}>
         <p style={{ fontSize: "13px", fontWeight: 600, marginBottom: "10px", color: "#212529" }}>
           Allowed Market Types ({username})

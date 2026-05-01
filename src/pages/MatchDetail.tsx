@@ -108,7 +108,7 @@ export default function MatchDetail() {
 
   if (matchLoading || clientLoading) {
     return (
-      <div className="min-h-screen bg-[#e6f2fc] flex items-center justify-center">
+      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-[#254465] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -116,7 +116,7 @@ export default function MatchDetail() {
 
   if (!match) {
     return (
-      <div className="min-h-screen bg-[#e6f2fc] flex flex-col items-center justify-center p-4 text-center">
+      <div className="min-h-screen bg-[#ecf0f1] flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-xl font-bold text-[#254465] mb-2">Match Not Found</h2>
         <button 
           onClick={() => navigate('/play')}
@@ -141,7 +141,7 @@ export default function MatchDetail() {
   const tabs = ["ALL", "Bookmaker", "BetFair-Fancy", "Fancy-2"];
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#e6f2fc", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column" }}>
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

@@ -60,7 +60,7 @@ export default function FootballMatchDetail({ match, clientData, session }: Foot
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
 
   return (
-    <div className="min-h-screen bg-[#e6f2fc] flex flex-col">
+    <div className="min-h-screen bg-[#ecf0f1] flex flex-col">
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

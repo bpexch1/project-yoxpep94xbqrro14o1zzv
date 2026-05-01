@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #e6f2fc;
+  --bg-primary: #ecf0f1;
   --bg-card: #ffffff;
   --accent-green: #00b181;
   --accent-green-hover: #4dbd74;
@@ -15,7 +15,7 @@
   --font-base: "Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 
   /* Shadcn CSS variable mappings */
-  --background: 200 50% 93%;
+  --background: 210 20% 96%;
   --foreground: 210 11% 15%;
   --card: 0 0% 100%;
   --card-foreground: 210 11% 15%;
@@ -23,16 +23,16 @@
   --popover-foreground: 210 11% 15%;
   --primary: 161 100% 35%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 200 50% 91%;
+  --secondary: 210 20% 93%;
   --secondary-foreground: 210 11% 15%;
-  --muted: 200 50% 91%;
+  --muted: 210 20% 93%;
   --muted-foreground: 210 8% 45%;
   --accent: 161 100% 35%;
   --accent-foreground: 0 0% 100%;
   --destructive: 354 70% 54%;
   --destructive-foreground: 0 0% 100%;
-  --border: 200 30% 87%;
-  --input: 200 30% 87%;
+  --border: 210 15% 85%;
+  --input: 210 15% 85%;
   --ring: 161 100% 35%;
   --radius: 0.5rem;
   --teal: 188 78% 41%;
@@ -59,7 +59,7 @@ html {
 }
 
 .app-container {
-  background-color: #e6f2fc;
+  background-color: #ecf0f1;
   background-image: url("https://bpexch.live/img/bg-diamonds.png");
   min-height: 100vh;
 }

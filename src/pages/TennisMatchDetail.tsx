@@ -76,7 +76,7 @@ export default function TennisMatchDetail({ match, clientData, session }: Tennis
   });
 
   return (
-    <div className="min-h-screen bg-[#e6f2fc] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#ecf0f1] flex flex-col font-sans">
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
