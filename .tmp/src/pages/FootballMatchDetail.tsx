@@ -67,7 +67,6 @@ export default function FootballMatchDetail({ match, clientData, session }: Foot
       <div className="bg-[#254465] p-3 text-white">
         <div className="flex justify-between items-center mb-1">
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate('/play')}><ArrowLeft size={20} /></button>
             <Clock size={14} className="text-white/60" />
             <span className="text-[11px] text-white/60">3 hours ago | May 01 6:00 pm | Winners: 1</span>
           </div>

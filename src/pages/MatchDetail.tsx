@@ -150,9 +150,6 @@ export default function MatchDetail() {
         {/* Row 1: time info + INPLAY */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <button onClick={() => navigate('/play')} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-              <ArrowLeft size={20} color="white" />
-            </button>
             <Clock size={14} color="rgba(255,255,255,0.6)" />
             <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>20 minutes ago | Apr 21 7:00 pm | Winners: 1</span>
           </div>

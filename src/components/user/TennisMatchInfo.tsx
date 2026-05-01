@@ -1,5 +1,4 @@
-import { ArrowLeft, Clock } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Clock } from "lucide-react";
 
 interface TennisMatchInfoProps {
   match: any;
@@ -8,7 +7,6 @@ interface TennisMatchInfoProps {
 }
 
 export function TennisMatchInfo({ match, keepDisplayOn, setKeepDisplayOn }: TennisMatchInfoProps) {
-  const navigate = useNavigate();
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
   
   return (
@@ -16,9 +14,6 @@ export function TennisMatchInfo({ match, keepDisplayOn, setKeepDisplayOn }: Tenn
       <div className="flex justify-between items-start">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate('/play')} className="hover:opacity-80 transition-opacity">
-              <ArrowLeft size={22} />
-            </button>
             <div className="flex items-center gap-1.5 ml-1">
               <Clock size={14} className="text-white/60" />
               <span className="text-[11px] text-white/60 font-bold uppercase tracking-wider">
