@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession } from "@/hooks/useClientAuth";
 import { Client } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
@@ -14,12 +14,21 @@ interface UserHeaderProps {
 export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHeaderProps) {
   const [session, setSession] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const s = getClientSession();
     if (!s) navigate("/login");
     else setSession(s);
   }, [navigate]);
+
+  const handleDashboardClick = () => {
+    if (location.pathname === "/play") {
+      navigate(0);
+    } else {
+      navigate("/play");
+    }
+  };
 
   const { data: clientData } = useQuery({
     queryKey: ["user-header-balance", session?.username],
@@ -78,7 +87,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
             <span style={{ display: "block", width: 22, height: 2, backgroundColor: "white" }} />
           </button>
           <span 
-            onClick={() => navigate('/play')}
+            onClick={handleDashboardClick}
             style={{ color: "white", fontWeight: 700, fontSize: 16, cursor: "pointer" }}
           >
             Dashboard
