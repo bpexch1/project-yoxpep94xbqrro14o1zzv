@@ -244,9 +244,9 @@ export function ClientSummaryCard({
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">0</td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">0</td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">0</td>
                   <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">{filteredClients.length}</td>
                 </tr>
               </tbody>
@@ -265,22 +265,19 @@ export function ClientSummaryCard({
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {totals.credit_received.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#28a745]">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {totals.credit_remaining.toLocaleString()}
                   </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                    totals.cash < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {totals.cash.toLocaleString()}
                   </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                    totals.pl_downline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {totals.pl_downline.toLocaleString()}
                   </td>
-                  <td className={cn("border border-[#dee2e6] px-3 py-2 font-bold", 
-                    totals.balance_upline < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {totals.balance_upline.toLocaleString()}
                   </td>
                   <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
@@ -460,11 +457,11 @@ export function ClientSummaryCard({
                         <tr className="bg-white">
                           <td colSpan={4} className="px-3 py-2 border-b border-[#d5d8dc]">
                             <ul className="text-[13px] text-[#212529] space-y-0.5 mb-2">
-                              <li>• Balance <span className={cn("font-bold", (display.balance ?? 0) < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>{display.isLoaded ? display.balance?.toLocaleString() : '-'}</span></li>
-                              <li>• Client (P/L) <span className={cn("font-bold", (display.plDownline ?? 0) < 0 ? "text-[#dc3545]" : "text-[#28a745]")}>{display.isLoaded ? display.plDownline?.toLocaleString() : '-'}</span></li>
-                              <li>• Share <span className="font-bold">{display.isLoaded ? display.share : '-'}</span></li>
-                              <li>• Exposure <span className="font-bold">0</span></li>
-                              <li>• Available Balance <span className="font-bold text-[#28a745]">{display.isLoaded ? display.available?.toLocaleString() : '-'}</span></li>
+                              <li>• Balance <span className="font-bold text-[#212529]">{display.isLoaded ? display.balance?.toLocaleString() : '-'}</span></li>
+                              <li>• Client (P/L) <span className="font-bold text-[#212529]">{display.isLoaded ? display.plDownline?.toLocaleString() : '-'}</span></li>
+                              <li>• Share <span className="font-bold text-[#212529]">{display.isLoaded ? display.share : '-'}</span></li>
+                              <li>• Exposure <span className="font-bold text-[#212529]">0</span></li>
+                              <li>• Available Balance <span className="font-bold text-[#212529]">{display.isLoaded ? display.available?.toLocaleString() : '-'}</span></li>
                             </ul>
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[12px] text-[#212529] mr-1 font-bold">• Options</span>
@@ -690,28 +687,22 @@ export function ClientSummaryCard({
                           </div>
                         </td>
                         <td className="px-2 py-2 border-r border-[#d5d8dc] text-gray-600">{getTypeLabel(client.role)}</td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#28a745]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           {display.isLoaded ? display.credit?.toLocaleString() : "-"}
                         </td>
-                        <td className={cn(
-                          "px-2 py-2 border-r border-[#d5d8dc] text-right",
-                          display.isLoaded ? (display.balance < 0 ? "text-[#dc3545]" : "text-[#28a745]") : "text-gray-400"
-                        )}>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           {display.isLoaded ? display.balance?.toLocaleString() : "-"}
                         </td>
-                        <td className={cn(
-                          "px-2 py-2 border-r border-[#d5d8dc] text-right",
-                          display.isLoaded ? (display.plDownline < 0 ? "text-[#dc3545]" : "text-[#28a745]") : "text-gray-400"
-                        )}>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           {display.isLoaded ? display.plDownline?.toLocaleString() : "-"}
                         </td>
                         <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           {display.isLoaded ? `${display.share}%` : "-"}
                         </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#dc3545]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           0
                         </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#28a745]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           {display.isLoaded ? display.available?.toLocaleString() : "-"}
                         </td>
                         <td className="px-2 py-1.5 border-r border-[#d5d8dc]">
