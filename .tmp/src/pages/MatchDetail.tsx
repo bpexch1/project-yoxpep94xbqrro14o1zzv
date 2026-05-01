@@ -458,7 +458,7 @@ function LastFigureGrid({ title, onBet }: { title: string; onBet: (n: number) =>
         </div>
         <span style={{ color: "white", fontWeight: 900, fontSize: 11, textTransform: "uppercase" }}>{title}</span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, padding: "6px 4px", backgroundColor: "#dce8f3" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, padding: "4px", backgroundColor: "#dce8f3" }}>
         {[0,1,2,3,4,5,6,7,8,9].map((n) => (
           <div
             key={n}
@@ -470,13 +470,13 @@ function LastFigureGrid({ title, onBet }: { title: string; onBet: (n: number) =>
               flexDirection: "column",
               alignItems: "center",
               cursor: "pointer",
-              minHeight: 75,
+              minHeight: 45,
               justifyContent: "flex-start",
-              paddingTop: 10,
+              paddingTop: 6,
             }}
           >
-            <span style={{ fontWeight: 900, fontSize: 28, color: "#212529", lineHeight: 1 }}>{n}</span>
-            <span style={{ fontSize: 12, color: "#212529", opacity: 0.7, marginTop: 6 }}>8.85</span>
+            <span style={{ fontWeight: 900, fontSize: 18, color: "#212529", lineHeight: 1 }}>{n}</span>
+            <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 3 }}>8.85</span>
           </div>
         ))}
       </div>
