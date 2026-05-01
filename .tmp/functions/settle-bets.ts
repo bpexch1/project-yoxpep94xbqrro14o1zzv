@@ -41,7 +41,10 @@ Deno.serve(async (req) => {
 
   const appId = Deno.env.get('SUPERDEV_APP_ID') ?? 'yoxpep94xbqrro14o1zzv';
 
-  const mongoClient = new MongoClient(mongoUri);
+  const mongoClient = new MongoClient(mongoUri, {
+    serverSelectionTimeoutMS: 10000, // fail fast after 10s if can't connect
+    connectTimeoutMS: 10000,
+  });
 
   try {
     const body = await req.json();
@@ -55,7 +58,7 @@ Deno.serve(async (req) => {
 
     // --- Connect to MongoDB Atlas ---
     await mongoClient.connect();
-    const db = mongoClient.db();
+    const db = mongoClient.db('bpexch');
     const usersCollection = db.collection('users');
     const plRecordsCollection = db.collection('pl_records');
 
@@ -211,8 +214,13 @@ Deno.serve(async (req) => {
 
   } catch (err: any) {
     try { await mongoClient.close(); } catch (_) {}
-    console.error('settle-bets error:', err?.message);
-    return new Response(JSON.stringify({ error: err?.message ?? 'Unknown error' }), {
+    const errMsg = err?.message ?? 'Unknown error';
+    console.error('settle-bets error:', errMsg, err?.code, err?.codeName);
+    return new Response(JSON.stringify({ 
+      error: errMsg,
+      code: err?.code,
+      codeName: err?.codeName,
+    }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
