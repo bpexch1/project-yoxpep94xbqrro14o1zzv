@@ -9,10 +9,11 @@ interface RaceSlot {
 interface RaceSectionProps {
   title: string;
   icon: React.ElementType;
+  emoji?: string;
   slots: RaceSlot[];
 }
 
-export function RaceSection({ title, icon: Icon, slots }: RaceSectionProps) {
+export function RaceSection({ title, icon: Icon, emoji, slots }: RaceSectionProps) {
   const [startIndex, setStartIndex] = useState(0);
   const visibleCount = 3;
 
@@ -30,7 +31,11 @@ export function RaceSection({ title, icon: Icon, slots }: RaceSectionProps) {
     <div className="flex flex-col w-full">
       {/* Section Header */}
       <div className="bg-[#e8f0f5] border-b border-[#ccd9e5] px-4 py-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-[#1e3a5c]" />
+        {emoji ? (
+          <span style={{ fontSize: 18 }}>{emoji}</span>
+        ) : (
+          <Icon className="w-5 h-5 text-[#1e3a5c]" />
+        )}
         <span className="text-[#1e3a5c] font-bold text-[13px]">{title}</span>
       </div>
 

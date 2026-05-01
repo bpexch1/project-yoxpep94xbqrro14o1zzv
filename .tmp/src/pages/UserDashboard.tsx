@@ -210,8 +210,8 @@ export default function UserDashboard() {
         <GameBanners />
 
         {/* Race Sections */}
-        <RaceSection title="Horse Race" icon={Trophy} slots={horseRaceSlots} />
-        <RaceSection title="Grey Hound" icon={Disc} slots={greyhoundSlots} />
+        <RaceSection title="Horse Race" icon={Trophy} emoji="🏇" slots={horseRaceSlots} />
+        <RaceSection title="Grey Hound" icon={Disc} emoji="🐕" slots={greyhoundSlots} />
 
         {/* Sport Category Tabs */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>

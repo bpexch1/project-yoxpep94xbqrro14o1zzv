@@ -7,7 +7,7 @@ import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Info, Volume2, Clock, CheckSquare, Square } from "lucide-react";
+import { ArrowLeft, Volume2, Clock, CheckSquare, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -133,15 +133,6 @@ export default function MatchDetail() {
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
   const tabs = ["ALL", "Bookmaker", "BetFair-Fancy", "Fancy-2"];
 
-  const fancyBets = [
-    { name: "1st Innings 6 Overs Line", backOdds: 46, layOdds: 45, backSize: "5.8M", laySize: "1.5M", label: "Book" },
-  ];
-
-  const fancy2Bets = [
-    { name: "6 Over Run PZ", backOdds: 46, layOdds: 45, backSize: "100", laySize: "100", label: "Book" },
-    { name: "1st Wkt Lost To PZ Balls", backOdds: 22, layOdds: 22, backSize: "90", laySize: "110", label: "Book" },
-  ];
-
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#d6e4f0", display: "flex", flexDirection: "column" }}>
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
@@ -158,9 +149,14 @@ export default function MatchDetail() {
             <Clock size={14} color="rgba(255,255,255,0.6)" />
             <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>20 minutes ago | Apr 21 7:00 pm | Winners: 1</span>
           </div>
-          {match.status === 'live' && (
-            <span style={{ color: "#00a65a", fontWeight: 900, fontSize: 16, letterSpacing: 1 }}>INPLAY</span>
-          )}
+          <span style={{ 
+            color: match.status === 'live' ? "#00a65a" : "rgba(255,255,255,0.5)", 
+            fontWeight: 900, 
+            fontSize: 14, 
+            letterSpacing: 1 
+          }}>
+            {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}
+          </span>
         </div>
         {/* Row 2: Match Title */}
         <h1 style={{ color: "white", fontWeight: 900, fontSize: 20, lineHeight: 1.3, margin: "6px 0" }}>
@@ -183,20 +179,20 @@ export default function MatchDetail() {
       </div>
 
       {/* === FILTER TABS (pill-shaped) === */}
-      <div style={{ backgroundColor: "#fff", padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto" }} className="no-scrollbar">
+      <div style={{ backgroundColor: "#1e3a5c", padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto" }} className="no-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
               borderRadius: 50,
-              padding: "7px 18px",
+              padding: "6px 16px",
               fontWeight: 700,
               fontSize: 13,
-              border: "none",
+              border: "2px solid rgba(255,255,255,0.2)",
               cursor: "pointer",
               whiteSpace: "nowrap",
-              backgroundColor: activeTab === tab ? "#00a65a" : "#3d6b8b",
+              backgroundColor: activeTab === tab ? "#00a65a" : "transparent",
               color: "white",
               transition: "background-color 0.2s",
             }}
@@ -206,23 +202,31 @@ export default function MatchDetail() {
         ))}
       </div>
 
-      {/* === SCORE BAR === */}
-      {match.status === 'live' && (
-        <div style={{ backgroundColor: "#fff", padding: "10px 14px", borderBottom: "1px solid #dde4ea" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <span style={{ fontWeight: 900, fontSize: 16, color: "#1e3a5c" }}>SRH</span>
-              <span style={{ fontWeight: 900, fontSize: 16, color: "#1e3a5c" }}> 48/0 (4.2)</span>
-              <span style={{ fontSize: 13, color: "#555", marginLeft: 12 }}>CRR: 11.08</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#00a65a", fontWeight: 900, fontSize: 18 }}>SIX</span>
-              <Volume2 size={16} color="#555" />
-            </div>
+      {/* === SCORE BAR — always show === */}
+      <div style={{ backgroundColor: "#fff", padding: "10px 14px", borderBottom: "1px solid #dde4ea" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <span style={{ fontWeight: 900, fontSize: 15, color: "#1e3a5c" }}>
+              {match.team1 ? match.team1.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() : 'T1'}
+            </span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#555", marginLeft: 8 }}>
+              {match.status === 'live' ? '48/0 (4.2)' : 'Match'}
+            </span>
+            <span style={{ fontSize: 12, color: "#777", marginLeft: 10 }}>
+              {match.status === 'live' ? 'CRR: 11.08' : match.status === 'upcoming' ? 'Upcoming' : 'Completed'}
+            </span>
           </div>
-          <div style={{ marginTop: 4, fontSize: 12, color: "#555" }}>This Over : 6 6</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {match.status === 'live' && (
+              <span style={{ color: "#00a65a", fontWeight: 900, fontSize: 16 }}>SIX</span>
+            )}
+            <Volume2 size={16} color="#999" />
+          </div>
         </div>
-      )}
+        <div style={{ marginTop: 4, fontSize: 11, color: "#777" }}>
+          {match.status === 'live' ? 'This Over : 6 6' : match.match_time || ''}
+        </div>
+      </div>
 
       {/* === MAIN CONTENT === */}
       <main style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
