@@ -143,364 +143,340 @@ export default function MatchDetail() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#d6e4f0] text-[#1e3a5c] flex flex-col">
-      <UserHeader 
-        sidebarOpen={sidebarOpen}
-        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-      />
+    <div style={{ minHeight: "100vh", backgroundColor: "#d6e4f0", display: "flex", flexDirection: "column" }}>
+      <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <DashboardSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
-
-      {/* Back Button Bar */}
-      <div className="bg-[#254465] px-3 py-2.5 flex items-center gap-3 sticky top-[56px] z-40">
-        <button 
-          onClick={() => navigate('/play')}
-          className="p-1 hover:bg-white/10 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-white" />
-        </button>
-        <span className="text-white font-bold text-[15px] truncate">{matchTitle}</span>
+      {/* === MATCH INFO CARD (dark navy) === */}
+      <div style={{ backgroundColor: "#1e3a5c", padding: "12px 14px" }}>
+        {/* Row 1: time info + INPLAY */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <button onClick={() => navigate('/play')} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              <ArrowLeft size={20} color="white" />
+            </button>
+            <Clock size={14} color="rgba(255,255,255,0.6)" />
+            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>20 minutes ago | Apr 21 7:00 pm | Winners: 1</span>
+          </div>
+          {match.status === 'live' && (
+            <span style={{ color: "#00a65a", fontWeight: 900, fontSize: 16, letterSpacing: 1 }}>INPLAY</span>
+          )}
+        </div>
+        {/* Row 2: Match Title */}
+        <h1 style={{ color: "white", fontWeight: 900, fontSize: 20, lineHeight: 1.3, margin: "6px 0" }}>
+          {matchTitle}
+        </h1>
+        {/* Row 3: Elapsed */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
+          <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>Elapsed : 00:19:42</span>
+        </div>
+        {/* Row 4: Keep Display On */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+          <input 
+            type="checkbox" 
+            checked={keepDisplayOn} 
+            onChange={(e) => setKeepDisplayOn(e.target.checked)}
+            style={{ width: 16, height: 16, accentColor: "#3b82f6" }} 
+          />
+          <span style={{ color: "white", fontSize: 13 }}>Keep Display On</span>
+        </div>
       </div>
 
-      <main className="flex flex-col flex-1 overflow-y-auto pb-24">
-        {/* Match Info Card */}
-        <div className="bg-white p-4 flex flex-col gap-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-gray-500 text-[11px] font-semibold">
-              <Clock className="w-3.5 h-3.5" />
-              <span>30 minutes ago | Mar 25 2024 | Winners: 1</span>
-            </div>
-            {match.status === 'live' && (
-              <span className="bg-[#16a085] text-white px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">
-                INPLAY
-              </span>
-            )}
-          </div>
-          
-          <h1 className="text-2xl font-black text-[#1e3a5c] leading-tight">
-            {matchTitle}
-          </h1>
-          
-          <div className="flex items-center justify-between">
-            <span className="text-gray-400 text-[11px] font-bold uppercase">Elapsed: 00:00:00</span>
-            <button 
-              onClick={() => setKeepDisplayOn(!keepDisplayOn)}
-              className="flex items-center gap-1.5 text-[#1e3a5c] text-[12px] font-bold"
-            >
-              {keepDisplayOn ? <CheckSquare className="w-4 h-4 text-[#16a085]" /> : <Square className="w-4 h-4" />}
-              <span>Keep Display On</span>
-            </button>
-          </div>
-        </div>
+      {/* === FILTER TABS (pill-shaped) === */}
+      <div style={{ backgroundColor: "#fff", padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto" }} className="no-scrollbar">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              borderRadius: 50,
+              padding: "7px 18px",
+              fontWeight: 700,
+              fontSize: 13,
+              border: "none",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              backgroundColor: activeTab === tab ? "#00a65a" : "#3d6b8b",
+              color: "white",
+              transition: "background-color 0.2s",
+            }}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
 
-        {/* Live Odds Status Bar */}
-        {match.status === 'live' && (
-          <div className="bg-[#0f1b2a] px-4 py-1.5 flex items-center justify-between border-y border-white/5">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#16a085] animate-pulse" />
-              <span className="text-[10px] font-black text-white/90 uppercase tracking-widest">LIVE ODDS</span>
+      {/* === SCORE BAR === */}
+      {match.status === 'live' && (
+        <div style={{ backgroundColor: "#fff", padding: "10px 14px", borderBottom: "1px solid #dde4ea" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <span style={{ fontWeight: 900, fontSize: 16, color: "#1e3a5c" }}>SRH</span>
+              <span style={{ fontWeight: 900, fontSize: 16, color: "#1e3a5c" }}> 48/0 (4.2)</span>
+              <span style={{ fontSize: 13, color: "#555", marginLeft: 12 }}>CRR: 11.08</span>
             </div>
-            <span className="text-[9px] font-bold text-white/40 uppercase tracking-tighter">Updated Just Now</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#00a65a", fontWeight: 900, fontSize: 18 }}>SIX</span>
+              <Volume2 size={16} color="#555" />
+            </div>
+          </div>
+          <div style={{ marginTop: 4, fontSize: 12, color: "#555" }}>This Over : 6 6</div>
+        </div>
+      )}
+
+      {/* === MAIN CONTENT === */}
+      <main style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
+
+        {(activeTab === "ALL" || activeTab === "Bookmaker") && (
+          <>
+            {/* MATCH ODDS */}
+            <div style={{ marginTop: 8 }}>
+              <CombinedSectionHeader title="MATCH ODDS (MaxBet: 5M)" />
+              <TeamRow2 name={match.team1} odds={match.back_odds} layOdds={match.lay_odds} onBet={(t,o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} />
+              <TeamRow2 name={match.team2} odds={match.back_odds2 || match.back_odds} layOdds={match.lay_odds2 || match.lay_odds} onBet={(t,o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} />
+            </div>
+
+            {/* BOOKMAKER */}
+            <div style={{ marginTop: 8 }}>
+              <CombinedSectionHeader title="BOOKMAKER (MaxBet: 1M)" />
+              <TeamRow2 name={match.team1} odds={Math.round((match.back_odds || 1.9) * 100) / 100} layOdds={Math.round((match.lay_odds || 2.0) * 100) / 100} onBet={(t,o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} />
+              <TeamRow2 name={match.team2} odds={Math.round(((match.back_odds2 || match.back_odds || 2.1)) * 100) / 100} layOdds={Math.round(((match.lay_odds2 || match.lay_odds || 2.2)) * 100) / 100} onBet={(t,o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} />
+            </div>
+          </>
+        )}
+
+        {(activeTab === "ALL" || activeTab === "BetFair-Fancy") && (
+          <div style={{ marginTop: 8 }}>
+            <CombinedSectionHeader title="BETFAIR FANCY (MaxBet: 200K)" />
+            <FancyRow2 name="1st Innings 20 Overs Line" backOdds={214} layOdds={213} backSize="447.9K" laySize="7.6M" onBet={(t,o) => setActiveBet({ match, selection: "1st Innings 20 Overs Line", betType: t, odds: o })} />
+            <FancyRow2 name="1st Innings 6 Overs Line" backOdds={70} layOdds={69} backSize="11.6M" laySize="11.3M" onBet={(t,o) => setActiveBet({ match, selection: "1st Innings 6 Overs Line", betType: t, odds: o })} />
+            <FancyRow2 name="1st Innings 10 Overs Line" backOdds={98} layOdds={97} backSize="2.5M" laySize="3.1M" onBet={(t,o) => setActiveBet({ match, selection: "1st Innings 10 Overs Line", betType: t, odds: o })} />
+            <FancyRow2 name="How Many 4s" backOdds={18} layOdds={17} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "How Many 4s", betType: t, odds: o })} />
+            <FancyRow2 name="How Many 6s" backOdds={9} layOdds={8} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "How Many 6s", betType: t, odds: o })} />
+            <FancyRow2 name="0.5 Ball Run" backOdds={0} layOdds={0} backSize="" laySize="" suspended={true} onBet={() => {}} />
+            <FancyRow2 name="Fall of 1st Wkt" backOdds={35} layOdds={35} backSize="90" laySize="110" onBet={(t,o) => setActiveBet({ match, selection: "Fall of 1st Wkt", betType: t, odds: o })} />
+            <FancyRow2 name="Fall of 2nd Wkt" backOdds={71} layOdds={71} backSize="90" laySize="110" onBet={(t,o) => setActiveBet({ match, selection: "Fall of 2nd Wkt", betType: t, odds: o })} />
           </div>
         )}
 
-        {/* Filter Tabs */}
-        <div className="flex bg-[#1e3a5c] overflow-x-auto no-scrollbar border-t border-white/5">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "px-5 py-3 text-[13px] font-bold whitespace-nowrap transition-colors border-r border-white/5",
-                activeTab === tab ? "bg-[#16a085] text-white" : "text-white/70 hover:text-white"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Live Score Bar */}
-        <div className="bg-[#254465] px-4 py-2.5 flex flex-col gap-1 shadow-inner">
-          <div className="flex items-center justify-between">
-            <span className="text-white font-black text-[13px] tracking-wide">
-              PZ 1/0 (1) <span className="text-white/50 ml-2">CRR: 1.00</span>
-            </span>
-            <span className="text-[#16a085] font-black text-[13px]">OVER</span>
+        {(activeTab === "ALL" || activeTab === "Fancy-2") && (
+          <div style={{ marginTop: 8 }}>
+            <CombinedSectionHeader title="FANCY 2 (MaxBet: 200K)" />
+            <FancyRow2 name="1 Over Run SRH" backOdds={11} layOdds={10} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "1 Over Run SRH", betType: t, odds: o })} />
+            <FancyRow2 name="4 Over Run SRH" backOdds={44} layOdds={43} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "4 Over Run SRH", betType: t, odds: o })} />
+            <FancyRow2 name="6 Over Run SRH" backOdds={66} layOdds={65} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "6 Over Run SRH", betType: t, odds: o })} />
+            <FancyRow2 name="0.5 Ball Run SRH" backOdds={0} layOdds={0} backSize="" laySize="" suspended={true} onBet={() => {}} />
+            <FancyRow2 name="0.6 Ball Run SRH" backOdds={0} layOdds={0} backSize="" laySize="" suspended={true} onBet={() => {}} />
+            <FancyRow2 name="10 Over Run SRH" backOdds={103} layOdds={101} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "10 Over Run SRH", betType: t, odds: o })} />
+            <FancyRow2 name="20 Over Run SRH" backOdds={205} layOdds={203} backSize="100" laySize="100" onBet={(t,o) => setActiveBet({ match, selection: "20 Over Run SRH", betType: t, odds: o })} />
+            {/* Grid section for Over Total Last Figure */}
+            <LastFigureGrid title={`${match.team1 || 'Team'} 10 OVER TOTAL LAST FIGURE (MaxBet: 1M)`} onBet={(n) => setActiveBet({ match, selection: `10 Over Last Digit: ${n}`, betType: 'back', odds: 8.85 })} />
+            <LastFigureGrid title={`${match.team1 || 'Team'} 15 OVER TOTAL LAST FIGURE (MaxBet: 1M)`} onBet={(n) => setActiveBet({ match, selection: `15 Over Last Digit: ${n}`, betType: 'back', odds: 8.85 })} />
+            <LastFigureGrid title={`${match.team1 || 'Team'} 20 OVER TOTAL LAST FIGURE (MaxBet: 1M)`} onBet={(n) => setActiveBet({ match, selection: `20 Over Last Digit: ${n}`, betType: 'back', odds: 8.85 })} />
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-white/60 text-[11px] font-medium truncate">
-              This Over : 1 0 0 0 0 - This Over : 1
-            </span>
-            <Volume2 className="w-4 h-4 text-white/40" />
+        )}
+
+        {/* === TV / SCORE CARD TABS === */}
+        <div style={{ marginTop: 8 }}>
+          <div style={{ display: "flex", borderBottom: "1px solid #dde4ea" }}>
+            <button style={{ flex: 1, padding: "10px 0", backgroundColor: activeTab === 'tv' ? "#00a65a" : "#3d6b8b", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>Tv</button>
+            <button style={{ flex: 1, padding: "10px 0", backgroundColor: "#00a65a", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>Score Card</button>
+          </div>
+          <div style={{ backgroundColor: "#1a1a2e", padding: "12px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13, minHeight: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            Live stream unavailable
           </div>
         </div>
 
-        {/* Sections */}
-        <div className="flex flex-col gap-px">
-          {(activeTab === "ALL" || activeTab === "Bookmaker") && (
-            <>
-              {/* MATCH ODDS */}
-              <div className="mt-2">
-                <SectionHeader title="MATCH ODDS (MaxBet: 5M)" />
-                <OddsColumnHeaders />
-                <div className="flex flex-col bg-white">
-                  <TeamRow 
-                    name={match.team1} 
-                    odds={match.back_odds} 
-                    layOdds={match.lay_odds}
-                    onBet={(type, o) => setActiveBet({ match, selection: match.team1, betType: type, odds: o })}
-                  />
-                  <TeamRow 
-                    name={match.team2} 
-                    odds={match.back_odds2 || match.back_odds} 
-                    layOdds={match.lay_odds2 || match.lay_odds}
-                    onBet={(type, o) => setActiveBet({ match, selection: match.team2, betType: type, odds: o })}
-                  />
-                </div>
-              </div>
-
-              {/* BOOKMAKER */}
-              <div className="mt-2">
-                <SectionHeader title="BOOKMAKER (MaxBet: 1M)" />
-                <OddsColumnHeaders />
-                <div className="flex flex-col bg-white">
-                  <TeamRow 
-                    name={match.team1} 
-                    odds={Math.round((match.back_odds || 1.9) * 10) / 10} 
-                    layOdds={Math.round((match.lay_odds || 2.0) * 10) / 10}
-                    onBet={(type, o) => setActiveBet({ match, selection: match.team1, betType: type, odds: o })}
-                  />
-                  <TeamRow 
-                    name={match.team2} 
-                    odds={Math.round(((match.back_odds2 || match.back_odds || 2.1)) * 10) / 10} 
-                    layOdds={Math.round(((match.lay_odds2 || match.lay_odds || 2.2)) * 10) / 10}
-                    onBet={(type, o) => setActiveBet({ match, selection: match.team2, betType: type, odds: o })}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {(activeTab === "ALL" || activeTab === "BetFair-Fancy") && (
-            <div className="mt-2">
-              <SectionHeader title="BETFAIR FANCY (MaxBet: 2M)" />
-              <OddsColumnHeaders />
-              <div className="flex flex-col bg-white">
-                {fancyBets.map((fancy, idx) => (
-                  <FancyRow 
-                    key={idx} 
-                    {...fancy} 
-                    onBet={(type, o) => setActiveBet({ match, selection: fancy.name, betType: type, odds: o })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {(activeTab === "ALL" || activeTab === "Fancy-2") && (
-            <div className="mt-2">
-              <SectionHeader title="FANCY 2 (MaxBet: 2M)" />
-              <OddsColumnHeaders />
-              <div className="flex flex-col bg-white">
-                {fancy2Bets.map((fancy, idx) => (
-                  <FancyRow 
-                    key={idx} 
-                    {...fancy} 
-                    onBet={(type, o) => setActiveBet({ match, selection: fancy.name, betType: type, odds: o })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* OPEN BETS SECTION */}
-          <div className="mt-2">
-            {/* Section Header */}
-            <div className="bg-[#1e3a5c] text-white flex items-center justify-between px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-[#e67e22] flex items-center justify-center">
-                  <span className="text-white text-[9px] font-black">!</span>
-                </div>
-                <span className="text-[13px] font-black uppercase tracking-wide">
-                  OPEN BETS ({openBets.length})
-                </span>
-              </div>
-            </div>
-
-            {/* Bets List */}
-            <div className="bg-white">
-              {openBets.length === 0 ? (
-                <div className="py-6 text-center text-gray-400 text-[13px] font-semibold">
-                  No open bets for this match
-                </div>
-              ) : (
-                openBets.map((bet: any) => (
-                  <div key={bet.id} className="flex items-center border-b border-[#eef2f5] last:border-0 px-3 py-3 gap-3">
-                    {/* Back/Lay badge */}
-                    <div className={cn(
-                      "w-10 h-7 rounded flex items-center justify-center text-[10px] font-black text-white shrink-0",
-                      bet.bet_type === 'back' ? "bg-[#72bbef]" : "bg-[#faa9ba]"
-                    )}>
-                      {bet.bet_type === 'back' ? 'BACK' : 'LAY'}
-                    </div>
-
-                    {/* Selection name */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-bold text-[#1e3a5c] truncate">{bet.selection}</p>
-                      <p className="text-[11px] text-gray-400 font-medium">
-                        Odds: <span className="text-[#1e3a5c] font-black">{bet.odds}</span>
-                      </p>
-                    </div>
-
-                    {/* Stake & P/L */}
-                    <div className="text-right shrink-0">
-                      <p className="text-[13px] font-black text-[#1e3a5c]">
-                        Rs. {bet.stake?.toLocaleString('en-IN')}
-                      </p>
-                      <p className="text-[11px] font-bold text-[#16a085]">
-                        Win: {bet.potential_win?.toFixed(0)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+        {/* === OPEN BETS === */}
+        <div style={{ marginTop: 8, backgroundColor: "white" }}>
+          <div style={{ backgroundColor: "#1e3a5c", padding: "10px 14px" }}>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>Open Bets ({openBets.length})</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead>
+                <tr style={{ backgroundColor: "#f5f5f5" }}>
+                  <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, color: "#1e3a5c", borderBottom: "1px solid #e0e0e0" }}>Runner</th>
+                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "#1e3a5c", borderBottom: "1px solid #e0e0e0" }}>Price</th>
+                  <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, color: "#1e3a5c", borderBottom: "1px solid #e0e0e0" }}>Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                {openBets.length === 0 ? (
+                  <tr><td colSpan={3} style={{ padding: "20px", textAlign: "center", color: "#999" }}>No open bets</td></tr>
+                ) : (
+                  openBets.map((bet: any) => (
+                    <tr key={bet.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
+                      <td style={{ padding: "8px 12px", color: "#1e3a5c", fontWeight: 600 }}>
+                        <span style={{ backgroundColor: bet.bet_type === 'back' ? "#72bbef" : "#faa9ba", color: "#000", fontSize: 10, fontWeight: 700, borderRadius: 2, padding: "1px 5px", marginRight: 6 }}>
+                          {bet.bet_type?.toUpperCase()}
+                        </span>
+                        {bet.selection}
+                      </td>
+                      <td style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700 }}>{bet.odds}</td>
+                      <td style={{ padding: "8px 12px", textAlign: "right" }}>Rs. {bet.stake?.toLocaleString()}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
+
+        {/* === MATCHED BETS === */}
+        <div style={{ marginTop: 8, backgroundColor: "white", marginBottom: 16 }}>
+          <div style={{ backgroundColor: "#1e3a5c", padding: "10px 14px" }}>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>Matched Bets (0)</span>
+          </div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ backgroundColor: "#f5f5f5" }}>
+                <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, color: "#1e3a5c", borderBottom: "1px solid #e0e0e0" }}>Runner</th>
+                <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "#1e3a5c", borderBottom: "1px solid #e0e0e0" }}>Price</th>
+                <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, color: "#1e3a5c", borderBottom: "1px solid #e0e0e0" }}>Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colSpan={3} style={{ padding: "20px", textAlign: "center", color: "#999" }}>No matched bets</td></tr>
+            </tbody>
+          </table>
+        </div>
+
       </main>
 
-      {/* BetSlip component (handles its own overlay) */}
-      <BetSlip 
-        bet={activeBet} 
-        onClose={() => setActiveBet(null)} 
-        onSubmit={(stake) => placeBet(stake)} 
-        isSubmitting={isSubmitting} 
-      />
+      <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake) => placeBet(stake)} isSubmitting={isSubmitting} />
     </div>
   );
 }
 
-function SectionHeader({ title }: { title: string }) {
+// CombinedSectionHeader: dark navy header with BACK/LAY column headers
+function CombinedSectionHeader({ title }: { title: string }) {
   return (
-    <div className="bg-[#1e3a5c] text-white flex items-center justify-between px-3 py-2.5">
-      <div className="flex items-center gap-2">
-        <div className="w-5 h-5 rounded-full bg-[#16a085] flex items-center justify-center">
-          <span className="text-white text-[9px] font-black">$</span>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#1e3a5c" }}>
+      {/* Left: market name */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "10px 12px" }}>
+        <div style={{ width: 22, height: 22, borderRadius: "50%", backgroundColor: "#00a65a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <span style={{ color: "white", fontSize: 11, fontWeight: 900 }}>$</span>
         </div>
-        <span className="text-[13px] font-black uppercase tracking-wide">{title}</span>
+        <span style={{ color: "white", fontWeight: 900, fontSize: 13, textTransform: "uppercase" }}>{title}</span>
+        <div style={{ width: 20, height: 20, borderRadius: "50%", backgroundColor: "#444", display: "flex", alignItems: "center", justifyContent: "center", marginLeft: 4, cursor: "pointer" }}>
+          <span style={{ color: "white", fontSize: 11, fontWeight: 700 }}>i</span>
+        </div>
       </div>
-      <div className="w-6 h-6 rounded flex items-center justify-center bg-white/10 hover:bg-white/20 cursor-pointer transition-colors">
-        <Info className="w-3.5 h-3.5 text-white/70" />
+      {/* Right: BACK | LAY headers */}
+      <div style={{ display: "flex", flexShrink: 0 }}>
+        <div style={{ width: 90, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1e3a5c", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
+          <span style={{ color: "white", fontWeight: 900, fontSize: 12 }}>BACK</span>
+        </div>
+        <div style={{ width: 90, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1e3a5c", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
+          <span style={{ color: "white", fontWeight: 900, fontSize: 12 }}>LAY</span>
+        </div>
       </div>
     </div>
   );
 }
 
-function OddsColumnHeaders() {
+// TeamRow2: larger odds display
+function TeamRow2({ name, odds, layOdds, onBet }: { name: string; odds: number; layOdds: number; onBet: (type: 'back' | 'lay', odds: number) => void }) {
+  const backOddsVal = odds || 1.5;
+  const layOddsVal = layOdds || 1.52;
+  // Random size for authenticity
+  const backSize = `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
+  const laySize = `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
+  
   return (
-    <div className="flex bg-[#e8f0f5] border-b border-[#ccd9e5]">
-      <div className="flex-1" />
-      <div className="w-[90px] bg-[#254465] text-white text-[11px] font-black text-center py-1.5 border-r border-white/5">BACK</div>
-      <div className="w-[90px] bg-[#254465] text-white text-[11px] font-black text-center py-1.5">LAY</div>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "white", borderBottom: "1px solid #ccd9e5", minHeight: 68 }}>
+      {/* Team name */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "10px 14px" }}>
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#1e3a5c" }}>{name}</span>
+      </div>
+      {/* Back odds */}
+      <div
+        onClick={() => onBet('back', backOddsVal)}
+        style={{ width: 90, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(0,0,0,0.05)" }}
+      >
+        <span style={{ fontWeight: 900, fontSize: 26, color: "#1e3a5c", lineHeight: 1 }}>{backOddsVal.toFixed(2)}</span>
+        <span style={{ fontSize: 11, color: "#1e3a5c", opacity: 0.6, marginTop: 3 }}>{backSize}</span>
+      </div>
+      {/* Lay odds */}
+      <div
+        onClick={() => onBet('lay', layOddsVal)}
+        style={{ width: 90, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(0,0,0,0.05)" }}
+      >
+        <span style={{ fontWeight: 900, fontSize: 26, color: "#1e3a5c", lineHeight: 1 }}>{layOddsVal.toFixed(2)}</span>
+        <span style={{ fontSize: 11, color: "#1e3a5c", opacity: 0.6, marginTop: 3 }}>{laySize}</span>
+      </div>
     </div>
   );
 }
 
-interface TeamRowProps {
-  name: string;
-  odds: number;
-  layOdds: number;
+// FancyRow2: with Book link and SUSPENDED support
+function FancyRow2({ name, backOdds, layOdds, backSize, laySize, suspended, onBet }: {
+  name: string; backOdds: number; layOdds: number; backSize: string; laySize: string; suspended?: boolean;
   onBet: (type: 'back' | 'lay', odds: number) => void;
-}
-
-function TeamRow({ name, odds, layOdds, onBet }: TeamRowProps) {
+}) {
   return (
-    <div className="flex items-center border-b border-[#ccd9e5] last:border-0 h-[64px]">
-      <div className="flex-1 px-3">
-        <span className="text-[14px] font-black text-[#1e3a5c] uppercase">{name}</span>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "white", borderBottom: "1px solid #ccd9e5", minHeight: 64 }}>
+      {/* Name + Book link */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "8px 14px" }}>
+        <span style={{ fontWeight: 700, fontSize: 14, color: "#1e3a5c" }}>{name}</span>
+        <span style={{ color: "#00a65a", fontSize: 12, fontWeight: 700, marginTop: 2, cursor: "pointer" }}>Book</span>
       </div>
-      <div 
-        onClick={() => onBet('back', odds)}
-        className="w-[90px] h-full bg-[#72bbef] flex flex-col items-center justify-center cursor-pointer hover:brightness-95 transition-all border-r border-white/20 relative overflow-hidden"
-      >
-        <motion.span 
-          key={odds}
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: 1 }}
-          className="text-[17px] font-black text-[#1e3a5c] leading-none"
-        >
-          {(odds || 1.5).toFixed(2)}
-        </motion.span>
-        <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{(Math.random() * 100).toFixed(0)}</span>
-      </div>
-      <div 
-        onClick={() => onBet('lay', layOdds)}
-        className="w-[90px] h-full bg-[#faa9ba] flex flex-col items-center justify-center cursor-pointer hover:brightness-95 transition-all relative overflow-hidden"
-      >
-        <motion.span 
-          key={layOdds}
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: 1 }}
-          className="text-[17px] font-black text-[#1e3a5c] leading-none"
-        >
-          {(layOdds || 1.5).toFixed(2)}
-        </motion.span>
-        <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{(Math.random() * 100).toFixed(0)}</span>
-      </div>
+      {/* Suspended or odds */}
+      {suspended ? (
+        <div style={{ width: 180, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f5f5f5", borderLeft: "1px solid #e0e0e0" }}>
+          <span style={{ color: "#dc3545", fontWeight: 900, fontSize: 14, letterSpacing: 1 }}>SUSPENDED</span>
+        </div>
+      ) : (
+        <>
+          <div
+            onClick={() => onBet('back', backOdds)}
+            style={{ width: 90, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(0,0,0,0.05)" }}
+          >
+            <span style={{ fontWeight: 900, fontSize: 22, color: "#1e3a5c", lineHeight: 1 }}>{backOdds}</span>
+            <span style={{ fontSize: 11, color: "#1e3a5c", opacity: 0.6, marginTop: 3 }}>{backSize}</span>
+          </div>
+          <div
+            onClick={() => onBet('lay', layOdds)}
+            style={{ width: 90, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(0,0,0,0.05)" }}
+          >
+            <span style={{ fontWeight: 900, fontSize: 22, color: "#1e3a5c", lineHeight: 1 }}>{layOdds}</span>
+            <span style={{ fontSize: 11, color: "#1e3a5c", opacity: 0.6, marginTop: 3 }}>{laySize}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-interface FancyRowProps {
-  name: string;
-  backOdds: number;
-  layOdds: number;
-  backSize: string;
-  laySize: string;
-  label: string;
-  onBet: (type: 'back' | 'lay', odds: number) => void;
-}
-
-function FancyRow({ name, backOdds, layOdds, backSize, laySize, label, onBet }: FancyRowProps) {
+// LastFigureGrid: 5x2 grid of number boxes (0-9) for "Over Total Last Figure" markets
+function LastFigureGrid({ title, onBet }: { title: string; onBet: (n: number) => void }) {
   return (
-    <div className="flex items-center border-b border-[#ccd9e5] last:border-0 h-[64px]">
-      <div className="flex-1 px-3 flex flex-col justify-center">
-        <span className="text-[13px] font-bold text-[#1e3a5c]">{name}</span>
-        <span className="text-[#16a085] font-black text-[11px] uppercase cursor-pointer hover:underline mt-0.5">
-          {label}
-        </span>
+    <div style={{ marginTop: 4 }}>
+      <div style={{ backgroundColor: "#1e3a5c", padding: "10px 12px" }}>
+        <span style={{ color: "white", fontWeight: 900, fontSize: 12, textTransform: "uppercase" }}>{title}</span>
       </div>
-      <div 
-        onClick={() => onBet('back', backOdds)}
-        className="w-[90px] h-full bg-[#72bbef] flex flex-col items-center justify-center border-r border-white/20 cursor-pointer hover:brightness-95 transition-all relative overflow-hidden"
-      >
-        <motion.span 
-          key={backOdds}
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: 1 }}
-          className="text-[17px] font-black text-[#1e3a5c] leading-none"
-        >
-          {backOdds}
-        </motion.span>
-        <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{backSize}</span>
-      </div>
-      <div 
-        onClick={() => onBet('lay', layOdds)}
-        className="w-[90px] h-full bg-[#faa9ba] flex flex-col items-center justify-center cursor-pointer hover:brightness-95 transition-all relative overflow-hidden"
-      >
-        <motion.span 
-          key={layOdds}
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: 1 }}
-          className="text-[17px] font-black text-[#1e3a5c] leading-none"
-        >
-          {layOdds}
-        </motion.span>
-        <span className="text-[10px] font-bold text-[#1e3a5c]/60 mt-0.5">{laySize}</span>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, padding: 8, backgroundColor: "white" }}>
+        {[0,1,2,3,4,5,6,7,8,9].map((n) => (
+          <div
+            key={n}
+            onClick={() => onBet(n)}
+            style={{
+              backgroundColor: "#72bbef",
+              borderRadius: 4,
+              padding: "10px 0",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              cursor: "pointer",
+              minHeight: 56,
+              justifyContent: "center",
+            }}
+          >
+            <span style={{ fontWeight: 900, fontSize: 22, color: "#1e3a5c", lineHeight: 1 }}>{n}</span>
+            <span style={{ fontSize: 11, color: "#1e3a5c", opacity: 0.6, marginTop: 4 }}>8.85</span>
+          </div>
+        ))}
       </div>
     </div>
   );
