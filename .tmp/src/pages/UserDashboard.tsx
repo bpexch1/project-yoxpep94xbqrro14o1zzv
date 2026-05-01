@@ -15,7 +15,6 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
   Trophy, 
-  Disc,
 } from "lucide-react";
 
 export default function UserDashboard() {
@@ -168,7 +167,8 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-[#edf2f7] text-[#212529]" style={{ 
-      fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif'
+      fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      backgroundImage: 'url("https://bpexch.live/img/bg-diamonds.png")'
     }}>
       <UserHeader 
         sidebarOpen={sidebarOpen}
@@ -208,7 +208,7 @@ export default function UserDashboard() {
         <RaceSection title="Horse Race" iconClass="svg-horse" slots={horseRaceSlots} />
         <RaceSection title="Grey Hound" iconClass="svg-greyhound-racing" slots={greyhoundSlots} />
 
-        {/* Bottom Tabs - Inline */}
+        {/* Bottom Tabs - Inline Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
           {categories.map((cat) => {
             const isActive = activeFilter === cat.id;
@@ -217,43 +217,22 @@ export default function UserDashboard() {
                 key={cat.id}
                 onClick={() => setActiveFilter(cat.id)}
                 style={{
-                  position: "relative",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "10px 4px 8px",
+                  padding: "8px 4px",
                   backgroundColor: isActive ? "#00b181" : "#254465",
-                  border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.08)",
+                  border: "none",
                   cursor: "pointer",
-                  minHeight: 85,
+                  transition: "background-color 0.2s",
+                  minHeight: 70,
                 }}
               >
-                {/* Count number - top right italic */}
-                <span style={{
-                  position: "absolute",
-                  top: 6,
-                  right: 8,
-                  color: "white",
-                  fontStyle: "italic",
-                  fontSize: 16,
-                  fontWeight: 400,
-                  opacity: isActive ? 1 : 0.8,
-                  lineHeight: 1,
-                }}>{cat.count}</span>
-                
-                {/* Icon */}
-                <div style={{ marginBottom: 6 }}>
-                  <span className={cat.iconClass} />
-                </div>
-
-                {/* Label */}
-                <span style={{
-                  color: "white",
-                  fontSize: 14,
-                  fontWeight: isActive ? 700 : 400,
-                }}>{cat.label}</span>
+                <span style={{ color: "white", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>{cat.count}</span>
+                <span className={cat.iconClass} style={{ marginBottom: 2 }} />
+                <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat.label}</span>
               </button>
             );
           })}
@@ -317,8 +296,6 @@ export default function UserDashboard() {
         )}
       </main>
 
-      {/* Sport Category Tabs - REMOVED FIXED BOTTOM */}
-      
       {/* BetSlip modal overlay */}
       {activeBet && (
         <div className="fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none pointer-events-none">

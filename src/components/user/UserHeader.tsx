@@ -57,19 +57,19 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
         position: "sticky",
         top: 0,
         zIndex: 50,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          padding: "0 12px",
-          minHeight: 64,
-          position: "relative",
+          padding: "8px 12px",
+          minHeight: 56,
         }}
       >
         {/* Left: hamburger + Dashboard label */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button
             onClick={onMenuToggle}
             style={{
@@ -86,7 +86,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
             <span style={{ display: "block", width: 22, height: 2, backgroundColor: "white" }} />
             <span style={{ display: "block", width: 22, height: 2, backgroundColor: "white" }} />
           </button>
-          <span 
+          <span
             onClick={handleDashboardClick}
             style={{ color: "white", fontWeight: 700, fontSize: 16, cursor: "pointer" }}
           >
@@ -94,40 +94,29 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           </span>
         </div>
 
-        {/* Center: Welcome Brand */}
-        <div
-          style={{
-            position: "absolute",
-            left: "50%",
-            transform: "translateX(-50%)",
-            color: "white",
-            fontWeight: 700,
-            fontSize: 20,
-            whiteSpace: "nowrap",
-          }}
-        >
-          Welcome to BpExch
-        </div>
-
-        {/* Right: 2-row layout */}
-        <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <div style={{ color: "white", fontWeight: 900, fontSize: 24, lineHeight: 1.1 }}>
-            B: {balance.toLocaleString('en-IN')} | L: 0
+        {/* Right: Welcome + Balance + Username */}
+        <div style={{ marginLeft: "auto", textAlign: "right" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
+            <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }}>Welcome to BpExch</span>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>
+              B: Rs. {balance.toLocaleString('en-IN')} | L: 0
+            </span>
           </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "flex-end",
               gap: 4,
               marginTop: 2,
               cursor: "pointer",
-              color: "white",
-              fontSize: 15,
             }}
             onClick={handleLogout}
           >
-            <span>{session.username}</span>
-            <ChevronDown size={14} />
+            <span style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
+              {session.username}
+            </span>
+            <ChevronDown size={14} color="white" />
           </div>
         </div>
       </div>
