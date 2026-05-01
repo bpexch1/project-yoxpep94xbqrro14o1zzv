@@ -22,6 +22,8 @@ export default function MatchDetail() {
   const [activeBet, setActiveBet] = useState<{ match: any; selection: string; betType: 'back' | 'lay'; odds: number } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [keepDisplayOn, setKeepDisplayOn] = useState(true);
+  const [thisOverBalls] = useState(['6', '6', '0', '4', '1']);
+  const [activeMediaTab, setActiveMediaTab] = useState<'tv'|'scorecard'>('tv');
 
   const session = getClientSession();
 
@@ -146,89 +148,98 @@ export default function MatchDetail() {
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* === MATCH INFO CARD (dark navy) === */}
-      <div style={{ backgroundColor: "#254465", padding: "12px 14px" }}>
-        {/* Row 1: time info + INPLAY */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Clock size={14} color="rgba(255,255,255,0.6)" />
-            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>20 minutes ago | Apr 21 7:00 pm | Winners: 1</span>
+      <div style={{ backgroundColor: "#254465", paddingBottom: 0 }}>
+        <div style={{ padding: "12px 14px" }}>
+          {/* Row 1: time info + INPLAY */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Clock size={14} color="rgba(255,255,255,0.6)" />
+              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>20 minutes ago | Apr 21 7:00 pm | Winners: 1</span>
+            </div>
+            <span style={{ 
+              color: match.status === 'live' ? "#00b181" : "rgba(255,255,255,0.5)", 
+              fontWeight: 900, 
+              fontSize: 14, 
+              letterSpacing: 1 
+            }}>
+              {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}
+            </span>
           </div>
-          <span style={{ 
-            color: match.status === 'live' ? "#00b181" : "rgba(255,255,255,0.5)", 
-            fontWeight: 900, 
-            fontSize: 14, 
-            letterSpacing: 1 
-          }}>
-            {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}
-          </span>
+          {/* Row 2: Match Title */}
+          <h1 style={{ color: "white", fontWeight: 900, fontSize: 20, lineHeight: 1.3, margin: "6px 0" }}>
+            {matchTitle}
+          </h1>
+          {/* Row 3: Elapsed */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>Elapsed : 00:19:42</span>
+          </div>
+          {/* Row 4: Keep Display On */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+            <input 
+              type="checkbox" 
+              checked={keepDisplayOn} 
+              onChange={(e) => setKeepDisplayOn(e.target.checked)}
+              style={{ width: 16, height: 16, accentColor: "#3b82f6" }} 
+            />
+            <span style={{ color: "white", fontSize: 13 }}>Keep Display On</span>
+          </div>
         </div>
-        {/* Row 2: Match Title */}
-        <h1 style={{ color: "white", fontWeight: 900, fontSize: 20, lineHeight: 1.3, margin: "6px 0" }}>
-          {matchTitle}
-        </h1>
-        {/* Row 3: Elapsed */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
-          <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>Elapsed : 00:19:42</span>
-        </div>
-        {/* Row 4: Keep Display On */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-          <input 
-            type="checkbox" 
-            checked={keepDisplayOn} 
-            onChange={(e) => setKeepDisplayOn(e.target.checked)}
-            style={{ width: 16, height: 16, accentColor: "#3b82f6" }} 
-          />
-          <span style={{ color: "white", fontSize: 13 }}>Keep Display On</span>
-        </div>
-      </div>
 
-      {/* === FILTER TABS (pill-shaped) === */}
-      <div style={{ backgroundColor: "#254465", padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto" }} className="no-scrollbar">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              borderRadius: 50,
-              padding: "6px 16px",
-              fontWeight: 700,
-              fontSize: 13,
-              border: "2px solid rgba(255,255,255,0.2)",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              backgroundColor: activeTab === tab ? "#00b181" : "transparent",
-              color: "white",
-              transition: "background-color 0.2s",
-            }}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* === SCORE BAR — always show === */}
-      <div style={{ backgroundColor: "#fff", padding: "10px 14px", borderBottom: "1px solid #dde4ea" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div>
-            <span style={{ fontWeight: 900, fontSize: 15, color: "#254465" }}>
-              {match.team1 ? match.team1.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() : 'T1'}
-            </span>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#555", marginLeft: 8 }}>
-              {match.status === 'live' ? '48/0 (4.2)' : 'Match'}
-            </span>
-            <span style={{ fontSize: 12, color: "#777", marginLeft: 10 }}>
-              {match.status === 'live' ? 'CRR: 11.08' : match.status === 'upcoming' ? 'Upcoming' : 'Completed'}
-            </span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            {match.status === 'live' && (
-              <span style={{ color: "#00b181", fontWeight: 900, fontSize: 16 }}>SIX</span>
-            )}
-            <Volume2 size={16} color="#999" />
-          </div>
+        {/* Row 5: FILTER TABS (pill-shaped) */}
+        <div style={{ padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto", backgroundColor: "rgba(0,0,0,0.2)" }} className="no-scrollbar">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                borderRadius: 50,
+                padding: "6px 16px",
+                fontWeight: 700,
+                fontSize: 13,
+                border: "2px solid rgba(255,255,255,0.2)",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                backgroundColor: activeTab === tab ? "#00b181" : "transparent",
+                color: "white",
+                transition: "background-color 0.2s",
+              }}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
-        <div style={{ marginTop: 4, fontSize: 11, color: "#777" }}>
-          {match.status === 'live' ? 'This Over : 6 6' : match.match_time || ''}
+
+        {/* Row 6: SCORE BAR */}
+        <div style={{ backgroundColor: "#1e3553", padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ color: "white", fontWeight: 900, fontSize: 15 }}>
+                {match.team1 ? match.team1.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() : 'T1'} {match.status === 'live' ? '48/0' : '--'} ({match.status === 'live' ? '4.2' : '0.0'})
+              </span>
+              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, marginLeft: 8 }}>
+                CRR: {match.status === 'live' ? '11.08' : '--'}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {match.status === 'live' && (
+                <motion.span
+                  key={thisOverBalls.join(',')}
+                  initial={{ opacity: 0, scale: 1.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  style={{ color: "#00e676", fontWeight: 900, fontSize: 16, letterSpacing: 1 }}
+                >
+                  SIX
+                </motion.span>
+              )}
+              <Volume2 size={16} color="rgba(255,255,255,0.6)" />
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginRight: 4 }}>This Over :</span>
+            {thisOverBalls.map((ball, i) => (
+              <ThisOverBall key={i} value={ball} />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -284,15 +295,9 @@ export default function MatchDetail() {
           </div>
         )}
 
-        {/* === TV / SCORE CARD TABS === */}
-        <div style={{ marginTop: 0 }}>
-          <div style={{ display: "flex", borderBottom: "1px solid #dde4ea" }}>
-            <button style={{ flex: 1, padding: "10px 0", backgroundColor: activeTab === 'tv' ? "#00b181" : "#3d6b8b", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>Tv</button>
-            <button style={{ flex: 1, padding: "10px 0", backgroundColor: "#00b181", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>Score Card</button>
-          </div>
-          <div style={{ backgroundColor: "#1a1a2e", padding: "12px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13, minHeight: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            Live stream unavailable
-          </div>
+        {/* === MEDIA BOX (TV/Scorecard content) === */}
+        <div style={{ backgroundColor: "#1a1a2e", padding: "12px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 13, minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {activeMediaTab === 'tv' ? 'Live stream unavailable' : 'Scorecard details loading...'}
         </div>
 
         {/* === OPEN BETS === */}
@@ -352,6 +357,36 @@ export default function MatchDetail() {
 
       </main>
 
+      {/* === STICKY TV / SCORE CARD BAR === */}
+      <div style={{ 
+        position: "sticky", bottom: 0, zIndex: 20,
+        display: "flex", borderTop: "2px solid rgba(255,255,255,0.2)"
+      }}>
+        <button 
+          onClick={() => setActiveMediaTab('tv')}
+          style={{ 
+            flex: 1, padding: "12px 0", 
+            backgroundColor: activeMediaTab === 'tv' ? "#00b181" : "#1e3a5c", 
+            color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
+            letterSpacing: 0.5
+          }}
+        >
+          Tv
+        </button>
+        <div style={{ width: 1, backgroundColor: "rgba(255,255,255,0.2)" }} />
+        <button 
+          onClick={() => setActiveMediaTab('scorecard')}
+          style={{ 
+            flex: 1, padding: "12px 0", 
+            backgroundColor: activeMediaTab === 'scorecard' ? "#00b181" : "#1e3a5c",
+            color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
+            letterSpacing: 0.5
+          }}
+        >
+          Score Card
+        </button>
+      </div>
+
       <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake) => placeBet(stake)} isSubmitting={isSubmitting} />
     </div>
   );
@@ -373,10 +408,10 @@ function CombinedSectionHeader({ title }: { title: string }) {
       </div>
       {/* Right: BACK and LAY header boxes */}
       <div style={{ display: "flex", flexShrink: 0 }}>
-        <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a" }}>
+        <div style={{ width: 70, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1e3a5c", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 13, letterSpacing: 1 }}>BACK</span>
         </div>
-        <div style={{ width: 50, display: "flex", alignItems: "center", justifyCenter: "center", backgroundColor: "#3d5a7a" }}>
+        <div style={{ width: 70, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1e3a5c", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 13, letterSpacing: 1 }}>LAY</span>
         </div>
       </div>
@@ -388,23 +423,22 @@ function CombinedSectionHeader({ title }: { title: string }) {
 function TeamRow2({ name, odds, layOdds, onBet }: { name: string; odds: number; layOdds: number; onBet: (type: 'back' | 'lay', odds: number) => void }) {
   const backOddsVal = odds || 1.5;
   const layOddsVal = layOdds || 1.52;
-  // Random size for authenticity
   const backSize = `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
   const laySize = `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
   
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#dce8f3", borderBottom: "1px solid #c4d9ea", minHeight: 65 }}>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 65 }}>
       {/* Team name */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "10px 14px" }}>
         <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>{name}</span>
       </div>
       {/* Back odds box */}
-      <div onClick={() => onBet('back', backOddsVal)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+      <div onClick={() => onBet('back', backOddsVal)} style={{ width: 70, backgroundColor: "#a5d9fe", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
         <span style={{ fontWeight: 900, fontSize: 20, color: "#212529", lineHeight: 1 }}>{backOddsVal.toFixed(2)}</span>
         <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
       </div>
       {/* Lay odds box */}
-      <div onClick={() => onBet('lay', layOddsVal)} style={{ width: 50, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+      <div onClick={() => onBet('lay', layOddsVal)} style={{ width: 70, backgroundColor: "#f8d0ce", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
         <span style={{ fontWeight: 900, fontSize: 20, color: "#212529", lineHeight: 1 }}>{layOddsVal.toFixed(2)}</span>
         <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{laySize}</span>
       </div>
@@ -418,7 +452,7 @@ function FancyRow2({ name, backOdds, layOdds, backSize, laySize, suspended, onBe
   onBet: (type: 'back' | 'lay', odds: number) => void;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#dce8f3", borderBottom: "1px solid #c4d9ea", minHeight: 65 }}>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 65 }}>
       {/* Name + Book link */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "8px 14px" }}>
         <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>{name}</span>
@@ -426,16 +460,16 @@ function FancyRow2({ name, backOdds, layOdds, backSize, laySize, suspended, onBe
       </div>
       {/* Suspended or odds */}
       {suspended ? (
-        <div style={{ width: 100, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f5f9", borderLeft: "1px solid #c4d9ea" }}>
+        <div style={{ width: 140, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f5f9", borderLeft: "1px solid #c4d9ea" }}>
           <span style={{ color: "#dc3545", fontWeight: 900, fontSize: 14, letterSpacing: 1 }}>SUSPENDED</span>
         </div>
       ) : (
         <>
-          <div onClick={() => onBet('back', backOdds)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <div onClick={() => onBet('back', backOdds)} style={{ width: 70, backgroundColor: "#a5d9fe", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
             <span style={{ fontWeight: 900, fontSize: 18, color: "#212529", lineHeight: 1 }}>{backOdds}</span>
             <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
           </div>
-          <div onClick={() => onBet('lay', layOdds)} style={{ width: 50, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <div onClick={() => onBet('lay', layOdds)} style={{ width: 70, backgroundColor: "#f8d0ce", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
             <span style={{ fontWeight: 900, fontSize: 18, color: "#212529", lineHeight: 1 }}>{layOdds}</span>
             <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{laySize}</span>
           </div>
@@ -455,13 +489,13 @@ function LastFigureGrid({ title, onBet }: { title: string; onBet: (n: number) =>
         </div>
         <span style={{ color: "white", fontWeight: 900, fontSize: 11, textTransform: "uppercase" }}>{title}</span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, padding: "4px", backgroundColor: "#dce8f3" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, padding: "4px", backgroundColor: "#edf4fc" }}>
         {[0,1,2,3,4,5,6,7,8,9].map((n) => (
           <div
             key={n}
             onClick={() => onBet(n)}
             style={{
-              backgroundColor: "#72bbef",
+              backgroundColor: "#a5d9fe",
               borderRadius: 4,
               display: "flex",
               flexDirection: "column",
@@ -478,5 +512,30 @@ function LastFigureGrid({ title, onBet }: { title: string; onBet: (n: number) =>
         ))}
       </div>
     </div>
+  );
+}
+
+function ThisOverBall({ value }: { value: string }) {
+  const isWicket = value === 'W';
+  const isSix = value === '6';
+  const isFour = value === '4';
+  const isDot = value === '0' || value === '.';
+  
+  const bg = isWicket ? '#dc3545' : isSix ? '#00b181' : isFour ? '#007bff' : '#ffffff22';
+  const color = (isWicket || isSix || isFour) ? 'white' : 'rgba(255,255,255,0.8)';
+  
+  return (
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      style={{
+        width: 26, height: 26, borderRadius: '50%',
+        backgroundColor: bg, color, 
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 12, fontWeight: 900, border: '1px solid rgba(255,255,255,0.2)'
+      }}
+    >
+      {isDot ? '•' : value}
+    </motion.div>
   );
 }
