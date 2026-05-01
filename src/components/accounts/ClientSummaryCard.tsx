@@ -78,8 +78,9 @@ export function ClientSummaryCard({
 
   const filteredClients = useMemo(() => {
     if (!clients) return [];
+    const list = [...clients];
     const query = localSearch.toLowerCase() || searchFilter.toLowerCase();
-    return clients.filter(
+    return list.filter(
       (c) =>
         c.role?.toLowerCase() !== 'company' &&
         (c.username?.toLowerCase().includes(query) ||

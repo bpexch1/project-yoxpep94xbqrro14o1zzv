@@ -60,7 +60,13 @@ export default function Accounts() {
       return ClientEntity.filter({ parent_username: session.username }, "-created_at");
     },
     enabled: !!session,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchInterval: 15000,
+    select: (data: any) => data ? data.map((c: any) => ({ ...c })) : [],
   });
+
+  const clientsKey = clients ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
 
   const suggestions = (clients || [])
     .filter(c => 
@@ -343,6 +349,7 @@ export default function Accounts() {
 
         {/* 3. Clients table/list — header shown inside ClientSummaryCard */}
         <ClientSummaryCard
+          key={clientsKey}
           clients={clients || []}
           isLoading={isLoading}
           username={session?.username || 'Admin'}
