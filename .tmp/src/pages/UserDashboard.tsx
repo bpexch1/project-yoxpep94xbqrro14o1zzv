@@ -17,7 +17,6 @@ import {
   Trophy, 
   Disc,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -124,10 +123,10 @@ export default function UserDashboard() {
   ];
   
   const categories = [
-    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", count: matchesList.filter((m: any) => m.status === 'live').length },
-    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
-    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
-    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
+    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", emoji: "⏱", count: matchesList.filter((m: any) => m.status === 'live').length },
+    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", emoji: "🏏", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
+    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", emoji: "🎾", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
+    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", emoji: "⚽", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -236,14 +235,7 @@ export default function UserDashboard() {
                 }}
               >
                 <span style={{ color: "white", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>{cat.count}</span>
-                <span 
-                  className={cat.iconClass}
-                  style={{ 
-                    margin: "4px 0",
-                    opacity: isActive ? 1 : 0.75,
-                    filter: "brightness(0) invert(1)",  // Make sprite white on dark bg
-                  }} 
-                />
+                <span style={{ fontSize: 18, marginBottom: 2 }}>{cat.emoji}</span>
                 <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat.label}</span>
               </button>
             );
@@ -261,7 +253,7 @@ export default function UserDashboard() {
                   {/* Sport section header */}
                   <div
                     style={{
-                      backgroundColor: "#e6f2fc",
+                      backgroundColor: "#e8f0f5",
                       borderBottom: "1px solid #ccd9e5",
                       padding: "8px 14px",
                       display: "flex",
@@ -269,19 +261,17 @@ export default function UserDashboard() {
                       justifyContent: "space-between",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      {sport.toLowerCase().includes('cricket') ? (
-                        <span className="svg-cricket" style={{ filter: "brightness(0.2)" }} />
-                      ) : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? (
-                        <span className="svg-soccer" style={{ filter: "brightness(0.2)" }} />
-                      ) : sport.toLowerCase().includes('tennis') ? (
-                        <span className="svg-tennis" style={{ filter: "brightness(0.2)" }} />
-                      ) : (
-                        <span style={{ fontSize: 14 }}>🏅</span>
-                      )}
-                      <span style={{ fontWeight: 700, fontSize: 14, color: "#254465" }}>{sport}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 15 }}>
+                        {sport.toLowerCase().includes('cricket') ? '🏏' 
+                         : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? '⚽' 
+                         : sport.toLowerCase().includes('tennis') ? '🎾' 
+                         : sport.toLowerCase().includes('horse') ? '🏇'
+                         : '🏅'}
+                      </span>
+                      <span style={{ fontWeight: 700, fontSize: 13, color: "#254465" }}>{sport}</span>
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#6c757d" }}>Matched</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#6c757d" }}>Matched</span>
                   </div>
                   <div className="flex flex-col">
                     {sportMatches.map((match: any) => (

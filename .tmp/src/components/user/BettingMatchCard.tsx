@@ -32,63 +32,77 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
       }}
       onClick={() => navigate(`/play/match/${match.id}`)}
     >
-      {/* Left: InPlay badge + time */}
-      <div
-        style={{
-          width: 62,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "6px 6px",
-          gap: 3,
-          borderRight: "1px solid #e0e8ef",
-          flexShrink: 0,
-        }}
-      >
+      {/* Left: Status + time */}
+      <div style={{
+        width: 62,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "6px 4px",
+        gap: 3,
+        borderRight: "1px solid #e0e8ef",
+        flexShrink: 0,
+        backgroundColor: "#fff",
+      }}>
         {isLive ? (
-          <span
-            style={{
-              backgroundColor: "#00b181",
-              color: "#fff",
-              fontSize: 10,
-              fontWeight: 700,
-              borderRadius: 3,
-              padding: "2px 5px",
-              letterSpacing: 0.3,
-            }}
-          >
-            InPlay
-          </span>
+          <span style={{
+            backgroundColor: "#00b181",
+            color: "#fff",
+            fontSize: 9,
+            fontWeight: 700,
+            borderRadius: 2,
+            padding: "2px 4px",
+            letterSpacing: 0.2,
+            textTransform: "uppercase",
+          }}>InPlay</span>
         ) : (
-          <span
-            style={{
-              backgroundColor: "#3d6b8b",
-              color: "#fff",
-              fontSize: 10,
-              fontWeight: 700,
-              borderRadius: 3,
-              padding: "2px 5px",
-            }}
-          >
-            Today
-          </span>
+          <span style={{
+            backgroundColor: "#3d6b8b",
+            color: "#fff",
+            fontSize: 9,
+            fontWeight: 700,
+            borderRadius: 2,
+            padding: "2px 4px",
+          }}>Today</span>
         )}
-        <span style={{ fontSize: 11, color: "#254465", fontWeight: 700 }}>
-          {timeDisplay}
-        </span>
+        <span style={{ fontSize: 10, color: "#254465", fontWeight: 700 }}>{timeDisplay}</span>
       </div>
 
-      {/* Center: match info */}
-      <div style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
-        <span style={{ fontWeight: 700, fontSize: 14, color: "#254465", lineHeight: 1.3 }}>
+      {/* Center: match title + icons + amount */}
+      <div style={{ flex: 1, padding: "7px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#254465", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis" }}>
           {matchTitle}
         </span>
-        {/* Icons row: TV + BM + F using sprite icons */}
-        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+        {/* Icons: TV + BM + F badges */}
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {/* TV icon - sprite or emoji fallback */}
           <span className="svg-DTV" style={{ flexShrink: 0 }} />
-          <span className="svg-DBM" style={{ flexShrink: 0 }} />
-          <span className="svg-DF" style={{ flexShrink: 0 }} />
+          {/* BM badge */}
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#00b181",
+            color: "#fff",
+            fontSize: 9,
+            fontWeight: 700,
+            borderRadius: 10,
+            padding: "1px 5px",
+            letterSpacing: 0.2,
+          }}>@BM</span>
+          {/* F badge */}
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#00b181",
+            color: "#fff",
+            fontSize: 9,
+            fontWeight: 700,
+            borderRadius: 10,
+            padding: "1px 5px",
+          }}>@F</span>
           {match.source === 'betfair' && (
             <span
               style={{
@@ -105,37 +119,22 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
           )}
         </div>
         {/* Matched amount */}
-        <span style={{ fontSize: 11, color: "#555", marginTop: 1 }}>
-          {matchedAmount}
-        </span>
+        <span style={{ fontSize: 11, color: "#6c757d" }}>{matchedAmount}</span>
       </div>
 
-      {/* Right: ℹ button */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          paddingRight: 10,
-          flexShrink: 0,
-        }}
+      {/* Right: info button */}
+      <div style={{ display: "flex", alignItems: "center", paddingRight: 8, flexShrink: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            border: "1px solid #aaa",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 12,
-            fontWeight: 700,
-            color: "#666",
-            cursor: "pointer",
-          }}
-        >
-          i
+        <div style={{
+          width: 22, height: 22,
+          borderRadius: "50%",
+          border: "1px solid #ccc",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer",
+          backgroundColor: "#fff",
+        }}>
+          <span style={{ fontSize: 11, color: "#888", fontWeight: 700 }}>i</span>
         </div>
       </div>
     </div>
