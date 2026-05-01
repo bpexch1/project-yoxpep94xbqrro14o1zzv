@@ -19,7 +19,7 @@ export default function FinalSheet() {
     if (!session) navigate("/login");
   }, [session, navigate]);
 
-  const { data: clients, isLoading } = useQuery({
+  const { data: clients, isLoading: isLoadingClients } = useQuery({
     queryKey: ["final-sheet-v2", session?.username],
     queryFn: async () => {
       if (!session) return [];
@@ -32,6 +32,30 @@ export default function FinalSheet() {
     enabled: !!session,
   });
 
+  const { data: selfClient, isLoading: isLoadingSelf } = useQuery({
+    queryKey: ["self-client", session?.username],
+    queryFn: async () => {
+      if (!session) return null;
+      const results = await ClientEntity.query().where("username", session.username).exec();
+      return results?.[0] || null;
+    },
+    enabled: !!session,
+  });
+
+  const isLoading = isLoadingClients || isLoadingSelf;
+
+  // Create a special "Cash" entry from selfClient's cash field
+  const cashEntry = useMemo(() => {
+    const cashAmount = selfClient?.cash || 0;
+    if (cashAmount === 0 && hideZero) return null;
+    return {
+      id: "cash-entry",
+      username: "Cash",
+      balance_upline: cashAmount,
+      isCashRow: true,
+    };
+  }, [selfClient, hideZero]);
+
   // Sort clients by name
   const sortedClients = useMemo(() => {
     if (!clients) return [];
@@ -43,17 +67,31 @@ export default function FinalSheet() {
   }, [clients, sortDir]);
 
   // Split into positive (left) and negative (right) based on balance_upline
-  const positiveClients = useMemo(() =>
-    sortedClients.filter((c) => {
+  const positiveClients = useMemo(() => {
+    const base = sortedClients.filter((c) => {
       const amt = c.balance_upline || 0;
       return hideZero ? amt > 0 : amt >= 0;
-    }), [sortedClients, hideZero]);
+    });
+    if (cashEntry && cashEntry.balance_upline > 0) {
+      return [...base, cashEntry];
+    }
+    // If not hiding zero and cash is exactly zero, we could show it in positive table by default
+    if (cashEntry && cashEntry.balance_upline === 0 && !hideZero) {
+      return [...base, cashEntry];
+    }
+    return base;
+  }, [sortedClients, hideZero, cashEntry]);
 
-  const negativeClients = useMemo(() =>
-    sortedClients.filter((c) => {
+  const negativeClients = useMemo(() => {
+    const base = sortedClients.filter((c) => {
       const amt = c.balance_upline || 0;
       return hideZero ? amt < 0 : amt <= 0;
-    }), [sortedClients, hideZero]);
+    });
+    if (cashEntry && cashEntry.balance_upline < 0) {
+      return [...base, cashEntry];
+    }
+    return base;
+  }, [sortedClients, hideZero, cashEntry]);
 
   const positiveTotal = positiveClients.reduce((s, c) => s + (c.balance_upline || 0), 0);
   const negativeTotal = negativeClients.reduce((s, c) => s + (c.balance_upline || 0), 0);
@@ -125,8 +163,8 @@ export default function FinalSheet() {
                         </td>
                       </tr>
                     ) : (
-                      positiveClients.map((c) => {
-                        const isCurrentUser = c.username === session?.username;
+                      positiveClients.map((c: any) => {
+                        const isCurrentUser = !c.isCashRow && c.username === session?.username;
                         return (
                           <tr
                             key={c.id}
@@ -178,8 +216,8 @@ export default function FinalSheet() {
                         </td>
                       </tr>
                     ) : (
-                      negativeClients.map((c) => {
-                        const isCurrentUser = c.username === session?.username;
+                      negativeClients.map((c: any) => {
+                        const isCurrentUser = !c.isCashRow && c.username === session?.username;
                         return (
                           <tr
                             key={c.id}
