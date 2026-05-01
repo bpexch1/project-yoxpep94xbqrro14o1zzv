@@ -43,36 +43,33 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter style={{ width: 16, height: 16, color: "#2c3e50", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 15, color: "#2c3e50" }}>Report Type</span>
       </div>
-      <div style={{ padding: "10px 8px" }}>
+      <div style={{ padding: "12px" }}>
         <div style={{ 
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 0,
-          border: "1px solid #bbb",
-          borderRadius: 4,
-          overflow: "hidden"
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "6px"
         }}>
           {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
+            const isLast = index === tabs.length - 1;
             
             return (
               <button
                 key={tab.label}
                 onClick={() => navigate(tab.path)}
                 style={{
-                  padding: "5px 8px",
-                  fontSize: "11px",
-                  fontWeight: "600",
-                  border: "none",
-                  borderRight: index === tabs.length - 1 ? "none" : "1px solid #bbb",
-                  background: isActive ? "#00b181" : "#f8f9fa",
+                  padding: "8px 6px",
+                  fontSize: "13px",
+                  fontWeight: isActive ? "700" : "500",
+                  borderRadius: "4px",
+                  border: isActive ? "1px solid #00b181" : "1px solid #17a2b8",
+                  background: isActive ? "#00b181" : "#fff",
                   color: isActive ? "#fff" : "#17a2b8",
                   cursor: "pointer",
                   transition: "all 0.15s",
                   textAlign: "center",
                   whiteSpace: "nowrap",
-                  flex: "0 0 auto",
-                  minWidth: 0
+                  gridColumn: isLast ? "2" : "auto"
                 }}
               >
                 {tab.label}

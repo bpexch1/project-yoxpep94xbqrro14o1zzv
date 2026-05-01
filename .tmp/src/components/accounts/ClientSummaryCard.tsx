@@ -328,6 +328,10 @@ export function ClientSummaryCard({
               <span className="w-5 h-5 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded text-[11px] font-black">D</span>
               <span>InActive</span>
             </div>
+            <div className="flex items-center gap-1">
+              <span className="w-5 h-5 bg-[#e74c3c] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
+              <span>Settle Account</span>
+            </div>
           </div>
         </div>
 
@@ -363,7 +367,7 @@ export function ClientSummaryCard({
         <div className="hidden lg:block overflow-x-auto border-x border-b border-[#d5d8dc]">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-[#ecf0f1] text-[#212529] text-[11px] font-black uppercase whitespace-nowrap">
+              <tr className="bg-[#ecf0f1] text-[#212529] text-[12px] font-black uppercase whitespace-nowrap">
                 <th 
                   onClick={() => handleSort('username')}
                   className={cn(
@@ -455,7 +459,7 @@ export function ClientSummaryCard({
                 <th className="px-2 py-2 border border-[#d5d8dc] text-center">Options</th>
               </tr>
             </thead>
-            <tbody className="text-[12px]">
+            <tbody className="text-[13px]">
               {/* Green Total Row */}
               {!isLoading && tableFilteredClients.length > 0 && (
                 <tr className="bg-[#00b181] text-white font-black whitespace-nowrap">
@@ -544,28 +548,28 @@ export function ClientSummaryCard({
                           </div>
                         </td>
                         <td className="px-2 py-2 border-r border-[#d5d8dc] text-gray-600">{getTypeLabel(client.role)}</td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#28a745]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#28a745]">
                           {display.isLoaded ? display.credit?.toLocaleString() : "-"}
                         </td>
                         <td className={cn(
-                          "px-2 py-2 border-r border-[#d5d8dc] text-right font-bold",
+                          "px-2 py-2 border-r border-[#d5d8dc] text-right",
                           display.isLoaded ? (display.balance < 0 ? "text-[#dc3545]" : "text-[#28a745]") : "text-gray-400"
                         )}>
                           {display.isLoaded ? display.balance?.toLocaleString() : "-"}
                         </td>
                         <td className={cn(
-                          "px-2 py-2 border-r border-[#d5d8dc] text-right font-bold",
+                          "px-2 py-2 border-r border-[#d5d8dc] text-right",
                           display.isLoaded ? (display.plDownline < 0 ? "text-[#dc3545]" : "text-[#28a745]") : "text-gray-400"
                         )}>
                           {display.isLoaded ? display.plDownline?.toLocaleString() : "-"}
                         </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#212529]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
                           {display.isLoaded ? `${display.share}%` : "-"}
                         </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#dc3545]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#dc3545]">
                           0
                         </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#28a745]">
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#28a745]">
                           {display.isLoaded ? display.available?.toLocaleString() : "-"}
                         </td>
                         <td className="px-2 py-1.5 border-r border-[#d5d8dc]">
@@ -615,7 +619,7 @@ export function ClientSummaryCard({
                       </tr>
                       {/* Expanded Row */}
                       {isExpanded && (
-                        <tr className="bg-[#f0f3f5] text-[12px] whitespace-nowrap">
+                        <tr className="bg-[#f0f3f5] text-[13px] whitespace-nowrap">
                           <td colSpan={9} className="p-0 border-b border-[#d5d8dc]">
                             <div className="p-3 flex items-center justify-between">
                               <div className="flex items-center gap-6">
