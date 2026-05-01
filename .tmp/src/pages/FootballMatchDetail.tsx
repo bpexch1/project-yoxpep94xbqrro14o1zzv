@@ -132,7 +132,7 @@ function FootballCombinedSectionHeader({ title }: { title: string }) {
         <div className="w-[50px] flex items-center justify-center bg-[#3d5a7a]">
           <span className="text-white font-black text-[13px] tracking-widest">BACK</span>
         </div>
-        <div className="w-[50px] flex items-center justify-center bg-[#3d5a7a] border-l border-white/15">
+        <div className="w-[50px] flex items-center justify-center bg-[#3d5a7a]">
           <span className="text-white font-black text-[13px] tracking-widest">LAY</span>
         </div>
       </div>
@@ -152,7 +152,7 @@ function FootballTeamRow({ name, odds, layOdds, onBet }: { name: string; odds: n
         <span className="font-black text-[20px] text-[#212529] leading-none">{odds.toFixed(2)}</span>
         <span className="text-[11px] text-[#212529]/70 mt-1">{backSize}</span>
       </div>
-      <div onClick={() => onBet('lay', layOdds)} className="w-[50px] bg-[#faa9ba] flex flex-col items-center justify-center cursor-pointer border-l border-white/30">
+      <div onClick={() => onBet('lay', layOdds)} className="w-[50px] bg-[#faa9ba] flex flex-col items-center justify-center cursor-pointer">
         <span className="font-black text-[20px] text-[#212529] leading-none">{layOdds.toFixed(2)}</span>
         <span className="text-[11px] text-[#212529]/70 mt-1">{laySize}</span>
       </div>
