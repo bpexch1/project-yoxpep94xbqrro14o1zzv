@@ -5,6 +5,8 @@ import { Match, Bet, Client } from "@/entities";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
+import FootballMatchDetail from "./FootballMatchDetail";
+import TennisMatchDetail from "./TennisMatchDetail";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Volume2, Clock, CheckSquare, Square } from "lucide-react";
@@ -124,6 +126,15 @@ export default function MatchDetail() {
         </button>
       </div>
     );
+  }
+
+  // Detect sport and render correct page
+  const sport = match?.sport?.toLowerCase() || '';
+  if (sport === 'football' || sport === 'soccer') {
+    return <FootballMatchDetail match={match} clientData={clientData} session={session} />;
+  }
+  if (sport === 'tennis') {
+    return <TennisMatchDetail match={match} clientData={clientData} session={session} />;
   }
 
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
@@ -365,10 +376,10 @@ function CombinedSectionHeader({ title }: { title: string }) {
       </div>
       {/* Right: BACK and LAY header boxes */}
       <div style={{ display: "flex", flexShrink: 0 }}>
-        <div style={{ width: 100, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
+        <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 13, letterSpacing: 1 }}>BACK</span>
         </div>
-        <div style={{ width: 100, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
+        <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 13, letterSpacing: 1 }}>LAY</span>
         </div>
       </div>
@@ -391,14 +402,14 @@ function TeamRow2({ name, odds, layOdds, onBet }: { name: string; odds: number; 
         <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>{name}</span>
       </div>
       {/* Back odds box */}
-      <div onClick={() => onBet('back', backOddsVal)} style={{ width: 100, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
-        <span style={{ fontWeight: 900, fontSize: 30, color: "#212529", lineHeight: 1 }}>{backOddsVal.toFixed(2)}</span>
-        <span style={{ fontSize: 12, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
+      <div onClick={() => onBet('back', backOddsVal)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
+        <span style={{ fontWeight: 900, fontSize: 20, color: "#212529", lineHeight: 1 }}>{backOddsVal.toFixed(2)}</span>
+        <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
       </div>
       {/* Lay odds box */}
-      <div onClick={() => onBet('lay', layOddsVal)} style={{ width: 100, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
-        <span style={{ fontWeight: 900, fontSize: 30, color: "#212529", lineHeight: 1 }}>{layOddsVal.toFixed(2)}</span>
-        <span style={{ fontSize: 12, color: "#212529", opacity: 0.7, marginTop: 4 }}>{laySize}</span>
+      <div onClick={() => onBet('lay', layOddsVal)} style={{ width: 50, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
+        <span style={{ fontWeight: 900, fontSize: 20, color: "#212529", lineHeight: 1 }}>{layOddsVal.toFixed(2)}</span>
+        <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{laySize}</span>
       </div>
     </div>
   );
@@ -418,18 +429,18 @@ function FancyRow2({ name, backOdds, layOdds, backSize, laySize, suspended, onBe
       </div>
       {/* Suspended or odds */}
       {suspended ? (
-        <div style={{ width: 200, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f5f9", borderLeft: "1px solid #c4d9ea" }}>
+        <div style={{ width: 100, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f5f9", borderLeft: "1px solid #c4d9ea" }}>
           <span style={{ color: "#dc3545", fontWeight: 900, fontSize: 14, letterSpacing: 1 }}>SUSPENDED</span>
         </div>
       ) : (
         <>
-          <div onClick={() => onBet('back', backOdds)} style={{ width: 100, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
-            <span style={{ fontWeight: 900, fontSize: 26, color: "#212529", lineHeight: 1 }}>{backOdds}</span>
-            <span style={{ fontSize: 12, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
+          <div onClick={() => onBet('back', backOdds)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
+            <span style={{ fontWeight: 900, fontSize: 18, color: "#212529", lineHeight: 1 }}>{backOdds}</span>
+            <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
           </div>
-          <div onClick={() => onBet('lay', layOdds)} style={{ width: 100, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
-            <span style={{ fontWeight: 900, fontSize: 26, color: "#212529", lineHeight: 1 }}>{layOdds}</span>
-            <span style={{ fontSize: 12, color: "#212529", opacity: 0.7, marginTop: 4 }}>{laySize}</span>
+          <div onClick={() => onBet('lay', layOdds)} style={{ width: 50, backgroundColor: "#faa9ba", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
+            <span style={{ fontWeight: 900, fontSize: 18, color: "#212529", lineHeight: 1 }}>{layOdds}</span>
+            <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{laySize}</span>
           </div>
         </>
       )}
