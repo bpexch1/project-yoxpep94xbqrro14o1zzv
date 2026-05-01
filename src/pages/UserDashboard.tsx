@@ -119,10 +119,10 @@ export default function UserDashboard() {
   ];
   
   const categories = [
-    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", emoji: "⏱", count: matchesList.filter((m: any) => m.status === 'live').length },
-    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", emoji: "🏏", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
-    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", emoji: "🎾", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
-    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", emoji: "⚽", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
+    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", count: matchesList.filter((m: any) => m.status === 'live').length },
+    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
+    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
+    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -179,22 +179,19 @@ export default function UserDashboard() {
       {/* Account Info Bar */}
       <div
         style={{
-          backgroundColor: "#254465",
-          padding: "8px 14px",
+          backgroundColor: "#fff",
+          padding: "9px 14px",
           display: "flex",
           alignItems: "center",
-          gap: 0,
-          fontSize: 13,
-          color: "white",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          justifyContent: "space-around",
+          fontSize: 14,
+          color: "#212529",
+          borderBottom: "1px solid #ccd9e5",
         }}
       >
         <span>Credit: <strong>{clientData?.credit_received ?? 0}</strong></span>
-        <span style={{ margin: "0 10px", opacity: 0.4 }}>|</span>
         <span>Balance: <strong>{clientBalance.toLocaleString('en-IN')}</strong></span>
-        <span style={{ margin: "0 10px", opacity: 0.4 }}>|</span>
         <span>Liable: <strong>0</strong></span>
-        <span style={{ margin: "0 10px", opacity: 0.4 }}>|</span>
         <span>Active Bets: <strong>*</strong></span>
       </div>
 
@@ -203,49 +200,19 @@ export default function UserDashboard() {
         onClose={() => setSidebarOpen(false)} 
       />
       
-      <main className="flex flex-col">
+      <main className="flex flex-col" style={{ paddingBottom: 82 }}>
         {/* Game Banners */}
         <GameBanners />
 
         {/* Race Sections */}
-        <RaceSection title="Horse Race" icon={Trophy} iconClass="svg-horse" slots={horseRaceSlots} />
-        <RaceSection title="Grey Hound" icon={Disc} iconClass="svg-greyhound-racing" slots={greyhoundSlots} />
+        <RaceSection title="Horse Race" iconClass="svg-horse" slots={horseRaceSlots} />
+        <RaceSection title="Grey Hound" iconClass="svg-greyhound-racing" slots={greyhoundSlots} />
 
-        {/* Sport Category Tabs */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
-          {categories.map((cat) => {
-            const isActive = activeFilter === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveFilter(cat.id)}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "8px 4px",
-                  backgroundColor: isActive ? "#00b181" : "#254465",
-                  borderRight: "1px solid rgba(255,255,255,0.08)",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                  minHeight: 70,
-                }}
-              >
-                <span style={{ color: "white", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>{cat.count}</span>
-                <span style={{ fontSize: 18, marginBottom: 2 }}>{cat.emoji}</span>
-                <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-        
         {/* Content Area */}
         {activeFilter === "Casino" ? (
           <CasinoSection />
         ) : (
-          <div className="flex flex-col pb-20">
+          <div className="flex flex-col">
             {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
               return (
                 <div key={sport} className="flex flex-col">
@@ -298,10 +265,81 @@ export default function UserDashboard() {
           </div>
         )}
       </main>
+
+      {/* Sport Category Tabs - Fixed Bottom */}
+      <div 
+        style={{ 
+          position: "fixed", 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          height: 82, 
+          zIndex: 60, 
+          display: "grid", 
+          gridTemplateColumns: "repeat(4, 1fr)", 
+          width: "100%",
+          boxShadow: "0 -2px 10px rgba(0,0,0,0.1)"
+        }}
+      >
+        {categories.map((cat) => {
+          const isActive = activeFilter === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveFilter(cat.id)}
+              style={{
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: isActive ? "#00b181" : "#254465",
+                border: "none",
+                cursor: "pointer",
+                transition: "background-color 0.2s",
+                paddingTop: 8,
+              }}
+            >
+              {/* Count bubble */}
+              <span 
+                style={{ 
+                  position: "absolute", 
+                  top: 4, 
+                  right: 6, 
+                  color: isActive ? "white" : "rgba(255,255,255,0.7)", 
+                  fontSize: 16, 
+                  fontWeight: 900, 
+                  fontStyle: "italic" 
+                }}
+              >
+                {cat.count}
+              </span>
+              
+              {/* Icon */}
+              <div style={{ marginBottom: 4 }}>
+                <span className={cat.iconClass} />
+              </div>
+
+              {/* Label */}
+              <span 
+                style={{ 
+                  color: "white", 
+                  fontSize: 13, 
+                  fontWeight: 600, 
+                  textTransform: "uppercase", 
+                  letterSpacing: 0.5 
+                }}
+              >
+                {cat.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
       
       {/* BetSlip modal overlay */}
       {activeBet && (
-        <div className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none pointer-events-none">
+        <div className="fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none pointer-events-none">
           <div className="pointer-events-auto">
             <BetSlip 
               bet={activeBet} 

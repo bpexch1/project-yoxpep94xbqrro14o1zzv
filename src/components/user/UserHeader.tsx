@@ -65,7 +65,8 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           display: "flex",
           alignItems: "center",
           padding: "8px 12px",
-          minHeight: 56,
+          minHeight: 64,
+          position: "relative",
         }}
       >
         {/* Left: hamburger + Dashboard label */}
@@ -94,26 +95,37 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           </span>
         </div>
 
-        {/* Right: Welcome + Balance + Username */}
-        <div style={{ marginLeft: "auto", textAlign: "right" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
-            <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }}>Welcome to Exchange</span>
-            <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>
-              B: Rs. {balance.toLocaleString('en-IN')} | L: 0
-            </span>
+        {/* Center: Welcome Brand */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            color: "white",
+            fontWeight: 700,
+            fontSize: 18,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Welcome to BpExch
+        </div>
+
+        {/* Right: Balance + Username */}
+        <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <div style={{ color: "white", fontWeight: 700, fontSize: 18 }}>
+            B: {balance.toLocaleString('en-IN')} | L: 0
           </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "flex-end",
               gap: 4,
               marginTop: 2,
               cursor: "pointer",
             }}
             onClick={handleLogout}
           >
-            <span style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
+            <span style={{ color: "white", fontSize: 14, fontWeight: 500 }}>
               {session.username}
             </span>
             <ChevronDown size={14} color="white" />
