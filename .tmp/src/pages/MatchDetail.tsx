@@ -60,7 +60,6 @@ export default function MatchDetail() {
 
   const clientData = clients?.[0];
   const clientBalance = clientData?.cash ?? 0;
-  const creditRemaining = clientData?.credit_remaining ?? 0;
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
@@ -146,9 +145,6 @@ export default function MatchDetail() {
   return (
     <div className="min-h-screen bg-[#d6e4f0] text-[#1e3a5c] flex flex-col">
       <UserHeader 
-        userEmail={session.username} 
-        clientBalance={clientBalance}
-        creditRemaining={creditRemaining}
         sidebarOpen={sidebarOpen}
         onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
       />
@@ -159,7 +155,7 @@ export default function MatchDetail() {
       />
 
       {/* Back Button Bar */}
-      <div className="bg-[#254465] px-3 py-2.5 flex items-center gap-3 sticky top-[88px] z-40 md:top-[112px]">
+      <div className="bg-[#254465] px-3 py-2.5 flex items-center gap-3 sticky top-[56px] z-40">
         <button 
           onClick={() => navigate('/play')}
           className="p-1 hover:bg-white/10 rounded-full transition-colors"

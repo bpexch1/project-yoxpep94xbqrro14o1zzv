@@ -14,14 +14,8 @@ import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
-  Clock, 
-  Ticket, 
-  Rocket, 
-  Tent, 
   Trophy, 
-  Volleyball, 
   Disc,
-  Gamepad2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +59,6 @@ export default function UserDashboard() {
 
   const clientData = clients?.[0];
   const clientBalance = clientData?.cash ?? 0;
-  const creditRemaining = clientData?.credit_remaining ?? 0;
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
@@ -131,15 +124,14 @@ export default function UserDashboard() {
   ];
   
   const categories = [
-    { id: "Inplay", label: "Inplay", icon: Clock, count: matchesList.filter((m: any) => m.status === 'live').length },
-    { id: "Cricket", label: "Cricket", icon: Ticket, count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
-    { id: "Tennis", label: "Tennis", icon: Tent, count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
-    { id: "Soccer", label: "Soccer", icon: Rocket, count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
-    { id: "Casino", label: "Casino", icon: Gamepad2, count: 12 },
+    { id: "Inplay", label: "Inplay", icon: "⊙", count: matchesList.filter((m: any) => m.status === 'live').length },
+    { id: "Cricket", label: "Cricket", icon: "🏏", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
+    { id: "Tennis", label: "Tennis", icon: "🎾", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
+    { id: "Soccer", label: "Soccer", icon: "⚽", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
-    if (activeFilter === "Inplay") return true; // Show all when Inplay is active per bpexch logic
+    if (activeFilter === "Inplay") return true; // Show all when Inplay is active
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === 'soccer') return sport === 'football' || sport === 'soccer';
@@ -179,22 +171,34 @@ export default function UserDashboard() {
     {time:"2:45 PM", venue:"Dapto (AU)"}
   ];
 
-  const getTabBg = (catId: string, isActive: boolean) => {
-    if (catId === 'Inplay' && isActive) return 'bg-[#16a085]';
-    if (catId === 'Soccer') return 'bg-[#111111]';
-    return isActive ? 'bg-[#1e3a5c]' : 'bg-[#254465]';
-  };
-
   return (
     <div className="min-h-screen bg-[#d6e4f0] text-[#1e3a5c]">
       <UserHeader 
-        userEmail={session.username} 
-        clientBalance={clientBalance}
-        creditRemaining={creditRemaining}
         sidebarOpen={sidebarOpen}
         onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-        onLoadBalance={() => queryClient.invalidateQueries({ queryKey: ['client-data'] })}
       />
+
+      {/* Account Info Bar */}
+      <div
+        style={{
+          backgroundColor: "#1e3a5c",
+          padding: "8px 14px",
+          display: "flex",
+          alignItems: "center",
+          gap: 0,
+          fontSize: 13,
+          color: "white",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <span>Credit: <strong>{clientData?.credit_received ?? 0}</strong></span>
+        <span style={{ margin: "0 10px", opacity: 0.4 }}>|</span>
+        <span>Balance: <strong>{clientBalance.toLocaleString('en-IN')}</strong></span>
+        <span style={{ margin: "0 10px", opacity: 0.4 }}>|</span>
+        <span>Liable: <strong>0</strong></span>
+        <span style={{ margin: "0 10px", opacity: 0.4 }}>|</span>
+        <span>Active Bets: <strong>*</strong></span>
+      </div>
 
       <DashboardSidebar 
         isOpen={sidebarOpen} 
@@ -210,31 +214,29 @@ export default function UserDashboard() {
         <RaceSection title="Grey Hound" icon={Disc} slots={greyhoundSlots} />
 
         {/* Sport Category Tabs */}
-        <div className="grid grid-cols-5 w-full bg-[#254465]">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
           {categories.map((cat) => {
-            const Icon = cat.icon;
             const isActive = activeFilter === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveFilter(cat.id)}
-                className={cn(
-                  "flex flex-col items-center justify-center py-2 relative transition-all border-r border-white/5",
-                  getTabBg(cat.id, isActive)
-                )}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "8px 4px",
+                  backgroundColor: isActive ? "#00a65a" : "#254465",
+                  borderRight: "1px solid rgba(255,255,255,0.08)",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                }}
               >
-                <div className="flex items-center gap-1 mb-0.5">
-                  <span className="text-white font-black text-[13px] leading-none">
-                    {cat.count}
-                  </span>
-                  {cat.id === 'Inplay' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#16a085] animate-pulse" />
-                  )}
-                </div>
-                <Icon className={cn("w-5 h-5 mb-0.5", isActive ? "text-white" : "text-white/60")} />
-                <span className={cn("text-[9px] font-bold uppercase tracking-widest", isActive ? "text-white" : "text-white/60")}>
-                  {cat.label}
-                </span>
+                <span style={{ color: "white", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>{cat.count}</span>
+                <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 20, margin: "3px 0" }}>{cat.icon}</span>
+                <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat.label}</span>
               </button>
             );
           })}
@@ -246,19 +248,26 @@ export default function UserDashboard() {
         ) : (
           <div className="flex flex-col pb-20">
             {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
-              // Pick an icon based on sport name
-              let SportIcon = Volleyball;
-              if (sport.toLowerCase().includes('cricket')) SportIcon = Trophy;
-              if (sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer')) SportIcon = Gamepad2;
-
               return (
                 <div key={sport} className="flex flex-col">
-                  <div className="bg-[#e8f0f5] border-b border-[#ccd9e5] px-3 py-2.5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <SportIcon className="w-5 h-5 text-[#1e3a5c]" />
-                      <span className="text-[#1e3a5c] font-bold text-[13px]">{sport}</span>
+                  {/* Sport section header */}
+                  <div
+                    style={{
+                      backgroundColor: "#e8f0f5",
+                      borderBottom: "1px solid #ccd9e5",
+                      padding: "8px 14px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>
+                        {sport.toLowerCase().includes('cricket') ? '🏏' : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? '⚽' : sport.toLowerCase().includes('tennis') ? '🎾' : '🏅'}
+                      </span>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "#1e3a5c" }}>{sport}</span>
                     </div>
-                    <span className="text-[#1e3a5c]/50 font-bold text-[11px] uppercase tracking-wider">Matched</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#6c757d" }}>Matched</span>
                   </div>
                   <div className="flex flex-col">
                     {sportMatches.map((match: any) => (
