@@ -27,19 +27,19 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
         borderBottom: "1px solid #e0e8ef",
         display: "flex",
         alignItems: "stretch",
-        minHeight: 64,
+        minHeight: 52,
         cursor: "pointer",
       }}
       onClick={() => navigate(`/play/match/${match.id}`)}
     >
       {/* Left: Status + time */}
       <div style={{
-        width: 68,
+        width: 65,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "6px 4px",
+        padding: "4px 3px",
         gap: 3,
         borderRight: "1px solid #e0e8ef",
         flexShrink: 0,
@@ -52,7 +52,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
             fontSize: 9,
             fontWeight: 800,
             borderRadius: 2,
-            padding: "2px 4px",
+            padding: "1px 3px",
             letterSpacing: 0.2,
             textTransform: "uppercase",
             textAlign: "center",
@@ -64,7 +64,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
             fontSize: 9,
             fontWeight: 800,
             borderRadius: 2,
-            padding: "2px 4px",
+            padding: "1px 3px",
             textTransform: "uppercase",
             textAlign: "center",
           }}>Today</span>
@@ -73,8 +73,8 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
       </div>
 
       {/* Center: match title + icons + amount */}
-      <div style={{ flex: 1, padding: "7px 10px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
-        <span style={{ fontWeight: 700, fontSize: 14, color: "#1a2a3a", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div style={{ flex: 1, padding: "5px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#1a2a3a", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {matchTitle}
         </span>
         {/* Icons: TV + BM + F badges */}

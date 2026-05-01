@@ -179,11 +179,11 @@ export default function UserDashboard() {
       <div
         style={{
           backgroundColor: "#254465",
-          padding: "9px 14px",
+          padding: "7px 14px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-around",
-          fontSize: 15,
+          fontSize: 13,
           color: "white",
           borderTop: "1px solid rgba(255,255,255,0.15)",
           borderBottom: "1px solid rgba(255,255,255,0.1)",
@@ -221,37 +221,48 @@ export default function UserDashboard() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "8px 4px",
+                  padding: "6px 4px",
                   backgroundColor: isActive ? "#00b181" : "#254465",
                   border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.08)",
                   cursor: "pointer",
                   transition: "background-color 0.2s",
-                  minHeight: 70,
+                  minHeight: 62,
                 }}
               >
-                {/* Count number - italic top */}
-                <span style={{
-                  color: "white",
-                  fontStyle: "italic",
-                  fontSize: 15,
-                  fontWeight: 400,
-                  lineHeight: 1,
-                  marginBottom: 4,
-                  opacity: 0.9,
-                }}>{cat.count}</span>
-
-                {/* Sport emoji */}
-                <span style={{ fontSize: 22, lineHeight: 1, marginBottom: 3 }}>{cat.emoji}</span>
-
+                {/* Icon + red badge wrapper */}
+                <div style={{ position: "relative", display: "inline-flex", marginBottom: 3 }}>
+                  {/* Sport icon (emoji) */}
+                  <span style={{ fontSize: 20, lineHeight: 1 }}>{cat.emoji}</span>
+                  {/* Red badge count */}
+                  {cat.count > 0 && (
+                    <span style={{
+                      position: "absolute",
+                      top: -6,
+                      right: -8,
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      fontSize: 8,
+                      fontWeight: 700,
+                      borderRadius: "50%",
+                      minWidth: 14,
+                      height: 14,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0 2px",
+                      lineHeight: 1,
+                      border: "1px solid rgba(255,255,255,0.3)",
+                    }}>{cat.count}</span>
+                  )}
+                </div>
                 {/* Label */}
                 <span style={{
                   color: "white",
                   fontSize: 10,
                   fontWeight: 700,
-                  textTransform: "none",
                   letterSpacing: 0.5,
-                  opacity: isActive ? 1 : 0.8,
+                  opacity: isActive ? 1 : 0.85,
                 }}>{cat.label}</span>
               </button>
             );
@@ -277,7 +288,7 @@ export default function UserDashboard() {
                     style={{
                       backgroundColor: "#e8eef4",
                       borderBottom: "1px solid #ccd9e5",
-                      padding: "7px 12px",
+                      padding: "5px 10px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
@@ -285,7 +296,7 @@ export default function UserDashboard() {
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span className={sportIconClass} />
-                      <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>{sport}</span>
+                      <span style={{ fontWeight: 700, fontSize: 13, color: "#212529" }}>{sport}</span>
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "#333" }}>Matched</span>
                   </div>
