@@ -14,7 +14,7 @@ export function TennisScoreCard({ scoreTab, setScoreTab, match }: TennisScoreCar
         <button 
           onClick={() => setScoreTab("tv")}
           className={cn(
-            "flex-1 py-3.5 font-black text-[16px] transition-all",
+            "flex-1 py-2 font-black text-[13px] transition-all",
             scoreTab === "tv" ? "bg-[#008c66] text-white shadow-inner" : "bg-[#00b181] text-white/80 hover:bg-[#00a377]"
           )}
         >
@@ -23,7 +23,7 @@ export function TennisScoreCard({ scoreTab, setScoreTab, match }: TennisScoreCar
         <button 
           onClick={() => setScoreTab("scorecard")}
           className={cn(
-            "flex-1 py-3.5 font-black text-[16px] transition-all border-l border-white/10",
+            "flex-1 py-2 font-black text-[13px] transition-all border-l border-white/10",
             scoreTab === "scorecard" ? "bg-[#008c66] text-white shadow-inner" : "bg-[#00b181] text-white/80 hover:bg-[#00a377]"
           )}
         >
