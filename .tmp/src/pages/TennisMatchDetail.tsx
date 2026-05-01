@@ -108,7 +108,7 @@ function TennisMarketHeader({ title }: { title: string }) {
         <span className="text-white font-black text-[13px] uppercase">{title}</span>
       </div>
       <div className="flex shrink-0">
-        <div className="w-[50px] flex items-center justify-center bg-[#3d5a7a] border-l border-white/15"><span className="text-white font-black text-[13px]">BACK</span></div>
+        <div className="w-[50px] flex items-center justify-center bg-[#3d5a7a]"><span className="text-white font-black text-[13px]">BACK</span></div>
         <div className="w-[50px] flex items-center justify-center bg-[#3d5a7a] border-l border-white/15"><span className="text-white font-black text-[13px]">LAY</span></div>
       </div>
     </div>
@@ -119,7 +119,7 @@ function TennisPlayerRow({ name, odds, layOdds, onBet }: { name: string; odds: n
   return (
     <div className="flex items-stretch bg-[#dce8f3] border-b border-[#c4d9ea] min-h-[55px]">
       <div className="flex-1 flex items-center px-3.5 py-2"><span className="font-bold text-sm text-[#212529]">{name}</span></div>
-      <div onClick={() => onBet('back', odds)} className="w-[50px] bg-[#72bbef] flex flex-col items-center justify-center cursor-pointer border-l border-white/30">
+      <div onClick={() => onBet('back', odds)} className="w-[50px] bg-[#72bbef] flex flex-col items-center justify-center cursor-pointer">
         <span className="font-black text-[20px] text-[#212529] leading-none">{odds.toFixed(2)}</span>
         <span className="text-[11px] text-[#212529]/70 mt-1">200K</span>
       </div>

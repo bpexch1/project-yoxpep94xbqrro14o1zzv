@@ -376,7 +376,7 @@ function CombinedSectionHeader({ title }: { title: string }) {
       </div>
       {/* Right: BACK and LAY header boxes */}
       <div style={{ display: "flex", flexShrink: 0 }}>
-        <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
+        <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 13, letterSpacing: 1 }}>BACK</span>
         </div>
         <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#3d5a7a", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
@@ -402,7 +402,7 @@ function TeamRow2({ name, odds, layOdds, onBet }: { name: string; odds: number; 
         <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>{name}</span>
       </div>
       {/* Back odds box */}
-      <div onClick={() => onBet('back', backOddsVal)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
+      <div onClick={() => onBet('back', backOddsVal)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
         <span style={{ fontWeight: 900, fontSize: 20, color: "#212529", lineHeight: 1 }}>{backOddsVal.toFixed(2)}</span>
         <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
       </div>
@@ -434,7 +434,7 @@ function FancyRow2({ name, backOdds, layOdds, backSize, laySize, suspended, onBe
         </div>
       ) : (
         <>
-          <div onClick={() => onBet('back', backOdds)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
+          <div onClick={() => onBet('back', backOdds)} style={{ width: 50, backgroundColor: "#72bbef", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
             <span style={{ fontWeight: 900, fontSize: 18, color: "#212529", lineHeight: 1 }}>{backOdds}</span>
             <span style={{ fontSize: 11, color: "#212529", opacity: 0.7, marginTop: 4 }}>{backSize}</span>
           </div>
