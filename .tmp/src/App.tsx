@@ -63,6 +63,7 @@ const App = () => (
             <Route path="/bet-lock" element={<AppLayout><BetLock /></AppLayout>} />
             <Route path="/settle-match" element={<AppLayout><SettleMatch /></AppLayout>} />
             <Route path="/play" element={<UserDashboard />} />
+            <Route path="/casino" element={<UserDashboard />} />
             <Route path="/play/profile" element={<UserProfile />} />
             <Route path="/play/match/:matchId" element={<MatchDetail />} />
             

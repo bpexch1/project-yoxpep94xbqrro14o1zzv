@@ -11,7 +11,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
   const isLive = match.status === 'live';
   
   // Random matched amount for UI authenticity
-  const matchedAmount = Math.floor(Math.random() * 30000000 + 500000).toLocaleString();
+  const matchedAmount = Math.floor(Math.random() * 30000000 + 500000).toLocaleString('en-IN');
   
   // Time display: extract time portion from match_time
   const timeDisplay = match.match_time 
@@ -34,7 +34,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
     >
       {/* Left: Status + time */}
       <div style={{
-        width: 62,
+        width: 68,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -50,32 +50,35 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
             backgroundColor: "#00b181",
             color: "#fff",
             fontSize: 9,
-            fontWeight: 700,
+            fontWeight: 800,
             borderRadius: 2,
             padding: "2px 4px",
             letterSpacing: 0.2,
             textTransform: "uppercase",
+            textAlign: "center",
           }}>InPlay</span>
         ) : (
           <span style={{
             backgroundColor: "#3d6b8b",
             color: "#fff",
             fontSize: 9,
-            fontWeight: 700,
+            fontWeight: 800,
             borderRadius: 2,
             padding: "2px 4px",
+            textTransform: "uppercase",
+            textAlign: "center",
           }}>Today</span>
         )}
-        <span style={{ fontSize: 10, color: "#254465", fontWeight: 700 }}>{timeDisplay}</span>
+        <span style={{ fontSize: 10, color: "#444", fontWeight: 800 }}>{timeDisplay}</span>
       </div>
 
       {/* Center: match title + icons + amount */}
-      <div style={{ flex: 1, padding: "7px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: "#254465", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis" }}>
+      <div style={{ flex: 1, padding: "7px 10px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3, minWidth: 0 }}>
+        <span style={{ fontWeight: 700, fontSize: 14, color: "#1a2a3a", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {matchTitle}
         </span>
         {/* Icons: TV + BM + F badges */}
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "nowrap" }}>
           {/* TV icon - sprite or emoji fallback */}
           <span className="svg-DTV" style={{ flexShrink: 0 }} />
           {/* BM badge */}
@@ -119,7 +122,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
           )}
         </div>
         {/* Matched amount */}
-        <span style={{ fontSize: 11, color: "#6c757d" }}>{matchedAmount}</span>
+        <span style={{ fontSize: 11, color: "#6c757d", fontWeight: 500 }}>{matchedAmount}</span>
       </div>
 
       {/* Right: info button */}
