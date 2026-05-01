@@ -46,42 +46,67 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div style={{ 
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "6px",
-        padding: "10px"
+        gap: "5px",
+        padding: "10px 12px 12px 12px"
       }}>
         {tabs.map((tab, index) => {
           const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
           const isLast = index === tabs.length - 1;
           
+          // Active = btn-primary, Inactive = btn-outline-primary
+          const btnStyle: React.CSSProperties = isActive
+            ? {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "5px 8px",
+                fontSize: "13px",
+                fontWeight: 400,
+                lineHeight: "1.5",
+                borderRadius: "4px",
+                border: "1px solid #00b181",
+                background: "#00b181",
+                color: "#fff",
+                cursor: "pointer",
+                textAlign: "center",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                width: "100%",
+                boxSizing: "border-box",
+                gridColumn: isLast ? "2" : "auto",
+                fontFamily: "inherit",
+                transition: "opacity 0.15s",
+              }
+            : {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "5px 8px",
+                fontSize: "13px",
+                fontWeight: 400,
+                lineHeight: "1.5",
+                borderRadius: "4px",
+                border: "1px solid #17a2b8",
+                background: "#ffffff",
+                color: "#17a2b8",
+                cursor: "pointer",
+                textAlign: "center",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                width: "100%",
+                boxSizing: "border-box",
+                gridColumn: isLast ? "2" : "auto",
+                fontFamily: "inherit",
+                transition: "opacity 0.15s",
+              };
+
           return (
             <button
               key={tab.label}
               onClick={() => navigate(tab.path)}
-              style={{
-                height: "36px",
-                minHeight: "36px",
-                maxHeight: "36px",
-                padding: "0 8px",
-                fontSize: "13px",
-                fontWeight: isActive ? "700" : "400",
-                borderRadius: "6px",
-                border: isActive ? "2px solid #00b181" : "1.5px solid #17a2b8",
-                background: isActive ? "#00b181" : "#ffffff",
-                color: isActive ? "#ffffff" : "#17a2b8",
-                cursor: "pointer",
-                textAlign: "center" as const,
-                whiteSpace: "nowrap" as const,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gridColumn: isLast ? "2" : "auto",
-                boxSizing: "border-box" as const,
-                width: "100%",
-                lineHeight: "1",
-                fontFamily: "inherit",
-              }}
+              style={btnStyle}
             >
               {tab.label}
             </button>
