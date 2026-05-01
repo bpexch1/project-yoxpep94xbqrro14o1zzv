@@ -6,27 +6,27 @@ interface TennisOddsRowProps {
 }
 
 export function TennisOddsRow({ name, odds, layOdds, onBet }: TennisOddsRowProps) {
-  const backSize = `${(Math.random() * 400 + 100).toFixed(1)}K`;
-  const laySize = `${(Math.random() * 600 + 200).toFixed(1)}K`;
+  const backSize = `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
+  const laySize = `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
   
   return (
-    <div className="flex items-stretch bg-[#dce8f3] border-b border-[#c4d9ea] min-h-[70px] hover:bg-[#d4e2ee] transition-colors">
-      <div className="flex-1 flex items-center px-4 py-3">
-        <span className="font-black text-[17px] text-[#1e293b] tracking-tight">{name}</span>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 44 }}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "6px 12px" }}>
+        <span style={{ fontWeight: 700, fontSize: 14, color: "#212529" }}>{name}</span>
       </div>
-      <div 
-        onClick={() => onBet('back', odds)} 
-        className="w-[60px] bg-[#72bbef] hover:bg-[#62aadd] flex flex-col items-center justify-center cursor-pointer transition-colors active:scale-95"
+      <div
+        onClick={() => onBet('back', odds)}
+        style={{ width: 60, backgroundColor: "#a5d9fe", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", gap: 0, padding: "0 2px" }}
       >
-        <span className="font-black text-[22px] text-[#1e293b] leading-none">{odds.toFixed(2)}</span>
-        <span className="text-[10px] font-black text-[#1e293b]/60 mt-1 tracking-tighter">{backSize}</span>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{odds.toFixed(2)}</span>
+        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{backSize}</span>
       </div>
-      <div 
-        onClick={() => onBet('lay', layOdds)} 
-        className="w-[60px] bg-[#faa9ba] hover:bg-[#f898ab] flex flex-col items-center justify-center cursor-pointer transition-colors active:scale-95"
+      <div
+        onClick={() => onBet('lay', layOdds)}
+        style={{ width: 60, backgroundColor: "#f8d0ce", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", gap: 0, padding: "0 2px" }}
       >
-        <span className="font-black text-[22px] text-[#1e293b] leading-none">{layOdds.toFixed(2)}</span>
-        <span className="text-[10px] font-black text-[#1e293b]/60 mt-1 tracking-tighter">{laySize}</span>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{layOdds.toFixed(2)}</span>
+        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{laySize}</span>
       </div>
     </div>
   );
