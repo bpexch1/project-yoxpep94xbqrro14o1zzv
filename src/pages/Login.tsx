@@ -122,124 +122,154 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center relative"
       style={{
-        backgroundColor: '#2b2b2b',
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23404040' fill-opacity='0.5'%3E%3Cpath d='M20 0l20 20-20 20L0 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        backgroundRepeat: 'repeat',
-        backgroundSize: '40px 40px',
+        minHeight: "100vh",
+        backgroundColor: "#2b2b2b",
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23505050' fill-opacity='0.25'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        backgroundRepeat: "repeat",
+        backgroundSize: "60px 60px",
+        display: "flex",
+        flexDirection: "column",
+        paddingBottom: "8px",
       }}
     >
-      {/* Blue gradient card */}
+      <style>{`
+        .login-input::placeholder { color: rgba(255,255,255,0.65); }
+        .login-input:focus { outline: none; }
+      `}</style>
+
+      {/* Login Card — upper portion, not vertically centered */}
       <div
-        className="relative z-10 w-full mx-4 rounded-2xl"
         style={{
-          maxWidth: '380px',
-          background: 'linear-gradient(180deg, #2e7a9a 0%, #0d2640 100%)',
-          boxShadow: '0 12px 50px rgba(0,0,0,0.6)',
-          padding: '60px 32px 48px',
-          marginTop: '40px',
+          margin: "40px 16px 0",
+          borderRadius: 18,
+          background: "linear-gradient(180deg, #3a7490 0%, #1a4a6e 50%, #0d2640 100%)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
+          padding: "36px 28px 36px",
+          overflow: "hidden",
         }}
       >
-        {/* BP Logo — teal circle centered at top */}
-        <div className="flex justify-center absolute left-0 right-0" style={{ top: '-60px' }}>
+        {/* BP Logo Circle — centered inside card */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
           <div
             style={{
-              width: '120px',
-              height: '120px',
-              borderRadius: '50%',
-              background: '#3dd6c8',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+              width: 120,
+              height: 120,
+              borderRadius: "50%",
+              backgroundColor: "#3dd6c8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
             }}
           >
-            <span style={{
-              fontFamily: 'Pacifico, cursive',
-              fontSize: '3.2rem',
-              color: '#0d2640',
-              lineHeight: 1,
-            }}>BP</span>
+            <span
+              style={{
+                fontFamily: "Pacifico, cursive",
+                fontSize: "3.2rem",
+                color: "#0d1f30",
+                lineHeight: 1,
+                fontStyle: "italic",
+              }}
+            >
+              BP
+            </span>
           </div>
         </div>
 
         <form onSubmit={handleLogin}>
           {/* Username field */}
-          <div className="mb-8" style={{ borderBottom: '1px solid rgba(255,255,255,0.35)' }}>
-            <div className="flex items-center gap-3 pb-3">
-              <User size={20} className="text-white/60" />
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
+              <User size={22} color="rgba(255,255,255,0.85)" />
               <input
                 type="text"
                 placeholder="Username"
                 value={username}
-                onChange={e => setUsername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
                 required
+                className="login-input"
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  color: 'white',
-                  fontSize: '16px',
-                  width: '100%',
+                  flex: 1,
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  color: "#fff",
+                  fontSize: 17,
+                  fontFamily: "Roboto, sans-serif",
                 }}
-                className="placeholder-white/60"
               />
             </div>
+            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
           </div>
 
           {/* Password field */}
-          <div className="mb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.35)' }}>
-            <div className="flex items-center gap-3 pb-3">
-              <Lock size={20} className="text-white/60" />
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
+              <Lock size={22} color="rgba(255,255,255,0.85)" />
               <input
                 type="password"
                 placeholder="Password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
+                className="login-input"
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  color: 'white',
-                  fontSize: '16px',
-                  width: '100%',
+                  flex: 1,
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  color: "#fff",
+                  fontSize: 17,
+                  fontFamily: "Roboto, sans-serif",
                 }}
-                className="placeholder-white/60"
               />
             </div>
+            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
           </div>
 
-          {/* Login button */}
-          <div className="flex justify-center">
+          {/* Login Button — pill shape, centered */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center disabled:opacity-60 active:scale-95 transition-transform"
               style={{
-                background: 'linear-gradient(180deg, #5a9ec0 0%, #2e6e90 100%)',
-                border: 'none',
-                borderRadius: '50px',
-                color: 'white',
-                fontSize: '17px',
-                fontWeight: '500',
-                padding: '13px 64px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
-                letterSpacing: '0.5px',
+                width: "65%",
+                borderRadius: 50,
+                background: "linear-gradient(180deg, #6090b0 0%, #3d6e8c 100%)",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                fontWeight: 500,
+                padding: "14px 0",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                fontFamily: "Roboto, sans-serif",
+                letterSpacing: 0.3,
+                transition: "opacity 0.2s",
               }}
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Login'}
+              {loading ? <Loader2 size={20} className="animate-spin" /> : "Login"}
             </button>
           </div>
         </form>
       </div>
 
-      {/* Bottom blue bar */}
+      {/* Blue bar at bottom of screen */}
       <div
-        className="absolute bottom-0 left-0 right-0"
-        style={{ height: '4px', background: '#1a6090' }}
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          background: "#1a6090",
+        }}
       />
 
       {/* Forced Password Change Modal */}
