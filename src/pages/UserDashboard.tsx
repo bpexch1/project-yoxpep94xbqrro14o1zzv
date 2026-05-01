@@ -249,7 +249,7 @@ export default function UserDashboard() {
                   color: "white",
                   fontSize: 10,
                   fontWeight: 700,
-                  textTransform: "uppercase",
+                  textTransform: "none",
                   letterSpacing: 0.5,
                   opacity: isActive ? 1 : 0.8,
                 }}>{cat.label}</span>
