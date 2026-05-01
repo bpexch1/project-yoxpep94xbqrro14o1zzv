@@ -43,49 +43,50 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter style={{ width: 16, height: 16, color: "#2c3e50", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 15, color: "#2c3e50" }}>Report Type</span>
       </div>
-      <div style={{ padding: "12px" }}>
-        <div style={{ 
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "2px"
-        }}>
-          {tabs.map((tab, index) => {
-            const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
-            const isLast = index === tabs.length - 1;
-            
-            return (
-              <button
-                key={tab.label}
-                onClick={() => navigate(tab.path)}
-                style={{
-                  height: "28px",
-                  padding: "0 6px",
-                  fontSize: "10px",
-                  fontWeight: isActive ? "700" : "500",
-                  borderRadius: "2px",
-                  border: isActive ? "1px solid #00b181" : "1px solid #17a2b8",
-                  background: isActive ? "#00b181" : "#ffffff",
-                  color: isActive ? "#ffffff" : "#17a2b8",
-                  cursor: "pointer",
-                  transition: "background 0.15s",
-                  textAlign: "center",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gridColumn: isLast ? "2" : "auto",
-                  boxSizing: "border-box",
-                  width: "100%",
-                  lineHeight: "1",
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+      <div style={{ 
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: "6px",
+        padding: "10px"
+      }}>
+        {tabs.map((tab, index) => {
+          const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
+          const isLast = index === tabs.length - 1;
+          
+          return (
+            <button
+              key={tab.label}
+              onClick={() => navigate(tab.path)}
+              style={{
+                height: "36px",
+                minHeight: "36px",
+                maxHeight: "36px",
+                padding: "0 8px",
+                fontSize: "13px",
+                fontWeight: isActive ? "700" : "400",
+                borderRadius: "6px",
+                border: isActive ? "2px solid #00b181" : "1.5px solid #17a2b8",
+                background: isActive ? "#00b181" : "#ffffff",
+                color: isActive ? "#ffffff" : "#17a2b8",
+                cursor: "pointer",
+                textAlign: "center" as const,
+                whiteSpace: "nowrap" as const,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gridColumn: isLast ? "2" : "auto",
+                boxSizing: "border-box" as const,
+                width: "100%",
+                lineHeight: "1",
+                fontFamily: "inherit",
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
