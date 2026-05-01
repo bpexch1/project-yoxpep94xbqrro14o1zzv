@@ -97,10 +97,6 @@ export default function FootballMatchDetail({ match, clientData, session }: Foot
         <FootballTeamRow name={match.team2} odds={match.back_odds2 || 3.4} layOdds={match.lay_odds2 || 3.45} onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} />
         <FootballTeamRow name="The Draw" odds={3.85} layOdds={3.9} onBet={(t, o) => setActiveBet({ match, selection: "The Draw", betType: t, odds: o })} />
 
-        <div className="bg-white p-3 border-y border-gray-200">
-          <span className="text-red-600 font-black text-sm">LIVE VIDEO AVAILABLE</span>
-        </div>
-
         <GoalsSection title="OVER/UNDER 0.5 GOALS (MaxBet: 250K)" underOdds={13} underLay={14.5} overOdds={1.07} overLay={1.09} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />
         <GoalsSection title="OVER/UNDER 1.5 GOALS (MaxBet: 250K)" underOdds={3.85} underLay={3.95} overOdds={1.34} overLay={1.35} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />
         <GoalsSection title="OVER/UNDER 2.5 GOALS (MaxBet: 250K)" underOdds={1.98} underLay={1.99} overOdds={2.0} overLay={2.04} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />

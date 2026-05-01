@@ -130,14 +130,6 @@ export default function TennisMatchDetail({ match, clientData, session }: Tennis
           onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
         />
 
-        {/* LIVE VIDEO STATUS */}
-        <div className="bg-white p-3.5 border-b border-gray-200">
-          <span className="text-[#e53e3e] font-black text-sm tracking-wider flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-            LIVE VIDEO AVAILABLE
-          </span>
-        </div>
-
         {/* 5. TV / SCORE CARD TABS & COURT VISUAL */}
         <TennisScoreCard 
           scoreTab={scoreTab} 
