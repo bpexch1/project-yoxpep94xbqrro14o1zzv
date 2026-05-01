@@ -151,13 +151,13 @@ export function CasinoSection() {
   return (
     <div className="flex flex-col bg-[#0a0f14] min-h-screen">
       {/* Casino Header */}
-      <div className="bg-[#1e3a5c] px-4 py-3 flex items-center justify-between border-b border-white/10">
+      <div className="bg-[#254465] px-4 py-3 flex items-center justify-between border-b border-white/10">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center w-6 h-6 bg-red-600 rounded-full animate-pulse">
             <div className="w-2.5 h-2.5 bg-white rounded-full" />
           </div>
           <h2 className="text-white font-black text-[15px] uppercase tracking-wider">
-            Live Casino <span className="text-[#16a085] ml-1">Betfair</span>
+            Live Casino <span className="text-[#00b181] ml-1">Betfair</span>
           </h2>
         </div>
         <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ export function CasinoSection() {
             className={cn(
               "px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap",
               activeCategory === cat 
-                ? "bg-[#16a085] text-white shadow-lg shadow-emerald-500/20" 
+                ? "bg-[#00b181] text-white shadow-lg shadow-emerald-500/20" 
                 : "bg-white/5 text-white/60 hover:bg-white/10"
             )}
           >
