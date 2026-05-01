@@ -36,6 +36,24 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#e6f2fc", fontFamily: "Roboto, system-ui, sans-serif" }}>
+      {/* Scrolling Welcome Ticker */}
+      <div style={{
+        backgroundColor: "#254465",
+        overflow: "hidden",
+        height: 32,
+        display: "flex",
+        alignItems: "center",
+        borderBottom: "1px solid rgba(255,255,255,0.1)"
+      }}>
+        <div className="animate-marquee whitespace-nowrap flex items-center gap-8" style={{ color: "white", fontSize: 13, fontWeight: 500 }}>
+          <span>🏏 Welcome to Exchange.</span>
+          <span style={{ margin: "0 32px" }}>⚽ Welcome to Exchange.</span>
+          <span style={{ margin: "0 32px" }}>🎾 Welcome to Exchange.</span>
+          <span style={{ margin: "0 32px" }}>🏏 Welcome to Exchange.</span>
+          <span style={{ margin: "0 32px" }}>⚽ Welcome to Exchange.</span>
+          <span style={{ margin: "0 32px" }}>🎾 Welcome to Exchange.</span>
+        </div>
+      </div>
       <main style={{ width: "100%", padding: "16px 16px 80px" }}>
 
         {/* 1. Search-Users Card */}
