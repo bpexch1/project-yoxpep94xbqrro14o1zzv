@@ -1,4 +1,3 @@
-import { Tv } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface BettingMatchCardProps {
@@ -85,33 +84,11 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
         <span style={{ fontWeight: 700, fontSize: 14, color: "#1e3a5c", lineHeight: 1.3 }}>
           {matchTitle}
         </span>
-        {/* Icons row: TV + BM + F */}
+        {/* Icons row: TV + BM + F using sprite icons */}
         <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-          <Tv size={13} color="#555" />
-          <span
-            style={{
-              backgroundColor: "#3dccc8",
-              color: "#fff",
-              fontSize: 9,
-              fontWeight: 700,
-              borderRadius: 10,
-              padding: "1px 6px",
-            }}
-          >
-            BM
-          </span>
-          <span
-            style={{
-              backgroundColor: "#3dccc8",
-              color: "#fff",
-              fontSize: 9,
-              fontWeight: 700,
-              borderRadius: 10,
-              padding: "1px 6px",
-            }}
-          >
-            F
-          </span>
+          <span className="svg-DTV" style={{ flexShrink: 0 }} />
+          <span className="svg-DBM" style={{ flexShrink: 0 }} />
+          <span className="svg-DF" style={{ flexShrink: 0 }} />
           {match.source === 'betfair' && (
             <span
               style={{

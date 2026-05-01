@@ -97,3 +97,61 @@ a:hover {
 .blink_me { 
   animation: blinker 1s linear infinite; 
 }
+
+/* ===== SPRITE ICONS from bpexch.live ===== */
+.svg-18plus {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 80.93905191873588% 70.59133986928104% no-repeat;
+    width: 24px; height: 24px; display: inline-block;
+}
+.svg-Casino {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 78.92359550561798% 76.57775974025974% no-repeat;
+    width: 20px; height: 20px; display: inline-block;
+}
+.svg-DBM {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 79.32413793103449% 67.04668820678513% no-repeat;
+    width: 40px; height: 17px; display: inline-block;
+}
+.svg-DF {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 83.06257110352674% 67.04668820678513% no-repeat;
+    width: 31px; height: 17px; display: inline-block;
+}
+.svg-DTV {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 85.47309417040358% 76.32993527508091% no-repeat;
+    width: 18px; height: 18px; display: inline-block;
+}
+.svg-cricket {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 91.54853273137698% 70.59133986928104% no-repeat;
+    width: 24px; height: 24px; display: inline-block;
+}
+.svg-greyhound-racing {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 90.80179775280898% 63.62179487179487% no-repeat;
+    width: 20px; height: 12px; display: inline-block;
+}
+.svg-horse {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 94.25733634311513% 70.59133986928104% no-repeat;
+    width: 24px; height: 24px; display: inline-block;
+}
+.svg-live-betting {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 96.74774774774775% 70.59133986928104% no-repeat;
+    width: 22px; height: 24px; display: inline-block;
+}
+.svg-live-casino {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 99.44920993227991% 70.59133986928104% no-repeat;
+    width: 24px; height: 24px; display: inline-block;
+}
+.svg-soccer {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 83.41797752808989% 76.57775974025974% no-repeat;
+    width: 20px; height: 20px; display: inline-block;
+}
+.svg-tennis {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 74.20090293453724% 77.07826797385621% no-repeat;
+    width: 24px; height: 24px; display: inline-block;
+}
+.svg-az-sport {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 83.64785553047405% 70.59133986928104% no-repeat;
+    width: 24px; height: 24px; display: inline-block;
+}
+.svg-clock-green {
+    background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 86.16216216216216% 70.59133986928104% no-repeat;
+    width: 22px; height: 24px; display: inline-block;
+}

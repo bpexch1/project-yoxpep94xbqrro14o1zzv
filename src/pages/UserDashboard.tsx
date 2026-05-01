@@ -124,10 +124,10 @@ export default function UserDashboard() {
   ];
   
   const categories = [
-    { id: "Inplay", label: "Inplay", icon: "⊙", count: matchesList.filter((m: any) => m.status === 'live').length },
-    { id: "Cricket", label: "Cricket", icon: "🏏", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
-    { id: "Tennis", label: "Tennis", icon: "🎾", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
-    { id: "Soccer", label: "Soccer", icon: "⚽", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
+    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", count: matchesList.filter((m: any) => m.status === 'live').length },
+    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
+    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
+    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -210,8 +210,8 @@ export default function UserDashboard() {
         <GameBanners />
 
         {/* Race Sections */}
-        <RaceSection title="Horse Race" icon={Trophy} emoji="🏇" slots={horseRaceSlots} />
-        <RaceSection title="Grey Hound" icon={Disc} emoji="🐕" slots={greyhoundSlots} />
+        <RaceSection title="Horse Race" icon={Trophy} iconClass="svg-horse" slots={horseRaceSlots} />
+        <RaceSection title="Grey Hound" icon={Disc} iconClass="svg-greyhound-racing" slots={greyhoundSlots} />
 
         {/* Sport Category Tabs */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
@@ -232,10 +232,18 @@ export default function UserDashboard() {
                   border: "none",
                   cursor: "pointer",
                   transition: "background-color 0.2s",
+                  minHeight: 70,
                 }}
               >
                 <span style={{ color: "white", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>{cat.count}</span>
-                <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 20, margin: "3px 0" }}>{cat.icon}</span>
+                <span 
+                  className={cat.iconClass}
+                  style={{ 
+                    margin: "4px 0",
+                    opacity: isActive ? 1 : 0.75,
+                    filter: "brightness(0) invert(1)",  // Make sprite white on dark bg
+                  }} 
+                />
                 <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat.label}</span>
               </button>
             );
@@ -262,9 +270,15 @@ export default function UserDashboard() {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 16 }}>
-                        {sport.toLowerCase().includes('cricket') ? '🏏' : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? '⚽' : sport.toLowerCase().includes('tennis') ? '🎾' : '🏅'}
-                      </span>
+                      {sport.toLowerCase().includes('cricket') ? (
+                        <span className="svg-cricket" style={{ filter: "brightness(0.2)" }} />
+                      ) : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? (
+                        <span className="svg-soccer" style={{ filter: "brightness(0.2)" }} />
+                      ) : sport.toLowerCase().includes('tennis') ? (
+                        <span className="svg-tennis" style={{ filter: "brightness(0.2)" }} />
+                      ) : (
+                        <span style={{ fontSize: 14 }}>🏅</span>
+                      )}
                       <span style={{ fontWeight: 700, fontSize: 14, color: "#1e3a5c" }}>{sport}</span>
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#6c757d" }}>Matched</span>
