@@ -26,6 +26,7 @@ Deno.serve(async (req) => {
       case '2': return 'Tennis';
       case '4': return 'Cricket';
       case '7': return 'Horse Racing';
+      case '4339': return 'Greyhound Racing';
       default: return 'Other';
     }
   };
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
         method: 'SportsAPING/v1.0/listMarketCatalogue',
         params: {
           filter: {
-            eventTypeIds: ['1', '2', '4', '7'],
+            eventTypeIds: ['1', '2', '4', '7', '4339'],
             inPlayOnly: true
           },
           marketProjection: ['EVENT', 'EVENT_TYPE', 'MARKET_START_TIME'],
@@ -79,7 +80,7 @@ Deno.serve(async (req) => {
           method: 'SportsAPING/v1.0/listMarketCatalogue',
           params: {
             filter: {
-              eventTypeIds: ['1', '2', '4', '7']
+              eventTypeIds: ['1', '2', '4', '7', '4339']
             },
             marketProjection: ['EVENT', 'EVENT_TYPE', 'MARKET_START_TIME'],
             maxResults: '200'
@@ -105,7 +106,7 @@ Deno.serve(async (req) => {
           method: 'SportsAPING/v1.0/listEvents',
           params: {
             filter: {
-              eventTypeIds: ['1', '2', '4', '7']
+              eventTypeIds: ['1', '2', '4', '7', '4339']
             }
           },
           id: 1

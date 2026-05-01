@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Match } from "@/entities";
+import { fetchBetfairEvents } from "@/functions";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -30,22 +30,22 @@ const mainMenuItems = [
 ];
 
 const sportsItems = [
-  { label: "Soccer", icon: CircleDot, link: "/sports/football", sportKey: "football" },
-  { label: "Tennis", icon: Crosshair, link: "/sports/tennis", sportKey: "tennis" },
-  { label: "Cricket", icon: Swords, link: "/sports/cricket", sportKey: "cricket" },
-  { label: "Horse Race", icon: Zap, link: "/sports/horse-race", sportKey: "horse-race" },
-  { label: "Greyhound", icon: Rabbit, link: "/sports/greyhound", sportKey: "greyhound" },
+  { label: "Soccer", icon: CircleDot, sportName: "Soccer" },
+  { label: "Tennis", icon: Crosshair, sportName: "Tennis" },
+  { label: "Cricket", icon: Swords, sportName: "Cricket" },
+  { label: "Horse Race", icon: Zap, sportName: "Horse Racing" },
+  { label: "Greyhound", icon: Rabbit, sportName: "Greyhound Racing" },
 ];
 
 function SportDropdown({ 
-  sportKey, 
+  sportName, 
   label, 
   icon: Icon, 
   isCollapsed, 
   onNavigate,
   isMobile = false
 }: { 
-  sportKey: string; 
+  sportName: string; 
   label: string; 
   icon: any; 
   isCollapsed: boolean; 
@@ -54,18 +54,17 @@ function SportDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const { data: matches, isLoading } = useQuery({
-    queryKey: ["sidebar-matches", sportKey],
-    queryFn: () => Match.query().where("sport", sportKey).sort("-created_at").limit(15).exec(),
+  const { data: allEvents, isLoading } = useQuery({
+    queryKey: ["betfair-events-all"],
+    queryFn: () => fetchBetfairEvents({}),
     enabled: isOpen && (!isCollapsed || isMobile),
-    staleTime: 30000,
+    staleTime: 60000,
   });
 
   const toggleOpen = (e: React.MouseEvent) => {
     if (isCollapsed && !isMobile) {
-      navigate(`/sports/${sportKey}`);
+      navigate(`/sports/${sportName.toLowerCase().replace(" ", "-")}`);
       onNavigate();
       return;
     }
@@ -74,10 +73,18 @@ function SportDropdown({
     setIsOpen(!isOpen);
   };
 
-  const handleMatchClick = (matchId: string) => {
-    navigate(`/play/match/${matchId}`);
+  const handleMatchClick = (marketId: string) => {
+    navigate(`/play/match/${marketId}`);
     onNavigate();
   };
+
+  const filteredEvents = allEvents 
+    ? Array.from(new Map(
+        (allEvents as any[])
+          .filter((e: any) => e.sport === sportName)
+          .map((e: any) => [e.eventName, e])
+      ).values())
+    : [];
 
   const showLabels = !isCollapsed || isMobile;
 
@@ -124,18 +131,18 @@ function SportDropdown({
                 <Loader2 className="w-3 h-3 animate-spin" />
                 <span>Loading...</span>
               </div>
-            ) : matches && matches.length > 0 ? (
+            ) : filteredEvents && filteredEvents.length > 0 ? (
               <div className="flex flex-col">
-                {matches.map((match: any) => (
+                {filteredEvents.map((event: any) => (
                   <button
-                    key={match.id}
-                    onClick={() => handleMatchClick(match.id)}
+                    key={event.id}
+                    onClick={() => handleMatchClick(event.marketId)}
                     className="pl-12 pr-4 py-2 text-[12px] text-left text-[#b8c7ce] hover:text-white hover:bg-white/[0.04] transition-colors border-b border-white/[0.02] group flex items-center justify-between"
                   >
                     <span className="truncate flex-1">
-                      {match.title || `${match.team1} v ${match.team2}`}
+                      {event.eventName}
                     </span>
-                    {match.status === "live" && (
+                    {event.status === "live" && (
                       <span className="w-1.5 h-1.5 rounded-full bg-[#00b181] ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(0,166,90,0.6)]" />
                     )}
                   </button>
@@ -211,8 +218,8 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
       <div className="flex flex-col">
         {sportsItems.map((item) => (
           <SportDropdown 
-            key={item.sportKey}
-            sportKey={item.sportKey} 
+            key={item.sportName}
+            sportName={item.sportName} 
             label={item.label} 
             icon={item.icon} 
             isCollapsed={isCollapsed} 
