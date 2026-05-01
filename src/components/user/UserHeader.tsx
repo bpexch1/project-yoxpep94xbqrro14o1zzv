@@ -57,20 +57,19 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
         position: "sticky",
         top: 0,
         zIndex: 50,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          padding: "8px 12px",
+          padding: "0 12px",
           minHeight: 64,
           position: "relative",
         }}
       >
         {/* Left: hamburger + Dashboard label */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <button
             onClick={onMenuToggle}
             style={{
@@ -103,16 +102,16 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
             transform: "translateX(-50%)",
             color: "white",
             fontWeight: 700,
-            fontSize: 18,
+            fontSize: 20,
             whiteSpace: "nowrap",
           }}
         >
           Welcome to BpExch
         </div>
 
-        {/* Right: Balance + Username */}
+        {/* Right: 2-row layout */}
         <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <div style={{ color: "white", fontWeight: 700, fontSize: 18 }}>
+          <div style={{ color: "white", fontWeight: 900, fontSize: 24, lineHeight: 1.1 }}>
             B: {balance.toLocaleString('en-IN')} | L: 0
           </div>
           <div
@@ -122,13 +121,13 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
               gap: 4,
               marginTop: 2,
               cursor: "pointer",
+              color: "white",
+              fontSize: 15,
             }}
             onClick={handleLogout}
           >
-            <span style={{ color: "white", fontSize: 14, fontWeight: 500 }}>
-              {session.username}
-            </span>
-            <ChevronDown size={14} color="white" />
+            <span>{session.username}</span>
+            <ChevronDown size={14} />
           </div>
         </div>
       </div>

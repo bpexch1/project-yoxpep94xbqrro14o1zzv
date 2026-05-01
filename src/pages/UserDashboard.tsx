@@ -167,9 +167,8 @@ export default function UserDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#e6f2fc] text-[#212529]" style={{ 
-      fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif',
-      backgroundImage: 'url("https://bpexch.live/img/bg-diamonds.png")'
+    <div className="min-h-screen bg-[#edf2f7] text-[#212529]" style={{ 
+      fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif'
     }}>
       <UserHeader 
         sidebarOpen={sidebarOpen}
@@ -179,14 +178,15 @@ export default function UserDashboard() {
       {/* Account Info Bar */}
       <div
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: "#254465",
           padding: "9px 14px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-around",
-          fontSize: 14,
-          color: "#212529",
-          borderBottom: "1px solid #ccd9e5",
+          fontSize: 15,
+          color: "white",
+          borderTop: "1px solid rgba(255,255,255,0.15)",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
         }}
       >
         <span>Credit: <strong>{clientData?.credit_received ?? 0}</strong></span>
@@ -200,7 +200,7 @@ export default function UserDashboard() {
         onClose={() => setSidebarOpen(false)} 
       />
       
-      <main className="flex flex-col" style={{ paddingBottom: 82 }}>
+      <main className="flex flex-col">
         {/* Game Banners */}
         <GameBanners />
 
@@ -208,36 +208,87 @@ export default function UserDashboard() {
         <RaceSection title="Horse Race" iconClass="svg-horse" slots={horseRaceSlots} />
         <RaceSection title="Grey Hound" iconClass="svg-greyhound-racing" slots={greyhoundSlots} />
 
+        {/* Bottom Tabs - Inline */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
+          {categories.map((cat) => {
+            const isActive = activeFilter === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveFilter(cat.id)}
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 4px 8px",
+                  backgroundColor: isActive ? "#00b181" : "#254465",
+                  border: "none",
+                  borderRight: "1px solid rgba(255,255,255,0.08)",
+                  cursor: "pointer",
+                  minHeight: 85,
+                }}
+              >
+                {/* Count number - top right italic */}
+                <span style={{
+                  position: "absolute",
+                  top: 6,
+                  right: 8,
+                  color: "white",
+                  fontStyle: "italic",
+                  fontSize: 16,
+                  fontWeight: 400,
+                  opacity: isActive ? 1 : 0.8,
+                  lineHeight: 1,
+                }}>{cat.count}</span>
+                
+                {/* Icon */}
+                <div style={{ marginBottom: 6 }}>
+                  <span className={cat.iconClass} />
+                </div>
+
+                {/* Label */}
+                <span style={{
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: isActive ? 700 : 400,
+                }}>{cat.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Content Area */}
         {activeFilter === "Casino" ? (
           <CasinoSection />
         ) : (
           <div className="flex flex-col">
             {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
+              const sportIconClass = sport.toLowerCase().includes('cricket') ? 'svg-cricket' 
+                                   : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? 'svg-soccer' 
+                                   : sport.toLowerCase().includes('tennis') ? 'svg-tennis' 
+                                   : sport.toLowerCase().includes('horse') ? 'svg-horse'
+                                   : 'svg-az-sport';
+
               return (
                 <div key={sport} className="flex flex-col">
                   {/* Sport section header */}
                   <div
                     style={{
-                      backgroundColor: "#e8f0f5",
+                      backgroundColor: "#e8eef4",
                       borderBottom: "1px solid #ccd9e5",
-                      padding: "8px 14px",
+                      padding: "7px 12px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 15 }}>
-                        {sport.toLowerCase().includes('cricket') ? '🏏' 
-                         : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? '⚽' 
-                         : sport.toLowerCase().includes('tennis') ? '🎾' 
-                         : sport.toLowerCase().includes('horse') ? '🏇'
-                         : '🏅'}
-                      </span>
-                      <span style={{ fontWeight: 700, fontSize: 13, color: "#254465" }}>{sport}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span className={sportIconClass} />
+                      <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>{sport}</span>
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#6c757d" }}>Matched</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#333" }}>Matched</span>
                   </div>
                   <div className="flex flex-col">
                     {sportMatches.map((match: any) => (
@@ -266,76 +317,7 @@ export default function UserDashboard() {
         )}
       </main>
 
-      {/* Sport Category Tabs - Fixed Bottom */}
-      <div 
-        style={{ 
-          position: "fixed", 
-          bottom: 0, 
-          left: 0, 
-          right: 0, 
-          height: 82, 
-          zIndex: 60, 
-          display: "grid", 
-          gridTemplateColumns: "repeat(4, 1fr)", 
-          width: "100%",
-          boxShadow: "0 -2px 10px rgba(0,0,0,0.1)"
-        }}
-      >
-        {categories.map((cat) => {
-          const isActive = activeFilter === cat.id;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setActiveFilter(cat.id)}
-              style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: isActive ? "#00b181" : "#254465",
-                border: "none",
-                cursor: "pointer",
-                transition: "background-color 0.2s",
-                paddingTop: 8,
-              }}
-            >
-              {/* Count bubble */}
-              <span 
-                style={{ 
-                  position: "absolute", 
-                  top: 4, 
-                  right: 6, 
-                  color: isActive ? "white" : "rgba(255,255,255,0.7)", 
-                  fontSize: 16, 
-                  fontWeight: 900, 
-                  fontStyle: "italic" 
-                }}
-              >
-                {cat.count}
-              </span>
-              
-              {/* Icon */}
-              <div style={{ marginBottom: 4 }}>
-                <span className={cat.iconClass} />
-              </div>
-
-              {/* Label */}
-              <span 
-                style={{ 
-                  color: "white", 
-                  fontSize: 13, 
-                  fontWeight: 600, 
-                  textTransform: "uppercase", 
-                  letterSpacing: 0.5 
-                }}
-              >
-                {cat.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Sport Category Tabs - REMOVED FIXED BOTTOM */}
       
       {/* BetSlip modal overlay */}
       {activeBet && (

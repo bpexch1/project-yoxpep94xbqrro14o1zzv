@@ -31,7 +31,7 @@ export function RaceSection({ title, icon: Icon, emoji, iconClass, slots }: Race
   return (
     <div className="flex flex-col w-full">
       {/* Section Header */}
-      <div className="bg-[#e6f2fc] border-b border-[#ccd9e5] px-4 py-2 flex items-center gap-3">
+      <div className="px-4 py-2 flex items-center gap-[10px]">
         {iconClass ? (
           <span className={iconClass} />
         ) : Icon ? (
@@ -39,7 +39,7 @@ export function RaceSection({ title, icon: Icon, emoji, iconClass, slots }: Race
         ) : (
           <span style={{ fontSize: 18 }}>{emoji}</span>
         )}
-        <span className="text-black font-bold text-[18px]">{title}</span>
+        <span className="text-black font-bold text-[17px]">{title}</span>
       </div>
 
       {/* Time Slots Row */}
@@ -48,7 +48,7 @@ export function RaceSection({ title, icon: Icon, emoji, iconClass, slots }: Race
           backgroundColor: "#254465", 
           display: "flex", 
           alignItems: "center", 
-          height: 64, 
+          height: 65, 
           padding: "0 10px" 
         }}
       >
@@ -59,8 +59,8 @@ export function RaceSection({ title, icon: Icon, emoji, iconClass, slots }: Race
             width: 28,
             height: 28,
             borderRadius: "50%",
-            border: "2px solid rgba(255,255,255,0.5)",
-            backgroundColor: "rgba(0,0,0,0.2)",
+            border: "2px solid rgba(255,255,255,0.4)",
+            backgroundColor: "rgba(0,0,0,0.15)",
             color: "white",
             display: "flex",
             alignItems: "center",
@@ -84,12 +84,12 @@ export function RaceSection({ title, icon: Icon, emoji, iconClass, slots }: Race
                 flexDirection: "column", 
                 alignItems: "center", 
                 justifyContent: "center", 
-                borderRight: idx < visibleSlots.length - 1 ? "1px solid rgba(255,255,255,0.2)" : "none", 
+                borderRight: idx < visibleSlots.length - 1 ? "1px solid rgba(255,255,255,0.25)" : "none", 
                 cursor: "pointer" 
               }}
             >
-              <span style={{ fontWeight: 700, fontSize: 14, color: "white" }}>{slot.time}</span>
-              <span style={{ fontSize: 12, color: "white", opacity: 0.8, marginTop: 2 }}>{slot.venue}</span>
+              <span style={{ fontWeight: 700, fontSize: 15, color: "white" }}>{slot.time}</span>
+              <span style={{ fontSize: 12, color: "white", opacity: 0.85, marginTop: 2 }}>{slot.venue}</span>
             </div>
           ))}
         </div>
@@ -101,8 +101,8 @@ export function RaceSection({ title, icon: Icon, emoji, iconClass, slots }: Race
             width: 28,
             height: 28,
             borderRadius: "50%",
-            border: "2px solid rgba(255,255,255,0.5)",
-            backgroundColor: "rgba(0,0,0,0.2)",
+            border: "2px solid rgba(255,255,255,0.4)",
+            backgroundColor: "rgba(0,0,0,0.15)",
             color: "white",
             display: "flex",
             alignItems: "center",
