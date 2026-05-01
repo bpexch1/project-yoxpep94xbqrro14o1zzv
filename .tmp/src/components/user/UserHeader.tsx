@@ -99,7 +99,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
             <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }}>Welcome to BpExch</span>
             <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>
-              B: Rs. {balance.toLocaleString('en-IN')} | L: 0
+              B: {balance.toLocaleString('en-IN')} | L: 0
             </span>
           </div>
           <div
