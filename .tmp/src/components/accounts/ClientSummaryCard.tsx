@@ -328,11 +328,6 @@ export function ClientSummaryCard({
               <span className="w-5 h-5 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded text-[11px] font-black">D</span>
               <span>InActive</span>
             </div>
-
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-[#e74c3c] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
-              <span>Settle Account</span>
-            </div>
           </div>
         </div>
 
@@ -500,131 +495,153 @@ export function ClientSummaryCard({
                       <td className="px-2 py-2 border border-[#4dbd74] text-right">
                         {totals.credit_remaining.toLocaleString()}
                       </td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-center"></td>
+                      <td className="px-2 py-2 border border-[#4dbd74]"></td>
                     </>
                   )}
                 </tr>
               )}
 
+              {/* Client Rows */}
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="px-3 py-12 text-center text-[#212529] bg-white">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto mb-2" />
-                    <span className="font-bold">Loading clients data...</span>
+                  <td colSpan={9} className="px-2 py-8 text-center text-gray-500">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                    Loading clients...
                   </td>
                 </tr>
-              ) : paginatedClients.length === 0 ? (
+              ) : tableFilteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-3 py-12 text-center text-[#212529] bg-white font-bold">
-                    No users found
-                  </td>
+                  <td colSpan={9} className="px-2 py-8 text-center text-gray-500 italic">No clients found</td>
                 </tr>
               ) : (
-                  paginatedClients.map((client, idx) => {
-                    const isClientAdmin = isAdminType(client.role);
-                    const display = getClientDisplayData(client);
-                    
-                    return (
-                      <tr key={client.id} className={cn(idx % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]", "hover:bg-green-50/50 transition-colors whitespace-nowrap")}>
-                        <td className="px-2 py-2 border border-[#d5d8dc]">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                if (isClientAdmin) {
-                                  navigate(`/accounts/view/${client.username}`);
-                                }
-                              }}
+                paginatedClients.map((client) => {
+                  const display = getClientDisplayData(client);
+                  const isExpanded = expandedIds.has(client.id);
+
+                  return (
+                    <React.Fragment key={client.id}>
+                      <tr className={cn(
+                        "hover:bg-[#f8f9fa] border-b border-[#d5d8dc] whitespace-nowrap transition-colors",
+                        isExpanded && "bg-[#f8f9fa]"
+                      )}>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc]">
+                          <div className="flex items-center gap-1.5">
+                            <button 
+                              onClick={() => toggleExpand(client.id)}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            </button>
+                            <span 
+                              onClick={() => isAdminType(client.role) && navigate(`/accounts/view/${client.username}`)}
                               className={cn(
-                                "font-black text-left",
-                                isClientAdmin ? "text-[#254465] hover:underline" : "text-[#212529]"
+                                "font-bold text-[#212529]",
+                                isAdminType(client.role) ? "cursor-pointer hover:text-[#00b181] hover:underline" : ""
                               )}
                             >
                               {client.username}
-                            </button>
-                            {!balancesLoaded && (
-                              <span style={{
-                                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                                width: 16, height: 16, borderRadius: "50%", 
-                                background: "#333", color: "#fff", fontSize: 10, fontWeight: 700,
-                                marginLeft: 4, flexShrink: 0
-                              }}>i</span>
-                            )}
+                            </span>
                           </div>
                         </td>
-                      <td className="px-2 py-2 border border-[#d5d8dc] font-bold text-[#6c757d]">
-                        {getTypeLabel(client.role)}
-                      </td>
-                      <td className="px-2 py-2 border border-[#d5d8dc] text-right font-black text-[#212529]">
-                        {display.credit !== null ? display.credit.toLocaleString() : "-"}
-                      </td>
-                      <td className={cn(
-                        "px-2 py-2 border border-[#d5d8dc] text-right font-black",
-                        display.balance !== null ? (display.balance >= 0 ? "text-[#28a745]" : "text-[#dc3545]") : "text-gray-400"
-                      )}>
-                        {display.balance !== null ? display.balance.toLocaleString() : "-"}
-                      </td>
-                      <td className={cn(
-                        "px-2 py-2 border border-[#d5d8dc] text-right font-black",
-                        display.plDownline !== null ? (display.plDownline >= 0 ? "text-[#28a745]" : "text-[#dc3545]") : "text-gray-400"
-                      )}>
-                        {display.plDownline !== null ? display.plDownline.toLocaleString() : "-"}
-                      </td>
-                      <td className="px-2 py-2 border border-[#d5d8dc] text-right font-bold text-[#212529]">
-                        {display.share !== null ? `${display.share}%` : "-"}
-                      </td>
-                      <td className="px-2 py-2 border border-[#d5d8dc] text-right font-bold text-[#dc3545]">
-                        {display.isLoaded ? "0" : "-"}
-                      </td>
-                      <td className="px-2 py-2 border border-[#d5d8dc] text-right font-black text-[#28a745]">
-                        {display.available !== null ? display.available.toLocaleString() : "-"}
-                      </td>
-                      <td className="px-2 py-1 border border-[#d5d8dc] text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button 
-                            onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                            className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm"
-                            title="Cash / Credit"
-                          >
-                            C
-                          </button>
-                          <button 
-                            onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                            className="w-6 h-6 bg-[#28a745] hover:bg-[#218838] text-white flex items-center justify-center rounded transition-colors shadow-sm"
-                            title="Edit"
-                          >
-                            <Pencil className="w-3 h-3" />
-                          </button>
-                          <button 
-                            onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                            className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm"
-                            title="Ledger"
-                          >
-                            L
-                          </button>
-                          <button 
-                            onClick={() => toggleStatus(client)}
-                            className={cn(
-                              "w-6 h-6 font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm",
-                              client.status === "active" 
-                                ? "bg-[#28a745] hover:bg-[#218838] text-white" 
-                                : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
-                            )}
-                            title={client.status === "active" ? "Deactivate" : "Activate"}
-                          >
-                            {client.status === "active" ? "A" : "D"}
-                          </button>
-                          {client.can_settle_pl && (
-                            <button 
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-gray-600">{getTypeLabel(client.role)}</td>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#28a745]">
+                          {display.isLoaded ? display.credit?.toLocaleString() : "-"}
+                        </td>
+                        <td className={cn(
+                          "px-2 py-2 border-r border-[#d5d8dc] text-right font-bold",
+                          display.isLoaded ? (display.balance < 0 ? "text-[#dc3545]" : "text-[#28a745]") : "text-gray-400"
+                        )}>
+                          {display.isLoaded ? display.balance?.toLocaleString() : "-"}
+                        </td>
+                        <td className={cn(
+                          "px-2 py-2 border-r border-[#d5d8dc] text-right font-bold",
+                          display.isLoaded ? (display.plDownline < 0 ? "text-[#dc3545]" : "text-[#28a745]") : "text-gray-400"
+                        )}>
+                          {display.isLoaded ? display.plDownline?.toLocaleString() : "-"}
+                        </td>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#212529]">
+                          {display.isLoaded ? `${display.share}%` : "-"}
+                        </td>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#dc3545]">
+                          0
+                        </td>
+                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right font-bold text-[#28a745]">
+                          {display.isLoaded ? display.available?.toLocaleString() : "-"}
+                        </td>
+                        <td className="px-2 py-1.5 border-r border-[#d5d8dc]">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
+                              className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black rounded text-[11px] flex items-center justify-center shadow-sm"
+                              title="Cash/Credit"
+                            >
+                              C
+                            </button>
+                            <button
+                              onClick={() => navigate(`/accounts/edit/${client.username}`)}
+                              className="w-6 h-6 bg-[#28a745] hover:bg-[#218838] text-white rounded flex items-center justify-center shadow-sm"
+                              title="Edit"
+                            >
+                              <Pencil className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => navigate(`/accounts/ledger/${client.username}`)}
+                              className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black rounded text-[11px] flex items-center justify-center shadow-sm"
+                              title="Ledger"
+                            >
+                              L
+                            </button>
+                            <button
+                              onClick={() => toggleStatus(client)}
+                              className={cn(
+                                "w-6 h-6 font-black rounded text-[11px] flex items-center justify-center transition-colors shadow-sm",
+                                client.status === "active" 
+                                  ? "bg-[#28a745] hover:bg-[#218838] text-white" 
+                                  : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
+                              )}
+                              title={client.status === "active" ? "Deactivate" : "Activate"}
+                            >
+                              {client.status === "active" ? "A" : "D"}
+                            </button>
+                            <button
                               onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                              className="w-6 h-6 bg-[#6f42c1] hover:bg-[#5a32a3] text-white font-black text-[11px] flex items-center justify-center rounded transition-colors shadow-sm"
+                              className="w-6 h-6 bg-[#e74c3c] hover:bg-[#c0392b] text-white font-black rounded text-[11px] flex items-center justify-center shadow-sm"
                               title="Settle Account"
                             >
                               S
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                          </div>
+                        </td>
+                      </tr>
+                      {/* Expanded Row */}
+                      {isExpanded && (
+                        <tr className="bg-[#f0f3f5] text-[12px] whitespace-nowrap">
+                          <td colSpan={9} className="p-0 border-b border-[#d5d8dc]">
+                            <div className="p-3 flex items-center justify-between">
+                              <div className="flex items-center gap-6">
+                                <div>
+                                  <span className="text-gray-500 mr-2">Full Name:</span>
+                                  <span className="font-bold">{client.full_name || client.username}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-500 mr-2">Created:</span>
+                                  <span className="font-bold">{new Date(client.created_at).toLocaleDateString()}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleRowRefresh(client)}
+                                  disabled={rowRefreshingMap[client.id]}
+                                  className="bg-[#2c3e50] hover:bg-[#1a252f] text-white px-3 py-1 rounded text-[11px] font-bold flex items-center gap-1"
+                                >
+                                  {rowRefreshingMap[client.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : "Refresh Balance"}
+                                </button>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })
               )}
@@ -632,182 +649,22 @@ export function ClientSummaryCard({
           </table>
         </div>
 
-        {/* MOBILE TABLE VIEW — exact clone of screenshot */}
-        <div className="lg:hidden overflow-x-auto">
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-            <thead>
-              <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 120 }}>Username</th>
-                <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 75 }}>Type</th>
-                <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", borderRight: "1px solid #ddd", minWidth: 80 }}>Credit</th>
-                <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, fontSize: 14, color: "#212529", borderBottom: "2px solid #ddd", minWidth: 80 }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* GREEN TOTAL ROW */}
-              {!isLoading && tableFilteredClients.length > 0 && (
-                !balancesLoaded ? (
-                  <tr style={{ backgroundColor: "#00b181" }}>
-                    <td colSpan={4} style={{ padding: "10px 12px" }}>
-                      <button
-                        onClick={handleLoadBalance}
-                        disabled={isLoadingBalances}
-                        style={{ backgroundColor: "#ffc107", color: "#000", border: "none", padding: "8px 24px", fontWeight: 900, fontSize: 15, borderRadius: 5, cursor: "pointer", letterSpacing: 0.3 }}
-                      >
-                        {isLoadingBalances ? "Loading..." : "Load Balance"}
-                      </button>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr style={{ backgroundColor: "#00b181" }}>
-                    <td colSpan={2} style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15 }}>Total</td>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15, textAlign: "right", borderLeft: "1px solid rgba(255,255,255,0.2)" }}>
-                      {totals.credit_received.toLocaleString()}
-                    </td>
-                    <td style={{ padding: "10px 12px", color: "#fff", fontWeight: 700, fontSize: 15, textAlign: "right", borderLeft: "1px solid rgba(255,255,255,0.2)" }}>
-                      {totals.cash.toLocaleString()}
-                    </td>
-                  </tr>
-                )
-              )}
-
-              {/* LOADING STATE */}
-              {isLoading && (
-                <tr>
-                  <td colSpan={4} style={{ padding: "40px 0", textAlign: "center" }}>
-                    <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto mb-2" />
-                    <span style={{ fontSize: 15, fontWeight: 700 }}>Loading...</span>
-                  </td>
-                </tr>
-              )}
-
-              {/* EMPTY STATE */}
-              {!isLoading && paginatedClients.length === 0 && (
-                <tr>
-                  <td colSpan={4} style={{ padding: "32px 0", textAlign: "center", fontSize: 15, fontWeight: 700, color: "#6c757d" }}>
-                    No users found
-                  </td>
-                </tr>
-              )}
-
-              {/* USER ROWS — each user = 2 rows */}
-              {!isLoading && paginatedClients.map((client, idx) => {
-                const display = getClientDisplayData(client);
-                
-                return (
-                  <React.Fragment key={client.id}>
-                    {/* ROW A - 4 columns: Username | Type | Credit | Balance (partial) */}
-                    <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}>
-                      <td style={{ padding: "10px 12px", fontSize: 14, borderBottom: "1px solid #e5e5e5", borderRight: "1px solid #e5e5e5" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span
-                            style={{
-                              fontWeight: 700,
-                              fontSize: 14,
-                              cursor: "pointer",
-                              color: isAdminType(client.role) ? "#00b181" : "#212529"
-                            }}
-                            onClick={() => navigate(`/accounts/view/${client.username}`)}
-                          >
-                            {client.username}
-                          </span>
-                          {!balancesLoaded && (
-                            <button
-                              onClick={() => toggleExpand(client.id)}
-                              style={{
-                                width: 22, height: 22, borderRadius: "50%",
-                                backgroundColor: "#333", color: "#fff",
-                                border: "none", fontSize: 12, fontWeight: 900,
-                                cursor: "pointer", lineHeight: "22px", textAlign: "center",
-                                flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center"
-                              }}
-                            >i</button>
-                          )}
-                        </div>
-                      </td>
-                      
-                      <td style={{ padding: "10px 12px", fontSize: 14, color: "#6c757d", fontWeight: 400, borderBottom: "1px solid #e5e5e5", borderRight: "1px solid #e5e5e5" }}>
-                        {getTypeLabel(client.role)}
-                      </td>
-                      
-                      <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 700, textAlign: "right", color: "#212529", borderBottom: "1px solid #e5e5e5", borderRight: "1px solid #e5e5e5" }}>
-                        {!balancesLoaded ? "-" : (display.credit ?? 0).toLocaleString()}
-                      </td>
-                      
-                      <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 400, textAlign: "right", color: "#212529", borderBottom: "1px solid #e5e5e5" }}>
-                        {!balancesLoaded ? "" : (display.balance ?? 0).toLocaleString()}
-                      </td>
-                    </tr>
-
-                    {/* ROW B - expanded bullet card (auto-show after load) */}
-                    {(balancesLoaded || expandedIds.has(client.id)) && (
-                      <tr style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}>
-                        <td colSpan={4} style={{ padding: "0 14px 12px 14px", borderBottom: "1px solid #e5e5e5" }}>
-                          <ul style={{ listStyle: "none", margin: 0, padding: 0, fontSize: 14, color: "#212529", lineHeight: "1.9" }}>
-                            <li>• Balance <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.balance ?? 0).toLocaleString() : "-"}</span></li>
-                            <li>• Client (P/L) <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.plDownline ?? 0).toLocaleString() : "-"}</span></li>
-                            <li>• Share <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.share ?? 0) : "-"}</span></li>
-                            <li>• Exposure <span style={{ fontWeight: 600 }}>0</span></li>
-                            <li>• Available Balance <span style={{ fontWeight: 600 }}>{balancesLoaded ? (display.available ?? 0).toLocaleString() : "-"}</span></li>
-                            <li style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                              <span>• Options</span>
-                              <button style={{ width: 32, height: 32, backgroundColor: "#ffc107", color: "#000", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
-                                onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}>C</button>
-                              
-                              <button style={{ width: 32, height: 32, backgroundColor: "#28a745", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                                onClick={() => navigate(`/accounts/edit/${client.username}`)}>
-                                <Pencil style={{ width: 15, height: 15 }} />
-                              </button>
-                              
-                              <button style={{ width: 32, height: 32, backgroundColor: "#17a2b8", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
-                                onClick={() => navigate(`/accounts/ledger/${client.username}`)}>L</button>
-                              
-                              <button
-                                style={{
-                                  width: 32, height: 32, borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer",
-                                  backgroundColor: client.status === "active" ? "#28a745" : "#fff",
-                                  color: client.status === "active" ? "#fff" : "#dc3545",
-                                  border: client.status === "active" ? "none" : "2px solid #dc3545"
-                                }}
-                                onClick={() => toggleStatus(client)}>
-                                {client.status === "active" ? "A" : "D"}
-                              </button>
-                              
-                              {client.can_settle_pl && (
-                                <button style={{ width: 32, height: 32, backgroundColor: "#e74c3c", color: "#fff", border: "none", borderRadius: 4, fontWeight: 900, fontSize: 13, cursor: "pointer" }}
-                                  onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}>S</button>
-                              )}
-                            </li>
-                          </ul>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* DataTable Bottom Controls */}
-        <div className="mt-4">
+        {/* Pagination */}
+        {!isLoading && sortedClients.length > 0 && (
           <DataTablePagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalRecords={sortedClients.length}
             pageSize={pageSize}
-            startRecord={startRecord}
-            endRecord={endRecord}
             onPageChange={setCurrentPage}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
               setCurrentPage(1);
             }}
-            searchValue={tableSearch}
-            onSearchChange={setTableSearch}
-            showTopControls={false}
+            totalRecords={sortedClients.length}
+            startRecord={startRecord}
+            endRecord={endRecord}
           />
-        </div>
+        )}
       </div>
     </section>
   );

@@ -43,38 +43,35 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter style={{ width: 16, height: 16, color: "#2c3e50", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 15, color: "#2c3e50" }}>Report Type</span>
       </div>
-      <div style={{ padding: "14px 16px" }}>
+      <div style={{ padding: "10px 8px" }}>
         <div style={{ 
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 8
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 0,
+          border: "1px solid #bbb",
+          borderRadius: 4,
+          overflow: "hidden"
         }}>
           {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
-            // If this is the last button AND it would be alone in its row (tabs.length % 3 === 1)
-            // place it in the middle column (gridColumn: 2) to center it
-            const isLastAlone = index === tabs.length - 1 && tabs.length % 3 === 1;
-
             return (
               <button
                 key={tab.label}
                 onClick={() => navigate(tab.path)}
                 style={{
-                  gridColumn: isLastAlone ? 2 : undefined,
-                  padding: "8px 6px",
-                  borderRadius: 3,
-                  fontSize: 13,
-                  fontWeight: isActive ? 700 : 500,
-                  border: `1px solid ${isActive ? "#00b181" : "#17a2b8"}`,
-                  background: isActive ? "#00b181" : "transparent",
+                  padding: "5px 8px",
+                  fontSize: "11px",
+                  fontWeight: "600",
+                  border: "none",
+                  borderRight: index === tabs.length - 1 ? "none" : "1px solid #bbb",
+                  background: isActive ? "#00b181" : "#f8f9fa",
                   color: isActive ? "#fff" : "#17a2b8",
                   cursor: "pointer",
                   transition: "all 0.15s",
                   textAlign: "center",
                   whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  flex: "0 0 auto",
                   minWidth: 0
                 }}
               >
