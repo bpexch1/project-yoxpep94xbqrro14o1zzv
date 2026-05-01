@@ -166,9 +166,9 @@ export default function UserDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#edf2f7] text-[#212529]" style={{ 
+    <div className="min-h-screen text-[#212529]" style={{ 
       fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif',
-      backgroundImage: 'url("https://bpexch.live/img/bg-diamonds.png")'
+      backgroundColor: '#edf2f7'
     }}>
       <UserHeader 
         sidebarOpen={sidebarOpen}
