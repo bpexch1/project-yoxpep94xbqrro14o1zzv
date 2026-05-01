@@ -307,7 +307,7 @@ export function ClientSummaryCard({
             </button>
           </div>
 
-          <div className="flex items-center gap-x-2 text-[10px] font-bold text-[#212529] uppercase flex-wrap gap-y-1">
+          <div className="flex items-center gap-x-2 text-[10px] font-bold text-[#212529] flex-wrap gap-y-1">
             <div className="flex items-center gap-1">
               <span className="w-5 h-5 bg-[#ffc107] text-black flex items-center justify-center rounded text-[11px] font-black">C</span>
               <span>Cash / Credit</span>
@@ -513,7 +513,7 @@ export function ClientSummaryCard({
         <div className="hidden lg:block overflow-x-auto border-x border-b border-[#d5d8dc]">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-[#ecf0f1] text-[#212529] text-[12px] font-black uppercase whitespace-nowrap">
+              <tr className="bg-[#ecf0f1] text-[#212529] text-[12px] font-black whitespace-nowrap">
                 <th 
                   onClick={() => handleSort('username')}
                   className={cn(
