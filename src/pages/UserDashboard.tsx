@@ -223,16 +223,43 @@ export default function UserDashboard() {
                   justifyContent: "center",
                   padding: "8px 4px",
                   backgroundColor: isActive ? "#00b181" : "#254465",
-                  borderRight: "1px solid rgba(255,255,255,0.08)",
                   border: "none",
+                  borderRight: "1px solid rgba(255,255,255,0.08)",
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                   minHeight: 70,
                 }}
               >
-                <span style={{ color: "white", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>{cat.count}</span>
-                <span className={cat.iconClass} style={{ marginBottom: 2 }} />
-                <span style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat.label}</span>
+                {/* Count number - italic top */}
+                <span style={{
+                  color: "white",
+                  fontStyle: "italic",
+                  fontSize: 15,
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  marginBottom: 4,
+                  opacity: 0.9,
+                }}>{cat.count}</span>
+
+                {/* Sport icon - white colored using filter */}
+                <span
+                  className={cat.iconClass}
+                  style={{
+                    filter: "brightness(0) invert(1)",
+                    marginBottom: 3,
+                    display: "inline-block",
+                  }}
+                />
+
+                {/* Label */}
+                <span style={{
+                  color: "white",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                  opacity: isActive ? 1 : 0.8,
+                }}>{cat.label}</span>
               </button>
             );
           })}
