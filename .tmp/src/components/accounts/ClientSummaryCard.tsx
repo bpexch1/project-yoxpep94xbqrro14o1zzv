@@ -308,30 +308,37 @@ export function ClientSummaryCard({
             </button>
           </div>
 
-          <div className="flex items-center gap-x-2 text-[10px] font-bold text-[#212529] flex-wrap gap-y-1">
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-[#ffc107] text-black flex items-center justify-center rounded text-[11px] font-black">C</span>
-              <span>Cash / Credit</span>
+          {/* Legend - 2 rows exactly like screenshot */}
+          <div className="flex flex-col gap-1 text-[10px] font-bold text-[#212529]">
+            {/* Row 1: C, Edit, L, A */}
+            <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-1">
+                <span className="w-5 h-5 bg-[#ffc107] text-black flex items-center justify-center rounded text-[11px] font-black">C</span>
+                <span>Cash / Credit</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded"><Pencil className="w-3 h-3" /></span>
+                <span>Edit</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-5 h-5 bg-[#17a2b8] text-white flex items-center justify-center rounded text-[11px] font-black">L</span>
+                <span>Ledger</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded text-[11px] font-black">A</span>
+                <span>Active</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded"><Pencil className="w-3 h-3" /></span>
-              <span>Edit</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-[#17a2b8] text-white flex items-center justify-center rounded text-[11px] font-black">L</span>
-              <span>Ledger</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-[#28a745] text-white flex items-center justify-center rounded text-[11px] font-black">A</span>
-              <span>Active</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded text-[11px] font-black">D</span>
-              <span>InActive</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-5 h-5 bg-[#e74c3c] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
-              <span>Settle Account</span>
+            {/* Row 2: D, S */}
+            <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-1">
+                <span className="w-5 h-5 bg-white border border-[#dc3545] text-[#dc3545] flex items-center justify-center rounded text-[11px] font-black">D</span>
+                <span>InActive</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-5 h-5 bg-[#e74c3c] text-white flex items-center justify-center rounded text-[11px] font-black">S</span>
+                <span>Settle Account</span>
+              </div>
             </div>
           </div>
         </div>
