@@ -89,10 +89,6 @@ export default function MatchDetail() {
       });
     },
     onSuccess: () => {
-      toast({
-        title: "Bet Placed Successfully!",
-        description: "Good luck with your selection.",
-      });
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data'] });
       queryClient.invalidateQueries({ queryKey: ['open-bets'] });

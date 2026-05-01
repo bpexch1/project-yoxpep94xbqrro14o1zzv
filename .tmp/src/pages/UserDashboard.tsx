@@ -89,10 +89,6 @@ export default function UserDashboard() {
       });
     },
     onSuccess: () => {
-      toast({
-        title: "Bet Placed Successfully!",
-        description: "Good luck with your selection.",
-      });
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data'] });
     },
