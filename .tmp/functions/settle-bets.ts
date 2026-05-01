@@ -7,6 +7,26 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+/**
+ * MongoDB "users" collection schema:
+ * {
+ *   username: String,           -- unique identifier
+ *   sharePercentage: Number,    -- default 85 (admin share %)
+ *   plDownline: Number,         -- Admin's cumulative P/L (85% share) starts at 0
+ *   plUpline: Number,           -- Company's cumulative P/L (15% share) starts at 0
+ *   balance: Number,            -- current balance
+ *   updatedAt: Date
+ * }
+ *
+ * P/L FORMULA (when user loses amount X):
+ *   plDownline += X * 0.85   (Admin earns 85% of loss → add to plDownline)
+ *   plUpline   -= X * 0.15   (Company 15% is deducted  → subtract from plUpline)
+ *
+ * P/L FORMULA (when user wins amount X):
+ *   plDownline -= X * 0.85   (Admin pays 85% of win → deduct from plDownline)
+ *   plUpline   += X * 0.15   (Company pays 15% of win → add to plUpline)
+ */
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -21,10 +41,10 @@ Deno.serve(async (req) => {
 
   const appId = Deno.env.get('SUPERDEV_APP_ID') ?? 'yoxpep94xbqrro14o1zzv';
 
+  const mongoClient = new MongoClient(mongoUri);
+
   try {
     const body = await req.json();
-    // matchId: string, winningSide: string (team name that won, or "draw")
-    // token: optional auth token from client
     const { matchId, winningSide, token } = body;
 
     if (!matchId || !winningSide) {
@@ -34,13 +54,12 @@ Deno.serve(async (req) => {
     }
 
     // --- Connect to MongoDB Atlas ---
-    const mongoClient = new MongoClient(mongoUri);
     await mongoClient.connect();
-    const db = mongoClient.db(); // uses DB from connection string
-    const plRecords = db.collection('pl_records');
-    const betRecords = db.collection('bets');
+    const db = mongoClient.db();
+    const usersCollection = db.collection('users');
+    const plRecordsCollection = db.collection('pl_records');
 
-    // --- Connect to Buildy entity system ---
+    // --- Connect to Buildy ---
     const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
     const userToken = token || authHeader.replace('Bearer ', '').trim();
     const superdev = createSuperdevClient({ appId });
@@ -50,7 +69,7 @@ Deno.serve(async (req) => {
     const ClientEntity = superdev.entity('Client');
     const MatchEntity = superdev.entity('Match');
 
-    // --- Fetch all pending bets for this match ---
+    // --- Fetch pending bets ---
     const bets = await BetEntity.query()
       .where('match_id', matchId)
       .where('status', 'pending')
@@ -63,124 +82,124 @@ Deno.serve(async (req) => {
       });
     }
 
-    // --- Update match status to completed ---
-    try {
-      await MatchEntity.update(matchId, { status: 'completed' });
-    } catch (_) { /* ignore match update errors */ }
+    // --- Mark match as completed ---
+    try { await MatchEntity.update(matchId, { status: 'completed' }); } catch (_) {}
 
     const settlements: any[] = [];
-    const clientPlMap: Map<string, { downline: number; upline: number; username: string; clientId: string }> = new Map();
 
-    // --- Calculate P/L for each bet ---
     for (const bet of bets as any[]) {
-      const stake = bet.stake ?? 0;
-      const odds = bet.odds ?? 1;
-      const betType = bet.bet_type ?? 'back'; // 'back' or 'lay'
+      const stake     = bet.stake ?? 0;
+      const odds      = bet.odds ?? 1;
+      const betType   = bet.bet_type ?? 'back';
       const selection = bet.selection ?? '';
-      const userEmail = bet.user_email ?? '';
+      const username  = bet.user_email ?? 'unknown';
 
-      let pl = 0; // positive = win, negative = loss
-      const didWin = selection === winningSide;
+      const didWin = selection === winningSide || (winningSide === 'draw' && selection === 'draw');
 
+      // Raw P/L from the bet
+      let pl = 0;
       if (betType === 'back') {
         pl = didWin ? stake * (odds - 1) : -stake;
       } else {
-        // lay bet: if selection wins → layer loses (pays odds-1 per stake unit); if selection loses → layer wins the stake
         pl = didWin ? -(stake * (odds - 1)) : stake;
       }
 
-      // 85% stays with downline (client), 15% goes to upline
-      const plDownline = parseFloat((pl * 0.85).toFixed(2));
-      const plUpline = parseFloat((pl * 0.15).toFixed(2));
+      // pl > 0 means user WON, pl < 0 means user LOST
+      const lossAmount = -pl; // positive when user lost
+      const sharePercentage = 85;
+
+      // ---- P/L SHARING FORMULA ----
+      // When user LOSES (lossAmount > 0):
+      //   plDownline += lossAmount * 0.85   (admin earns 85%)
+      //   plUpline   -= lossAmount * 0.15   (company 15% deducted)
+      // When user WINS (lossAmount < 0, i.e., pl > 0):
+      //   plDownline -= winAmount * 0.85    (admin pays 85%)
+      //   plUpline   += winAmount * 0.15    (company pays 15%)
+      const plDownlineDelta = parseFloat((lossAmount * 0.85).toFixed(2));  // +85% when loss, -85% when win
+      const plUplineDelta   = parseFloat((-lossAmount * 0.15).toFixed(2)); // -15% when loss, +15% when win
 
       const newStatus = didWin ? 'won' : 'lost';
 
-      // Update bet status in Buildy
-      try {
-        await BetEntity.update(bet.id, { status: newStatus });
-      } catch (_) {}
+      // --- Update bet status in Buildy ---
+      try { await BetEntity.update(bet.id, { status: newStatus }); } catch (_) {}
 
-      // Sync bet to MongoDB bets collection
-      await betRecords.updateOne(
-        { buildy_id: bet.id },
-        { $set: {
-          buildy_id: bet.id,
-          match_id: matchId,
-          user_email: userEmail,
-          selection,
-          bet_type: betType,
-          stake,
-          odds,
-          pl,
-          pl_downline: plDownline,
-          pl_upline: plUpline,
-          status: newStatus,
-          winning_side: winningSide,
-          settled_at: new Date(),
-        }},
-        { upsert: true }
+      // --- Upsert user in MongoDB with findOneAndUpdate + $inc (atomic, no data loss) ---
+      const updatedUser = await usersCollection.findOneAndUpdate(
+        { username },
+        {
+          $inc: {
+            plDownline: plDownlineDelta,
+            plUpline:   plUplineDelta,
+            balance:    pl, // add win or subtract loss from balance
+          },
+          $set: { updatedAt: new Date() },
+          $setOnInsert: {
+            username,
+            sharePercentage,
+            createdAt: new Date(),
+          },
+        },
+        {
+          upsert: true,
+          returnDocument: 'after',
+        }
       );
 
-      // Accumulate P/L per client (by email)
-      if (userEmail) {
-        const existing = clientPlMap.get(userEmail) || { downline: 0, upline: 0, username: userEmail, clientId: '' };
-        existing.downline += plDownline;
-        existing.upline += plUpline;
-        clientPlMap.set(userEmail, existing);
-      }
+      // --- Save P/L record for audit ---
+      await plRecordsCollection.insertOne({
+        match_id:        matchId,
+        winning_side:    winningSide,
+        username,
+        bet_id:          bet.id,
+        stake,
+        odds,
+        bet_type:        betType,
+        selection,
+        did_win:         didWin,
+        pl_raw:          parseFloat(pl.toFixed(2)),
+        pl_downline:     plDownlineDelta,
+        pl_upline:       plUplineDelta,
+        share_pct_admin: sharePercentage,
+        share_pct_company: 100 - sharePercentage,
+        new_pl_downline: updatedUser?.plDownline ?? 0,
+        new_pl_upline:   updatedUser?.plUpline ?? 0,
+        settled_at:      new Date(),
+      });
 
-      settlements.push({ betId: bet.id, status: newStatus, pl, plDownline, plUpline });
-    }
-
-    // --- Update Client P/L in Buildy entity + save to MongoDB pl_records ---
-    for (const [email, plData] of clientPlMap.entries()) {
-      // Find client by email (created_by = email)
-      let clients: any[] = [];
+      // --- Update Buildy Client entity ---
       try {
-        clients = await ClientEntity.query().where('created_by', email).limit(1).exec();
-        if (!clients || clients.length === 0) {
-          // try by username
-          clients = await ClientEntity.query().where('username', email).limit(1).exec();
+        let clients = await ClientEntity.query().where('created_by', username).limit(1).exec() as any[];
+        if (!clients?.length) {
+          clients = await ClientEntity.query().where('username', username).limit(1).exec() as any[];
+        }
+        if (clients?.length) {
+          const c = clients[0];
+          await ClientEntity.update(c.id, {
+            pl_downline:   parseFloat(((c.pl_downline ?? 0) + plDownlineDelta).toFixed(2)),
+            balance_upline: parseFloat(((c.balance_upline ?? 0) + plUplineDelta).toFixed(2)),
+          });
         }
       } catch (_) {}
 
-      if (clients && clients.length > 0) {
-        const client = clients[0];
-        const newPlDownline = parseFloat(((client.pl_downline ?? 0) + plData.downline).toFixed(2));
-        const newBalanceUpline = parseFloat(((client.balance_upline ?? 0) + plData.upline).toFixed(2));
-
-        try {
-          await ClientEntity.update(client.id, {
-            pl_downline: newPlDownline,
-            balance_upline: newBalanceUpline,
-          });
-        } catch (_) {}
-
-        plData.clientId = client.id;
-        plData.username = client.username || email;
-      }
-
-      // Save P/L record to MongoDB
-      await plRecords.insertOne({
-        match_id: matchId,
-        winning_side: winningSide,
-        user_email: email,
-        username: plData.username,
-        client_id: plData.clientId,
-        pl_total: parseFloat((plData.downline + plData.upline).toFixed(2)),
-        pl_downline: parseFloat(plData.downline.toFixed(2)),
-        pl_upline: parseFloat(plData.upline.toFixed(2)),
-        pl_downline_pct: 85,
-        pl_upline_pct: 15,
-        settled_at: new Date(),
-        created_at: new Date(),
+      settlements.push({
+        betId:         bet.id,
+        username,
+        status:        newStatus,
+        stake,
+        odds,
+        pl_raw:        parseFloat(pl.toFixed(2)),
+        pl_downline:   plDownlineDelta,
+        pl_upline:     plUplineDelta,
+        note:          didWin
+          ? `User WON ${pl.toFixed(2)} → Admin pays 85% (${(-plDownlineDelta).toFixed(2)}), Company pays 15% (${(plUplineDelta).toFixed(2)})`
+          : `User LOST ${(-pl).toFixed(2)} → Admin earns 85% (+${plDownlineDelta.toFixed(2)}), Company deducted 15% (${plUplineDelta.toFixed(2)})`,
       });
     }
 
     await mongoClient.close();
 
     return new Response(JSON.stringify({
-      success: true,
+      success:          true,
       matchId,
       winningSide,
       totalBetsSettled: settlements.length,
@@ -191,6 +210,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (err: any) {
+    try { await mongoClient.close(); } catch (_) {}
     console.error('settle-bets error:', err?.message);
     return new Response(JSON.stringify({ error: err?.message ?? 'Unknown error' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -1,6 +1,6 @@
 import { 
   Gauge, Users, Filter, CreditCard, Lock, Star, Globe, 
-  CircleDot, Crosshair, Swords, Zap, Rabbit,
+  CircleDot, Crosshair, Swords, Zap, Rabbit, Trophy,
   X, ChevronLeft, ChevronRight, ChevronDown, Loader2 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +24,7 @@ const mainMenuItems = [
   { label: "Current Position", icon: Filter, link: "/current-position" },
   { label: "Reports", icon: CreditCard, link: "/reports/daily-pl" },
   { label: "Bet Lock", icon: Lock, link: "/bet-lock" },
+  { label: "Settle Match", icon: Trophy, link: "/settle-match" },
   { label: "Star Casino", icon: Star, link: "/star-casino" },
   { label: "World Casino", icon: Globe, link: "/world-casino" },
   { label: "BetFair Games", icon: Globe, link: "/betfair-games" },
