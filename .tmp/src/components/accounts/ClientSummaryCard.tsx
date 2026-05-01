@@ -289,21 +289,21 @@ export function ClientSummaryCard({
         </div>
 
         {/* Action bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
           <div className="flex items-center gap-2">
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
+                className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[11px] py-0.5 px-2 rounded-[3px] flex items-center gap-1 transition-colors"
               >
-                <User className="w-4 h-4" /> New User
+                <User className="w-3 h-3" /> New User
               </button>
             )}
             <button
               onClick={() => navigate(`/reports/daily`)}
-              className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[13px] py-1.5 px-4 rounded-[4px] flex items-center gap-2 transition-colors shadow-sm"
+              className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[11px] py-0.5 px-2 rounded-[3px] flex items-center gap-1 transition-colors"
             >
-              <Book className="w-4 h-4" /> Account Ledger
+              <Book className="w-3 h-3" /> Account Ledger
             </button>
           </div>
 
