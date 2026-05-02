@@ -7,38 +7,90 @@ const corsHeaders = {
 const BASE = 'https://betfair-orbitexch-data.p.rapidapi.com';
 
 const parseTeams = (name: string) => {
-  if (name.includes(' v ')) {
-    const [t1, t2] = name.split(' v ');
-    return { team1: t1.trim(), team2: t2.trim() };
-  }
-  if (name.includes(' vs ')) {
-    const [t1, t2] = name.split(' vs ');
-    return { team1: t1.trim(), team2: t2.trim() };
-  }
-  if (name.includes(' - ')) {
-    const [t1, t2] = name.split(' - ');
-    return { team1: t1.trim(), team2: t2.trim() };
+  for (const sep of [' v ', ' vs ', ' - ']) {
+    if (name.includes(sep)) {
+      const [t1, t2] = name.split(sep);
+      return { team1: t1.trim(), team2: t2.trim() };
+    }
   }
   return { team1: name, team2: '' };
 };
 
-const mapSportLabel = (sport: string): string => {
-  const s = sport.toLowerCase();
-  if (s.includes('soccer') || s.includes('football')) return 'Soccer';
-  if (s.includes('tennis')) return 'Tennis';
-  if (s.includes('cricket')) return 'Cricket';
-  if (s.includes('basket')) return 'Basketball';
-  if (s.includes('ice') || s.includes('hockey')) return 'Ice Hockey';
-  if (s.includes('volleyball')) return 'Volleyball';
-  if (s.includes('baseball')) return 'Baseball';
-  return sport.charAt(0).toUpperCase() + sport.slice(1);
+const mapSport = (s: string): string => {
+  const l = (s || '').toLowerCase();
+  if (l.includes('soccer') || l.includes('football')) return 'Soccer';
+  if (l.includes('tennis')) return 'Tennis';
+  if (l.includes('cricket')) return 'Cricket';
+  if (l.includes('basket')) return 'Basketball';
+  if (l.includes('hockey')) return 'Ice Hockey';
+  if (l === '1') return 'Soccer';
+  if (l === '2') return 'Tennis';
+  if (l === '4') return 'Cricket';
+  return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-const extractEvents = (raw: any): any[] => {
+const extractList = (raw: any): any[] => {
   if (Array.isArray(raw)) return raw;
-  return raw?.events || raw?.data || raw?.result || 
-         raw?.matches || raw?.eventList || raw?.items || [];
+  return raw?.events || raw?.data || raw?.result || raw?.matches || raw?.eventList || [];
 };
+
+const fetchSport = async (url: string, headers: any, sportLabel: string): Promise<any[]> => {
+  try {
+    const res = await fetch(url, { headers });
+    console.log(`[BFE] GET ${url} → ${res.status}`);
+    if (!res.ok) return [];
+    const raw = await res.json();
+    console.log(`[BFE] ${url} raw: ${JSON.stringify(raw).substring(0, 300)}`);
+    return extractList(raw).map((e: any) => ({ ...e, _sport: sportLabel }));
+  } catch (err: any) {
+    console.log(`[BFE] ${url} error: ${err.message}`);
+    return [];
+  }
+};
+
+function mapAll(events: any[]): any[] {
+  return events
+    .map((item: any) => {
+      const name = item.event?.name || item.eventName || item.name 
+                || item.title || item.matchName || item.event_name || '';
+      if (!name) return null;
+
+      const teams = parseTeams(name);
+      const eventId = item.event?.id || item.eventId || item.event_id 
+                    || item.id || item.marketId || '';
+      const rawSport = item._sport || item.eventType?.name || item.sport || item.sportName || '';
+      const isLive = item.inPlay === true || item.inplay === true 
+                  || item.in_play === true || item.status === 'OPEN'
+                  || item.status === 'live' || item.isInPlay === true;
+
+      // Extract real odds if available
+      const backOdds = item.back?.[0]?.price || item.availableToBack?.[0]?.price 
+                     || item.backPrice || item.back_odds || 1.9;
+      const layOdds = item.lay?.[0]?.price || item.availableToLay?.[0]?.price 
+                    || item.layPrice || item.lay_odds || 2.0;
+
+      return {
+        id: `bf-${eventId || Math.random().toString(36).slice(2, 9)}`,
+        betfair_event_id: String(eventId),
+        title: name,
+        team1: teams.team1,
+        team2: teams.team2,
+        sport: mapSport(rawSport),
+        status: isLive ? 'live' : 'upcoming',
+        match_time: item.marketStartTime || item.startTime
+                 || item.openDate || item.event?.openDate
+                 || item.matchTime || new Date().toISOString(),
+        back_odds: Number(backOdds) || 1.9,
+        lay_odds: Number(layOdds) || 2.0,
+        back_odds2: 1.9,
+        lay_odds2: 2.0,
+        source: 'betfair',
+      };
+    })
+    .filter((e): e is NonNullable<typeof e> => 
+      !!e && !!e.title && !!e.betfair_event_id && e.betfair_event_id !== 'undefined'
+    );
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -47,6 +99,7 @@ Deno.serve(async (req) => {
 
   const rapidApiKey = Deno.env.get('BETFAIR_RAPIDAPI_KEY');
   if (!rapidApiKey) {
+    console.log('[BFE] No API key set');
     return new Response(JSON.stringify([]), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -56,214 +109,83 @@ Deno.serve(async (req) => {
   const h = {
     'x-rapidapi-key': rapidApiKey,
     'x-rapidapi-host': 'betfair-orbitexch-data.p.rapidapi.com',
-    'Content-Type': 'application/json',
   };
 
   // ============================================================
-  // STEP 1: Call GET /betfair/get_sports to discover sport names
+  // STRATEGY: Try path-based first (matches get_event_with_markets pattern)
+  // then fall back to query param, then no-param (returns all sports)
+  // Only 4 API calls total — stay within free tier limits
   // ============================================================
-  let availableSports: string[] = [];
+
+  // Try 1: Path-based with sport name → /betfair/get_sport_events/soccer
+  const testPath = await fetchSport(`${BASE}/betfair/get_sport_events/soccer`, h, 'Soccer');
   
-  try {
-    const sportsRes = await fetch(`${BASE}/betfair/get_sports`, { headers: h });
-    console.log(`[fetch-betfair-events] get_sports status: ${sportsRes.status}`);
+  if (testPath.length > 0) {
+    console.log('[BFE] Path-based format works');
+    // Fetch soccer + tennis + cricket in parallel (3 calls)
+    const [soccerEvents, tennisEvents, cricketEvents] = await Promise.all([
+      Promise.resolve(testPath), // already have soccer
+      fetchSport(`${BASE}/betfair/get_sport_events/tennis`, h, 'Tennis'),
+      fetchSport(`${BASE}/betfair/get_sport_events/cricket`, h, 'Cricket'),
+    ]);
     
-    if (sportsRes.ok) {
-      const sportsRaw = await sportsRes.json();
-      console.log(`[fetch-betfair-events] get_sports raw: ${JSON.stringify(sportsRaw).substring(0, 500)}`);
-      
-      // Extract sport names from various formats
-      const sportsList = Array.isArray(sportsRaw) ? sportsRaw 
-        : (sportsRaw?.sports || sportsRaw?.data || sportsRaw?.result || []);
-      
-      availableSports = sportsList
-        .map((s: any) => s?.sport || s?.name || s?.sportName || s?.id || s)
-        .filter((s: any) => typeof s === 'string' && s.length > 0)
-        .map((s: string) => s.toLowerCase());
-      
-      console.log(`[fetch-betfair-events] Available sports: ${JSON.stringify(availableSports)}`);
-    }
-  } catch (e: any) {
-    console.log(`[fetch-betfair-events] get_sports error: ${e.message}`);
+    const allEvents = [...soccerEvents, ...tennisEvents, ...cricketEvents];
+    return new Response(JSON.stringify(mapAll(allEvents)), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
-  // ============================================================
-  // STEP 2: Determine which sport names to fetch
-  // Based on API docs, these are the inplay sports available
-  // ============================================================
-  const targetSports = ['soccer', 'tennis', 'cricket', 'basketball'];
+  // Try 2: Path-based with sport ID → /betfair/get_sport_events/1 (Betfair: 1=soccer, 2=tennis, 4=cricket)
+  const testPathId = await fetchSport(`${BASE}/betfair/get_sport_events/1`, h, 'Soccer');
   
-  // If we got available sports, filter to what's supported. Otherwise try all.
-  const sportsToFetch = availableSports.length > 0
-    ? targetSports.filter(s => availableSports.some(a => a.includes(s) || s.includes(a)))
-    : targetSports;
-  
-  // Always include soccer and tennis at minimum
-  const finalSports = sportsToFetch.length > 0 ? sportsToFetch : ['soccer', 'tennis', 'cricket'];
-  console.log(`[fetch-betfair-events] Sports to fetch: ${JSON.stringify(finalSports)}`);
-
-  // ============================================================
-  // STEP 3: Try GET /betfair/get_sport_events?sport={name}
-  // ============================================================
-  const allEvents: any[] = [];
-  
-  // Also try different param names in case 'sport' doesn't work
-  const paramNamesToTry = ['sport', 'sportName', 'sport_name', 'name', 'type'];
-  let workingParamName = 'sport'; // default
-  
-  // First test with soccer to find working param name
-  let foundWorkingParam = false;
-  for (const paramName of paramNamesToTry) {
-    try {
-      const testUrl = `${BASE}/betfair/get_sport_events?${paramName}=soccer`;
-      console.log(`[fetch-betfair-events] Testing param: GET ${testUrl}`);
-      const res = await fetch(testUrl, { headers: h });
-      console.log(`[fetch-betfair-events] Param test ${paramName} status: ${res.status}`);
-      
-      if (res.ok) {
-        const raw = await res.json();
-        console.log(`[fetch-betfair-events] Param test ${paramName} raw: ${JSON.stringify(raw).substring(0, 400)}`);
-        const events = extractEvents(raw);
-        
-        if (events.length > 0) {
-          workingParamName = paramName;
-          foundWorkingParam = true;
-          console.log(`[fetch-betfair-events] Working param found: ${paramName}`);
-          
-          // Add soccer events
-          for (const item of events) {
-            allEvents.push({ ...item, _detectedSport: 'Soccer' });
-          }
-          break;
-        }
-      }
-    } catch (e: any) {
-      console.log(`[fetch-betfair-events] Param ${paramName} error: ${e.message}`);
-    }
-  }
-  
-  // If found working param, fetch remaining sports
-  if (foundWorkingParam) {
-    const remainingSports = finalSports.filter(s => s !== 'soccer');
+  if (testPathId.length > 0) {
+    console.log('[BFE] Path-based ID format works');
+    const [soccerEvents, tennisEvents, cricketEvents] = await Promise.all([
+      Promise.resolve(testPathId),
+      fetchSport(`${BASE}/betfair/get_sport_events/2`, h, 'Tennis'),
+      fetchSport(`${BASE}/betfair/get_sport_events/4`, h, 'Cricket'),
+    ]);
     
-    const sportResults = await Promise.allSettled(
-      remainingSports.map(sport =>
-        fetch(`${BASE}/betfair/get_sport_events?${workingParamName}=${sport}`, { headers: h })
-          .then(r => r.ok ? r.json() : [])
-          .then(raw => {
-            const events = extractEvents(raw);
-            console.log(`[fetch-betfair-events] ${sport}: ${events.length} events`);
-            return events.map((e: any) => ({ ...e, _detectedSport: mapSportLabel(sport) }));
-          })
-          .catch(e => { console.log(`Sport ${sport} error: ${e.message}`); return []; })
-      )
-    );
-    
-    for (const r of sportResults) {
-      if (r.status === 'fulfilled') allEvents.push(...r.value);
-    }
-  } else {
-    // No param worked — try path-based or no-param
-    console.log(`[fetch-betfair-events] No query param worked, trying path-based`);
-    
-    try {
-      // Try path: /betfair/get_sport_events/soccer
-      const res = await fetch(`${BASE}/betfair/get_sport_events/soccer`, { headers: h });
-      console.log(`[fetch-betfair-events] Path-based status: ${res.status}`);
-      
-      if (res.ok) {
-        const raw = await res.json();
-        console.log(`[fetch-betfair-events] Path-based raw: ${JSON.stringify(raw).substring(0, 400)}`);
-        const events = extractEvents(raw);
-        if (events.length > 0) {
-          allEvents.push(...events.map((e: any) => ({ ...e, _detectedSport: 'Soccer' })));
-        }
-      }
-    } catch (e: any) {
-      console.log(`[fetch-betfair-events] Path-based error: ${e.message}`);
-    }
-
-    // Last resort: no params (returns all)
-    if (allEvents.length === 0) {
-      try {
-        const res = await fetch(`${BASE}/betfair/get_sport_events`, { headers: h });
-        console.log(`[fetch-betfair-events] No-param status: ${res.status}`);
-        
-        if (res.ok) {
-          const raw = await res.json();
-          console.log(`[fetch-betfair-events] No-param raw: ${JSON.stringify(raw).substring(0, 600)}`);
-          allEvents.push(...extractEvents(raw));
-        }
-      } catch (e: any) {
-        console.log(`[fetch-betfair-events] No-param error: ${e.message}`);
-      }
-    }
+    const allEvents = [...soccerEvents, ...tennisEvents, ...cricketEvents];
+    return new Response(JSON.stringify(mapAll(allEvents)), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
-  // ============================================================
-  // CRICKET FALLBACK: Try fetching cricket using numeric sport IDs
-  // ============================================================
-  const cricketUrls = [
-    `${BASE}/betfair/get_sport_events?sport_id=4`,
-    `${BASE}/betfair/get_sport_events?id=4`,
-    `${BASE}/betfair/get_sport_events?eventTypeId=4`,
-    `${BASE}/betfair/get_sport_events?sport=Cricket`,
-  ];
-
-  for (const url of cricketUrls) {
-    try {
-      const res = await fetch(url, { headers: h });
-      if (res.ok) {
-        const raw = await res.json();
-        const events = extractEvents(raw);
-        if (events.length > 0) {
-          console.log(`[fetch-betfair-events] Cricket found via: ${url} → ${events.length} events`);
-          allEvents.push(...events.map((e: any) => ({ ...e, _detectedSport: 'Cricket' })));
-          break;
-        }
-      }
-    } catch (e: any) {
-      console.log(`[fetch-betfair-events] Cricket URL ${url} error: ${e.message}`);
-    }
+  // Try 3: Query param → /betfair/get_sport_events?sport=soccer
+  const testQuery = await fetchSport(`${BASE}/betfair/get_sport_events?sport=soccer`, h, 'Soccer');
+  
+  if (testQuery.length > 0) {
+    console.log('[BFE] Query param format works');
+    const [soccerEvents, tennisEvents, cricketEvents] = await Promise.all([
+      Promise.resolve(testQuery),
+      fetchSport(`${BASE}/betfair/get_sport_events?sport=tennis`, h, 'Tennis'),
+      fetchSport(`${BASE}/betfair/get_sport_events?sport=cricket`, h, 'Cricket'),
+    ]);
+    
+    const allEvents = [...soccerEvents, ...tennisEvents, ...cricketEvents];
+    return new Response(JSON.stringify(mapAll(allEvents)), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
-  // ============================================================
-  // STEP 4: Map to our standard event format
-  // ============================================================
-  const mapped = allEvents.map((item: any) => {
-    const name = item.event?.name || item.eventName || item.name 
-              || item.title || item.matchName || item.event_name || '';
-    const teams = parseTeams(name);
-    const eventId = item.event?.id || item.eventId || item.event_id 
-                  || item.id || item.marketId || '';
-    const rawSport = item._detectedSport || item.eventType?.name 
-                   || item.sport || item.sportName || 'Soccer';
-    const isLive = item.inPlay === true || item.inplay === true 
-                || item.in_play === true || item.status === 'OPEN'
-                || item.status === 'live' || item.isInPlay === true;
+  // Try 4: No params (returns ALL inplay sports at once — 1 API call)
+  console.log('[BFE] All format attempts failed, trying no-param');
+  const noParamEvents = await fetchSport(`${BASE}/betfair/get_sport_events`, h, 'Soccer');
+  
+  if (noParamEvents.length > 0) {
+    return new Response(JSON.stringify(mapAll(noParamEvents)), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
-    return {
-      id: `bf-${eventId || Math.random().toString(36).slice(2)}`,
-      betfair_event_id: String(eventId),
-      title: name,
-      team1: teams.team1,
-      team2: teams.team2,
-      sport: mapSportLabel(rawSport),
-      status: isLive ? 'live' : 'upcoming',
-      match_time: item.marketStartTime || item.startTime 
-               || item.openDate || item.event?.openDate 
-               || item.matchTime || '',
-      back_odds: 1.9,
-      lay_odds: 2.0,
-      back_odds2: 1.9,
-      lay_odds2: 2.0,
-      source: 'betfair',
-    };
-  }).filter((e: any) => e.title && e.betfair_event_id && e.betfair_event_id !== 'undefined');
-
-  console.log(`[fetch-betfair-events] Final result: ${mapped.length} events`);
-
-  return new Response(JSON.stringify(mapped), {
+  // Final fallback: empty (DB matches will still show on dashboard)
+  console.log('[BFE] All attempts failed — returning empty array');
+  return new Response(JSON.stringify([]), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });

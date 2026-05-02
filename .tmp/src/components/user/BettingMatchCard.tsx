@@ -16,9 +16,9 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
   // Time display: extract time portion from match_time and convert to PKT
   const mt = match.match_time != null ? String(match.match_time) : '';
   const timeDisplay = (() => {
-    if (!mt) return "19:00";
+    if (!mt) return "00:00";
     try {
-      // If it looks like an ISO date/timestamp, parse and show in PKT
+      // If it looks like an ISO date/timestamp or numeric timestamp — parse and convert to PKT
       if (mt.includes('T') || mt.includes('Z') || /^\d{10,}$/.test(mt)) {
         const d = /^\d{10,}$/.test(mt) ? new Date(parseInt(mt)) : new Date(mt);
         return d.toLocaleTimeString('en-US', {
@@ -28,7 +28,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
           timeZone: 'Asia/Karachi'
         });
       }
-      // Already a formatted time string - show as-is (it's stored in PKT already)
+      // Already a short time string — show as-is (stored in PKT already)
       return mt.length > 5 ? mt.substring(0, 5) : mt;
     } catch {
       return mt.length > 5 ? mt.substring(0, 5) : mt;
