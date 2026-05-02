@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Match, Bet, Client } from "@/entities";
 import { UserHeader } from "@/components/user/UserHeader";
@@ -27,6 +27,8 @@ export default function MatchDetail() {
   const [activeMediaTab, setActiveMediaTab] = useState<'tv'|'scorecard'>('tv');
 
   const session = getClientSession();
+  const location = useLocation();
+  const stateMatch = location.state?.match || null;
 
   useEffect(() => {
     if (!session || session.role !== 'client') {
@@ -35,15 +37,19 @@ export default function MatchDetail() {
   }, [session, navigate]);
 
   // Fetch match details
-  const { data: match, isLoading: matchLoading } = useQuery({
+  const { data: matchFromDB, isLoading: matchLoading_raw } = useQuery({
     queryKey: ['match', matchId],
     queryFn: async () => {
       const results = await Match.list();
       return results.find((m: any) => m.id === matchId);
     },
-    enabled: !!matchId,
-    refetchInterval: 4000 // Refresh odds every 4 seconds
+    enabled: !!matchId && !stateMatch,
+    refetchInterval: stateMatch ? false : 4000 // Refresh odds every 4 seconds
   });
+
+  // Use state match (Betfair event) OR DB match
+  const match = stateMatch || matchFromDB;
+  const matchLoading = stateMatch ? false : matchLoading_raw;
 
   // Fetch real-time client data
   const { data: clients, isLoading: clientLoading } = useQuery({

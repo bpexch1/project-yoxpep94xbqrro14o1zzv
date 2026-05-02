@@ -30,7 +30,7 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
         minHeight: 52,
         cursor: "pointer",
       }}
-      onClick={() => navigate(`/play/match/${match.id}`)}
+      onClick={() => navigate(`/play/match/${match.id}`, { state: { match } })}
     >
       {/* Left: Status + time */}
       <div style={{

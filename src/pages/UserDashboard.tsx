@@ -115,7 +115,12 @@ export default function UserDashboard() {
     ...(matches || []).filter((m: any) => 
       !(betfairEvents || []).some((bf: any) => bf.title === (m.title || `${m.team1} v ${m.team2}`))
     )
-  ];
+  ].sort((a: any, b: any) => {
+    // Live first, then upcoming
+    if (a.status === 'live' && b.status !== 'live') return -1;
+    if (b.status === 'live' && a.status !== 'live') return 1;
+    return 0;
+  });
   
   const categories = [
     { id: "Inplay", label: "Inplay", emoji: "⏱️", count: matchesList.filter((m: any) => m.status === 'live').length },
@@ -314,13 +319,20 @@ export default function UserDashboard() {
             })}
 
             {/* Empty state */}
-            {filteredMatches.length === 0 && (
+            {filteredMatches.length === 0 && !betfairLoading && (
               <div className="flex flex-col items-center justify-center py-20 text-center px-4">
                 <div className="w-16 h-16 bg-[#254465]/5 rounded-full flex items-center justify-center mb-4">
                   <Trophy className="w-8 h-8 text-[#254465]/20" />
                 </div>
                 <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/40">No Matches Found</h3>
                 <p className="text-xs text-[#254465]/30 mt-1">There are currently no active matches for this category.</p>
+              </div>
+            )}
+
+            {filteredMatches.length === 0 && betfairLoading && (
+              <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+                <Loader2 className="w-8 h-8 text-[#254465]/40 animate-spin mb-4" />
+                <p className="text-xs text-[#254465]/40">Loading live matches...</p>
               </div>
             )}
           </div>

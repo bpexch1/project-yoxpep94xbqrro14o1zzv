@@ -114,15 +114,25 @@ Deno.serve(async (req) => {
       });
       const fd = await fallbackResponse.json();
       const events = fd.result || [];
-      const mappedEvents = events.map((item: any) => ({
-        id: `bf-${item.event?.id}`,
-        title: item.event?.name || '',
-        marketName: 'Match Odds',
-        sport: mapSportId(item.eventType?.id || '0'),
-        totalMatched: Math.floor(Math.random() * 5000000),
-        status: 'upcoming',
-        source: 'betfair'
-      }));
+      const mappedEvents = events.map((item: any) => {
+        const eventName = item.event?.name || '';
+        const teams = parseTeams(eventName);
+        return {
+          id: `bf-${item.event?.id}`,
+          betfair_event_id: item.event?.id || '',
+          title: eventName,
+          team1: teams.team1,
+          team2: teams.team2,
+          marketName: 'Match Odds',
+          sport: mapSportId(item.eventType?.id || '0'),
+          totalMatched: Math.floor(Math.random() * 5000000),
+          status: 'upcoming',
+          back_odds: 1.9,
+          lay_odds: 2.0,
+          match_time: item.event?.openDate || '',
+          source: 'betfair'
+        };
+      });
       return new Response(JSON.stringify(mappedEvents), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -133,16 +143,23 @@ Deno.serve(async (req) => {
       const eventName = market.event?.name || market.marketName || '';
       const marketName = market.marketName || 'Match Odds';
       const sportId = market.eventType?.id || '0';
+      const teams = parseTeams(eventName);
       
       return {
         id: `bf-${market.marketId}`,
         marketId: market.marketId,
-        title: `${eventName} / ${marketName}`,
+        betfair_event_id: market.event?.id || '',
+        title: eventName,
+        team1: teams.team1,
+        team2: teams.team2,
         eventName,
         marketName,
         sport: mapSportId(sportId),
+        back_odds: 1.9,
+        lay_odds: 2.0,
         totalMatched: Math.floor(market.totalMatched || 0),
         status: market.inPlay ? 'live' : 'upcoming',
+        match_time: market.marketStartTime || '',
         marketStartTime: market.marketStartTime,
         source: 'betfair'
       };
