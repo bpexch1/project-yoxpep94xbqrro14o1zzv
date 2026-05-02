@@ -31,7 +31,20 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       padding: 0,
       overflow: "hidden"
     }}>
-      <div style={{ padding: "12px 10px", backgroundColor: "#ffffff" }}>
+      {/* Header */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 14px",
+        backgroundColor: "#dcdcdc",
+        borderBottom: "1px solid #c8c8c8"
+      }}>
+        <Filter style={{ width: 18, height: 18, color: "#2d2d2d", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: "14px", color: "#2d2d2d" }}>Report Type</span>
+      </div>
+
+      <div style={{ padding: "10px 10px", backgroundColor: "#ffffff" }}>
         <div style={{ 
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
