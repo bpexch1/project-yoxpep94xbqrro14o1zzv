@@ -11,7 +11,7 @@ import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Volume2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { getLiveOdds } from "@/functions";
+import { getLiveOdds, getCricketScore } from "@/functions";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -82,6 +82,18 @@ export default function MatchDetail() {
     staleTime: 0,
   });
 
+  // Fetch real-time cricket score from Cricbuzz every 5 seconds
+  const { data: cricketScoreData } = useQuery({
+    queryKey: ['cricket-score', match?.cricbuzz_match_id],
+    queryFn: async () => {
+      const result = await getCricketScore({ matchId: match.cricbuzz_match_id });
+      return result;
+    },
+    enabled: !!match?.cricbuzz_match_id && match?.sport?.toLowerCase() === 'cricket',
+    refetchInterval: 5000,
+    staleTime: 0,
+  });
+
   // Extract Match Odds market
   const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
     m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
@@ -96,16 +108,21 @@ export default function MatchDetail() {
   const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
 
   // Score logic
-  const scoreInfo = liveOddsData?.score;
+  const liveScore = cricketScoreData?.score || liveOddsData?.score || null;
   const battingAbbr = match.team1?.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() || 'T1';
-  const scoreDisplay = scoreInfo 
-    ? `${scoreInfo.battingTeam || battingAbbr} ${scoreInfo.runs || '--'}/${scoreInfo.wickets ?? '--'} (${scoreInfo.overs || '--'})`
-    : `${battingAbbr} ${match.status === 'live' ? '--/--' : '--'} (--)`;
-  const crrDisplay = scoreInfo?.crr || (match.status === 'live' ? '--' : '--');
-  const thisOverBalls = scoreInfo?.thisOver || (match.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
+  
+  const scoreDisplay = liveScore?.runs != null
+    ? `${liveScore.battingTeam || battingAbbr} ${liveScore.runs}/${liveScore.wickets ?? '--'} (${liveScore.overs || '--'})`
+    : (liveScore 
+      ? `${liveScore.battingTeam || battingAbbr} ${match.status === 'live' ? '--/--' : '--'} (--)`
+      : `${battingAbbr} ${match.status === 'live' ? '--/--' : '--'} (--)`
+    );
+
+  const crrDisplay = liveScore?.crr || (match.status === 'live' ? '--' : '--');
+  const thisOverBalls: string[] = liveScore?.thisOver || (match.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
 
   // Last ball label and color
-  const lastBall = scoreInfo?.lastBall || (thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null);
+  const lastBall = liveScore?.lastBall || (thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null);
   const getLastBallLabel = (ball: string | null) => {
     if (!ball) return 'NO RUN';
     const b = String(ball);

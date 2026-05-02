@@ -12,12 +12,14 @@ export default function Dashboard() {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingEventId, setEditingEventId] = useState<{ id: string; val: string } | null>(null);
+  const [editingCricbuzzId, setEditingCricbuzzId] = useState<{ id: string; val: string } | null>(null);
   const [newMatch, setNewMatch] = useState({
     title: "",
     sport: "Cricket",
     team1: "",
     team2: "",
     betfair_event_id: "",
+    cricbuzz_match_id: "",
     status: "live",
     category: "IPL 2026",
   });
@@ -58,6 +60,7 @@ export default function Dashboard() {
         back_odds2: 1.9,
         lay_odds2: 2.0,
         betfair_event_id: newMatch.betfair_event_id,
+        cricbuzz_match_id: newMatch.cricbuzz_match_id,
         category: newMatch.category,
       });
     },
@@ -70,6 +73,7 @@ export default function Dashboard() {
         team1: "",
         team2: "",
         betfair_event_id: "",
+        cricbuzz_match_id: "",
         status: "live",
         category: "IPL 2026",
       });
@@ -85,6 +89,17 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-matches"] });
       setEditingEventId(null);
+    },
+  });
+
+  // Update Cricbuzz ID mutation
+  const { mutate: updateCricbuzzId } = useMutation({
+    mutationFn: async ({ id, val }: { id: string; val: string }) => {
+      await Match.update(id, { cricbuzz_match_id: val });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-matches"] });
+      setEditingCricbuzzId(null);
     },
   });
 
@@ -111,6 +126,7 @@ export default function Dashboard() {
         back_odds2: event.back_odds2 || 1.9,
         lay_odds2: event.lay_odds2 || 2.0,
         betfair_event_id: event.betfair_event_id,
+        cricbuzz_match_id: "",
         category: event.sport === "Cricket" ? "IPL 2026" : event.sport,
       });
       return event.betfair_event_id;
@@ -337,8 +353,8 @@ export default function Dashboard() {
                   />
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "10px", alignItems: "flex-end" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginBottom: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                    <label style={{ fontSize: 10, fontWeight: 700, color: "#666" }}>BETFAIR EVENT ID</label>
                    <input
                     placeholder="Event ID e.g. 33256431"
@@ -347,17 +363,26 @@ export default function Dashboard() {
                     style={{ ...inputStyle, width: "100%" }}
                   />
                 </div>
-                <div style={{ display: "flex", gap: "8px", height: 28 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                   <label style={{ fontSize: 10, fontWeight: 700, color: "#666" }}>CRICBUZZ MATCH ID</label>
+                   <input
+                    placeholder="Cricbuzz ID e.g. 40381"
+                    value={newMatch.cricbuzz_match_id}
+                    onChange={e => setNewMatch({ ...newMatch, cricbuzz_match_id: e.target.value })}
+                    style={{ ...inputStyle, width: "100%" }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "8px", height: 28, alignSelf: "flex-end" }}>
                   <button
                     onClick={() => setShowAddForm(false)}
-                    style={{ background: "#666", color: "#fff", border: "none", borderRadius: 4, padding: "0 12px", cursor: "pointer", fontSize: 12 }}
+                    style={{ background: "#666", color: "#fff", border: "none", borderRadius: 4, padding: "0 12px", cursor: "pointer", fontSize: 12, height: "100%" }}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => saveNewMatch()}
                     disabled={savingNew}
-                    style={{ background: "#00b181", color: "#fff", border: "none", borderRadius: 4, padding: "0 12px", cursor: "pointer", fontWeight: 700, fontSize: 12 }}
+                    style={{ background: "#00b181", color: "#fff", border: "none", borderRadius: 4, padding: "0 12px", cursor: "pointer", fontWeight: 700, fontSize: 12, height: "100%" }}
                   >
                     {savingNew ? 'Saving...' : 'Save Match'}
                   </button>
@@ -378,6 +403,7 @@ export default function Dashboard() {
                   <tr style={{ borderBottom: "1px solid #eee" }}>
                     <th style={{ textAlign: "left", padding: "10px 16px", color: "#666", fontSize: 11, textTransform: "uppercase" }}>Match Info</th>
                     <th style={{ textAlign: "left", padding: "10px 16px", color: "#666", fontSize: 11, textTransform: "uppercase" }}>Event ID</th>
+                    <th style={{ textAlign: "left", padding: "10px 16px", color: "#666", fontSize: 11, textTransform: "uppercase" }}>Cricbuzz ID</th>
                     <th style={{ textAlign: "right", padding: "10px 16px", color: "#666", fontSize: 11, textTransform: "uppercase" }}>Actions</th>
                   </tr>
                 </thead>
@@ -418,20 +444,45 @@ export default function Dashboard() {
                             <input 
                               value={editingEventId.val} 
                               onChange={e => setEditingEventId({ ...editingEventId, val: e.target.value })}
-                              style={{ ...inputStyle, width: 120, fontSize: 11, height: 24 }}
+                              style={{ ...inputStyle, width: 90, fontSize: 11, height: 24 }}
                             />
                             <button onClick={() => updateEventId(editingEventId)} style={{ color: "#00b181" }}><Check size={14} /></button>
                             <button onClick={() => setEditingEventId(null)} style={{ color: "#ff4d4d" }}><X size={14} /></button>
                           </div>
                         ) : (
                           <div style={{ display: "flex", alignItems: "center", gap: 6, color: match.betfair_event_id ? "#333" : "#999" }}>
-                            <span style={{ fontSize: 12, fontFamily: "monospace" }}>{match.betfair_event_id || "No ID"}</span>
+                            <span style={{ fontSize: 11, fontFamily: "monospace" }}>{match.betfair_event_id || "No ID"}</span>
                             <button 
                               onClick={() => setEditingEventId({ id: match.id, val: match.betfair_event_id || '' })}
                               style={{ color: "#3d6b8b", padding: 2 }}
                             >
                               <Edit2 size={12} />
                             </button>
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ padding: "10px 16px" }}>
+                        {editingCricbuzzId?.id === match.id ? (
+                          <div style={{ display: "flex", gap: 4 }}>
+                            <input 
+                              value={editingCricbuzzId.val} 
+                              onChange={e => setEditingCricbuzzId({ ...editingCricbuzzId, val: e.target.value })}
+                              style={{ ...inputStyle, width: 80, fontSize: 11, height: 24 }}
+                            />
+                            <button onClick={() => updateCricbuzzId(editingCricbuzzId)} style={{ color: "#00b181" }}><Check size={14} /></button>
+                            <button onClick={() => setEditingCricbuzzId(null)} style={{ color: "#ff4d4d" }}><X size={14} /></button>
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, color: match.cricbuzz_match_id ? "#333" : "#999" }}>
+                            <span style={{ fontSize: 11, fontFamily: "monospace" }}>{match.cricbuzz_match_id || "No CB ID"}</span>
+                            {match.sport === 'Cricket' && (
+                              <button 
+                                onClick={() => setEditingCricbuzzId({ id: match.id, val: match.cricbuzz_match_id || '' })}
+                                style={{ color: "#3d6b8b", padding: 2 }}
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                            )}
                           </div>
                         )}
                       </td>

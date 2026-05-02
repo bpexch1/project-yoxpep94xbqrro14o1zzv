@@ -16,6 +16,10 @@
     "betfair_event_id": {
       "type": "string",
       "description": "Betfair event ID for fetching live odds from OrbitExch API (e.g. '28741766')"
+    },
+    "cricbuzz_match_id": {
+      "type": "string",
+      "description": "Cricbuzz match ID for fetching live score data (e.g. '40381')"
     }
   }
 }
