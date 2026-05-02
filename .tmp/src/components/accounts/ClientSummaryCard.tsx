@@ -546,32 +546,32 @@ export function ClientSummaryCard({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse text-[13px]" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
             <thead>
-              <tr style={{ background: "#dcdcdc", borderBottom: "1px solid #c8c8c8" }}>
-                <th onClick={() => handleSort('username')} className="px-2 py-2 border-r border-[#c8c8c8] text-left font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+              <tr style={{ background: "#f0f0f0", borderBottom: "1px solid #d0d0d0" }}>
+                <th onClick={() => handleSort('username')} className="px-2 py-2 border-r border-[#d0d0d0] text-left font-bold text-[#000000] cursor-pointer whitespace-nowrap">
                   User Name {getSortIcon('username')}
                 </th>
-                <th onClick={() => handleSort('role')} className="px-2 py-2 border-r border-[#c8c8c8] text-left font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+                <th onClick={() => handleSort('role')} className="px-2 py-2 border-r border-[#d0d0d0] text-left font-bold text-[#000000] cursor-pointer whitespace-nowrap">
                   Type {getSortIcon('role')}
                 </th>
-                <th onClick={() => handleSort('credit_received')} className="px-1 py-1 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap" style={{ width: 70, fontSize: 12, maxWidth: 70, minWidth: 50 }}>
+                <th onClick={() => handleSort('credit_received')} className="px-1 py-1 border-r border-[#d0d0d0] text-right font-bold text-[#000000] cursor-pointer whitespace-nowrap" style={{ width: 70, fontSize: 12, maxWidth: 70, minWidth: 50 }}>
                   Credit {getSortIcon('credit_received')}
                 </th>
-                <th onClick={() => handleSort('cash')} className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+                <th onClick={() => handleSort('cash')} className="px-2 py-2 border-r border-[#d0d0d0] text-right font-bold text-[#000000] cursor-pointer whitespace-nowrap">
                   Balance {getSortIcon('cash')}
                 </th>
-                <th onClick={() => handleSort('pl_downline')} className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+                <th onClick={() => handleSort('pl_downline')} className="px-2 py-2 border-r border-[#d0d0d0] text-right font-bold text-[#000000] cursor-pointer whitespace-nowrap">
                   Client (P/L) {getSortIcon('pl_downline')}
                 </th>
-                <th onClick={() => handleSort('downline_share')} className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+                <th onClick={() => handleSort('downline_share')} className="px-2 py-2 border-r border-[#d0d0d0] text-right font-bold text-[#000000] cursor-pointer whitespace-nowrap">
                   Share {getSortIcon('downline_share')}
                 </th>
-                <th className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] whitespace-nowrap">
+                <th className="px-2 py-2 border-r border-[#d0d0d0] text-right font-bold text-[#000000] whitespace-nowrap">
                   Exposure
                 </th>
-                <th onClick={() => handleSort('credit_remaining')} className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+                <th onClick={() => handleSort('credit_remaining')} className="px-2 py-2 border-r border-[#d0d0d0] text-right font-bold text-[#000000] cursor-pointer whitespace-nowrap">
                   Available Balance {getSortIcon('credit_remaining')}
                 </th>
-                <th className="px-2 py-2 text-center font-bold text-[#2d2d2d] whitespace-nowrap">
+                <th className="px-2 py-2 text-center font-bold text-[#000000] whitespace-nowrap">
                   Options
                 </th>
               </tr>
