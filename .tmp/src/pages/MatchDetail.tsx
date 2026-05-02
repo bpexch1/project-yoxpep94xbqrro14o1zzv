@@ -22,7 +22,6 @@ export default function MatchDetail() {
   const [activeBet, setActiveBet] = useState<{ match: any; selection: string; betType: 'back' | 'lay'; odds: number } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [keepDisplayOn, setKeepDisplayOn] = useState(true);
-  const [thisOverBalls] = useState(['6', '6', '0', '4', '1']);
   const [activeMediaTab, setActiveMediaTab] = useState<'tv'|'scorecard'>('tv');
 
   const session = getClientSession();
@@ -88,8 +87,41 @@ export default function MatchDetail() {
     m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
   ) || liveOddsData?.markets?.[0];
 
+  const fancyMarkets = liveOddsData?.markets?.filter((m: any) => 
+    !m.marketName?.toLowerCase().includes('match odds') && 
+    !m.marketName?.toLowerCase().includes('match_odds')
+  ) || [];
+
   const isMarketSuspended = matchOddsMarket?.status === 'SUSPENDED' || matchOddsMarket?.status === 'CLOSED';
   const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
+
+  // Score logic
+  const scoreInfo = liveOddsData?.score;
+  const battingAbbr = match.team1?.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() || 'T1';
+  const scoreDisplay = scoreInfo 
+    ? `${scoreInfo.battingTeam || battingAbbr} ${scoreInfo.runs || '--'}/${scoreInfo.wickets ?? '--'} (${scoreInfo.overs || '--'})`
+    : `${battingAbbr} ${match.status === 'live' ? '--/--' : '--'} (--)`;
+  const crrDisplay = scoreInfo?.crr || (match.status === 'live' ? '--' : '--');
+  const thisOverBalls = scoreInfo?.thisOver || (match.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
+
+  // Last ball label and color
+  const lastBall = scoreInfo?.lastBall || (thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null);
+  const getLastBallLabel = (ball: string | null) => {
+    if (!ball) return 'NO RUN';
+    const b = String(ball);
+    if (b === '6') return 'SIX';
+    if (b === '4') return 'FOUR';
+    if (b === 'W' || b === 'w') return 'WICKET';
+    if (b.includes('w')) return 'WIDE';
+    if (b === '0') return 'NO RUN';
+    return `${b} RUN${b !== '1' ? 'S' : ''}`;
+  };
+  const lastBallLabel = getLastBallLabel(lastBall);
+  const lastBallColor = lastBallLabel === 'SIX' ? '#00e676' 
+    : lastBallLabel === 'FOUR' ? '#ffca28'
+    : lastBallLabel === 'WICKET' ? '#ff5252'
+    : lastBallLabel === 'WIDE' ? '#ff9800'
+    : 'rgba(255,255,255,0.5)';
 
   const formatSize = (size: number | null) => {
     if (!size) return '';
@@ -217,66 +249,126 @@ export default function MatchDetail() {
             </button>
           ))}
         </div>
+      </div>
 
-        <div style={{ backgroundColor: "#1e3553", padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ color: "white", fontWeight: 900, fontSize: 15 }}>
-                {match.team1 ? match.team1.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() : 'T1'} {match.status === 'live' ? '48/0' : '--'} ({match.status === 'live' ? '4.2' : '0.0'})
-              </span>
-              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, marginLeft: 8 }}>CRR: {match.status === 'live' ? '11.08' : '--'}</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {match.status === 'live' && (
-                <motion.span key={thisOverBalls.join(',')} initial={{ opacity: 0, scale: 1.5 }} animate={{ opacity: 1, scale: 1 }} style={{ color: "#00e676", fontWeight: 900, fontSize: 16, letterSpacing: 1 }}>SIX</motion.span>
-              )}
-              <Volume2 size={16} color="rgba(255,255,255,0.6)" />
-            </div>
+      {/* SCORE SECTION — shows below tabs, above match odds */}
+      <div style={{
+        backgroundColor: "#ecf0f1",
+        padding: "8px 12px",
+        borderBottom: "2px solid #00b181"
+      }}>
+        {/* Row 1: Score + CRR | LastBall + Sound */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ color: "#212529", fontWeight: 900, fontSize: 15 }}>
+              {scoreDisplay}
+            </span>
+            <span style={{ color: "#6c757d", fontSize: 13, fontWeight: 700 }}>
+              CRR: {crrDisplay}
+            </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}>
-            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginRight: 4 }}>This Over :</span>
-            {thisOverBalls.map((ball, i) => (
-              <ThisOverBall key={i} value={ball} />
-            ))}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {/* Last ball indicator */}
+            <span style={{ 
+              padding: "2px 10px", 
+              borderRadius: 4, 
+              fontWeight: 900, 
+              fontSize: 12, 
+              letterSpacing: 0.5,
+              backgroundColor: lastBallLabel === 'NO RUN' ? '#254465' : lastBallColor,
+              color: lastBallLabel === 'NO RUN' ? 'white' : (lastBallColor === 'rgba(255,255,255,0.5)' ? '#212529' : 'white'),
+            }}>
+              {lastBallLabel}
+            </span>
+            <Volume2 size={16} color="#6c757d" style={{ cursor: "pointer" }} />
           </div>
+        </div>
+        
+        {/* Row 2: This Over balls */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+          <span style={{ color: "#6c757d", fontSize: 12, fontWeight: 700, marginRight: 2 }}>This Over :</span>
+          {thisOverBalls.map((ball, i) => <ThisOverBall key={i} value={ball} />)}
         </div>
       </div>
 
       <main style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
         {(activeTab === "ALL" || activeTab === "Bookmaker") && (
-          <>
-            <div style={{ marginTop: 0 }}>
-              <CombinedSectionHeader title="MATCH ODDS (MaxBet: 5M)" />
-              {(() => {
-                const runner1 = getLiveRunner(match.team1, 0);
-                const runner2 = getLiveRunner(match.team2, 1);
-                return (
-                  <>
-                    <TeamRow2
-                      name={match.team1}
-                      odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds) : match.back_odds}
-                      layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds) : match.lay_odds}
-                      backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
-                      laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
-                      loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
-                      suspended={isMarketSuspended}
-                      onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
-                    />
-                    <TeamRow2
-                      name={match.team2}
-                      odds={hasLiveOdds ? (runner2?.backPrice ?? (match.back_odds2 || match.back_odds)) : (match.back_odds2 || match.back_odds)}
-                      layOdds={hasLiveOdds ? (runner2?.layPrice ?? (match.lay_odds2 || match.lay_odds)) : (match.lay_odds2 || match.lay_odds)}
-                      backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
-                      laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
-                      loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
-                      suspended={isMarketSuspended}
-                      onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
-                    />
-                  </>
-                );
-              })()}
+          <div style={{ marginTop: 0 }}>
+            <CombinedSectionHeader title="MATCH ODDS (MaxBet: 5M)" />
+            {(() => {
+              const runner1 = getLiveRunner(match.team1, 0);
+              const runner2 = getLiveRunner(match.team2, 1);
+              return (
+                <>
+                  <TeamRow2
+                    name={match.team1}
+                    odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds) : match.back_odds}
+                    layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds) : match.lay_odds}
+                    backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
+                    laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
+                    loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
+                    suspended={isMarketSuspended}
+                    onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
+                  />
+                  <TeamRow2
+                    name={match.team2}
+                    odds={hasLiveOdds ? (runner2?.backPrice ?? (match.back_odds2 || match.back_odds)) : (match.back_odds2 || match.back_odds)}
+                    layOdds={hasLiveOdds ? (runner2?.layPrice ?? (match.lay_odds2 || match.lay_odds)) : (match.lay_odds2 || match.lay_odds)}
+                    backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
+                    laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
+                    loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
+                    suspended={isMarketSuspended}
+                    onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
+                  />
+                </>
+              );
+            })()}
+
+            {/* Bookmaker section (ALL or Bookmaker) */}
+            <div style={{ marginTop: 15 }}>
+              <CombinedSectionHeader title="BOOKMAKER (MaxBet: 1M)" />
+              <TeamRow2
+                name={match.team1}
+                odds={(hasLiveOdds ? (getLiveRunner(match.team1, 0)?.backPrice ?? match.back_odds) : match.back_odds) * 0.99}
+                layOdds={(hasLiveOdds ? (getLiveRunner(match.team1, 0)?.layPrice ?? match.lay_odds) : match.lay_odds) * 0.99}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
+              />
+              <TeamRow2
+                name={match.team2}
+                odds={(hasLiveOdds ? (getLiveRunner(match.team2, 1)?.backPrice ?? (match.back_odds2 || match.back_odds)) : (match.back_odds2 || match.back_odds)) * 0.99}
+                layOdds={(hasLiveOdds ? (getLiveRunner(match.team2, 1)?.layPrice ?? (match.lay_odds2 || match.lay_odds)) : (match.lay_odds2 || match.lay_odds)) * 0.99}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
+              />
             </div>
-          </>
+          </div>
+        )}
+
+        {(activeTab === "ALL" || activeTab === "BetFair-Fancy" || activeTab === "Fancy-2") && (
+          <div style={{ marginTop: 15 }}>
+            {fancyMarkets.length > 0 ? (
+              fancyMarkets.map((market: any) => (
+                <div key={market.marketId} style={{ marginBottom: 15 }}>
+                  <CombinedSectionHeader title={market.marketName || 'FANCY MARKET'} />
+                  {market.runners?.map((runner: any) => (
+                    <TeamRow2
+                      key={runner.selectionId}
+                      name={runner.runnerName}
+                      odds={runner.backPrice}
+                      layOdds={runner.layPrice}
+                      backSize={formatSize(runner.backSize)}
+                      laySize={formatSize(runner.laySize)}
+                      suspended={market.status === 'SUSPENDED' || market.status === 'CLOSED'}
+                      onBet={(t, o) => setActiveBet({ match, selection: runner.runnerName, betType: t, odds: o })}
+                    />
+                  ))}
+                </div>
+              ))
+            ) : (
+              <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+                No Fancy markets available for this match.
+              </div>
+            )}
+          </div>
         )}
       </main>
 
@@ -335,9 +427,24 @@ function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, 
 }
 
 function ThisOverBall({ value }: { value: string }) {
+  const v = String(value);
+  const bg = v === '6' ? '#00e676' 
+    : v === '4' ? '#ffca28' 
+    : v === 'W' || v === 'w' || v === 'Wd' ? '#ff5252' 
+    : v.includes('w') ? '#ff9800'
+    : '#fff';
+  const textColor = (v === '6' || v === '4' || v === '0' || !isNaN(Number(v))) ? '#212529' : 'white';
+  const borderColor = (v === '0' || !isNaN(Number(v))) ? '#dee2e6' : 'transparent';
+  
   return (
-    <div style={{ width: 20, height: 20, borderRadius: '50%', backgroundColor: '#ffffff22', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, border: '1px solid rgba(255,255,255,0.2)' }}>
-      {value}
+    <div style={{ 
+      minWidth: 22, height: 22, borderRadius: '50%', 
+      backgroundColor: bg, color: textColor, 
+      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+      fontSize: 9, fontWeight: 900, border: `1px solid ${borderColor}`,
+      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+    }}>
+      {v}
     </div>
   );
 }

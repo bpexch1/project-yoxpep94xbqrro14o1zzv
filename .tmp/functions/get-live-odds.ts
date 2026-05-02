@@ -106,7 +106,32 @@ Deno.serve(async (req) => {
       };
     });
 
-    return new Response(JSON.stringify({ markets: parsedMarkets }), {
+    // Extract score data from raw response (various formats)
+    const scoreData = raw.score || raw.scorecard || raw.eventScore 
+                   || raw.event?.score || raw.inning || raw.innings 
+                   || raw.liveScore || null;
+
+    const battingTeam = scoreData?.batting || scoreData?.battingTeam 
+                      || scoreData?.team || scoreData?.teamName || null;
+    const runs = scoreData?.runs || scoreData?.score || scoreData?.totalRuns || null;
+    const wickets = scoreData?.wickets || scoreData?.totalWickets || null;
+    const overs = scoreData?.overs || scoreData?.currentOvers || null;
+    const crr = scoreData?.crr || scoreData?.runRate || scoreData?.currentRunRate || null;
+    const thisOver = scoreData?.thisOver || scoreData?.currentOver || scoreData?.overBalls || null;
+    const lastBall = scoreData?.lastBall || scoreData?.currentBall || null;
+
+    return new Response(JSON.stringify({ 
+      markets: parsedMarkets,
+      score: scoreData ? {
+        battingTeam,
+        runs,
+        wickets,
+        overs,
+        crr,
+        thisOver: Array.isArray(thisOver) ? thisOver : (thisOver ? String(thisOver).split(' ') : []),
+        lastBall
+      } : null
+    }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
