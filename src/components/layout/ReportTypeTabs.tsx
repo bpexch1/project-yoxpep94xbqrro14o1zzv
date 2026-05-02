@@ -44,63 +44,65 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <span style={{ fontWeight: 700, fontSize: 15, color: "#2c3e50" }}>Report Type</span>
       </div>
       <div style={{ 
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "5px",
-        padding: "8px 12px 10px 12px"
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "4px",
+        padding: "8px 10px 10px 10px"
       }}>
         {tabs.map((tab, index) => {
           const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
           const isLast = index === tabs.length - 1;
           
-          // Active = btn-primary, Inactive = btn-outline-primary
           const btnStyle: React.CSSProperties = isActive
             ? {
+                fontSize: "12px",
+                padding: "4px 10px",
+                borderRadius: "6px",
+                border: "1px solid #2bbbad",
+                background: "#2bbbad",
+                color: "#fff",
+                fontWeight: 600,
+                height: "28px",
+                lineHeight: "18px",
+                cursor: "pointer",
+                fontFamily: "inherit",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "5px 8px",
-                fontSize: "13px",
-                fontWeight: 700,
-                lineHeight: "1.5",
-                borderRadius: "8px",
-                border: "1px solid #00b181",
-                background: "#00b181",
-                color: "#fff",
-                cursor: "pointer",
-                textAlign: "center",
                 whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                width: "100%",
-                boxSizing: "border-box",
-                gridColumn: isLast ? "2" : "auto",
-                fontFamily: "inherit",
                 transition: "opacity 0.15s",
               }
             : {
+                fontSize: "12px",
+                padding: "4px 10px",
+                borderRadius: "6px",
+                border: "1px solid #2bbbad",
+                background: "white",
+                color: "#2bbbad",
+                fontWeight: 500,
+                height: "28px",
+                lineHeight: "18px",
+                cursor: "pointer",
+                fontFamily: "inherit",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "5px 8px",
-                fontSize: "13px",
-                fontWeight: 400,
-                lineHeight: "1.5",
-                borderRadius: "8px",
-                border: "1px solid #17a2b8",
-                background: "#ffffff",
-                color: "#17a2b8",
-                cursor: "pointer",
-                textAlign: "center",
                 whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                width: "100%",
-                boxSizing: "border-box",
-                gridColumn: isLast ? "2" : "auto",
-                fontFamily: "inherit",
                 transition: "opacity 0.15s",
               };
+
+          if (isLast) {
+            return (
+              <div key={tab.label} style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                <button
+                  onClick={() => navigate(tab.path)}
+                  style={btnStyle}
+                >
+                  {tab.label}
+                </button>
+              </div>
+            );
+          }
 
           return (
             <button
