@@ -411,10 +411,12 @@ export function ClientSummaryCard({
                       </button>
                     </td>
                   ) : (
-                    <>
-                      <td colSpan={2} className="px-2 py-2 border border-[#4dbd74] font-bold">Total</td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right font-bold">{summaryData.credit_received.toLocaleString()}</td>
-                    </>
+                    <td colSpan={3} style={{ background: "#00b181", padding: "6px 10px", border: "1px solid #4dbd74" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>Total</span>
+                        <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>{summaryData.credit_received.toLocaleString()}</span>
+                      </div>
+                    </td>
                   )}
                 </tr>
               )}
@@ -472,11 +474,17 @@ export function ClientSummaryCard({
                         <tr className="bg-white">
                           <td colSpan={3} className="px-3 py-2 border-b border-[#d5d8dc]">
                             <ul className="text-[13px] text-[#212529] space-y-0.5 mb-2">
-                              <li>• Balance <span className="font-bold" style={{ color: balancesLoaded ? getAmountColor(display.balance || 0) : "#212529" }}>{display.isLoaded ? display.balance?.toLocaleString() : '-'}</span></li>
-                              <li>• Client (P/L) <span className="font-bold" style={{ color: balancesLoaded ? getAmountColor(display.plDownline || 0) : "#212529" }}>{display.isLoaded ? display.plDownline?.toLocaleString() : '-'}</span></li>
+                              <li>• Balance <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.balance ?? 0) : "#212529" }}>
+                                {display.isLoaded ? display.balance?.toLocaleString() : '-'}
+                              </span></li>
+                              <li>• Client (P/L) <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.plDownline ?? 0) : "#212529" }}>
+                                {display.isLoaded ? display.plDownline?.toLocaleString() : '-'}
+                              </span></li>
                               <li>• Share <span className="font-bold" style={{ color: "#212529" }}>{display.isLoaded ? display.share : '-'}</span></li>
                               <li>• Exposure <span className="font-bold" style={{ color: "#212529" }}>0</span></li>
-                              <li>• Available Balance <span className="font-bold" style={{ color: "#212529" }}>{display.isLoaded ? display.available?.toLocaleString() : '-'}</span></li>
+                              <li>• Available Balance <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.available ?? 0) : "#212529" }}>
+                                {display.isLoaded ? display.available?.toLocaleString() : '-'}
+                              </span></li>
                             </ul>
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[12px] text-[#212529] mr-1 font-bold">• Options</span>
