@@ -28,6 +28,189 @@ Deno.serve(async (req) => {
     const { action, matchId, odds, isSuspended, matchMeta } = body;
     const col = await getDb();
 
+    // ── SYNC from Betfair (Auto-Update) ───────────────────
+    if (action === "syncFromBetfair") {
+      const { betfairEventId } = body;
+      if (!matchId || !betfairEventId) return json({ error: "matchId and betfairEventId required" }, 400);
+      
+      const rapidApiKey = Deno.env.get("BETFAIR_RAPIDAPI_KEY");
+      if (!rapidApiKey) return json({ error: "No API key" }, 400);
+
+      // Check if admin overrode recently (within 60 seconds)
+      const existing = await col.findOne({ matchId });
+      if (existing?.lastManualOverride) {
+        const secsSince = (Date.now() - new Date(existing.lastManualOverride).getTime()) / 1000;
+        if (secsSince < 60) {
+          // Return existing without syncing
+          return json({ odds: existing, skipped: true });
+        }
+      }
+
+      // Fetch from Betfair
+      const res = await fetch(
+        `https://betfair-orbitexch-data.p.rapidapi.com/betfair/get_event_with_markets/${betfairEventId}`,
+        { headers: { 
+          "x-rapidapi-key": rapidApiKey, 
+          "x-rapidapi-host": "betfair-orbitexch-data.p.rapidapi.com" 
+        } }
+      );
+      
+      if (!res.ok) {
+        console.error(`[odds-engine] Betfair API error: ${res.status}`);
+        return json({ odds: existing || null, error: "Betfair API error" });
+      }
+
+      const raw = await res.json();
+      
+      // Normalize markets
+      let rawMarkets: any[] = [];
+      if (Array.isArray(raw)) rawMarkets = raw;
+      else if (Array.isArray(raw?.markets)) rawMarkets = raw.markets;
+      else if (Array.isArray(raw?.result?.markets)) rawMarkets = raw.result.markets;
+      else if (raw?.market) rawMarkets = Array.isArray(raw.market) ? raw.market : [raw.market];
+      else if (raw?.marketBook) rawMarkets = Array.isArray(raw.marketBook) ? raw.marketBook : [raw.marketBook];
+
+      // Find Match Odds market
+      const matchOddsMarket = rawMarkets.find((m: any) =>
+        (m.marketName || m.MarketName || '').toLowerCase().includes('match odds')
+      ) || rawMarkets[0];
+
+      if (!matchOddsMarket) return json({ odds: existing || null, error: "No market found" });
+
+      const isMarketSuspended = matchOddsMarket.status === 'SUSPENDED' || matchOddsMarket.status === 'CLOSED';
+      const runners = matchOddsMarket.runners || matchOddsMarket.runner || [];
+
+      const getOdds = (runner: any, type: 'back' | 'lay') => {
+        const list = type === 'back'
+          ? (runner.availableToBack || runner.ex?.availableToBack || runner.back || [])
+          : (runner.availableToLay || runner.ex?.availableToLay || runner.lay || []);
+        const price = list[0]?.price ?? list[0]?.Price;
+        return typeof price === 'number' ? price : (parseFloat(price) || null);
+      };
+
+      const r0 = runners[0];
+      const r1 = runners[1];
+
+      if (!r0) return json({ odds: existing || null, error: "No runners found" });
+
+      const update: any = {
+        matchId,
+        isSuspended: isMarketSuspended,
+        autoSynced: true,
+        lastUpdated: new Date(),
+      };
+      
+      if (r0) {
+        const b = getOdds(r0, 'back');
+        const l = getOdds(r0, 'lay');
+        if (b) update.teamA_back = b;
+        if (l) update.teamA_lay = l;
+      }
+      if (r1) {
+        const b = getOdds(r1, 'back');
+        const l = getOdds(r1, 'lay');
+        if (b) update.teamB_back = b;
+        if (l) update.teamB_lay = l;
+      }
+
+      // Preserve manual meta if existing
+      if (existing) {
+        if (!update.teamA && existing.teamA) update.teamA = existing.teamA;
+        if (!update.teamB && existing.teamB) update.teamB = existing.teamB;
+      }
+
+      await col.updateOne({ matchId }, { $set: update }, { upsert: true });
+      const doc = await col.findOne({ matchId });
+      return json({ odds: doc, synced: true });
+    }
+
+    // ── SYNC ALL from Betfair ────────────────────────────
+    if (action === "syncAllFromBetfair") {
+      const { matches } = body; // Array of { matchId, betfairEventId }
+      if (!Array.isArray(matches)) return json({ error: "matches array required" }, 400);
+
+      const rapidApiKey = Deno.env.get("BETFAIR_RAPIDAPI_KEY");
+      if (!rapidApiKey) return json({ error: "No API key" }, 400);
+
+      const results = await Promise.allSettled(
+        matches.slice(0, 10).map(async (m: any) => {
+          const { matchId, betfairEventId } = m;
+          
+          // Check if admin overrode recently (within 60 seconds)
+          const existing = await col.findOne({ matchId });
+          if (existing?.lastManualOverride) {
+            const secsSince = (Date.now() - new Date(existing.lastManualOverride).getTime()) / 1000;
+            if (secsSince < 60) return { matchId, skipped: true };
+          }
+
+          const res = await fetch(
+            `https://betfair-orbitexch-data.p.rapidapi.com/betfair/get_event_with_markets/${betfairEventId}`,
+            { headers: { 
+              "x-rapidapi-key": rapidApiKey, 
+              "x-rapidapi-host": "betfair-orbitexch-data.p.rapidapi.com" 
+            } }
+          );
+          if (!res.ok) return { matchId, error: "API error" };
+
+          const raw = await res.json();
+          let rawMarkets: any[] = [];
+          if (Array.isArray(raw)) rawMarkets = raw;
+          else if (Array.isArray(raw?.markets)) rawMarkets = raw.markets;
+          else if (Array.isArray(raw?.result?.markets)) rawMarkets = raw.result.markets;
+          else if (raw?.market) rawMarkets = Array.isArray(raw.market) ? raw.market : [raw.market];
+          else if (raw?.marketBook) rawMarkets = Array.isArray(raw.marketBook) ? raw.marketBook : [raw.marketBook];
+
+          const matchOddsMarket = rawMarkets.find((m: any) =>
+            (m.marketName || m.MarketName || '').toLowerCase().includes('match odds')
+          ) || rawMarkets[0];
+
+          if (!matchOddsMarket) return { matchId, error: "No market" };
+
+          const runners = matchOddsMarket.runners || matchOddsMarket.runner || [];
+          const getOdds = (runner: any, type: 'back' | 'lay') => {
+            const list = type === 'back'
+              ? (runner.availableToBack || runner.ex?.availableToBack || runner.back || [])
+              : (runner.availableToLay || runner.ex?.availableToLay || runner.lay || []);
+            const price = list[0]?.price ?? list[0]?.Price;
+            return typeof price === 'number' ? price : (parseFloat(price) || null);
+          };
+
+          const r0 = runners[0];
+          const r1 = runners[1];
+          if (!r0) return { matchId, error: "No runners" };
+
+          const update: any = {
+            matchId,
+            isSuspended: matchOddsMarket.status === 'SUSPENDED' || matchOddsMarket.status === 'CLOSED',
+            autoSynced: true,
+            lastUpdated: new Date(),
+          };
+          if (r0) {
+            const b = getOdds(r0, 'back');
+            const l = getOdds(r0, 'lay');
+            if (b) update.teamA_back = b;
+            if (l) update.teamA_lay = l;
+          }
+          if (r1) {
+            const b = getOdds(r1, 'back');
+            const l = getOdds(r1, 'lay');
+            if (b) update.teamB_back = b;
+            if (l) update.teamB_lay = l;
+          }
+
+          if (existing) {
+            if (!update.teamA && existing.teamA) update.teamA = existing.teamA;
+            if (!update.teamB && existing.teamB) update.teamB = existing.teamB;
+          }
+
+          await col.updateOne({ matchId }, { $set: update }, { upsert: true });
+          return { matchId, synced: true };
+        })
+      );
+
+      return json({ results });
+    }
+
     // ── GET single match odds ──────────────────────────────
     if (action === "getOdds") {
       if (!matchId) return json({ error: "matchId required" }, 400);
@@ -64,7 +247,10 @@ Deno.serve(async (req) => {
     // ── UPDATE odds ───────────────────────────────────────
     if (action === "updateOdds") {
       if (!matchId) return json({ error: "matchId required" }, 400);
-      const update: any = { lastUpdated: new Date() };
+      const update: any = { 
+        lastUpdated: new Date(),
+        lastManualOverride: new Date() // Mark as manually overridden
+      };
       if (odds?.teamA_back != null) update.teamA_back = Number(odds.teamA_back);
       if (odds?.teamA_lay != null)  update.teamA_lay  = Number(odds.teamA_lay);
       if (odds?.teamB_back != null) update.teamB_back = Number(odds.teamB_back);

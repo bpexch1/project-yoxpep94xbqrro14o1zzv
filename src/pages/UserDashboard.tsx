@@ -53,6 +53,27 @@ export default function UserDashboard() {
     refetchInterval: 5000 // Refresh odds every 5 seconds
   });
 
+  // Auto-sync Betfair odds for all visible matches every 10 seconds
+  const matchesWithBetfair = (matches || []).filter((m: any) => m.betfair_event_id);
+
+  useQuery({
+    queryKey: ['betfair-bulk-sync', matchesWithBetfair.map((m: any) => m.id).join(',')],
+    queryFn: async () => {
+      if (matchesWithBetfair.length === 0) return null;
+      await oddsEngine({
+        action: 'syncAllFromBetfair',
+        matches: matchesWithBetfair.slice(0, 10).map((m: any) => ({
+          matchId: m.id,
+          betfairEventId: m.betfair_event_id
+        }))
+      });
+      return true;
+    },
+    enabled: matchesWithBetfair.length > 0,
+    refetchInterval: 10000,  // every 10 seconds
+    staleTime: 0,
+  });
+
   // Fetch live Betfair events
   const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
     queryKey: ['betfair-events'],

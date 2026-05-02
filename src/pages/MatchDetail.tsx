@@ -70,7 +70,23 @@ export default function MatchDetail() {
   const clientData = clients?.[0];
   const clientBalance = clientData?.cash ?? 0;
 
-  // Fetch live odds from Betfair/OrbitExch every 1 second
+  // AUTO-SYNC: Fetch Betfair odds → MongoDB every 3 seconds (only if match has betfair_event_id)
+  const { data: syncResult } = useQuery({
+    queryKey: ['betfair-sync', match?.betfair_event_id, match?.id],
+    queryFn: async () => {
+      const res = await oddsEngine({
+        action: 'syncFromBetfair',
+        matchId: match.id,
+        betfairEventId: match.betfair_event_id,
+      });
+      return res;
+    },
+    enabled: !!match?.betfair_event_id && !!match?.id,
+    refetchInterval: 3000,
+    staleTime: 0,
+  });
+
+  // Keep liveOddsData only for Fancy Markets / Scorecard if needed, but remove polling
   const { data: liveOddsData, isLoading: liveOddsLoading } = useQuery({
     queryKey: ['live-odds', match?.betfair_event_id],
     queryFn: async () => {
@@ -78,7 +94,7 @@ export default function MatchDetail() {
       return result;
     },
     enabled: !!match?.betfair_event_id,
-    refetchInterval: 1000,
+    refetchInterval: 10000, // Reduced frequency for fancy markets
     staleTime: 0,
   });
 
