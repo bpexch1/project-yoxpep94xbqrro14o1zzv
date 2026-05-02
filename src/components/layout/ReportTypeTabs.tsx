@@ -46,8 +46,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div style={{ 
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "6px",
-        padding: "10px 12px 14px 12px"
+        gap: "5px",
+        padding: "8px 12px 10px 12px"
       }}>
         {tabs.map((tab, index) => {
           const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
@@ -59,8 +59,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "11px 10px",
-                fontSize: "14px",
+                padding: "5px 8px",
+                fontSize: "13px",
                 fontWeight: 700,
                 lineHeight: "1.5",
                 borderRadius: "8px",
@@ -82,8 +82,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "11px 10px",
-                fontSize: "14px",
+                padding: "5px 8px",
+                fontSize: "13px",
                 fontWeight: 400,
                 lineHeight: "1.5",
                 borderRadius: "8px",
