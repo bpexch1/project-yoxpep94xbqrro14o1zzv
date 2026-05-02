@@ -17,12 +17,77 @@ import {
   Trophy, 
 } from "lucide-react";
 
-const getSectionIcon = (sport: string) => {
+const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color?: string, size?: number }) => {
   const s = sport.toLowerCase();
-  if (s.includes('cricket')) return <span className="svg-cricket" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
-  if (s.includes('football') || s.includes('soccer')) return <span className="svg-soccer" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
-  if (s.includes('tennis')) return <span className="svg-tennis" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
-  return <span className="svg-cricket" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
+  const props = {
+    width: size, height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: color,
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    style: { display: 'block' }
+  };
+
+  if (s.includes('inplay') || s.includes('live')) {
+    // Stopwatch icon
+    return (
+      <svg {...props}>
+        <circle cx="12" cy="14" r="8"/>
+        <path d="M10 3h4"/>
+        <path d="M12 3v3"/>
+        <polyline points="12,10 12,14 15,16"/>
+      </svg>
+    );
+  }
+  
+  if (s.includes('cricket')) {
+    // Cricket bat at 45 degree angle — wider blade, thin handle
+    return (
+      <svg {...props}>
+        <path d="M20.5 3.5a2 2 0 0 0-3 0L5 16c-.5.5-.5 1.2 0 1.7l1.3 1.3c.5.5 1.2.5 1.7 0L20.5 6.5a2 2 0 0 0 0-3z"/>
+        <path d="M5 16l-2.5 3.5c-.4.5-.3 1.1.2 1.5.5.4 1.1.3 1.5-.2L7 17.5"/>
+      </svg>
+    );
+  }
+
+  if (s.includes('tennis')) {
+    // Tennis racket — oval head with string lines, handle
+    return (
+      <svg {...props}>
+        <ellipse cx="12" cy="9" rx="5.5" ry="7"/>
+        <line x1="6.5" y1="7" x2="17.5" y2="7"/>
+        <line x1="6" y1="10.5" x2="18" y2="10.5"/>
+        <line x1="10" y1="2.2" x2="10" y2="15.8"/>
+        <line x1="14" y1="2.2" x2="14" y2="15.8"/>
+        <line x1="12" y1="16" x2="12" y2="22"/>
+        <line x1="10" y1="20" x2="14" y2="20"/>
+      </svg>
+    );
+  }
+
+  if (s.includes('soccer') || s.includes('football')) {
+    // Soccer ball — circle with pentagon patches
+    return (
+      <svg {...props}>
+        <circle cx="12" cy="12" r="9.5"/>
+        <polygon points="12,5.5 14.5,8 13.5,11 10.5,11 9.5,8" fill={color} stroke={color} strokeWidth="0.5"/>
+        <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+        <line x1="19" y1="7.5" x2="14.5" y2="8"/>
+        <line x1="17" y1="20" x2="13.5" y2="17.5"/>
+        <line x1="7" y1="20" x2="10.5" y2="17.5"/>
+        <line x1="5" y1="7.5" x2="9.5" y2="8"/>
+        <line x1="10.5" y1="11" x2="7" y2="20"/>
+        <line x1="13.5" y1="11" x2="17" y2="20"/>
+        <line x1="9.5" y1="8" x2="5" y2="7.5"/>
+        <line x1="14.5" y1="8" x2="19" y2="7.5"/>
+      </svg>
+    );
+  }
+
+  // Default circle
+  return <svg {...props}><circle cx="12" cy="12" r="9"/></svg>;
 };
 
 export default function UserDashboard() {
@@ -168,10 +233,10 @@ export default function UserDashboard() {
   const soccerCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length;
 
   const categories = [
-    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", count: inplayCount },
-    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", count: cricketCount },
-    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", count: tennisCount },
-    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", count: soccerCount },
+    { id: "Inplay", label: "Inplay", count: inplayCount },
+    { id: "Cricket", label: "Cricket", count: cricketCount },
+    { id: "Tennis", label: "Tennis", count: tennisCount },
+    { id: "Soccer", label: "Soccer", count: soccerCount },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -295,10 +360,7 @@ export default function UserDashboard() {
                 
                 {/* Sport icon */}
                 <div style={{ marginBottom: 4 }}>
-                   <span 
-                     className={`${cat.iconClass} sprite-icon-white`}
-                     style={{ display: 'inline-block' }}
-                   />
+                   <SportIcon sport={cat.id} color="white" size={22} />
                 </div>
 
                 {/* Label */}
@@ -335,7 +397,9 @@ export default function UserDashboard() {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      {getSectionIcon(sport)}
+                      <div style={{ display:'inline-block', verticalAlign:'middle' }}>
+                        <SportIcon sport={sport} color="#444" size={16} />
+                      </div>
                       <span style={{ fontWeight: 700, fontSize: 13, color: "#212529" }}>{sport}</span>
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "#666" }}>Matched</span>
