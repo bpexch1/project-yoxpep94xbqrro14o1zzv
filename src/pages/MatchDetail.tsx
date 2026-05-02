@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Match, Bet, Client } from "@/entities";
@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Volume2, Clock, CheckSquare, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { getLiveOdds } from "@/functions";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -64,6 +65,43 @@ export default function MatchDetail() {
 
   const clientData = clients?.[0];
   const clientBalance = clientData?.cash ?? 0;
+
+  // Fetch live odds from Betfair/OrbitExch every 1 second (only if betfair_event_id is set)
+  const { data: liveOddsData, isLoading: liveOddsLoading } = useQuery({
+    queryKey: ['live-odds', match?.betfair_event_id],
+    queryFn: async () => {
+      const result = await getLiveOdds({ eventId: match.betfair_event_id });
+      return result;
+    },
+    enabled: !!match?.betfair_event_id,
+    refetchInterval: 1000,
+    staleTime: 0,
+  });
+
+  // Extract Match Odds market from live data
+  const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
+    m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
+  ) || liveOddsData?.markets?.[0];
+
+  const isMarketSuspended = matchOddsMarket?.status === 'SUSPENDED' || matchOddsMarket?.status === 'CLOSED';
+  const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
+
+  // Helper: format size number to readable string e.g. 1200000 -> "1.2M", 450000 -> "450K"
+  const formatSize = (size: number | null) => {
+    if (!size) return '';
+    if (size >= 1000000) return `${(size / 1000000).toFixed(1)}M`;
+    if (size >= 1000) return `${(size / 1000).toFixed(1)}K`;
+    return String(Math.round(size));
+  };
+
+  // Get runner data from live odds
+  const getLiveRunner = (teamName: string, idx: number) => {
+    if (!matchOddsMarket) return null;
+    return matchOddsMarket.runners?.[idx] || 
+      matchOddsMarket.runners?.find((r: any) => 
+        r.runnerName?.toLowerCase() === teamName?.toLowerCase()
+      ) || null;
+  };
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
@@ -251,8 +289,34 @@ export default function MatchDetail() {
             {/* MATCH ODDS */}
             <div style={{ marginTop: 0 }}>
               <CombinedSectionHeader title="MATCH ODDS (MaxBet: 5M)" />
-              <TeamRow2 name={match.team1} odds={match.back_odds} layOdds={match.lay_odds} onBet={(t,o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} />
-              <TeamRow2 name={match.team2} odds={match.back_odds2 || match.back_odds} layOdds={match.lay_odds2 || match.lay_odds} onBet={(t,o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} />
+              {(() => {
+                const runner1 = getLiveRunner(match.team1, 0);
+                const runner2 = getLiveRunner(match.team2, 1);
+                return (
+                  <>
+                    <TeamRow2
+                      name={match.team1}
+                      odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds) : match.back_odds}
+                      layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds) : match.lay_odds}
+                      backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
+                      laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
+                      loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
+                      suspended={isMarketSuspended}
+                      onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
+                    />
+                    <TeamRow2
+                      name={match.team2}
+                      odds={hasLiveOdds ? (runner2?.backPrice ?? (match.back_odds2 || match.back_odds)) : (match.back_odds2 || match.back_odds)}
+                      layOdds={hasLiveOdds ? (runner2?.layPrice ?? (match.lay_odds2 || match.lay_odds)) : (match.lay_odds2 || match.lay_odds)}
+                      backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
+                      laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
+                      loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
+                      suspended={isMarketSuspended}
+                      onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
+                    />
+                  </>
+                );
+              })()}
             </div>
 
             {/* BOOKMAKER */}
@@ -448,47 +512,102 @@ function CombinedSectionHeader({ title }: { title: string }) {
   );
 }
 
-// TeamRow2: larger odds display
-function TeamRow2({ name, odds, layOdds, onBet }: { name: string; odds: number; layOdds: number; onBet: (type: 'back' | 'lay', odds: number) => void }) {
+// TeamRow2: larger odds display with loading, suspended, and blink support
+function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, onBet }: {
+  name: string;
+  odds: number;
+  layOdds: number;
+  backSize?: string;
+  laySize?: string;
+  loading?: boolean;
+  suspended?: boolean;
+  onBet: (type: 'back' | 'lay', odds: number) => void;
+}) {
   const backOddsVal = odds || 1.5;
   const layOddsVal = layOdds || 1.52;
-  const backSize = `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
-  const laySize = `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
-  
+
+  // Blink animation: track previous odds to detect change
+  const prevBackRef = useRef<number>(backOddsVal);
+  const prevLayRef = useRef<number>(layOddsVal);
+  const [backBlink, setBackBlink] = useState(false);
+  const [layBlink, setLayBlink] = useState(false);
+
+  useEffect(() => {
+    if (prevBackRef.current !== backOddsVal) {
+      prevBackRef.current = backOddsVal;
+      setBackBlink(true);
+      const t = setTimeout(() => setBackBlink(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [backOddsVal]);
+
+  useEffect(() => {
+    if (prevLayRef.current !== layOddsVal) {
+      prevLayRef.current = layOddsVal;
+      setLayBlink(true);
+      const t = setTimeout(() => setLayBlink(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [layOddsVal]);
+
+  // Fallback random size if no live size provided
+  const displayBackSize = backSize || `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
+  const displayLaySize = laySize || `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
+
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 44 }}>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 44, position: "relative" }}>
       {/* Team name */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "6px 12px" }}>
         <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>{name}</span>
       </div>
-      {/* Back odds box */}
-      <div onClick={() => onBet('back', backOddsVal)} style={{ 
-        width: 60, 
-        backgroundColor: "#a5d9fe", 
-        display: "flex", flexDirection: "column", 
-        alignItems: "center", justifyContent: "center", 
-        cursor: "pointer", 
-        borderLeft: "1px solid #c4d9ea",
-        gap: 0,
-        padding: "0 2px"
-      }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{backOddsVal.toFixed(2)}</span>
-        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{backSize}</span>
-      </div>
-      {/* Lay odds box */}
-      <div onClick={() => onBet('lay', layOddsVal)} style={{ 
-        width: 60, 
-        backgroundColor: "#f8d0ce", 
-        display: "flex", flexDirection: "column", 
-        alignItems: "center", justifyContent: "center", 
-        cursor: "pointer", 
-        borderLeft: "1px solid #c4d9ea",
-        gap: 0,
-        padding: "0 2px"
-      }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{layOddsVal.toFixed(2)}</span>
-        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{laySize}</span>
-      </div>
+
+      {/* Back odds cell */}
+      {loading ? (
+        <div style={{ width: 120, display: "flex", alignItems: "center", justifyContent: "center", borderLeft: "1px solid #c4d9ea" }}>
+          <div style={{ width: 80, height: 20, backgroundColor: "#c8e8ff", borderRadius: 4, animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }} />
+        </div>
+      ) : suspended ? (
+        <div style={{ width: 120, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f0e0e0", borderLeft: "1px solid #c4d9ea" }}>
+          <span style={{ color: "#dc3545", fontWeight: 900, fontSize: 11, letterSpacing: 1 }}>SUSPENDED</span>
+        </div>
+      ) : (
+        <>
+          <div
+            onClick={() => onBet('back', backOddsVal)}
+            style={{
+              width: 60,
+              backgroundColor: backBlink ? "#72bbef" : "#a5d9fe",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              cursor: "pointer",
+              borderLeft: "1px solid #c4d9ea",
+              gap: 0,
+              padding: "0 2px",
+              transition: "background-color 0.3s ease",
+            }}
+          >
+            <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{typeof backOddsVal === 'number' ? backOddsVal.toFixed(2) : backOddsVal}</span>
+            <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{displayBackSize}</span>
+          </div>
+          <div
+            onClick={() => onBet('lay', layOddsVal)}
+            style={{
+              width: 60,
+              backgroundColor: layBlink ? "#f898ab" : "#f8d0ce",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              cursor: "pointer",
+              borderLeft: "1px solid #c4d9ea",
+              gap: 0,
+              padding: "0 2px",
+              transition: "background-color 0.3s ease",
+            }}
+          >
+            <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{typeof layOddsVal === 'number' ? layOddsVal.toFixed(2) : layOddsVal}</span>
+            <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{displayLaySize}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
