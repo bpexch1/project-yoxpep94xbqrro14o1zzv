@@ -515,10 +515,12 @@ export function ClientSummaryCard({
                               >
                                 {client.status === "active" ? "A" : "D"}
                               </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}
-                                className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center"
-                              >S</button>
+                              {isAdminType(client.role) && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}
+                                  className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center"
+                                >S</button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -695,11 +697,13 @@ export function ClientSummaryCard({
                           >
                             {client.status === "active" ? "A" : "D"}
                           </button>
-                          <button
-                            onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                            title="Settle Account"
-                            className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center hover:opacity-80 transition-opacity"
-                          >S</button>
+                          {isAdminType(client.role) && (
+                            <button
+                              onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
+                              title="Settle Account"
+                              className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center hover:opacity-80 transition-opacity"
+                            >S</button>
+                          )}
                         </div>
                       </td>
                     </tr>
