@@ -156,11 +156,16 @@ export default function UserDashboard() {
     return 0;
   });
   
+  const inplayCount = matchesList.filter((m: any) => m.status === 'live').length;
+  const cricketCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length;
+  const tennisCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length;
+  const soccerCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length;
+
   const categories = [
-    { id: "Inplay", label: "Inplay", emoji: "⏱️", count: matchesList.filter((m: any) => m.status === 'live').length },
-    { id: "Cricket", label: "Cricket", emoji: "🏏", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length },
-    { id: "Tennis", label: "Tennis", emoji: "🎾", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length },
-    { id: "Soccer", label: "Soccer", emoji: "⚽", count: matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length },
+    { id: "Inplay", label: "Inplay", iconClass: "svg-live-betting", count: inplayCount },
+    { id: "Cricket", label: "Cricket", iconClass: "svg-cricket", count: cricketCount },
+    { id: "Tennis", label: "Tennis", iconClass: "svg-tennis", count: tennisCount },
+    { id: "Soccer", label: "Soccer", iconClass: "svg-soccer", count: soccerCount },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -262,7 +267,7 @@ export default function UserDashboard() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "6px 4px",
+                  padding: "8px 4px",
                   backgroundColor: isActive ? "#00b181" : "#254465",
                   border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.08)",
@@ -271,32 +276,22 @@ export default function UserDashboard() {
                   minHeight: 62,
                 }}
               >
-                {/* Icon + red badge wrapper */}
-                <div style={{ position: "relative", display: "inline-flex", marginBottom: 3 }}>
-                  {/* Sport icon (emoji) */}
-                  <span style={{ fontSize: 20, lineHeight: 1 }}>{cat.emoji}</span>
-                  {/* Red badge count */}
-                  {cat.count > 0 && (
-                    <span style={{
-                      position: "absolute",
-                      top: -6,
-                      right: -8,
-                      backgroundColor: "#dc3545",
-                      color: "white",
-                      fontSize: 8,
-                      fontWeight: 700,
-                      borderRadius: "50%",
-                      minWidth: 14,
-                      height: 14,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "0 2px",
-                      lineHeight: 1,
-                      border: "1px solid rgba(255,255,255,0.3)",
-                    }}>{cat.count}</span>
-                  )}
+                {/* Count number at top */}
+                <span style={{ 
+                  color: 'white', 
+                  fontSize: 14, 
+                  fontWeight: 900, 
+                  lineHeight: 1, 
+                  marginBottom: 4 
+                }}>
+                  {cat.count}
+                </span>
+                
+                {/* Sport icon (sprite) */}
+                <div style={{ marginBottom: 2 }}>
+                   <span className={cat.iconClass} style={{ transform: 'scale(0.85)' }} />
                 </div>
+
                 {/* Label */}
                 <span style={{
                   color: "white",
@@ -304,6 +299,7 @@ export default function UserDashboard() {
                   fontWeight: 700,
                   letterSpacing: 0.5,
                   opacity: isActive ? 1 : 0.85,
+                  textTransform: 'uppercase'
                 }}>{cat.label}</span>
               </button>
             );
@@ -329,7 +325,7 @@ export default function UserDashboard() {
                     style={{
                       backgroundColor: "#e8eef4",
                       borderBottom: "1px solid #ccd9e5",
-                      padding: "5px 10px",
+                      padding: "5px 12px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
@@ -339,7 +335,7 @@ export default function UserDashboard() {
                       <span className={sportIconClass} />
                       <span style={{ fontWeight: 700, fontSize: 13, color: "#212529" }}>{sport}</span>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#333" }}>Matched</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#666" }}>Matched</span>
                   </div>
                   <div className="flex flex-col">
                     {sportMatches.map((match: any) => (
