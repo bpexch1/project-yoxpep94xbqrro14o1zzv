@@ -6,7 +6,6 @@ import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Sub-components
@@ -19,9 +18,10 @@ interface TennisMatchDetailProps {
   match: any;
   clientData: any;
   session: any;
+  liveOddsData?: any;
 }
 
-export default function TennisMatchDetail({ match, clientData, session }: TennisMatchDetailProps) {
+export default function TennisMatchDetail({ match, clientData, session, liveOddsData }: TennisMatchDetailProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [scoreTab, setScoreTab] = useState<"tv" | "scorecard">("scorecard");
@@ -75,6 +75,28 @@ export default function TennisMatchDetail({ match, clientData, session }: Tennis
     }
   });
 
+  // Extract Match Odds market
+  const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
+    m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
+  ) || liveOddsData?.markets?.[0];
+
+  const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
+
+  const formatSize = (size: number | null) => {
+    if (!size) return '';
+    if (size >= 1000000) return `${(size / 1000000).toFixed(1)}M`;
+    if (size >= 1000) return `${(size / 1000).toFixed(1)}K`;
+    return String(Math.round(size));
+  };
+
+  const getLiveRunner = (teamName: string, idx: number) => {
+    if (!matchOddsMarket) return null;
+    return matchOddsMarket.runners?.[idx] || 
+      matchOddsMarket.runners?.find((r: any) => 
+        r.runnerName?.toLowerCase() === teamName?.toLowerCase()
+      ) || null;
+  };
+
   return (
     <div className="min-h-screen bg-[#ecf0f1] flex flex-col font-sans">
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
@@ -112,18 +134,30 @@ export default function TennisMatchDetail({ match, clientData, session }: Tennis
           </div>
         </div>
 
-        <TennisOddsRow 
-          name={match.team1} 
-          odds={match.back_odds || 1.72} 
-          layOdds={match.lay_odds || 1.74} 
-          onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} 
-        />
-        <TennisOddsRow 
-          name={match.team2} 
-          odds={match.back_odds2 || 2.36} 
-          layOdds={match.lay_odds2 || 2.4} 
-          onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
-        />
+        {(() => {
+          const runner1 = getLiveRunner(match.team1, 0);
+          const runner2 = getLiveRunner(match.team2, 1);
+          return (
+            <>
+              <TennisOddsRow 
+                name={match.team1} 
+                odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? 1.72) : (match.back_odds ?? 1.72)} 
+                layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? 1.74) : (match.lay_odds ?? 1.74)} 
+                backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} 
+              />
+              <TennisOddsRow 
+                name={match.team2} 
+                odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? 2.36) : (match.back_odds2 ?? 2.36)} 
+                layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? 2.4) : (match.lay_odds2 ?? 2.4)} 
+                backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
+              />
+            </>
+          );
+        })()}
 
         {/* 5. TV / SCORE CARD TABS & COURT VISUAL */}
         <TennisScoreCard 

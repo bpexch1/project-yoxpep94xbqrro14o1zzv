@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bet, Client } from "@/entities";
@@ -6,15 +6,16 @@ import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Clock, Volume2 } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface FootballMatchDetailProps {
   match: any;
   clientData: any;
   session: any;
+  liveOddsData?: any;
 }
 
-export default function FootballMatchDetail({ match, clientData, session }: FootballMatchDetailProps) {
+export default function FootballMatchDetail({ match, clientData, session, liveOddsData }: FootballMatchDetailProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -58,6 +59,28 @@ export default function FootballMatchDetail({ match, clientData, session }: Foot
     }
   });
 
+  // Extract Match Odds market
+  const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
+    m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
+  ) || liveOddsData?.markets?.[0];
+
+  const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
+
+  const formatSize = (size: number | null) => {
+    if (!size) return '';
+    if (size >= 1000000) return `${(size / 1000000).toFixed(1)}M`;
+    if (size >= 1000) return `${(size / 1000).toFixed(1)}K`;
+    return String(Math.round(size));
+  };
+
+  const getLiveRunner = (teamName: string, idx: number) => {
+    if (!matchOddsMarket) return null;
+    return matchOddsMarket.runners?.[idx] || 
+      matchOddsMarket.runners?.find((r: any) => 
+        r.runnerName?.toLowerCase() === teamName?.toLowerCase()
+      ) || null;
+  };
+
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
 
   return (
@@ -93,9 +116,40 @@ export default function FootballMatchDetail({ match, clientData, session }: Foot
 
       <main className="flex-1 overflow-y-auto pb-6">
         <FootballCombinedSectionHeader title="MATCH ODDS (MaxBet: 1M)" />
-        <FootballTeamRow name={match.team1} odds={match.back_odds || 2.1} layOdds={match.lay_odds || 2.12} onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} />
-        <FootballTeamRow name={match.team2} odds={match.back_odds2 || 3.4} layOdds={match.lay_odds2 || 3.45} onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} />
-        <FootballTeamRow name="The Draw" odds={3.85} layOdds={3.9} onBet={(t, o) => setActiveBet({ match, selection: "The Draw", betType: t, odds: o })} />
+        {(() => {
+          const runner1 = getLiveRunner(match.team1, 0);
+          const runner2 = getLiveRunner(match.team2, 1);
+          const runnerDraw = getLiveRunner("The Draw", 2) || matchOddsMarket?.runners?.find((r: any) => r.runnerName?.toLowerCase().includes('draw'));
+          
+          return (
+            <>
+              <FootballTeamRow 
+                name={match.team1} 
+                odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? 2.1) : (match.back_odds ?? 2.1)} 
+                layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? 2.12) : (match.lay_odds ?? 2.12)} 
+                backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} 
+              />
+              <FootballTeamRow 
+                name={match.team2} 
+                odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? 3.4) : (match.back_odds2 ?? 3.4)} 
+                layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? 3.45) : (match.lay_odds2 ?? 3.45)} 
+                backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
+              />
+              <FootballTeamRow 
+                name="The Draw" 
+                odds={hasLiveOdds ? (runnerDraw?.backPrice ?? 3.85) : 3.85} 
+                layOdds={hasLiveOdds ? (runnerDraw?.layPrice ?? 3.9) : 3.9} 
+                backSize={hasLiveOdds ? formatSize(runnerDraw?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runnerDraw?.laySize) : undefined}
+                onBet={(t, o) => setActiveBet({ match, selection: "The Draw", betType: t, odds: o })} 
+              />
+            </>
+          );
+        })()}
 
         <GoalsSection title="OVER/UNDER 0.5 GOALS (MaxBet: 250K)" underOdds={13} underLay={14.5} overOdds={1.07} overLay={1.09} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />
         <GoalsSection title="OVER/UNDER 1.5 GOALS (MaxBet: 250K)" underOdds={3.85} underLay={3.95} overOdds={1.34} overLay={1.35} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />
@@ -187,9 +241,9 @@ function FootballCombinedSectionHeader({ title }: { title: string }) {
   );
 }
 
-function FootballTeamRow({ name, odds, layOdds, onBet }: { name: string; odds: number; layOdds: number; onBet: (type: 'back' | 'lay', odds: number) => void }) {
-  const backSize = `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
-  const laySize = `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
+function FootballTeamRow({ name, odds, layOdds, backSize, laySize, onBet }: { name: string; odds: number; layOdds: number; backSize?: string; laySize?: string; onBet: (type: 'back' | 'lay', odds: number) => void }) {
+  const displayBackSize = backSize || `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
+  const displayLaySize = laySize || `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
   return (
     <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 44 }}>
       <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "6px 12px" }}>
@@ -197,11 +251,11 @@ function FootballTeamRow({ name, odds, layOdds, onBet }: { name: string; odds: n
       </div>
       <div onClick={() => onBet('back', odds)} style={{ width: 60, backgroundColor: "#a5d9fe", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", gap: 0, padding: "0 2px" }}>
         <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{odds.toFixed(2)}</span>
-        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{backSize}</span>
+        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{displayBackSize}</span>
       </div>
       <div onClick={() => onBet('lay', layOdds)} style={{ width: 60, backgroundColor: "#f8d0ce", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", gap: 0, padding: "0 2px" }}>
         <span style={{ fontWeight: 700, fontSize: 13, color: "#212529", lineHeight: 1.1 }}>{layOdds.toFixed(2)}</span>
-        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{laySize}</span>
+        <span style={{ fontSize: 9, color: "#666", lineHeight: 1 }}>{displayLaySize}</span>
       </div>
     </div>
   );
