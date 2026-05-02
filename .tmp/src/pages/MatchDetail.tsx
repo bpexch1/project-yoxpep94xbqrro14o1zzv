@@ -109,17 +109,17 @@ export default function MatchDetail() {
 
   // Score logic
   const liveScore = cricketScoreData?.score || liveOddsData?.score || null;
-  const battingAbbr = match.team1?.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() || 'T1';
+  const battingAbbr = match?.team1?.split(' ').map((w: string) => w[0]).join('').substring(0, 3).toUpperCase() || 'T1';
   
   const scoreDisplay = liveScore?.runs != null
     ? `${liveScore.battingTeam || battingAbbr} ${liveScore.runs}/${liveScore.wickets ?? '--'} (${liveScore.overs || '--'})`
     : (liveScore 
-      ? `${liveScore.battingTeam || battingAbbr} ${match.status === 'live' ? '--/--' : '--'} (--)`
-      : `${battingAbbr} ${match.status === 'live' ? '--/--' : '--'} (--)`
+      ? `${liveScore.battingTeam || battingAbbr} ${match?.status === 'live' ? '--/--' : '--'} (--)`
+      : `${battingAbbr} ${match?.status === 'live' ? '--/--' : '--'} (--)`
     );
 
-  const crrDisplay = liveScore?.crr || (match.status === 'live' ? '--' : '--');
-  const thisOverBalls: string[] = liveScore?.thisOver || (match.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
+  const crrDisplay = liveScore?.crr || (match?.status === 'live' ? '--' : '--');
+  const thisOverBalls: string[] = liveScore?.thisOver || (match?.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
 
   // Last ball label and color
   const lastBall = liveScore?.lastBall || (thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null);
