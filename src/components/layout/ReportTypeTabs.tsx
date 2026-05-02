@@ -1,8 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
-
-import { Filter } from "lucide-react";
 
 interface ReportTypeTabsProps {
   activeTab?: string;
@@ -26,66 +23,57 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   return (
     <div style={{
       backgroundColor: "#fff",
-      borderRadius: 4,
       border: "1px solid #d0d0d0",
-      boxShadow: "0 1px 3px rgba(0,0,0,.08)",
-      marginBottom: 16,
+      borderRadius: 4,
+      boxShadow: "0 1px 2px rgba(0,0,0,.06)",
+      marginBottom: 12,
+      padding: "8px 10px 10px 10px",
       overflow: "hidden"
     }}>
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "10px 16px",
-        backgroundColor: "#ecf0f1",
-        borderBottom: "1px solid #d0d0d0"
-      }}>
-        <Filter style={{ width: 16, height: 16, color: "#2c3e50", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#2c3e50" }}>Report Type</span>
-      </div>
       <div style={{ 
-        display: "flex",
-        flexWrap: "wrap",
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gap: "4px",
-        justifyContent: "flex-start",
-        padding: "8px 10px 10px 10px"
       }}>
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
           
-          const btnStyle: React.CSSProperties = isActive
-            ? {
-                fontSize: "12px",
-                padding: "0 10px",
-                height: "26px",
-                lineHeight: "26px",
-                borderRadius: "4px",
-                border: "1px solid #2bbbad",
-                background: "#2bbbad",
-                color: "#fff",
-                fontWeight: 600,
-                display: "inline-block",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                whiteSpace: "nowrap",
-                boxSizing: "border-box",
-              }
-            : {
-                fontSize: "12px",
-                padding: "0 10px",
-                height: "26px",
-                lineHeight: "26px",
-                borderRadius: "4px",
-                border: "1px solid #2bbbad",
-                background: "white",
-                color: "#2bbbad",
-                fontWeight: 500,
-                display: "inline-block",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                whiteSpace: "nowrap",
-                boxSizing: "border-box",
-              };
+          const baseStyle: React.CSSProperties = {
+            fontSize: "12px",
+            padding: "0 10px",
+            height: "26px",
+            lineHeight: "26px",
+            borderRadius: "4px",
+            border: "1px solid #2bbbad",
+            display: "inline-block",
+            cursor: "pointer",
+            fontFamily: "inherit",
+            whiteSpace: "nowrap",
+            width: "100%",
+            textAlign: "center",
+            boxSizing: "border-box",
+          };
+
+          const activeStyle: React.CSSProperties = {
+            ...baseStyle,
+            background: "#2bbbad",
+            color: "#fff",
+            fontWeight: 600,
+          };
+
+          const inactiveStyle: React.CSSProperties = {
+            ...baseStyle,
+            background: "white",
+            color: "#2bbbad",
+            fontWeight: 500,
+          };
+
+          const btnStyle: React.CSSProperties = isActive ? { ...activeStyle } : { ...inactiveStyle };
+
+          // Special case for Commission Report (last button, index 6)
+          if (index === 6) {
+            btnStyle.gridColumn = "2";
+          }
 
           return (
             <button
