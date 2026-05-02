@@ -27,30 +27,25 @@ export default function UserDashboard() {
 
   const session = getClientSession();
 
-  // Fetch all MongoDB live odds
-  const { data: allMongoOdds } = useQuery({
-    queryKey: ['mongo-odds-dashboard'],
-    queryFn: async () => {
-      const res = await oddsEngine({ action: 'getAllOdds' });
-      const map: Record<string, any> = {};
-      (res?.odds || []).forEach((o: any) => { map[o.matchId] = o; });
-      return map;
-    },
-    refetchInterval: 2000,
-    staleTime: 0,
-  });
-
   useEffect(() => {
     if (!session || session.role !== 'client') {
       navigate("/login", { replace: true });
     }
   }, [session, navigate]);
 
-  // Fetch matches
+  // Fetch matches from DB
   const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ['matches'],
     queryFn: () => Match.list(),
-    refetchInterval: 5000 // Refresh odds every 5 seconds
+    refetchInterval: 10000 // Refresh list every 10 seconds
+  });
+
+  // Fetch live Betfair events from API
+  const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
+    queryKey: ['betfair-events'],
+    queryFn: () => fetchBetfairEvents({}),
+    refetchInterval: 60000, // Refresh every 60 seconds
+    retry: 1
   });
 
   // Auto-sync Betfair odds for all visible matches every 10 seconds
@@ -69,17 +64,11 @@ export default function UserDashboard() {
       });
       return true;
     },
-    enabled: matchesWithBetfair.length > 0,
+    // Only sync if we have matches to sync AND we have some betfair events loaded
+    // to avoid hammering Betfair/MongoDB unnecessarily
+    enabled: matchesWithBetfair.length > 0 && !!betfairEvents,
     refetchInterval: 10000,  // every 10 seconds
     staleTime: 0,
-  });
-
-  // Fetch live Betfair events
-  const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
-    queryKey: ['betfair-events'],
-    queryFn: () => fetchBetfairEvents({}),
-    refetchInterval: 60000, // Refresh every 60 seconds
-    retry: 1
   });
 
   // Fetch real-time client data for balance and credits
@@ -144,11 +133,20 @@ export default function UserDashboard() {
     );
   }
 
+  // Filter the match list to only show real matches:
+  // 1. Matches directly from Betfair API
+  // 2. DB matches that have a betfair_event_id (linked to real events)
   const matchesList = [
     ...(betfairEvents || []),
-    ...(matches || []).filter((m: any) => 
-      !(betfairEvents || []).some((bf: any) => bf.title === (m.title || `${m.team1} v ${m.team2}`))
-    )
+    ...(matches || []).filter((m: any) => {
+      // Only include DB matches that:
+      // 1. Have a real betfair_event_id (admin linked to real event)
+      // 2. Are NOT already shown from betfairEvents (no duplicate)
+      if (!m.betfair_event_id) return false; 
+      return !(betfairEvents || []).some((bf: any) => 
+        bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
+      );
+    })
   ].sort((a: any, b: any) => {
     // Live first, then upcoming
     if (a.status === 'live' && b.status !== 'live') return -1;
@@ -343,7 +341,7 @@ export default function UserDashboard() {
                         key={match.id} 
                         match={match} 
                         onSelectBet={handleSelectBet} 
-                        mongoOdds={allMongoOdds?.[match.id] || null}
+                        mongoOdds={null}
                       />
                     ))}
                   </div>

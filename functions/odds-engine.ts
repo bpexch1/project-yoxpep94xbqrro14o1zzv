@@ -13,10 +13,27 @@ const corsHeaders = {
 let client: MongoClient | null = null;
 
 async function getDb() {
-  if (!client) {
-    client = new MongoClient(MONGODB_URI);
-    await client.connect();
+  // If client exists, check if it's still connected
+  if (client) {
+    try {
+      // Ping to verify connection is alive
+      await client.db("admin").command({ ping: 1 });
+      return client.db(DB_NAME).collection(COLLECTION);
+    } catch (e) {
+      // Connection dead — close and reconnect
+      console.log("[odds-engine] MongoDB connection dead, reconnecting...");
+      try { await client.close(); } catch {}
+      client = null;
+    }
   }
+  
+  // Create new connection
+  client = new MongoClient(MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 5000,
+    socketTimeoutMS: 10000,
+  });
+  await client.connect();
   return client.db(DB_NAME).collection(COLLECTION);
 }
 
