@@ -240,7 +240,7 @@ export function ClientSummaryCard({
       {!hideHeader && (
         <div className="bg-[#ecf0f1] border-b border-[#d0d0d0]" style={{ padding: "6px 8px" }}>
           <span className="font-bold text-sm text-[#212529]">
-            {username} - Clients List{(!adminRecord && !balancesLoaded) ? " | Default" : ""}
+            {username} - Clients List{!balancesLoaded ? " | Default" : ""}
           </span>
         </div>
       )}
@@ -248,42 +248,7 @@ export function ClientSummaryCard({
       <div style={{ padding: "8px 6px" }}>
         {/* Summary Stats Table */}
         <div className="mb-3 overflow-x-auto">
-          {adminRecord ? (
-            <table className="border-collapse border border-[#dee2e6] text-[13px]">
-              <thead>
-                <tr className="bg-white">
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Received</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Remaining</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L<br/>Downline</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance<br/>UpLine</th>
-                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.credit_received) }}>
-                    {summaryData.credit_received.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.credit_remaining) }}>
-                    {summaryData.credit_remaining.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.cash) }}>
-                    {summaryData.cash.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.pl_downline) }}>
-                    {summaryData.pl_downline.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.balance_upline) }}>
-                    {summaryData.balance_upline.toLocaleString()}
-                  </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
-                    {filteredClients.length}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          ) : !balancesLoaded ? (
+          {!balancesLoaded ? (
             <table className="border-collapse border border-[#dee2e6] text-[13px]">
               <thead>
                 <tr className="bg-white">
@@ -316,20 +281,20 @@ export function ClientSummaryCard({
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.credit_received) }}>
-                    {totals.credit_received.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.credit_received) }}>
+                    {summaryData.credit_received.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.credit_remaining) }}>
-                    {totals.credit_remaining.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.credit_remaining) }}>
+                    {summaryData.credit_remaining.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.cash) }}>
-                    {totals.cash.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.cash) }}>
+                    {summaryData.cash.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.pl_downline) }}>
-                    {totals.pl_downline.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.pl_downline) }}>
+                    {summaryData.pl_downline.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(totals.balance_upline) }}>
-                    {totals.balance_upline.toLocaleString()}
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.balance_upline) }}>
+                    {summaryData.balance_upline.toLocaleString()}
                   </td>
                   <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
                     {filteredClients.length}
@@ -427,7 +392,7 @@ export function ClientSummaryCard({
               {/* GREEN TOTAL ROW — always first */}
               {!isLoading && (
                 <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
-                  {(!adminRecord && !balancesLoaded) ? (
+                  {!balancesLoaded ? (
                     <td colSpan={3} className="px-2 py-2 border border-[#4dbd74]">
                       <button
                         onClick={handleLoadBalance}
@@ -576,7 +541,7 @@ export function ClientSummaryCard({
               {!isLoading && (
                 <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
                   <td colSpan={2} className="px-2 py-2 border-r border-[#4dbd74]">Total</td>
-                  {(!adminRecord && !balancesLoaded) ? (
+                  {!balancesLoaded ? (
                     <td colSpan={6} className="px-2 py-2 border-r border-[#4dbd74]">
                       <button
                         onClick={handleLoadBalance}
