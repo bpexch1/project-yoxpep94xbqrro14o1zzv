@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Filter, Search, Plus, Check, RefreshCw, Trash2, Edit2, X, Trophy } from "lucide-react";
-import { fetchBetfairEvents } from "@/functions";
+import { fetchBetfairEvents, oddsEngine } from "@/functions";
 import { Match } from "@/entities";
 
 export default function Dashboard() {
@@ -24,6 +24,12 @@ export default function Dashboard() {
     category: "IPL 2026",
   });
 
+  const [oddsControl, setOddsControl] = useState<Record<string, {
+    teamA_back: string; teamA_lay: string; teamB_back: string; teamB_lay: string;
+  }>>({});
+  const [expandedOddsId, setExpandedOddsId] = useState<string | null>(null);
+  const [liveOddsMap, setLiveOddsMap] = useState<Record<string, any>>({});
+
   const inputStyle = {
     border: "1px solid #ccc",
     borderRadius: "4px",
@@ -42,6 +48,44 @@ export default function Dashboard() {
     queryKey: ["dashboard-markets"],
     queryFn: () => fetchBetfairEvents({}),
     staleTime: 60000,
+  });
+
+  const { data: allMongoOdds, refetch: refetchOdds } = useQuery({
+    queryKey: ['mongo-odds-all'],
+    queryFn: async () => {
+      const res = await oddsEngine({ action: 'getAllOdds' });
+      return res?.odds || [];
+    },
+    refetchInterval: 3000,
+  });
+
+  useEffect(() => {
+    if (allMongoOdds) {
+      const map: Record<string, any> = {};
+      allMongoOdds.forEach((o: any) => { map[o.matchId] = o; });
+      setLiveOddsMap(map);
+    }
+  }, [allMongoOdds]);
+
+  const { mutate: saveOdds, isPending: savingOdds } = useMutation({
+    mutationFn: async ({ matchId, odds, meta }: { matchId: string; odds: any; meta: any }) => {
+      await oddsEngine({ action: 'updateOdds', matchId, odds, matchMeta: meta });
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['mongo-odds-all'] }); },
+  });
+
+  const { mutate: toggleSuspend } = useMutation({
+    mutationFn: async ({ matchId, isSuspended }: { matchId: string; isSuspended: boolean }) => {
+      await oddsEngine({ action: 'suspendMarket', matchId, isSuspended });
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['mongo-odds-all'] }); },
+  });
+
+  const { mutate: initOdds } = useMutation({
+    mutationFn: async ({ matchId, meta }: { matchId: string; meta: any }) => {
+      await oddsEngine({ action: 'initOdds', matchId, matchMeta: meta });
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['mongo-odds-all'] }); },
   });
 
   // Add match mutation
@@ -409,94 +453,216 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {(dbMatches as any[]).map((match: any) => (
-                    <tr key={match.id} style={{ borderBottom: "1px solid #f1f1f1" }}>
-                      <td style={{ padding: "10px 16px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{
-                            background: getSportColor(match.sport),
-                            color: "#fff",
-                            padding: "2px 6px",
-                            borderRadius: 4,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            minWidth: 40,
-                            textAlign: "center"
-                          }}>
-                            {match.sport?.substring(0, 3).toUpperCase()}
-                          </span>
-                          <span style={{ fontWeight: 600, color: "#333" }}>{match.title}</span>
-                          <span style={{ 
-                            fontSize: 10, 
-                            color: match.status === 'live' ? "#00b181" : "#999",
-                            fontWeight: 700,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 3
-                          }}>
-                            {match.status === 'live' && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00b181" }} />}
-                            {match.status?.toUpperCase()}
-                          </span>
-                        </div>
-                      </td>
-                      <td style={{ padding: "10px 16px" }}>
-                        {editingEventId?.id === match.id ? (
-                          <div style={{ display: "flex", gap: 4 }}>
-                            <input 
-                              value={editingEventId.val} 
-                              onChange={e => setEditingEventId({ ...editingEventId, val: e.target.value })}
-                              style={{ ...inputStyle, width: 90, fontSize: 11, height: 24 }}
-                            />
-                            <button onClick={() => updateEventId(editingEventId)} style={{ color: "#00b181" }}><Check size={14} /></button>
-                            <button onClick={() => setEditingEventId(null)} style={{ color: "#ff4d4d" }}><X size={14} /></button>
+                    <React.Fragment key={match.id}>
+                      <tr style={{ borderBottom: "1px solid #f1f1f1" }}>
+                        <td style={{ padding: "10px 16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{
+                              background: getSportColor(match.sport),
+                              color: "#fff",
+                              padding: "2px 6px",
+                              borderRadius: 4,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              minWidth: 40,
+                              textAlign: "center"
+                            }}>
+                              {match.sport?.substring(0, 3).toUpperCase()}
+                            </span>
+                            <span style={{ fontWeight: 600, color: "#333" }}>{match.title}</span>
+                            <span style={{ 
+                              fontSize: 10, 
+                              color: match.status === 'live' ? "#00b181" : "#999",
+                              fontWeight: 700,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 3
+                            }}>
+                              {match.status === 'live' && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00b181" }} />}
+                              {match.status?.toUpperCase()}
+                            </span>
+                            {liveOddsMap[match.id]?.isSuspended && (
+                              <span style={{ fontSize: 9, fontWeight: 700, color: "white", backgroundColor: "#dc3545", padding: "1px 4px", borderRadius: 2 }}>SUSP</span>
+                            )}
                           </div>
-                        ) : (
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, color: match.betfair_event_id ? "#333" : "#999" }}>
-                            <span style={{ fontSize: 11, fontFamily: "monospace" }}>{match.betfair_event_id || "No ID"}</span>
-                            <button 
-                              onClick={() => setEditingEventId({ id: match.id, val: match.betfair_event_id || '' })}
-                              style={{ color: "#3d6b8b", padding: 2 }}
-                            >
-                              <Edit2 size={12} />
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ padding: "10px 16px" }}>
-                        {editingCricbuzzId?.id === match.id ? (
-                          <div style={{ display: "flex", gap: 4 }}>
-                            <input 
-                              value={editingCricbuzzId.val} 
-                              onChange={e => setEditingCricbuzzId({ ...editingCricbuzzId, val: e.target.value })}
-                              style={{ ...inputStyle, width: 80, fontSize: 11, height: 24 }}
-                            />
-                            <button onClick={() => updateCricbuzzId(editingCricbuzzId)} style={{ color: "#00b181" }}><Check size={14} /></button>
-                            <button onClick={() => setEditingCricbuzzId(null)} style={{ color: "#ff4d4d" }}><X size={14} /></button>
-                          </div>
-                        ) : (
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, color: match.cricbuzz_match_id ? "#333" : "#999" }}>
-                            <span style={{ fontSize: 11, fontFamily: "monospace" }}>{match.cricbuzz_match_id || "No CB ID"}</span>
-                            {match.sport === 'Cricket' && (
+                        </td>
+                        <td style={{ padding: "10px 16px" }}>
+                          {editingEventId?.id === match.id ? (
+                            <div style={{ display: "flex", gap: 4 }}>
+                              <input 
+                                value={editingEventId.val} 
+                                onChange={e => setEditingEventId({ ...editingEventId, val: e.target.value })}
+                                style={{ ...inputStyle, width: 90, fontSize: 11, height: 24 }}
+                              />
+                              <button onClick={() => updateEventId(editingEventId)} style={{ color: "#00b181" }}><Check size={14} /></button>
+                              <button onClick={() => setEditingEventId(null)} style={{ color: "#ff4d4d" }}><X size={14} /></button>
+                            </div>
+                          ) : (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, color: match.betfair_event_id ? "#333" : "#999" }}>
+                              <span style={{ fontSize: 11, fontFamily: "monospace" }}>{match.betfair_event_id || "No ID"}</span>
                               <button 
-                                onClick={() => setEditingCricbuzzId({ id: match.id, val: match.cricbuzz_match_id || '' })}
+                                onClick={() => setEditingEventId({ id: match.id, val: match.betfair_event_id || '' })}
                                 style={{ color: "#3d6b8b", padding: 2 }}
                               >
                                 <Edit2 size={12} />
                               </button>
-                            )}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ padding: "10px 16px" }}>
+                          {editingCricbuzzId?.id === match.id ? (
+                            <div style={{ display: "flex", gap: 4 }}>
+                              <input 
+                                value={editingCricbuzzId.val} 
+                                onChange={e => setEditingCricbuzzId({ ...editingCricbuzzId, val: e.target.value })}
+                                style={{ ...inputStyle, width: 80, fontSize: 11, height: 24 }}
+                              />
+                              <button onClick={() => updateCricbuzzId(editingCricbuzzId)} style={{ color: "#00b181" }}><Check size={14} /></button>
+                              <button onClick={() => setEditingCricbuzzId(null)} style={{ color: "#ff4d4d" }}><X size={14} /></button>
+                            </div>
+                          ) : (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, color: match.cricbuzz_match_id ? "#333" : "#999" }}>
+                              <span style={{ fontSize: 11, fontFamily: "monospace" }}>{match.cricbuzz_match_id || "No CB ID"}</span>
+                              {match.sport === 'Cricket' && (
+                                <button 
+                                  onClick={() => setEditingCricbuzzId({ id: match.id, val: match.cricbuzz_match_id || '' })}
+                                  style={{ color: "#3d6b8b", padding: 2 }}
+                                >
+                                  <Edit2 size={12} />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ padding: "10px 16px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => setExpandedOddsId(prev => prev === match.id ? null : match.id)}
+                              style={{
+                                padding: '3px 8px', fontSize: 10, fontWeight: 700, borderRadius: 3, cursor: 'pointer',
+                                backgroundColor: liveOddsMap[match.id] ? '#254465' : '#6c757d',
+                                color: 'white', border: 'none'
+                              }}
+                              title="Live Odds Control"
+                            >
+                              ⚡ Odds
+                            </button>
+                            <button 
+                              onClick={() => {
+                                if (window.confirm('Delete this match?')) deleteMatch(match.id);
+                              }}
+                              style={{ color: "#ff4d4d", padding: 4 }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
-                        )}
-                      </td>
-                      <td style={{ padding: "10px 16px", textAlign: "right" }}>
-                        <button 
-                          onClick={() => {
-                            if (window.confirm('Delete this match?')) deleteMatch(match.id);
-                          }}
-                          style={{ color: "#ff4d4d", padding: 4 }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+                      {expandedOddsId === match.id && (
+                        <tr>
+                          <td colSpan={4} style={{ padding: 0 }}>
+                            <div style={{ backgroundColor: '#f0f8ff', border: '1px solid #c4d9ea', padding: '12px', marginBottom: 4 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                                <span style={{ fontWeight: 700, fontSize: 12 }}>LIVE ODDS CONTROL — {match.team1} v {match.team2}</span>
+                                {/* Suspend Toggle */}
+                                <button
+                                  onClick={() => toggleSuspend({ matchId: match.id, isSuspended: !liveOddsMap[match.id]?.isSuspended })}
+                                  style={{
+                                    padding: '4px 12px', borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: 'pointer',
+                                    backgroundColor: liveOddsMap[match.id]?.isSuspended ? '#dc3545' : '#00b181',
+                                    color: 'white', border: 'none'
+                                  }}
+                                >
+                                  {liveOddsMap[match.id]?.isSuspended ? '⛔ SUSPENDED' : '✅ ACTIVE — Click to Suspend'}
+                                </button>
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
+                                {/* teamA_back */}
+                                <div>
+                                  <label style={{ fontSize: 10, fontWeight: 700, color: '#254465' }}>{match.team1 || 'Team A'} BACK</label>
+                                  <input
+                                    type="number" step="0.01"
+                                    value={oddsControl[match.id]?.teamA_back ?? liveOddsMap[match.id]?.teamA_back ?? '1.90'}
+                                    onChange={e => setOddsControl(prev => ({ ...prev, [match.id]: { ...prev[match.id], teamA_back: e.target.value }}))}
+                                    style={{ width: '100%', padding: '4px 6px', border: '1px solid #72bbef', borderRadius: 4, fontSize: 13, fontWeight: 700, backgroundColor: '#dbeafe' }}
+                                  />
+                                </div>
+                                {/* teamA_lay */}
+                                <div>
+                                  <label style={{ fontSize: 10, fontWeight: 700, color: '#254465' }}>{match.team1 || 'Team A'} LAY</label>
+                                  <input
+                                    type="number" step="0.01"
+                                    value={oddsControl[match.id]?.teamA_lay ?? liveOddsMap[match.id]?.teamA_lay ?? '2.00'}
+                                    onChange={e => setOddsControl(prev => ({ ...prev, [match.id]: { ...prev[match.id], teamA_lay: e.target.value }}))}
+                                    style={{ width: '100%', padding: '4px 6px', border: '1px solid #faa9ba', borderRadius: 4, fontSize: 13, fontWeight: 700, backgroundColor: '#fde8e8' }}
+                                  />
+                                </div>
+                                {/* teamB_back */}
+                                <div>
+                                  <label style={{ fontSize: 10, fontWeight: 700, color: '#254465' }}>{match.team2 || 'Team B'} BACK</label>
+                                  <input
+                                    type="number" step="0.01"
+                                    value={oddsControl[match.id]?.teamB_back ?? liveOddsMap[match.id]?.teamB_back ?? '1.90'}
+                                    onChange={e => setOddsControl(prev => ({ ...prev, [match.id]: { ...prev[match.id], teamB_back: e.target.value }}))}
+                                    style={{ width: '100%', padding: '4px 6px', border: '1px solid #72bbef', borderRadius: 4, fontSize: 13, fontWeight: 700, backgroundColor: '#dbeafe' }}
+                                  />
+                                </div>
+                                {/* teamB_lay */}
+                                <div>
+                                  <label style={{ fontSize: 10, fontWeight: 700, color: '#254465' }}>{match.team2 || 'Team B'} LAY</label>
+                                  <input
+                                    type="number" step="0.01"
+                                    value={oddsControl[match.id]?.teamB_lay ?? liveOddsMap[match.id]?.teamB_lay ?? '2.00'}
+                                    onChange={e => setOddsControl(prev => ({ ...prev, [match.id]: { ...prev[match.id], teamB_lay: e.target.value }}))}
+                                    style={{ width: '100%', padding: '4px 6px', border: '1px solid #faa9ba', borderRadius: 4, fontSize: 13, fontWeight: 700, backgroundColor: '#fde8e8' }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', gap: 8 }}>
+                                {/* Init button — if no odds exist in MongoDB yet */}
+                                {!liveOddsMap[match.id] && (
+                                  <button
+                                    onClick={() => initOdds({ matchId: match.id, meta: { teamA: match.team1, teamB: match.team2, sport: match.sport, matchTitle: match.title } })}
+                                    style={{ padding: '5px 14px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                                  >
+                                    + Init Market
+                                  </button>
+                                )}
+                                {/* Save button */}
+                                <button
+                                  onClick={() => {
+                                    const ctrl = oddsControl[match.id] || {};
+                                    const cur = liveOddsMap[match.id] || {};
+                                    saveOdds({
+                                      matchId: match.id,
+                                      odds: {
+                                        teamA_back: parseFloat(ctrl.teamA_back ?? cur.teamA_back ?? '1.90'),
+                                        teamA_lay: parseFloat(ctrl.teamA_lay ?? cur.teamA_lay ?? '2.00'),
+                                        teamB_back: parseFloat(ctrl.teamB_back ?? cur.teamB_back ?? '1.90'),
+                                        teamB_lay: parseFloat(ctrl.teamB_lay ?? cur.teamB_lay ?? '2.00'),
+                                      },
+                                      meta: { teamA: match.team1, teamB: match.team2, sport: match.sport, matchTitle: match.title }
+                                    });
+                                  }}
+                                  disabled={savingOdds}
+                                  style={{ padding: '5px 14px', backgroundColor: '#254465', color: 'white', border: 'none', borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  {savingOdds ? '...' : '💾 Save Odds'}
+                                </button>
+                                {/* Last updated */}
+                                {liveOddsMap[match.id]?.lastUpdated && (
+                                  <span style={{ fontSize: 10, color: '#6c757d', alignSelf: 'center' }}>
+                                    Updated: {new Date(liveOddsMap[match.id].lastUpdated).toLocaleTimeString()}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
