@@ -137,7 +137,13 @@ export default function UserDashboard() {
     return sport === filter;
   });
 
-  const groupedMatches = filteredMatches.reduce((acc: any, match: any) => {
+  // If Cricket is selected but empty, we'll show Soccer instead with a notice
+  const isCricketEmpty = activeFilter === "Cricket" && filteredMatches.length === 0;
+  const displayMatches = isCricketEmpty 
+    ? matchesList.filter((m: any) => m.sport?.toLowerCase() === 'soccer' || m.sport?.toLowerCase() === 'football')
+    : filteredMatches;
+
+  const groupedMatches = displayMatches.reduce((acc: any, match: any) => {
     const sport = match.sport || 'Others';
     if (!acc[sport]) acc[sport] = [];
     acc[sport].push(match);
@@ -279,6 +285,14 @@ export default function UserDashboard() {
           <CasinoSection />
         ) : (
           <div className="flex flex-col">
+            {isCricketEmpty && displayMatches.length > 0 && (
+              <div className="bg-emerald-50 border-y border-emerald-100 px-4 py-2 flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
+                  Cricket matches coming soon — Showing Live Soccer instead
+                </span>
+              </div>
+            )}
             {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
               const sportIconClass = sport.toLowerCase().includes('cricket') ? 'svg-cricket' 
                                    : sport.toLowerCase().includes('football') || sport.toLowerCase().includes('soccer') ? 'svg-soccer' 
