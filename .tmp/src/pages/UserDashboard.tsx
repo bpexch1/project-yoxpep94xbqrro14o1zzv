@@ -102,7 +102,7 @@ export default function UserDashboard() {
 
   if (!session) return null;
 
-  if ((matchesLoading && !matches) || clientLoading) {
+  if (matchesLoading && !matches) {
     return (
       <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
@@ -319,20 +319,24 @@ export default function UserDashboard() {
             })}
 
             {/* Empty state */}
-            {filteredMatches.length === 0 && !betfairLoading && (
+            {filteredMatches.length === 0 && !betfairLoading && !matchesLoading && (
               <div className="flex flex-col items-center justify-center py-20 text-center px-4">
                 <div className="w-16 h-16 bg-[#254465]/5 rounded-full flex items-center justify-center mb-4">
                   <Trophy className="w-8 h-8 text-[#254465]/20" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/40">No Matches Found</h3>
-                <p className="text-xs text-[#254465]/30 mt-1">There are currently no active matches for this category.</p>
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/40">No Matches Available</h3>
+                <p className="text-xs text-[#254465]/30 mt-1">
+                  {activeFilter === 'Inplay' 
+                    ? 'No live or upcoming matches right now. Live matches will appear here automatically.'
+                    : `No ${activeFilter} matches available right now.`}
+                </p>
               </div>
             )}
 
-            {filteredMatches.length === 0 && betfairLoading && (
+            {filteredMatches.length === 0 && (betfairLoading || matchesLoading) && (
               <div className="flex flex-col items-center justify-center py-20 text-center px-4">
                 <Loader2 className="w-8 h-8 text-[#254465]/40 animate-spin mb-4" />
-                <p className="text-xs text-[#254465]/40">Loading live matches...</p>
+                <p className="text-xs text-[#254465]/40">Fetching live matches...</p>
               </div>
             )}
           </div>
