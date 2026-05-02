@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
     : targetSports;
   
   // Always include soccer and tennis at minimum
-  const finalSports = sportsToFetch.length > 0 ? sportsToFetch : ['soccer', 'tennis'];
+  const finalSports = sportsToFetch.length > 0 ? sportsToFetch : ['soccer', 'tennis', 'cricket'];
   console.log(`[fetch-betfair-events] Sports to fetch: ${JSON.stringify(finalSports)}`);
 
   // ============================================================
@@ -197,6 +197,33 @@ Deno.serve(async (req) => {
       } catch (e: any) {
         console.log(`[fetch-betfair-events] No-param error: ${e.message}`);
       }
+    }
+  }
+
+  // ============================================================
+  // CRICKET FALLBACK: Try fetching cricket using numeric sport IDs
+  // ============================================================
+  const cricketUrls = [
+    `${BASE}/betfair/get_sport_events?sport_id=4`,
+    `${BASE}/betfair/get_sport_events?id=4`,
+    `${BASE}/betfair/get_sport_events?eventTypeId=4`,
+    `${BASE}/betfair/get_sport_events?sport=Cricket`,
+  ];
+
+  for (const url of cricketUrls) {
+    try {
+      const res = await fetch(url, { headers: h });
+      if (res.ok) {
+        const raw = await res.json();
+        const events = extractEvents(raw);
+        if (events.length > 0) {
+          console.log(`[fetch-betfair-events] Cricket found via: ${url} → ${events.length} events`);
+          allEvents.push(...events.map((e: any) => ({ ...e, _detectedSport: 'Cricket' })));
+          break;
+        }
+      }
+    } catch (e: any) {
+      console.log(`[fetch-betfair-events] Cricket URL ${url} error: ${e.message}`);
     }
   }
 

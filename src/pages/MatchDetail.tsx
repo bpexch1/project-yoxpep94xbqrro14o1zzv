@@ -106,6 +106,23 @@ export default function MatchDetail() {
       ) || null;
   };
 
+  const formatPKT = (timeStr: string | null | undefined): string => {
+    if (!timeStr) return '';
+    const s = String(timeStr);
+    try {
+      if (s.includes('T') || s.includes('Z') || /^\d{10,}$/.test(s)) {
+        const d = /^\d{10,}$/.test(s) ? new Date(parseInt(s)) : new Date(s);
+        return d.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Karachi'
+        });
+      }
+      return s.length > 5 ? s.substring(0, 5) : s;
+    } catch { return s; }
+  };
+
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
@@ -175,7 +192,9 @@ export default function MatchDetail() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <Clock size={14} color="rgba(255,255,255,0.6)" />
-              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>20 minutes ago | Apr 21 7:00 pm | Winners: 1</span>
+              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>
+                Starts at: {formatPKT(match.match_time)} | Winners: 1
+              </span>
             </div>
             <span style={{ color: match.status === 'live' ? "#00b181" : "rgba(255,255,255,0.5)", fontWeight: 900, fontSize: 14, letterSpacing: 1 }}>
               {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}

@@ -81,6 +81,25 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
       ) || null;
   };
 
+  const formatPKT = (timeStr: string | null | undefined): string => {
+    if (!timeStr) return '';
+    const s = String(timeStr);
+    try {
+      if (s.includes('T') || s.includes('Z') || /^\d{10,}$/.test(s)) {
+        const d = /^\d{10,}$/.test(s) ? new Date(parseInt(s)) : new Date(s);
+        return d.toLocaleString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Karachi'
+        });
+      }
+      return s.length > 5 ? s.substring(0, 5) : s;
+    } catch { return s; }
+  };
+
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
 
   return (
@@ -92,9 +111,11 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
         <div className="flex justify-between items-center mb-1">
           <div className="flex items-center gap-2">
             <Clock size={14} className="text-white/60" />
-            <span className="text-[11px] text-white/60">3 hours ago | May 01 6:00 pm | Winners: 1</span>
+            <span className="text-[11px] text-white/60">Starts at: {formatPKT(match.match_time)} | Winners: 1</span>
           </div>
-          <span className="text-[#00b181] font-black text-sm tracking-wider">INPLAY</span>
+          <span className="text-[#00b181] font-black text-sm tracking-wider uppercase">
+            {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}
+          </span>
         </div>
         <h1 className="font-black text-xl leading-tight my-1.5">{matchTitle}</h1>
         <div className="flex items-center justify-between mt-1">
@@ -272,9 +293,30 @@ function GoalsSection({ title, underOdds, underLay, overOdds, overLay, onBet }: 
 }
 
 function FootballScoreCard({ match }: { match: any }) {
+  const formatPKTDate = (timeStr: string | null | undefined): string => {
+    if (!timeStr) return 'TBA';
+    const s = String(timeStr);
+    try {
+      const d = (s.includes('T') || s.includes('Z') || /^\d{10,}$/.test(s))
+        ? (/^\d{10,}$/.test(s) ? new Date(parseInt(s)) : new Date(s))
+        : null;
+      if (!d) return s;
+      return d.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        timeZone: 'Asia/Karachi'
+      }).toUpperCase() + ' | ' + d.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'Asia/Karachi'
+      });
+    } catch { return s; }
+  };
+
   return (
     <div className="bg-[#1a1a2e] p-4 text-white flex flex-col items-center">
-      <div className="text-[13px] font-bold text-white/80 mb-4">01 MAY | 18:00</div>
+      <div className="text-[13px] font-bold text-white/80 mb-4">{formatPKTDate(match.match_time)}</div>
       <div className="flex justify-between items-center w-full max-w-sm mb-6">
         <div className="flex flex-col items-center gap-2">
           <span className="text-3xl">⚽</span>

@@ -9,6 +9,23 @@ interface TennisMatchInfoProps {
 export function TennisMatchInfo({ match, keepDisplayOn, setKeepDisplayOn }: TennisMatchInfoProps) {
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
   
+  const formatPKT = (timeStr: string | null | undefined): string => {
+    if (!timeStr) return 'Live Now';
+    const s = String(timeStr);
+    try {
+      if (s.includes('T') || s.includes('Z') || /^\d{10,}$/.test(s)) {
+        const d = /^\d{10,}$/.test(s) ? new Date(parseInt(s)) : new Date(s);
+        return d.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Karachi'
+        });
+      }
+      return s.length > 5 ? s.substring(0, 5) : s;
+    } catch { return s; }
+  };
+
   return (
     <div className="bg-[#254465] p-3.5 text-white">
       <div className="flex justify-between items-start">
@@ -17,7 +34,7 @@ export function TennisMatchInfo({ match, keepDisplayOn, setKeepDisplayOn }: Tenn
             <div className="flex items-center gap-1.5 ml-1">
               <Clock size={14} className="text-white/60" />
               <span className="text-[11px] text-white/60 font-bold uppercase tracking-wider">
-                an hour ago | {match.match_time || 'Live Now'} | Winners: 1
+                Starts at: {formatPKT(match.match_time)} | Winners: 1
               </span>
             </div>
           </div>
@@ -26,7 +43,7 @@ export function TennisMatchInfo({ match, keepDisplayOn, setKeepDisplayOn }: Tenn
           </h1>
         </div>
         <span className="text-[#00b181] font-black text-sm uppercase tracking-widest bg-black/20 px-2 py-0.5 rounded">
-          INPLAY
+          {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}
         </span>
       </div>
       

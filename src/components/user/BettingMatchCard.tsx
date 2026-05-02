@@ -13,13 +13,27 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
   // Random matched amount for UI authenticity
   const matchedAmount = Math.floor(Math.random() * 30000000 + 500000).toLocaleString('en-IN');
   
-  // Time display: extract time portion from match_time
+  // Time display: extract time portion from match_time and convert to PKT
   const mt = match.match_time != null ? String(match.match_time) : '';
-  const timeDisplay = mt
-    ? (mt.includes('T')
-        ? new Date(mt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-        : (mt.length > 5 ? mt.substring(0, 5) : mt))
-    : "19:00";
+  const timeDisplay = (() => {
+    if (!mt) return "19:00";
+    try {
+      // If it looks like an ISO date/timestamp, parse and show in PKT
+      if (mt.includes('T') || mt.includes('Z') || /^\d{10,}$/.test(mt)) {
+        const d = /^\d{10,}$/.test(mt) ? new Date(parseInt(mt)) : new Date(mt);
+        return d.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Karachi'
+        });
+      }
+      // Already a formatted time string - show as-is (it's stored in PKT already)
+      return mt.length > 5 ? mt.substring(0, 5) : mt;
+    } catch {
+      return mt.length > 5 ? mt.substring(0, 5) : mt;
+    }
+  })();
 
   return (
     <div
