@@ -306,7 +306,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Action bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-[16px]">
           <div className="flex items-center gap-2">
             {!hideCreateButton && (
               <button
@@ -361,14 +361,17 @@ export function ClientSummaryCard({
 
         {/* Simple Search box - matching original design */}
         <div style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          gap: 6, 
-          marginBottom: 10, 
-          marginTop: 14 
+          textAlign: "center", 
+          marginTop: 12, 
+          marginBottom: 12 
         }}>
-          <label style={{ fontSize: 14, fontWeight: 600, color: "#212529" }}>
+          <label style={{ 
+            display: "block",
+            fontSize: 14, 
+            fontWeight: 600, 
+            color: "#212529",
+            marginBottom: 4
+          }}>
             Search:
           </label>
           <input
@@ -379,10 +382,14 @@ export function ClientSummaryCard({
               setCurrentPage(1);
             }}
             style={{
-              width: 160,
+              width: "60%",
+              maxWidth: 280,
+              minWidth: 160,
+              margin: "0 auto",
+              display: "block",
               border: "1px solid #d1d5db",
               borderRadius: 4,
-              padding: "4px 8px",
+              padding: "5px 10px",
               fontSize: 13,
               outline: "none",
               fontFamily: "Roboto, system-ui, sans-serif"
