@@ -471,8 +471,8 @@ export function ClientSummaryCard({
                       </tr>
                       {isExpanded && (
                         <tr className="bg-white">
-                          <td colSpan={3} className="px-3 py-2 border-b border-[#d5d8dc]">
-                            <ul className="text-[13px] text-[#212529] space-y-0.5 mb-2">
+                          <td colSpan={3} className="px-4 py-3 border-b border-[#d5d8dc]">
+                            <ul className="text-[15px] text-[#212529] space-y-2 mb-2">
                               <li>• Balance <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.balance ?? 0) : "#212529" }}>
                                 {display.isLoaded ? display.balance?.toLocaleString() : '-'}
                               </span></li>
@@ -485,24 +485,24 @@ export function ClientSummaryCard({
                                 {display.isLoaded ? display.available?.toLocaleString() : '-'}
                               </span></li>
                             </ul>
-                            <div className="flex items-center gap-1 mt-1">
-                              <span className="text-[12px] text-[#212529] mr-1 font-bold">• Options</span>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="text-[15px] text-[#212529] mr-1 font-bold">• Options</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); navigate(`/accounts/cash-credit/${client.username}`); }}
-                                className="w-6 h-6 bg-[#ffc107] text-black font-black rounded text-[11px] flex items-center justify-center"
+                                className="w-11 h-11 bg-[#ffc107] text-black font-black rounded-lg text-[15px] flex items-center justify-center"
                               >C</button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); navigate(`/accounts/edit/${client.username}`); }}
-                                className="w-6 h-6 bg-[#28a745] text-white rounded flex items-center justify-center"
-                              ><Pencil className="w-3 h-3" /></button>
+                                className="w-11 h-11 bg-[#28a745] text-white rounded-lg flex items-center justify-center"
+                              ><Pencil className="w-5 h-5" /></button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); navigate(`/accounts/ledger/${client.username}`); }}
-                                className="w-6 h-6 bg-[#17a2b8] text-white rounded text-[11px] font-black flex items-center justify-center"
+                                className="w-11 h-11 bg-[#17a2b8] text-white rounded-lg text-[15px] font-black flex items-center justify-center"
                               >L</button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); toggleStatus(client); }}
                                 className={cn(
-                                  "w-6 h-6 rounded text-[11px] font-black flex items-center justify-center",
+                                  "w-11 h-11 rounded-lg text-[15px] font-black flex items-center justify-center",
                                   client.status === "active" ? "bg-[#28a745] text-white" : "bg-white border border-[#dc3545] text-[#dc3545]"
                                 )}
                               >
@@ -511,7 +511,7 @@ export function ClientSummaryCard({
                               {isAdminType(client.role) && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}
-                                  className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center"
+                                  className="w-11 h-11 bg-[#e74c3c] text-white rounded-lg text-[15px] font-black flex items-center justify-center"
                                 >S</button>
                               )}
                             </div>
