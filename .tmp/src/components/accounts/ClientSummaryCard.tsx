@@ -360,8 +360,15 @@ export function ClientSummaryCard({
         </div>
 
         {/* Simple Search box - matching original design */}
-        <div style={{ textAlign: "center", marginBottom: 12, marginTop: 4 }}>
-          <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#212529", marginBottom: 6 }}>
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          gap: 6, 
+          marginBottom: 10, 
+          marginTop: 14 
+        }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: "#212529" }}>
             Search:
           </label>
           <input
@@ -372,12 +379,11 @@ export function ClientSummaryCard({
               setCurrentPage(1);
             }}
             style={{
-              width: "calc(100% - 32px)",
-              maxWidth: 400,
+              width: 160,
               border: "1px solid #d1d5db",
               borderRadius: 4,
-              padding: "6px 12px",
-              fontSize: 14,
+              padding: "4px 8px",
+              fontSize: 13,
               outline: "none",
               fontFamily: "Roboto, system-ui, sans-serif"
             }}
