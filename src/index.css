@@ -161,3 +161,8 @@ a:hover {
     background: url("https://bpexch.live/svg/sprite.css-22165d0e.svg") 86.16216216216216% 70.59133986928104% no-repeat;
     width: 22px; height: 24px; display: inline-block;
 }
+
+/* White version of sprite icons for dark backgrounds */
+.sprite-icon-white {
+  filter: brightness(0) invert(1);
+}

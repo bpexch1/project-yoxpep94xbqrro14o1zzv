@@ -17,59 +17,12 @@ import {
   Trophy, 
 } from "lucide-react";
 
-const getSportIcon = (id: string, color: string = "white") => {
-  const iconStyle = { display: 'block' };
-  
-  if (id === 'Inplay' || id.toLowerCase().includes('inplay')) return (
-    // Stopwatch icon - circle with timer hand
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={iconStyle}>
-      <circle cx="12" cy="13" r="8"/>
-      <path d="M12 9v4l2 2"/>
-      <path d="M9 2h6"/>
-      <path d="M12 2v3"/>
-    </svg>
-  );
-  
-  if (id === 'Cricket' || id.toLowerCase().includes('cricket')) return (
-    // Cricket bat and ball (matching user suggestion)
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={iconStyle}>
-      <path d="M19 5L5 19"/>
-      <path d="M5 5l4 4"/>
-      <path d="M14 14l4 4 1-1-4-4z"/>
-      <circle cx="6" cy="18" r="2" fill={color === 'white' ? color : 'none'} stroke={color}/>
-    </svg>
-  );
-  
-  if (id === 'Tennis' || id.toLowerCase().includes('tennis')) return (
-    // Tennis racket
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={iconStyle}>
-      <circle cx="10" cy="9" r="6"/>
-      <line x1="6" y1="9" x2="14" y2="9"/>
-      <line x1="10" y1="5" x2="10" y2="13"/>
-      <line x1="14.5" y1="13.5" x2="19" y2="19"/>
-      <circle cx="20" cy="20" r="1.5" fill={color === 'white' ? color : 'none'} stroke={color}/>
-    </svg>
-  );
-  
-  if (id === 'Soccer' || id.toLowerCase().includes('soccer') || id.toLowerCase().includes('football')) return (
-    // Soccer ball
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={iconStyle}>
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M12 3l2.5 4h-5L12 3z"/>
-      <path d="M3.5 7.5l3 1.5L5 13H2.5"/>
-      <path d="M20.5 7.5l-3 1.5L19 13h2.5"/>
-      <path d="M7.5 20l1.5-3.5 3 1 3-1 1.5 3.5"/>
-      <path d="M7 9l5 3 5-3"/>
-      <path d="M12 12v4.5"/>
-    </svg>
-  );
-  
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={iconStyle}>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 8v8M8 12h8" />
-    </svg>
-  );
+const getSectionIcon = (sport: string) => {
+  const s = sport.toLowerCase();
+  if (s.includes('cricket')) return <span className="svg-cricket" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
+  if (s.includes('football') || s.includes('soccer')) return <span className="svg-soccer" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
+  if (s.includes('tennis')) return <span className="svg-tennis" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
+  return <span className="svg-cricket" style={{ display:'inline-block', verticalAlign:'middle', marginRight:6 }} />;
 };
 
 export default function UserDashboard() {
@@ -342,7 +295,10 @@ export default function UserDashboard() {
                 
                 {/* Sport icon */}
                 <div style={{ marginBottom: 4 }}>
-                   {getSportIcon(cat.id, "white")}
+                   <span 
+                     className={`${cat.iconClass} sprite-icon-white`}
+                     style={{ display: 'inline-block' }}
+                   />
                 </div>
 
                 {/* Label */}
@@ -379,7 +335,7 @@ export default function UserDashboard() {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      {getSportIcon(sport, "#254465")}
+                      {getSectionIcon(sport)}
                       <span style={{ fontWeight: 700, fontSize: 13, color: "#212529" }}>{sport}</span>
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "#666" }}>Matched</span>
