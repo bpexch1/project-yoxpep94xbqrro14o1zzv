@@ -393,7 +393,7 @@ export function ClientSummaryCard({
               {!isLoading && (
                 <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
                   {!balancesLoaded ? (
-                    <td colSpan={4} className="px-2 py-2 border border-[#4dbd74]">
+                    <td colSpan={3} className="px-2 py-2 border border-[#4dbd74]">
                       <button
                         onClick={handleLoadBalance}
                         style={{
@@ -415,7 +415,6 @@ export function ClientSummaryCard({
                       <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74", fontWeight: 700, color: "#fff", fontSize: 13 }}>Total</td>
                       <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74" }}></td>
                       <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74", fontWeight: 700, color: "#fff", fontSize: 13, textAlign: "right" }}>{summaryData.credit_received.toLocaleString()}</td>
-                      <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74", fontWeight: 700, color: "#fff", fontSize: 13, textAlign: "right" }}>{summaryData.cash.toLocaleString()}</td>
                     </>
                   )}
                 </tr>
@@ -425,21 +424,20 @@ export function ClientSummaryCard({
               <tr style={{ background: "#fff" }}>
                 <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">Username</th>
                 <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">Type</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right text-[13px] font-bold text-[#212529]">Credit</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right text-[13px] font-bold text-[#212529]">Balance</th>
+                <th className="px-1 py-1 border border-[#d5d8dc] text-right text-[12px] font-bold text-[#212529]" style={{ maxWidth: 70, minWidth: 50 }}>Credit</th>
               </tr>
 
               {/* USER ROWS */}
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="px-2 py-8 text-center text-gray-500">
+                  <td colSpan={3} className="px-2 py-8 text-center text-gray-500">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                     Loading...
                   </td>
                 </tr>
               ) : tableFilteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-2 py-8 text-center text-gray-500 italic">No clients found</td>
+                  <td colSpan={3} className="px-2 py-8 text-center text-gray-500 italic">No clients found</td>
                 </tr>
               ) : (
                 paginatedClients.map((client) => {
@@ -467,18 +465,13 @@ export function ClientSummaryCard({
                         <td className="px-2 py-2 border-r border-[#d5d8dc] text-[#212529]">
                           {getTypeLabel(client.role)}
                         </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
+                        <td className="px-1 py-1 border-r border-[#d5d8dc] text-right text-[#212529]" style={{ fontSize: 12, maxWidth: 70, minWidth: 50 }}>
                           {display.isLoaded ? display.credit?.toLocaleString() : "-"}
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          {display.isLoaded ? (
-                            <span style={{ color: getAmountColor(display.balance ?? 0) }}>{display.balance?.toLocaleString()}</span>
-                          ) : "-"}
                         </td>
                       </tr>
                       {isExpanded && (
                         <tr className="bg-white">
-                          <td colSpan={4} className="px-3 py-2 border-b border-[#d5d8dc]">
+                          <td colSpan={3} className="px-3 py-2 border-b border-[#d5d8dc]">
                             <ul className="text-[13px] text-[#212529] space-y-0.5 mb-2">
                               <li>• Balance <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.balance ?? 0) : "#212529" }}>
                                 {display.isLoaded ? display.balance?.toLocaleString() : '-'}
@@ -561,7 +554,7 @@ export function ClientSummaryCard({
                 <th onClick={() => handleSort('role')} className="px-2 py-2 border-r border-[#c8c8c8] text-left font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
                   Type {getSortIcon('role')}
                 </th>
-                <th onClick={() => handleSort('credit_received')} className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
+                <th onClick={() => handleSort('credit_received')} className="px-1 py-1 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap" style={{ width: 70, fontSize: 12, maxWidth: 70, minWidth: 50 }}>
                   Credit {getSortIcon('credit_received')}
                 </th>
                 <th onClick={() => handleSort('cash')} className="px-2 py-2 border-r border-[#c8c8c8] text-right font-bold text-[#2d2d2d] cursor-pointer whitespace-nowrap">
@@ -652,7 +645,7 @@ export function ClientSummaryCard({
                       <td className="px-2 py-2 border-r border-[#dee2e6] text-[#212529]">
                         {getTypeLabel(client.role)}
                       </td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right text-[#212529]">
+                      <td className="px-1 py-1 border-r border-[#dee2e6] text-right text-[#212529]" style={{ fontSize: 12, maxWidth: 70, minWidth: 50 }}>
                         {display.isLoaded ? display.credit?.toLocaleString() : "-"}
                       </td>
                       <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold" style={{ color: display.isLoaded ? getAmountColor(display.balance ?? 0) : "#212529" }}>
