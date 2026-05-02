@@ -238,8 +238,8 @@ export function ClientSummaryCard({
     <section className="bg-white border border-[#dee2e6] shadow-sm rounded-[4px] overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
       {/* Card title */}
       {!hideHeader && (
-        <div className="bg-[#ecf0f1] border-b border-[#dee2e6]" style={{ padding: "8px 10px" }}>
-          <span className="font-bold text-sm" style={{ color: "#212529" }}>
+        <div style={{ backgroundColor: "#ebebeb", borderBottom: "1px solid #d4d4d4", padding: "8px 10px" }}>
+          <span className="font-bold text-sm" style={{ color: "#2d2d2d" }}>
             {username} - Clients List{!balancesLoaded ? " | Default" : ""}
           </span>
         </div>
@@ -498,21 +498,21 @@ export function ClientSummaryCard({
                               ><Pencil className="w-3 h-3" /></button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); navigate(`/accounts/ledger/${client.username}`); }}
-                                className="w-6 h-6 bg-[#17a2b8] text-white font-black rounded text-[11px] flex items-center justify-center"
+                                className="w-6 h-6 bg-[#17a2b8] text-white rounded text-[11px] font-black flex items-center justify-center"
                               >L</button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}
+                                className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center"
+                              >S</button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); toggleStatus(client); }}
                                 className={cn(
-                                  "w-6 h-6 font-black rounded text-[11px] flex items-center justify-center",
-                                  client.status === "active" ? "bg-[#28a745] text-white" : "bg-white border border-[#dc3545] text-[#dc3545]"
+                                  "w-6 h-6 rounded text-[11px] font-black flex items-center justify-center",
+                                  client.status === "active" ? "bg-[#28a745] text-white" : "border border-[#dc3545] text-[#dc3545] bg-white"
                                 )}
-                              >{client.status === "active" ? "A" : "D"}</button>
-                              {client.can_settle_pl && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}
-                                  className="w-6 h-6 bg-[#e74c3c] text-white font-black rounded text-[11px] flex items-center justify-center"
-                                >S</button>
-                              )}
+                              >
+                                {client.status === "active" ? "A" : "D"}
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -526,82 +526,88 @@ export function ClientSummaryCard({
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden lg:block overflow-x-auto border border-[#dee2e6] rounded-[4px]">
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse text-[13px]" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
             <thead>
-              <tr className="bg-[#1f3044] text-white">
-                <th className="px-2 py-2 border-r border-white/10 text-left font-bold cursor-pointer" onClick={() => handleSort('username')}>Username {getSortIcon('username')}</th>
-                <th className="px-2 py-2 border-r border-white/10 text-left font-bold cursor-pointer" onClick={() => handleSort('role')}>Type {getSortIcon('role')}</th>
-                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('credit_received')}>Credit {getSortIcon('credit_received')}</th>
-                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('cash')}>Balance {getSortIcon('cash')}</th>
-                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('pl_downline')}>Client (P/L) {getSortIcon('pl_downline')}</th>
-                <th className="px-2 py-2 border-r border-white/10 text-right font-bold">Exposure</th>
-                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('downline_share')}>Share {getSortIcon('downline_share')}</th>
-                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('credit_remaining')}>Avail. Bal. {getSortIcon('credit_remaining')}</th>
-                <th className="px-2 py-2 text-center font-bold">Options</th>
+              <tr className="bg-[#ecf0f1]">
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529] cursor-pointer" onClick={() => handleSort('username')}>
+                  Username {getSortIcon('username')}
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529] cursor-pointer" onClick={() => handleSort('credit_received')}>
+                  Credit {getSortIcon('credit_received')}
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529] cursor-pointer" onClick={() => handleSort('cash')}>
+                  Balance {getSortIcon('cash')}
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529] cursor-pointer" onClick={() => handleSort('pl_downline')}>
+                  Client (P/L) {getSortIcon('pl_downline')}
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">
+                  Exposure
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529] cursor-pointer" onClick={() => handleSort('credit_remaining')}>
+                  Avail. Bal. {getSortIcon('credit_remaining')}
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">
+                  Type
+                </th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">
+                  Options
+                </th>
+              </tr>
+              {/* GREEN TOTAL ROW (Desktop) */}
+              <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
+                <td className="px-2 py-2 border border-[#4dbd74]">
+                  {!balancesLoaded ? (
+                    <button
+                      onClick={handleLoadBalance}
+                      style={{
+                        background: "#ffc107",
+                        color: "#000",
+                        border: "none",
+                        padding: "3px 12px",
+                        fontWeight: 700,
+                        fontSize: 12,
+                        borderRadius: 3,
+                        cursor: "pointer"
+                      }}
+                    >
+                      {isLoadingBalances ? "Loading..." : "Load Balance"}
+                    </button>
+                  ) : "Total"}
+                </td>
+                <td className="px-2 py-2 border border-[#4dbd74]">{balancesLoaded ? summaryData.credit_received.toLocaleString() : "-"}</td>
+                <td className="px-2 py-2 border border-[#4dbd74]">{balancesLoaded ? summaryData.cash.toLocaleString() : "-"}</td>
+                <td className="px-2 py-2 border border-[#4dbd74]">{balancesLoaded ? summaryData.pl_downline.toLocaleString() : "-"}</td>
+                <td className="px-2 py-2 border border-[#4dbd74]">0</td>
+                <td className="px-2 py-2 border border-[#4dbd74]">{balancesLoaded ? summaryData.credit_remaining.toLocaleString() : "-"}</td>
+                <td className="px-2 py-2 border border-[#4dbd74]"></td>
+                <td className="px-2 py-2 border border-[#4dbd74]"></td>
               </tr>
             </thead>
             <tbody>
-              {/* GREEN TOTAL ROW */}
-              {!isLoading && (
-                <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
-                  <td colSpan={2} className="px-2 py-2 border-r border-[#4dbd74]">Total</td>
-                  {!balancesLoaded ? (
-                    <td colSpan={6} className="px-2 py-2 border-r border-[#4dbd74]">
-                      <button
-                        onClick={handleLoadBalance}
-                        style={{
-                          background: "#ffc107",
-                          color: "#000",
-                          border: "none",
-                          padding: "3px 12px",
-                          fontWeight: 700,
-                          fontSize: 12,
-                          borderRadius: 3,
-                          cursor: "pointer"
-                        }}
-                      >
-                        {isLoadingBalances ? "Loading..." : "Load Balance"}
-                      </button>
-                    </td>
-                  ) : (
-                    <>
-                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.credit_received.toLocaleString()}</td>
-                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.cash.toLocaleString()}</td>
-                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.pl_downline.toLocaleString()}</td>
-                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">0</td>
-                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">-</td>
-                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.credit_remaining.toLocaleString()}</td>
-                    </>
-                  )}
-                  <td className="px-2 py-2"></td>
-                </tr>
-              )}
-
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="px-2 py-12 text-center text-gray-500 bg-white">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-[#00b181]" />
-                    <span className="text-sm font-medium">Fetching client data...</span>
+                  <td colSpan={8} className="px-2 py-8 text-center text-gray-500">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                    Loading...
                   </td>
                 </tr>
               ) : tableFilteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-2 py-12 text-center text-gray-500 italic bg-white font-medium">No clients found matching your search.</td>
+                  <td colSpan={8} className="px-2 py-8 text-center text-gray-500 italic">No clients found</td>
                 </tr>
               ) : (
                 paginatedClients.map((client) => {
                   const display = getClientDisplayData(client);
                   return (
-                    <tr key={client.id} className="border-b border-[#dee2e6] hover:bg-[#f8f9fa] bg-white transition-colors">
-                      <td className="px-2 py-2 border-r border-[#dee2e6]">
+                    <tr key={client.id} className="border-b border-[#d5d8dc] hover:bg-[#f8f9fa]">
+                      <td className="px-2 py-2 border-r border-[#d5d8dc]">
                         <span
-                          className={cn(
-                            "font-bold text-[#212529] cursor-pointer hover:underline",
-                            isAdminType(client.role) ? "text-[#00b181]" : ""
-                          )}
-                          onClick={() => {
+                          style={{ fontWeight: 700, fontSize: 13, color: isAdminType(client.role) ? "#00b181" : "#212529", cursor: isAdminType(client.role) ? "pointer" : "default" }}
+                          onClick={(e) => {
                             if (isAdminType(client.role)) {
+                              e.stopPropagation();
                               navigate(`/accounts/view/${client.username}`);
                             }
                           }}
@@ -609,57 +615,62 @@ export function ClientSummaryCard({
                           {client.username}
                         </span>
                       </td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-[#212529] font-medium">{getTypeLabel(client.role)}</td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#212529]">
+                      <td className="px-2 py-2 border-r border-[#d5d8dc]">
                         {display.isLoaded ? display.credit?.toLocaleString() : "-"}
                       </td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold" style={{ color: getAmountColor(display.balance || 0) }}>
-                        {display.isLoaded ? display.balance?.toLocaleString() : "-"}
+                      <td className="px-2 py-2 border-r border-[#d5d8dc]">
+                        <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.balance ?? 0) : "#212529" }}>
+                          {display.isLoaded ? display.balance?.toLocaleString() : '-'}
+                        </span>
                       </td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold" style={{ color: getAmountColor(display.plDownline || 0) }}>
-                        {display.isLoaded ? display.plDownline?.toLocaleString() : "-"}
+                      <td className="px-2 py-2 border-r border-[#d5d8dc]">
+                        <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.plDownline ?? 0) : "#212529" }}>
+                          {display.isLoaded ? display.plDownline?.toLocaleString() : '-'}
+                        </span>
                       </td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#dc3545]">0</td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#212529]">
-                        {display.isLoaded ? display.share : "-"}
+                      <td className="px-2 py-2 border-r border-[#d5d8dc]">0</td>
+                      <td className="px-2 py-2 border-r border-[#d5d8dc]">
+                        <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.available ?? 0) : "#212529" }}>
+                          {display.isLoaded ? display.available?.toLocaleString() : '-'}
+                        </span>
                       </td>
-                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#212529]">
-                        {display.isLoaded ? display.available?.toLocaleString() : "-"}
+                      <td className="px-2 py-2 border-r border-[#d5d8dc] text-[#212529]">
+                        {getTypeLabel(client.role)}
                       </td>
                       <td className="px-2 py-2">
-                        <div className="flex items-center justify-center gap-1.5">
+                        <div className="flex items-center gap-1">
                           <button
-                            onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                            className="w-7 h-7 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/accounts/cash-credit/${client.username}`); }}
+                            className="w-6 h-6 bg-[#ffc107] text-black font-black rounded text-[11px] flex items-center justify-center"
                             title="Cash/Credit"
                           >C</button>
                           <button
-                            onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                            className="w-7 h-7 bg-[#28a745] hover:bg-[#218838] text-white rounded flex items-center justify-center shadow-sm transition-colors"
-                            title="Edit Client"
-                          ><Pencil className="w-3.5 h-3.5" /></button>
+                            onClick={(e) => { e.stopPropagation(); navigate(`/accounts/edit/${client.username}`); }}
+                            className="w-6 h-6 bg-[#28a745] text-white rounded flex items-center justify-center"
+                            title="Edit"
+                          ><Pencil className="w-3 h-3" /></button>
                           <button
-                            onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                            className="w-7 h-7 bg-[#17a2b8] hover:bg-[#138496] text-white font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
-                            title="Account Ledger"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/accounts/ledger/${client.username}`); }}
+                            className="w-6 h-6 bg-[#17a2b8] text-white rounded text-[11px] font-black flex items-center justify-center"
+                            title="Ledger"
                           >L</button>
                           <button
-                            onClick={() => toggleStatus(client)}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}
+                            className="w-6 h-6 bg-[#e74c3c] text-white rounded text-[11px] font-black flex items-center justify-center"
+                            title="Settle"
+                          >S</button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleStatus(client); }}
                             className={cn(
-                              "w-7 h-7 font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-all",
-                              client.status === "active" ? "bg-[#28a745] hover:bg-[#218838] text-white" : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
+                              "w-6 h-6 rounded text-[11px] font-black flex items-center justify-center",
+                              client.status === "active" ? "bg-[#28a745] text-white" : "border border-[#dc3545] text-[#dc3545] bg-white"
                             )}
-                            title={client.status === "active" ? "Active" : "Inactive"}
-                          >{client.status === "active" ? "A" : "D"}</button>
-                            {client.can_settle_pl && (
-                              <button
-                                onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                                className="w-7 h-7 bg-[#e74c3c] hover:bg-red-600 text-white font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
-                                title="Settle Account"
-                              >S</button>
-                            )}
-                          </div>
-                        </td>
+                            title={client.status === "active" ? "Deactivate" : "Activate"}
+                          >
+                            {client.status === "active" ? "A" : "D"}
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })
@@ -668,18 +679,34 @@ export function ClientSummaryCard({
           </table>
         </div>
 
-        {/* Footer info & Pagination */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-4 px-1">
-          <div className="text-[13px] text-[#6c757d] font-medium">
+        {/* Pagination */}
+        <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-4 px-1 pb-4">
+          <div className="text-[13px] text-[#212529]">
             Showing {startRecord} to {endRecord} of {sortedClients.length} entries
           </div>
-          <DataTablePagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-          />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-[13px] text-[#212529]">
+              Show
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="border border-[#d1d5db] rounded px-1 py-0.5 outline-none"
+              >
+                {[10, 25, 50, 100].map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+              entries
+            </div>
+            <DataTablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
       </div>
     </section>

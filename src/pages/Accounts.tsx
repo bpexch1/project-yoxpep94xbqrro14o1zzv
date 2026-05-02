@@ -139,7 +139,7 @@ export default function Accounts() {
   const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
 
   return (
-    <div style={{ minHeight: "100vh", background: "#ecf0f1", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#e0e0e0", fontFamily: "Roboto, system-ui, sans-serif" }}>
       <main style={{ width: "100%", padding: "8px 6px 80px" }}>
 
         {/* 1. Report Type Card */}
@@ -159,11 +159,11 @@ export default function Accounts() {
             alignItems: "center",
             gap: 8,
             padding: "10px 16px",
-            background: "#ecf0f1",
-            borderBottom: "1px solid #dee2e6",
+            background: "#ebebeb",
+            borderBottom: "1px solid #d4d4d4",
           }}>
-            <Filter style={{ width: 18, height: 18, color: "#212529", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
+            <Filter style={{ width: 18, height: 18, color: "#2d2d2d", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#2d2d2d", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
           <div style={{ padding: "12px 16px" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
