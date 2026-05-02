@@ -14,6 +14,7 @@ interface ClientSummaryCardProps {
   onRefresh?: () => void;
   hideCreateButton?: boolean;
   hideHeader?: boolean;
+  adminRecord?: any;
 }
 
 export function ClientSummaryCard({ 
@@ -24,6 +25,7 @@ export function ClientSummaryCard({
   onRefresh,
   hideCreateButton = false,
   hideHeader = false,
+  adminRecord,
 }: ClientSummaryCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -111,6 +113,14 @@ export function ClientSummaryCard({
     ),
     [filteredClients]
   );
+
+  const summaryData = adminRecord ? {
+    credit_received: adminRecord.credit_received || 0,
+    credit_remaining: adminRecord.credit_remaining || 0,
+    cash: adminRecord.cash || 0,
+    pl_downline: adminRecord.pl_downline || 0,
+    balance_upline: adminRecord.balance_upline || 0,
+  } : totals;
 
   // DataTable Logic
   useEffect(() => {
@@ -230,15 +240,50 @@ export function ClientSummaryCard({
       {!hideHeader && (
         <div className="bg-[#ecf0f1] border-b border-[#d0d0d0]" style={{ padding: "6px 8px" }}>
           <span className="font-bold text-sm text-[#212529]">
-            {username} - Clients List{!balancesLoaded ? " | Default" : ""}
+            {username} - Clients List{(!adminRecord && !balancesLoaded) ? " | Default" : ""}
           </span>
         </div>
       )}
 
       <div style={{ padding: "8px 6px" }}>
-        {/* Summary Stats Table — use balancesLoaded to show 0 vs real totals */}
+        {/* Summary Stats Table */}
         <div className="mb-3 overflow-x-auto">
-          {!balancesLoaded ? (
+          {adminRecord ? (
+            <table className="border-collapse border border-[#dee2e6] text-[13px]">
+              <thead>
+                <tr className="bg-white">
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Received</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Credit<br/>Remaining</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Cash</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">P/L<br/>Downline</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Balance<br/>UpLine</th>
+                  <th className="border border-[#dee2e6] px-3 py-2 text-left font-bold text-[#212529] whitespace-nowrap">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-white">
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.credit_received) }}>
+                    {summaryData.credit_received.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.credit_remaining) }}>
+                    {summaryData.credit_remaining.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.cash) }}>
+                    {summaryData.cash.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.pl_downline) }}>
+                    {summaryData.pl_downline.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: getAmountColor(summaryData.balance_upline) }}>
+                    {summaryData.balance_upline.toLocaleString()}
+                  </td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">
+                    {filteredClients.length}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          ) : !balancesLoaded ? (
             <table className="border-collapse border border-[#dee2e6] text-[13px]">
               <thead>
                 <tr className="bg-white">
@@ -382,7 +427,7 @@ export function ClientSummaryCard({
               {/* GREEN TOTAL ROW — always first */}
               {!isLoading && (
                 <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
-                  {!balancesLoaded ? (
+                  {(!adminRecord && !balancesLoaded) ? (
                     <td colSpan={3} className="px-2 py-2 border border-[#4dbd74]">
                       <button
                         onClick={handleLoadBalance}
@@ -403,7 +448,7 @@ export function ClientSummaryCard({
                   ) : (
                     <>
                       <td colSpan={2} className="px-2 py-2 border border-[#4dbd74] font-bold">Total</td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right font-bold">{totals.credit_received.toLocaleString()}</td>
+                      <td className="px-2 py-2 border border-[#4dbd74] text-right font-bold">{summaryData.credit_received.toLocaleString()}</td>
                     </>
                   )}
                 </tr>
@@ -511,117 +556,37 @@ export function ClientSummaryCard({
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden lg:block overflow-x-auto border-x border-b border-[#d5d8dc]">
-          <table className="w-full border-collapse">
+        <div className="hidden lg:block overflow-x-auto border border-[#dee2e6] rounded-[4px]">
+          <table className="w-full border-collapse text-[13px]" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
             <thead>
-              <tr className="bg-[#ecf0f1] text-[#212529] text-[12px] font-black whitespace-nowrap">
-                <th 
-                  onClick={() => handleSort('username')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-left cursor-pointer select-none transition-colors",
-                    sortColumn === 'username' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    Username {getSortIcon('username')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('role')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-left cursor-pointer select-none transition-colors",
-                    sortColumn === 'role' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    Type {getSortIcon('role')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('credit_received')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
-                    sortColumn === 'credit_received' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-end">
-                    Credit {getSortIcon('credit_received')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('cash')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
-                    sortColumn === 'cash' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-end">
-                    Balance {getSortIcon('cash')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('pl_downline')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
-                    sortColumn === 'pl_downline' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-end">
-                    Client (P/L) {getSortIcon('pl_downline')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('downline_share')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
-                    sortColumn === 'downline_share' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-end">
-                    Share {getSortIcon('downline_share')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('exposure')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
-                    sortColumn === 'exposure' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-end">
-                    Exposure {getSortIcon('exposure')}
-                  </div>
-                </th>
-                <th 
-                  onClick={() => handleSort('credit_remaining')}
-                  className={cn(
-                    "px-2 py-2 border border-[#d5d8dc] text-right cursor-pointer select-none transition-colors",
-                    sortColumn === 'credit_remaining' ? "bg-[#d5d8dc]" : "hover:bg-[#e2e6e9]"
-                  )}
-                >
-                  <div className="flex items-center justify-end">
-                    Available Balance {getSortIcon('credit_remaining')}
-                  </div>
-                </th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-center">Options</th>
+              <tr className="bg-[#1f3044] text-white">
+                <th className="px-2 py-2 border-r border-white/10 text-left font-bold cursor-pointer" onClick={() => handleSort('username')}>Username {getSortIcon('username')}</th>
+                <th className="px-2 py-2 border-r border-white/10 text-left font-bold cursor-pointer" onClick={() => handleSort('role')}>Type {getSortIcon('role')}</th>
+                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('credit_received')}>Credit {getSortIcon('credit_received')}</th>
+                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('cash')}>Balance {getSortIcon('cash')}</th>
+                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('pl_downline')}>Client (P/L) {getSortIcon('pl_downline')}</th>
+                <th className="px-2 py-2 border-r border-white/10 text-right font-bold">Exposure</th>
+                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('downline_share')}>Share {getSortIcon('downline_share')}</th>
+                <th className="px-2 py-2 border-r border-white/10 text-right font-bold cursor-pointer" onClick={() => handleSort('credit_remaining')}>Avail. Bal. {getSortIcon('credit_remaining')}</th>
+                <th className="px-2 py-2 text-center font-bold">Options</th>
               </tr>
             </thead>
-            <tbody className="text-[13px]">
-              {/* Green Total Row */}
-              {!isLoading && tableFilteredClients.length > 0 && (
-                <tr className="bg-[#00b181] text-white font-black whitespace-nowrap">
-                  {!balancesLoaded ? (
-                    <td className="px-2 py-2 border border-[#4dbd74]" colSpan={9}>
+            <tbody>
+              {/* GREEN TOTAL ROW */}
+              {!isLoading && (
+                <tr style={{ background: "#00b181", color: "#fff", fontWeight: 700 }}>
+                  <td colSpan={2} className="px-2 py-2 border-r border-[#4dbd74]">Total</td>
+                  {(!adminRecord && !balancesLoaded) ? (
+                    <td colSpan={6} className="px-2 py-2 border-r border-[#4dbd74]">
                       <button
                         onClick={handleLoadBalance}
-                        disabled={isLoadingBalances}
                         style={{
                           background: "#ffc107",
                           color: "#000",
                           border: "none",
-                          padding: "4px 14px",
+                          padding: "3px 12px",
                           fontWeight: 700,
-                          fontSize: 13,
+                          fontSize: 12,
                           borderRadius: 3,
                           cursor: "pointer"
                         }}
@@ -631,162 +596,109 @@ export function ClientSummaryCard({
                     </td>
                   ) : (
                     <>
-                      <td className="px-2 py-2 border border-[#4dbd74]" colSpan={2}>Total</td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
-                        {totals.credit_received.toLocaleString()}
-                      </td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
-                        {totals.cash.toLocaleString()}
-                      </td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
-                        {totals.pl_downline.toLocaleString()}
-                      </td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right">-</td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right">0</td>
-                      <td className="px-2 py-2 border border-[#4dbd74] text-right">
-                        {totals.credit_remaining.toLocaleString()}
-                      </td>
-                      <td className="px-2 py-2 border border-[#4dbd74]"></td>
+                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.credit_received.toLocaleString()}</td>
+                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.cash.toLocaleString()}</td>
+                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.pl_downline.toLocaleString()}</td>
+                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">0</td>
+                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">-</td>
+                      <td className="px-2 py-2 border-r border-[#4dbd74] text-right">{summaryData.credit_remaining.toLocaleString()}</td>
                     </>
                   )}
+                  <td className="px-2 py-2"></td>
                 </tr>
               )}
 
-              {/* Client Rows */}
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="px-2 py-8 text-center text-gray-500">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                    Loading clients...
+                  <td colSpan={9} className="px-2 py-12 text-center text-gray-500 bg-white">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-[#00b181]" />
+                    <span className="text-sm font-medium">Fetching client data...</span>
                   </td>
                 </tr>
               ) : tableFilteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-2 py-8 text-center text-gray-500 italic">No clients found</td>
+                  <td colSpan={9} className="px-2 py-12 text-center text-gray-500 italic bg-white font-medium">No clients found matching your search.</td>
                 </tr>
               ) : (
                 paginatedClients.map((client) => {
                   const display = getClientDisplayData(client);
-                  const isExpanded = expandedIds.has(client.id);
-
                   return (
-                    <React.Fragment key={client.id}>
-                      <tr className={cn(
-                        "hover:bg-[#f8f9fa] border-b border-[#d5d8dc] whitespace-nowrap transition-colors",
-                        isExpanded && "bg-[#f8f9fa]"
-                      )}>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc]">
-                          <div className="flex items-center gap-1.5">
-                            <button 
-                              onClick={() => toggleExpand(client.id)}
-                              className="text-gray-400 hover:text-gray-600"
-                            >
-                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                            </button>
-                            <span 
-                              onClick={() => isAdminType(client.role) && navigate(`/accounts/view/${client.username}`)}
-                              className={cn(
-                                "font-bold text-[#212529]",
-                                isAdminType(client.role) ? "cursor-pointer hover:text-[#00b181] hover:underline" : ""
-                              )}
-                            >
-                              {client.username}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-gray-600">{getTypeLabel(client.role)}</td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          {display.isLoaded ? display.credit?.toLocaleString() : "-"}
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          {display.isLoaded ? display.balance?.toLocaleString() : "-"}
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          {display.isLoaded ? display.plDownline?.toLocaleString() : "-"}
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          {display.isLoaded ? `${display.share}%` : "-"}
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          0
-                        </td>
-                        <td className="px-2 py-2 border-r border-[#d5d8dc] text-right text-[#212529]">
-                          {display.isLoaded ? display.available?.toLocaleString() : "-"}
-                        </td>
-                        <td className="px-2 py-1.5 border-r border-[#d5d8dc]">
-                          <div className="flex items-center justify-center gap-1">
-                            <button
-                              onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
-                              className="w-6 h-6 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black rounded text-[11px] flex items-center justify-center shadow-sm"
-                              title="Cash/Credit"
-                            >
-                              C
-                            </button>
-                            <button
-                              onClick={() => navigate(`/accounts/edit/${client.username}`)}
-                              className="w-6 h-6 bg-[#28a745] hover:bg-[#218838] text-white rounded flex items-center justify-center shadow-sm"
-                              title="Edit"
-                            >
-                              <Pencil className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => navigate(`/accounts/ledger/${client.username}`)}
-                              className="w-6 h-6 bg-[#17a2b8] hover:bg-[#138496] text-white font-black rounded text-[11px] flex items-center justify-center shadow-sm"
-                              title="Ledger"
-                            >
-                              L
-                            </button>
-                            <button
-                              onClick={() => toggleStatus(client)}
-                              className={cn(
-                                "w-6 h-6 font-black rounded text-[11px] flex items-center justify-center transition-colors shadow-sm",
-                                client.status === "active" 
-                                  ? "bg-[#28a745] hover:bg-[#218838] text-white" 
-                                  : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
-                              )}
-                              title={client.status === "active" ? "Deactivate" : "Activate"}
-                            >
-                              {client.status === "active" ? "A" : "D"}
-                            </button>
+                    <tr key={client.id} className="border-b border-[#dee2e6] hover:bg-[#f8f9fa] bg-white transition-colors">
+                      <td className="px-2 py-2 border-r border-[#dee2e6]">
+                        <span
+                          className={cn(
+                            "font-bold text-[#212529] cursor-pointer hover:underline",
+                            isAdminType(client.role) ? "text-[#00b181]" : ""
+                          )}
+                          onClick={() => {
+                            if (isAdminType(client.role)) {
+                              navigate(`/accounts/view/${client.username}`);
+                            }
+                          }}
+                        >
+                          {client.username}
+                        </span>
+                      </td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-[#212529] font-medium">{getTypeLabel(client.role)}</td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#212529]">
+                        {display.isLoaded ? display.credit?.toLocaleString() : "-"}
+                      </td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold" style={{ color: getAmountColor(display.balance || 0) }}>
+                        {display.isLoaded ? display.balance?.toLocaleString() : "-"}
+                      </td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold" style={{ color: getAmountColor(display.plDownline || 0) }}>
+                        {display.isLoaded ? display.plDownline?.toLocaleString() : "-"}
+                      </td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#dc3545]">0</td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#212529]">
+                        {display.isLoaded ? display.share : "-"}
+                      </td>
+                      <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-bold text-[#212529]">
+                        {display.isLoaded ? display.available?.toLocaleString() : "-"}
+                      </td>
+                      <td className="px-2 py-2">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => navigate(`/accounts/cash-credit/${client.username}`)}
+                            className="w-7 h-7 bg-[#ffc107] hover:bg-[#e0a800] text-black font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
+                            title="Cash/Credit"
+                          >C</button>
+                          <button
+                            onClick={() => navigate(`/accounts/edit/${client.username}`)}
+                            className="w-7 h-7 bg-[#28a745] hover:bg-[#218838] text-white rounded flex items-center justify-center shadow-sm transition-colors"
+                            title="Edit Client"
+                          ><Pencil className="w-3.5 h-3.5" /></button>
+                          <button
+                            onClick={() => navigate(`/accounts/ledger/${client.username}`)}
+                            className="w-7 h-7 bg-[#17a2b8] hover:bg-[#138496] text-white font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
+                            title="Account Ledger"
+                          >L</button>
+                          <button
+                            onClick={() => toggleStatus(client)}
+                            className={cn(
+                              "w-7 h-7 font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-all",
+                              client.status === "active" ? "bg-[#28a745] hover:bg-[#218838] text-white" : "bg-white border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
+                            )}
+                            title={client.status === "active" ? "Active" : "Inactive"}
+                          >{client.status === "active" ? "A" : "D"}</button>
+                          {client.can_settle_pl && (
                             <button
                               onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                              className="w-6 h-6 bg-[#e74c3c] hover:bg-[#c0392b] text-white font-black rounded text-[11px] flex items-center justify-center shadow-sm"
+                              className="w-7 h-7 bg-[#e74c3c] hover:bg-red-600 text-white font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
                               title="Settle Account"
-                            >
-                              S
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                      {/* Expanded Row */}
-                      {isExpanded && (
-                        <tr className="bg-[#f0f3f5] text-[13px] whitespace-nowrap">
-                          <td colSpan={9} className="p-0 border-b border-[#d5d8dc]">
-                            <div className="p-3 flex items-center justify-between">
-                              <div className="flex items-center gap-6">
-                                <div>
-                                  <span className="text-gray-500 mr-2">Full Name:</span>
-                                  <span className="font-bold">{client.full_name || client.username}</span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-500 mr-2">Created:</span>
-                                  <span className="font-bold">{new Date(client.created_at).toLocaleDateString()}</span>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleRowRefresh(client)}
-                                  disabled={rowRefreshingMap[client.id]}
-                                  className="bg-[#2c3e50] hover:bg-[#1a252f] text-white px-3 py-1 rounded text-[11px] font-bold flex items-center gap-1"
-                                >
-                                  {rowRefreshingMap[client.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : "Refresh Balance"}
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
+                            >S</button>
+                          )}
+                          <button
+                            onClick={() => handleRowRefresh(client)}
+                            disabled={rowRefreshingMap[client.id]}
+                            className="w-7 h-7 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded flex items-center justify-center transition-colors disabled:opacity-50"
+                            title="Refresh Balance"
+                          >
+                            <i className={cn("fas fa-sync-alt text-[10px]", rowRefreshingMap[client.id] && "animate-spin")} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })
               )}
@@ -794,22 +706,19 @@ export function ClientSummaryCard({
           </table>
         </div>
 
-        {/* Pagination */}
-        {!isLoading && sortedClients.length > 0 && (
-          <DataTablePagination
+        {/* Footer info & Pagination */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-4 px-1">
+          <div className="text-[13px] text-[#6c757d] font-medium">
+            Showing {startRecord} to {endRecord} of {sortedClients.length} entries
+          </div>
+          <DataTablePagination 
             currentPage={currentPage}
             totalPages={totalPages}
-            pageSize={pageSize}
             onPageChange={setCurrentPage}
-            onPageSizeChange={(newSize) => {
-              setPageSize(newSize);
-              setCurrentPage(1);
-            }}
-            totalRecords={sortedClients.length}
-            startRecord={startRecord}
-            endRecord={endRecord}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
           />
-        )}
+        </div>
       </div>
     </section>
   );

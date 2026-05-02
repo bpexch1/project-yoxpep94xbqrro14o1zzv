@@ -66,6 +66,15 @@ export default function Accounts() {
     select: (data: any) => data ? data.map((c: any) => ({ ...c })) : [],
   });
 
+  // Admin's own record to show in summary table
+  const { data: adminOwnData } = useQuery({
+    queryKey: ["admin-own-record", session?.username],
+    queryFn: () => ClientEntity.filter({ username: session?.username }),
+    enabled: !!session?.username,
+    refetchInterval: 15000,
+  });
+  const adminRecord = adminOwnData?.[0];
+
   const clientsKey = clients ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
 
   const suggestions = (clients || [])
@@ -355,6 +364,7 @@ export default function Accounts() {
           username={session?.username || 'Admin'}
           searchFilter={searchQuery}
           onRefresh={refetch}
+          adminRecord={adminRecord}
         />
 
         {/* News Ticker — only on Accounts page */}

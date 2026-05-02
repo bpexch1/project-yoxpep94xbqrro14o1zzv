@@ -8,12 +8,14 @@ import {
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getClientSession } from "@/hooks/useClientAuth";
 
 export default function CashCreditPage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const session = getClientSession();
   
   const [activeTab, setActiveTab] = useState<'cash' | 'credit'>('cash');
   const [depositDesc, setDepositDesc] = useState('');
@@ -31,6 +33,14 @@ export default function CashCreditPage() {
   });
 
   const client = clients?.[0];
+
+  // Admin's own record to update balance bidirectional
+  const { data: adminClients, refetch: refetchAdmin } = useQuery({
+    queryKey: ["admin-own-record", session?.username],
+    queryFn: () => Client.filter({ username: session?.username }),
+    enabled: !!session?.username,
+  });
+  const adminClient = adminClients?.[0];
 
   const { data: transactions, isLoading: isFetchingTx, refetch: refetchTx } = useQuery({
     queryKey: ["transactions", username, activeTab],
@@ -54,9 +64,11 @@ export default function CashCreditPage() {
   const refreshAll = async () => {
     await refetchClient();
     await refetchTx();
+    await refetchAdmin();
     queryClient.invalidateQueries({ queryKey: ["clients"] });
     queryClient.invalidateQueries({ queryKey: ["client", username] });
     queryClient.invalidateQueries({ queryKey: ["transactions", username] });
+    queryClient.invalidateQueries({ queryKey: ["admin-own-record"] });
   };
 
   const handleDeposit = async () => {
@@ -88,6 +100,20 @@ export default function CashCreditPage() {
       }
 
       await Client.update(client.id, clientUpdateData);
+
+      // BIDIRECTIONAL: Update Admin's balance
+      if (adminClient) {
+        if (activeTab === 'cash') {
+          await Client.update(adminClient.id, { 
+            cash: (adminClient.cash || 0) - amount 
+          });
+        } else {
+          await Client.update(adminClient.id, { 
+            credit_remaining: Math.max(0, (adminClient.credit_remaining || 0) - amount) 
+          });
+        }
+      }
+
       await Transaction.create({
         client_username: client.username,
         type: activeTab,
@@ -144,6 +170,20 @@ export default function CashCreditPage() {
       }
 
       await Client.update(client.id, clientUpdateData);
+
+      // BIDIRECTIONAL: Update Admin's balance
+      if (adminClient) {
+        if (activeTab === 'cash') {
+          await Client.update(adminClient.id, { 
+            cash: (adminClient.cash || 0) + amount 
+          });
+        } else {
+          await Client.update(adminClient.id, { 
+            credit_remaining: (adminClient.credit_remaining || 0) + amount 
+          });
+        }
+      }
+
       await Transaction.create({
         client_username: client.username,
         type: activeTab,
