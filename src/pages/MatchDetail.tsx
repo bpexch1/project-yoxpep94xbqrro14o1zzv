@@ -134,6 +134,14 @@ export default function MatchDetail() {
   const isMarketSuspended = matchOddsMarket?.status === 'SUSPENDED' || matchOddsMarket?.status === 'CLOSED';
   const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
 
+  const getLiveRunner = (teamName: string, idx: number) => {
+    if (!matchOddsMarket) return null;
+    return matchOddsMarket.runners?.[idx] || 
+      matchOddsMarket.runners?.find((r: any) => 
+        r.runnerName?.toLowerCase() === teamName?.toLowerCase()
+      ) || null;
+  };
+
   // Market suspension from MongoDB
   const isMongoSuspended = mongoOddsData?.isSuspended === true;
 
@@ -188,14 +196,6 @@ export default function MatchDetail() {
     if (size >= 1000000) return `${(size / 1000000).toFixed(1)}M`;
     if (size >= 1000) return `${(size / 1000).toFixed(1)}K`;
     return String(Math.round(size));
-  };
-
-  const getLiveRunner = (teamName: string, idx: number) => {
-    if (!matchOddsMarket) return null;
-    return matchOddsMarket.runners?.[idx] || 
-      matchOddsMarket.runners?.find((r: any) => 
-        r.runnerName?.toLowerCase() === teamName?.toLowerCase()
-      ) || null;
   };
 
   const formatPKT = (timeStr: string | null | undefined): string => {
