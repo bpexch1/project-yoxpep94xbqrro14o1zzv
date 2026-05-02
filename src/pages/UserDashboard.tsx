@@ -43,11 +43,19 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color
   }
   
   if (s.includes('cricket')) {
-    // Cricket bat at 45 degree angle — wider blade, thin handle
+    // Cricket bat + wicket stumps (3 stumps + 2 bails + diagonal bat)
     return (
       <svg {...props}>
-        <path d="M20.5 3.5a2 2 0 0 0-3 0L5 16c-.5.5-.5 1.2 0 1.7l1.3 1.3c.5.5 1.2.5 1.7 0L20.5 6.5a2 2 0 0 0 0-3z"/>
-        <path d="M5 16l-2.5 3.5c-.4.5-.3 1.1.2 1.5.5.4 1.1.3 1.5-.2L7 17.5"/>
+        {/* 3 wicket stumps */}
+        <line x1="14" y1="9" x2="14" y2="22"/>
+        <line x1="17" y1="8" x2="17" y2="21"/>
+        <line x1="20" y1="9" x2="20" y2="22"/>
+        {/* Bails on top of stumps */}
+        <line x1="13.5" y1="9.5" x2="17.5" y2="8.5"/>
+        <line x1="16.5" y1="8.5" x2="20.5" y2="9.5"/>
+        {/* Cricket bat - diagonal, wider blade at bottom-left */}
+        <path d="M2 22L14 6" strokeWidth="3.5"/>
+        <path d="M2 22L4 20" strokeWidth="2"/>
       </svg>
     );
   }
