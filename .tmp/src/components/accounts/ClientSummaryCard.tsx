@@ -260,10 +260,10 @@ export function ClientSummaryCard({
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">0</td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">0</td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">0</td>
-                  <td className="border border-[#dee2e6] px-3 py-2 font-bold text-[#212529]">{filteredClients.length}</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: "#212529", fontWeight: 700 }}>0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: "#212529", fontWeight: 700 }}>0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: "#212529", fontWeight: 700 }}>0</td>
+                  <td className="border border-[#dee2e6] px-3 py-2 font-bold" style={{ color: "#212529", fontWeight: 700 }}>{filteredClients.length}</td>
                 </tr>
               </tbody>
             </table>
@@ -421,9 +421,9 @@ export function ClientSummaryCard({
 
               {/* COLUMN HEADER ROW — below total row */}
               <tr style={{ background: "#fff" }}>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[12px] font-bold text-[#212529]">Username</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[12px] font-bold text-[#212529]">Type</th>
-                <th className="px-2 py-2 border border-[#d5d8dc] text-right text-[12px] font-bold text-[#212529]">Credit</th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">Username</th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]">Type</th>
+                <th className="px-2 py-2 border border-[#d5d8dc] text-right text-[13px] font-bold text-[#212529]">Credit</th>
               </tr>
 
               {/* USER ROWS */}
@@ -450,10 +450,7 @@ export function ClientSummaryCard({
                       >
                         <td className="px-2 py-2 border-r border-[#d5d8dc]">
                           <span
-                            className={cn(
-                              "font-bold text-[#212529]",
-                              isAdminType(client.role) ? "text-[#00b181]" : ""
-                            )}
+                            style={{ fontWeight: 700, fontSize: 13, color: isAdminType(client.role) ? "#00b181" : "#212529", cursor: isAdminType(client.role) ? "pointer" : "default" }}
                             onClick={(e) => {
                               if (isAdminType(client.role)) {
                                 e.stopPropagation();
@@ -475,11 +472,11 @@ export function ClientSummaryCard({
                         <tr className="bg-white">
                           <td colSpan={3} className="px-3 py-2 border-b border-[#d5d8dc]">
                             <ul className="text-[13px] text-[#212529] space-y-0.5 mb-2">
-                              <li>• Balance <span className="font-bold text-[#212529]">{display.isLoaded ? display.balance?.toLocaleString() : '-'}</span></li>
-                              <li>• Client (P/L) <span className="font-bold text-[#212529]">{display.isLoaded ? display.plDownline?.toLocaleString() : '-'}</span></li>
-                              <li>• Share <span className="font-bold text-[#212529]">{display.isLoaded ? display.share : '-'}</span></li>
-                              <li>• Exposure <span className="font-bold text-[#212529]">0</span></li>
-                              <li>• Available Balance <span className="font-bold text-[#212529]">{display.isLoaded ? display.available?.toLocaleString() : '-'}</span></li>
+                              <li>• Balance <span className="font-bold" style={{ color: balancesLoaded ? getAmountColor(display.balance || 0) : "#212529" }}>{display.isLoaded ? display.balance?.toLocaleString() : '-'}</span></li>
+                              <li>• Client (P/L) <span className="font-bold" style={{ color: balancesLoaded ? getAmountColor(display.plDownline || 0) : "#212529" }}>{display.isLoaded ? display.plDownline?.toLocaleString() : '-'}</span></li>
+                              <li>• Share <span className="font-bold" style={{ color: "#212529" }}>{display.isLoaded ? display.share : '-'}</span></li>
+                              <li>• Exposure <span className="font-bold" style={{ color: "#212529" }}>0</span></li>
+                              <li>• Available Balance <span className="font-bold" style={{ color: "#212529" }}>{display.isLoaded ? display.available?.toLocaleString() : '-'}</span></li>
                             </ul>
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[12px] text-[#212529] mr-1 font-bold">• Options</span>
@@ -646,23 +643,15 @@ export function ClientSummaryCard({
                             )}
                             title={client.status === "active" ? "Active" : "Inactive"}
                           >{client.status === "active" ? "A" : "D"}</button>
-                          {client.can_settle_pl && (
-                            <button
-                              onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
-                              className="w-7 h-7 bg-[#e74c3c] hover:bg-red-600 text-white font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
-                              title="Settle Account"
-                            >S</button>
-                          )}
-                          <button
-                            onClick={() => handleRowRefresh(client)}
-                            disabled={rowRefreshingMap[client.id]}
-                            className="w-7 h-7 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded flex items-center justify-center transition-colors disabled:opacity-50"
-                            title="Refresh Balance"
-                          >
-                            <i className={cn("fas fa-sync-alt text-[10px]", rowRefreshingMap[client.id] && "animate-spin")} />
-                          </button>
-                        </div>
-                      </td>
+                            {client.can_settle_pl && (
+                              <button
+                                onClick={() => navigate(`/accounts/settle-pl/${client.username}`)}
+                                className="w-7 h-7 bg-[#e74c3c] hover:bg-red-600 text-white font-black rounded text-[12px] flex items-center justify-center shadow-sm transition-colors"
+                                title="Settle Account"
+                              >S</button>
+                            )}
+                          </div>
+                        </td>
                     </tr>
                   );
                 })
