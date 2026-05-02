@@ -52,10 +52,10 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
             const baseStyle: React.CSSProperties = {
-              fontSize: "15px",
+              fontSize: "13px",
               padding: "0 8px",
-              height: "48px",
-              lineHeight: "48px",
+              height: "36px",
+              lineHeight: "36px",
               borderRadius: "8px",
               border: "1.5px solid #2bbbad",
               display: "block",
