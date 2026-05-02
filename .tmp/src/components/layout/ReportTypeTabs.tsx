@@ -47,62 +47,45 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         display: "flex",
         flexWrap: "wrap",
         gap: "4px",
+        justifyContent: "flex-start",
         padding: "8px 10px 10px 10px"
       }}>
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
-          const isLast = index === tabs.length - 1;
           
           const btnStyle: React.CSSProperties = isActive
             ? {
                 fontSize: "12px",
-                padding: "4px 10px",
-                borderRadius: "6px",
+                padding: "0 10px",
+                height: "26px",
+                lineHeight: "26px",
+                borderRadius: "4px",
                 border: "1px solid #2bbbad",
                 background: "#2bbbad",
                 color: "#fff",
                 fontWeight: 600,
-                height: "28px",
-                lineHeight: "18px",
+                display: "inline-block",
                 cursor: "pointer",
                 fontFamily: "inherit",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 whiteSpace: "nowrap",
-                transition: "opacity 0.15s",
+                boxSizing: "border-box",
               }
             : {
                 fontSize: "12px",
-                padding: "4px 10px",
-                borderRadius: "6px",
+                padding: "0 10px",
+                height: "26px",
+                lineHeight: "26px",
+                borderRadius: "4px",
                 border: "1px solid #2bbbad",
                 background: "white",
                 color: "#2bbbad",
                 fontWeight: 500,
-                height: "28px",
-                lineHeight: "18px",
+                display: "inline-block",
                 cursor: "pointer",
                 fontFamily: "inherit",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 whiteSpace: "nowrap",
-                transition: "opacity 0.15s",
+                boxSizing: "border-box",
               };
-
-          if (isLast) {
-            return (
-              <div key={tab.label} style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                <button
-                  onClick={() => navigate(tab.path)}
-                  style={btnStyle}
-                >
-                  {tab.label}
-                </button>
-              </div>
-            );
-          }
 
           return (
             <button
