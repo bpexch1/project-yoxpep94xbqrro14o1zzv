@@ -42,20 +42,19 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <Filter style={{ width: 18, height: 18, color: "#2d2d2d", flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 15, color: "#2d2d2d" }}>Report Type</span>
       </div>
-      <div style={{ padding: "14px 12px", backgroundColor: "#ffffff" }}>
+      <div style={{ padding: "10px 10px", backgroundColor: "#ffffff" }}>
         <div style={{ 
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "8px",
+          gap: "6px",
         }}>
           {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
             const baseStyle: React.CSSProperties = {
-              fontSize: "13px",
-              padding: "0 8px",
-              height: "36px",
-              lineHeight: "36px",
+              fontSize: "12px",
+              padding: "4px 8px",
+              lineHeight: "1.4",
               borderRadius: "8px",
               border: "1.5px solid #2bbbad",
               display: "block",
