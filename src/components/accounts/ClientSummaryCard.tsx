@@ -359,19 +359,9 @@ export function ClientSummaryCard({
           </div>
         </div>
 
-        {/* Simple Search box - matching original design */}
-        <div style={{ 
-          textAlign: "center", 
-          marginTop: 12, 
-          marginBottom: 12 
-        }}>
-          <label style={{ 
-            display: "block",
-            fontSize: 14, 
-            fontWeight: 600, 
-            color: "#212529",
-            marginBottom: 4
-          }}>
+        {/* Search box - matching DataTables style */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginTop: 8, marginBottom: 8, gap: 6 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: "#212529", whiteSpace: "nowrap" }}>
             Search:
           </label>
           <input
@@ -382,14 +372,10 @@ export function ClientSummaryCard({
               setCurrentPage(1);
             }}
             style={{
-              width: "60%",
-              maxWidth: 280,
-              minWidth: 160,
-              margin: "0 auto",
-              display: "block",
+              width: 180,
               border: "1px solid #d1d5db",
               borderRadius: 4,
-              padding: "5px 10px",
+              padding: "4px 8px",
               fontSize: 13,
               outline: "none",
               fontFamily: "Roboto, system-ui, sans-serif"
