@@ -159,7 +159,7 @@ export default function Accounts() {
             alignItems: "center",
             gap: 8,
             padding: "10px 16px",
-            background: "#f5f5f5",
+            background: "#ecf0f1",
             borderBottom: "1px solid #dee2e6",
           }}>
             <Filter style={{ width: 18, height: 18, color: "#212529", flexShrink: 0 }} />
