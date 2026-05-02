@@ -437,7 +437,7 @@ export function ClientSummaryCard({
               <tr style={{ background: "#fff" }}>
                 <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]" style={{ width: '45%' }}>Username</th>
                 <th className="px-2 py-2 border border-[#d5d8dc] text-left text-[13px] font-bold text-[#212529]" style={{ width: '35%' }}>Type</th>
-                <th className="px-2 py-1 border border-[#d5d8dc] text-left text-[12px] font-bold text-[#212529]" style={{ width: '20%' }}>Credit</th>
+                <th className="px-1 py-1 border border-[#d5d8dc] text-left text-[11px] font-bold text-[#212529]" style={{ width: '15%' }}>Credit</th>
               </tr>
 
               {/* USER ROWS */}
@@ -478,7 +478,7 @@ export function ClientSummaryCard({
                         <td className="px-2 py-2 border-r border-[#d5d8dc] text-[#212529]">
                           {getTypeLabel(client.role)}
                         </td>
-                        <td className="px-2 py-1 border-r border-[#d5d8dc] text-left text-[#212529]" style={{ fontSize: 12 }}>
+                        <td className="px-1 py-1 border-r border-[#d5d8dc] text-left text-[#212529]" style={{ fontSize: 11 }}>
                           {display.isLoaded ? display.credit?.toLocaleString() : "-"}
                         </td>
                       </tr>
