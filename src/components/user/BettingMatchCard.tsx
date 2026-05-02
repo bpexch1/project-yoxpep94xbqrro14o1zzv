@@ -14,10 +14,11 @@ export function BettingMatchCard({ match, onSelectBet }: BettingMatchCardProps) 
   const matchedAmount = Math.floor(Math.random() * 30000000 + 500000).toLocaleString('en-IN');
   
   // Time display: extract time portion from match_time
-  const timeDisplay = match.match_time 
-    ? (match.match_time.includes('T') 
-        ? new Date(match.match_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-        : (match.match_time.length > 5 ? match.match_time.substring(0, 5) : match.match_time))
+  const mt = match.match_time != null ? String(match.match_time) : '';
+  const timeDisplay = mt
+    ? (mt.includes('T')
+        ? new Date(mt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+        : (mt.length > 5 ? mt.substring(0, 5) : mt))
     : "19:00";
 
   return (
