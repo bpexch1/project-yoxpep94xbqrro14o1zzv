@@ -360,7 +360,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* Search box - matching DataTables style */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginTop: 8, marginBottom: 8, gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 8, marginBottom: 8, gap: 6 }}>
           <label style={{ fontSize: 13, fontWeight: 600, color: "#212529", whiteSpace: "nowrap" }}>
             Search:
           </label>
