@@ -11,7 +11,7 @@ import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Volume2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { getLiveOdds, getCricketScore } from "@/functions";
+import { getLiveOdds, getCricketScore, oddsEngine } from "@/functions";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -94,6 +94,17 @@ export default function MatchDetail() {
     staleTime: 0,
   });
 
+  const { data: mongoOddsData } = useQuery({
+    queryKey: ['mongo-odds', match?.id],
+    queryFn: async () => {
+      const res = await oddsEngine({ action: 'getOdds', matchId: match.id });
+      return res?.odds || null;
+    },
+    enabled: !!match?.id,
+    refetchInterval: 1000,
+    staleTime: 0,
+  });
+
   // Extract Match Odds market
   const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
     m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
@@ -106,6 +117,22 @@ export default function MatchDetail() {
 
   const isMarketSuspended = matchOddsMarket?.status === 'SUSPENDED' || matchOddsMarket?.status === 'CLOSED';
   const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
+
+  // Market suspension from MongoDB
+  const isMongoSuspended = mongoOddsData?.isSuspended === true;
+
+  // Team 1 odds: MongoDB > Betfair Live > DB
+  const runner1 = getLiveRunner(match?.team1, 0);
+  const t1_back = mongoOddsData?.teamA_back ?? (hasLiveOdds ? (runner1?.backPrice ?? match?.back_odds) : match?.back_odds);
+  const t1_lay  = mongoOddsData?.teamA_lay  ?? (hasLiveOdds ? (runner1?.layPrice  ?? match?.lay_odds)  : match?.lay_odds);
+
+  // Team 2 odds: MongoDB > Betfair Live > DB
+  const runner2 = getLiveRunner(match?.team2, 1);
+  const t2_back = mongoOddsData?.teamB_back ?? (hasLiveOdds ? (runner2?.backPrice ?? (match?.back_odds2 || match?.back_odds)) : (match?.back_odds2 || match?.back_odds));
+  const t2_lay  = mongoOddsData?.teamB_lay  ?? (hasLiveOdds ? (runner2?.layPrice  ?? (match?.lay_odds2 || match?.lay_odds)) : (match?.lay_odds2 || match?.lay_odds));
+
+  // Combined suspension
+  const isSuspended = isMongoSuspended || isMarketSuspended;
 
   // Score logic
   const liveScore = cricketScoreData?.score || liveOddsData?.score || null;
@@ -177,6 +204,23 @@ export default function MatchDetail() {
     mutationFn: async (stake: number) => {
       if (!activeBet || !session || !clientData) return;
       if (stake > clientBalance) throw new Error("Insufficient balance");
+
+      // Validate odds against MongoDB live engine
+      const side = activeBet.selection === match.team1 
+        ? (activeBet.betType === 'back' ? 'teamA_back' : 'teamA_lay')
+        : (activeBet.betType === 'back' ? 'teamB_back' : 'teamB_lay');
+      
+      const validation = await oddsEngine({
+        action: 'validateOdds',
+        matchId: match.id,
+        requestedOdds: activeBet.odds,
+        side,
+      });
+
+      if (validation?.valid === false) {
+        throw new Error(validation.reason || 'Odds have changed. Please refresh.');
+      }
+
       const potentialWin = (stake * activeBet.odds) - stake;
       await Bet.create({
         user_email: session.username,
@@ -311,49 +355,58 @@ export default function MatchDetail() {
       <main style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
         {(activeTab === "ALL" || activeTab === "Bookmaker") && (
           <div style={{ marginTop: 0 }}>
+            {isMongoSuspended && (
+              <div style={{ 
+                backgroundColor: "#fff3cd", 
+                color: "#856404", 
+                padding: "8px 12px", 
+                textAlign: "center", 
+                fontSize: 13, 
+                fontWeight: 700,
+                borderBottom: "1px solid #ffeeba"
+              }}>
+                Market Suspended by Admin
+              </div>
+            )}
             <CombinedSectionHeader title="MATCH ODDS (MaxBet: 5M)" />
-            {(() => {
-              const runner1 = getLiveRunner(match.team1, 0);
-              const runner2 = getLiveRunner(match.team2, 1);
-              return (
-                <>
-                  <TeamRow2
-                    name={match.team1}
-                    odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds) : match.back_odds}
-                    layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds) : match.lay_odds}
-                    backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
-                    laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
-                    loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
-                    suspended={isMarketSuspended}
-                    onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
-                  />
-                  <TeamRow2
-                    name={match.team2}
-                    odds={hasLiveOdds ? (runner2?.backPrice ?? (match.back_odds2 || match.back_odds)) : (match.back_odds2 || match.back_odds)}
-                    layOdds={hasLiveOdds ? (runner2?.layPrice ?? (match.lay_odds2 || match.lay_odds)) : (match.lay_odds2 || match.lay_odds)}
-                    backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
-                    laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
-                    loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
-                    suspended={isMarketSuspended}
-                    onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
-                  />
-                </>
-              );
-            })()}
+            <>
+              <TeamRow2
+                name={match.team1}
+                odds={t1_back}
+                layOdds={t1_lay}
+                backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
+                loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
+                suspended={isSuspended}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
+              />
+              <TeamRow2
+                name={match.team2}
+                odds={t2_back}
+                layOdds={t2_lay}
+                backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
+                laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
+                loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
+                suspended={isSuspended}
+                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
+              />
+            </>
 
             {/* Bookmaker section (ALL or Bookmaker) */}
             <div style={{ marginTop: 15 }}>
               <CombinedSectionHeader title="BOOKMAKER (MaxBet: 1M)" />
               <TeamRow2
                 name={match.team1}
-                odds={(hasLiveOdds ? (getLiveRunner(match.team1, 0)?.backPrice ?? match.back_odds) : match.back_odds) * 0.99}
-                layOdds={(hasLiveOdds ? (getLiveRunner(match.team1, 0)?.layPrice ?? match.lay_odds) : match.lay_odds) * 0.99}
+                odds={t1_back * 0.99}
+                layOdds={t1_lay * 0.99}
+                suspended={isSuspended}
                 onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
               />
               <TeamRow2
                 name={match.team2}
-                odds={(hasLiveOdds ? (getLiveRunner(match.team2, 1)?.backPrice ?? (match.back_odds2 || match.back_odds)) : (match.back_odds2 || match.back_odds)) * 0.99}
-                layOdds={(hasLiveOdds ? (getLiveRunner(match.team2, 1)?.layPrice ?? (match.lay_odds2 || match.lay_odds)) : (match.lay_odds2 || match.lay_odds)) * 0.99}
+                odds={t2_back * 0.99}
+                layOdds={t2_lay * 0.99}
+                suspended={isSuspended}
                 onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
               />
             </div>

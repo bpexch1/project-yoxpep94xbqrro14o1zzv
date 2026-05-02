@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { Match, Bet, Client } from "@/entities";
-import { fetchBetfairEvents } from "@/functions";
+import { fetchBetfairEvents, oddsEngine } from "@/functions";
 import { UserHeader } from "@/components/user/UserHeader";
 import { BettingMatchCard } from "@/components/user/BettingMatchCard";
 import { BetSlip } from "@/components/user/BetSlip";
@@ -26,6 +26,19 @@ export default function UserDashboard() {
   const [activeBet, setActiveBet] = useState<{ match: any; selection: string; betType: 'back' | 'lay'; odds: number } | null>(null);
 
   const session = getClientSession();
+
+  // Fetch all MongoDB live odds
+  const { data: allMongoOdds } = useQuery({
+    queryKey: ['mongo-odds-dashboard'],
+    queryFn: async () => {
+      const res = await oddsEngine({ action: 'getAllOdds' });
+      const map: Record<string, any> = {};
+      (res?.odds || []).forEach((o: any) => { map[o.matchId] = o; });
+      return map;
+    },
+    refetchInterval: 2000,
+    staleTime: 0,
+  });
 
   useEffect(() => {
     if (!session || session.role !== 'client') {
@@ -313,6 +326,7 @@ export default function UserDashboard() {
                         key={match.id} 
                         match={match} 
                         onSelectBet={handleSelectBet} 
+                        mongoOdds={allMongoOdds?.[match.id] || null}
                       />
                     ))}
                   </div>
