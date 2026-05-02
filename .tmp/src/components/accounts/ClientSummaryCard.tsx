@@ -238,8 +238,8 @@ export function ClientSummaryCard({
     <section className="bg-white border border-[#dee2e6] shadow-sm rounded-[4px] overflow-hidden mb-4" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
       {/* Card title */}
       {!hideHeader && (
-        <div style={{ backgroundColor: "#dcdcdc", borderBottom: "1px solid #c8c8c8", padding: "8px 10px" }}>
-          <span className="font-bold" style={{ color: "#2d2d2d", fontSize: "14px" }}>
+        <div style={{ backgroundColor: "#f0f0f0", borderBottom: "1px solid #d0d0d0", padding: "8px 10px" }}>
+          <span className="font-bold" style={{ color: "#000000", fontSize: "14px" }}>
             {username} - Clients List{!balancesLoaded ? " | Default" : ""}
           </span>
         </div>
