@@ -24,7 +24,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
   return (
     <div style={{
       backgroundColor: "#fff",
-      border: "1px solid #d0d0d0",
+      border: "1px solid #dee2e6",
       borderRadius: 4,
       boxShadow: "0 1px 2px rgba(0,0,0,.06)",
       marginBottom: 12,
@@ -35,30 +35,30 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         display: "flex",
         alignItems: "center",
         gap: 8,
-        padding: "7px 12px",
-        backgroundColor: "#2c3e50",
-        borderBottom: "1px solid #1a2a3a"
+        padding: "10px 14px",
+        backgroundColor: "#f5f5f5",
+        borderBottom: "1px solid #dee2e6"
       }}>
-        <Filter style={{ width: 14, height: 14, color: "#fff", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>Report Type</span>
+        <Filter style={{ width: 18, height: 18, color: "#212529", flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#212529" }}>Report Type</span>
       </div>
-      <div style={{ padding: "8px 10px 10px 10px" }}>
+      <div style={{ padding: "14px 12px", backgroundColor: "#ffffff" }}>
         <div style={{ 
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "4px",
+          gap: "8px",
         }}>
           {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
             const baseStyle: React.CSSProperties = {
-              fontSize: "13px",
-              padding: "0 10px",
-              height: "34px",
-              lineHeight: "34px",
+              fontSize: "15px",
+              padding: "0 8px",
+              height: "48px",
+              lineHeight: "48px",
               borderRadius: "8px",
-              border: "1px solid #2bbbad",
-              display: "inline-block",
+              border: "1.5px solid #2bbbad",
+              display: "block",
               cursor: "pointer",
               fontFamily: "inherit",
               whiteSpace: "nowrap",
@@ -69,23 +69,26 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
             const activeStyle: React.CSSProperties = {
               ...baseStyle,
-              background: "#2bbbad",
+              background: "#00b181",
               color: "#fff",
               fontWeight: 600,
+              border: "1.5px solid #00b181",
             };
 
             const inactiveStyle: React.CSSProperties = {
               ...baseStyle,
-              background: "white",
+              background: "#ffffff",
               color: "#2bbbad",
               fontWeight: 500,
             };
 
             const btnStyle: React.CSSProperties = isActive ? { ...activeStyle } : { ...inactiveStyle };
 
-            // Special case for Commission Report (last button, index 6)
             if (index === 6) {
-              btnStyle.gridColumn = "2";
+              btnStyle.gridColumn = "1 / -1";
+              btnStyle.width = "calc(66.666% - 4px)";
+              btnStyle.margin = "0 auto";
+              btnStyle.display = "block";
             }
 
             return (
