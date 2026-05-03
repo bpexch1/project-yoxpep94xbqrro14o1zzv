@@ -7,6 +7,7 @@ process.env.SUPERDEV_SANDBOX = "true";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
+    allowedHosts: [".mysuperdev.app",".superdev.run",".fly.dev"],
     host: "::",
     port: 8080,
     proxy: {
