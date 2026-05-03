@@ -158,12 +158,12 @@ export default function Accounts() {
             display: "flex",
             alignItems: "center",
             gap: 8,
-            padding: "10px 16px",
-            background: "#f0f0f0",
-            borderBottom: "1px solid #d0d0d0",
+            padding: "6px 12px",
+            backgroundColor: "#f8f9fa",
+            borderBottom: "1px solid #dee2e6",
           }}>
-            <Filter style={{ width: 18, height: 18, color: "#000000", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#000000", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
+            <Filter style={{ width: "16px", height: "16px", color: "#212529", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
           <div style={{ padding: "12px 16px" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
