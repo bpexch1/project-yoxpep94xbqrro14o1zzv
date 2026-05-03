@@ -22,104 +22,87 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
   return (
     <div style={{
-      backgroundColor: "#fff",
-      border: "1px solid #dee2e6",
-      borderRadius: 0,
-      boxShadow: "0 1px 2px rgba(0,0,0,.06)",
-      marginBottom: 12,
-      padding: 0,
-      overflow: "hidden"
+      border: "2px solid #007bff",
+      borderRadius: "0px",
+      overflow: "hidden",
+      marginBottom: "12px",
+      boxShadow: "0 1px 3px rgba(0,123,255,0.15)"
     }}>
-      {/* Header */}
+      {/* Header Bar - Dark Grey */}
       <div style={{
+        backgroundColor: "#333333",
+        padding: "5px 10px",
         display: "flex",
         alignItems: "center",
-        gap: 8,
-        padding: "4.8px 20px",
-        backgroundColor: "#f0f3f5",
-        borderBottom: "1px solid #d0d0d0",
-        borderRadius: "0",
-        color: "#23282c",
-        fontSize: "16px",
-        fontWeight: 400,
-        lineHeight: "24px",
-        flexDirection: "row",
-        flexWrap: "nowrap"
       }}>
-        <i className="fa fa-filter" style={{ fontSize: "16px", color: "#23282c", flexShrink: 0 }} />
-        <strong style={{ fontWeight: 700, fontSize: "16px", color: "#23282c" }}>Report Type</strong>
+        <span style={{
+          color: "#ffffff",
+          fontSize: "12px",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.5px",
+          fontFamily: "inherit",
+        }}>
+          Report Type
+        </span>
       </div>
 
-      <div style={{ 
-        padding: "0px", 
-        backgroundColor: "#007bff",
-        display: "flex",
-        flexWrap: "wrap",
+      {/* Button Grid Container */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gap: "1px",
+        backgroundColor: "#007bff",   // blue bg = blue 1px gaps between buttons
+        padding: "0px",
       }}>
-        {tabs.map((tab, index) => {
-            const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
-            
-            const baseStyle: React.CSSProperties = {
-              flex: "0 0 calc(33.333% - 0.667px)",
-              maxWidth: "calc(33.333% - 0.667px)",
-              minWidth: 0,
-              height: "30px",
-              fontSize: "11px",
-              fontWeight: 700,
-              textTransform: "uppercase" as const,
-              borderRadius: "0px",
-              padding: "0px",
-              margin: "0px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              whiteSpace: "nowrap" as const,
-              overflow: "hidden",
-              border: "none",
-              transition: "background-color 0.15s ease-in-out, color 0.15s ease-in-out",
-              lineHeight: "1",
-              fontFamily: "inherit",
-              boxSizing: "border-box" as const,
-            };
+        {tabs.map((tab) => {
+          const isActive = location.pathname === tab.path ||
+            (tab.path === "/accounts" && location.pathname.startsWith("/accounts"));
 
-            const activeStyle: React.CSSProperties = {
-              ...baseStyle,
-              background: "#007bff",
-              color: "#ffffff",
-            };
-
-            const inactiveStyle: React.CSSProperties = {
-              ...baseStyle,
-              background: "#f8f9fa",
-              color: "#007bff",
-            };
-
-            const btnStyle: React.CSSProperties = isActive ? activeStyle : inactiveStyle;
-
-            return (
-              <button
-                key={tab.label}
-                onClick={() => navigate(tab.path)}
-                style={btnStyle}
-                onMouseOver={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = "#007bff";
-                    e.currentTarget.style.color = "#ffffff";
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = "#f8f9fa";
-                    e.currentTarget.style.color = "#007bff";
-                  }
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+          return (
+            <button
+              key={tab.label}
+              onClick={() => navigate(tab.path)}
+              style={{
+                height: "30px",
+                margin: "0px",
+                padding: "0px",
+                border: "none",
+                borderRadius: "0px",
+                fontSize: "11px",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                fontFamily: "inherit",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                lineHeight: "1",
+                boxSizing: "border-box",
+                width: "100%",
+                transition: "background-color 0.15s ease-in-out, color 0.15s ease-in-out",
+                backgroundColor: isActive ? "#007bff" : "#ffffff",
+                color: isActive ? "#ffffff" : "#007bff",
+              }}
+              onMouseOver={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#007bff";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#ffffff";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#007bff";
+                }
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
