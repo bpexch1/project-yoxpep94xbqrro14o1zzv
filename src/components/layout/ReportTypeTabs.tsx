@@ -54,10 +54,10 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       {/* Button Flex Area */}
       <div style={{
         backgroundColor: "#ffffff",
-        padding: "14px 8px",
+        padding: "20px 8px",
         display: "flex",
         flexWrap: "wrap",
-        gap: "4px",
+        gap: "6px",
         justifyContent: "center",
       }}>
         {tabs.map((tab) => {
@@ -70,12 +70,12 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "3px 6px",
+                padding: "8px 18px",
                 border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
                 color: isActive ? "#ffffff" : "#17a2b8",
-                fontSize: "12px",
+                fontSize: "13px",
                 fontWeight: 500,
                 fontFamily: "inherit",
                 cursor: "pointer",
