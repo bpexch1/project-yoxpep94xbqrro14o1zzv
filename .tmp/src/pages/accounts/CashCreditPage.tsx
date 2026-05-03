@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getClientSession } from "@/hooks/useClientAuth";
+import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 
 export default function CashCreditPage() {
   const { username } = useParams();
@@ -25,11 +26,37 @@ export default function CashCreditPage() {
   
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
   const [isSubmittingWithdraw, setIsSubmittingWithdraw] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+
+    async function checkAuthorization() {
+      if (!username) {
+        setIsAuthorized(false);
+        navigate("/accounts", { replace: true });
+        return;
+      }
+
+      const authorized = await verifyInHierarchy(username, session!.username, session!.role);
+      if (!authorized) {
+        setIsAuthorized(false);
+        navigate("/accounts", { replace: true });
+      } else {
+        setIsAuthorized(true);
+      }
+    }
+
+    checkAuthorization();
+  }, [session, navigate, username]);
 
   const { data: clients, isLoading: isFetchingClient, refetch: refetchClient } = useQuery({
     queryKey: ["client", username],
     queryFn: () => Client.filter({ username }),
-    enabled: !!username,
+    enabled: !!username && isAuthorized === true,
   });
 
   const client = clients?.[0];
@@ -45,7 +72,7 @@ export default function CashCreditPage() {
   const { data: transactions, isLoading: isFetchingTx, refetch: refetchTx } = useQuery({
     queryKey: ["transactions", username, activeTab],
     queryFn: () => Transaction.filter({ client_username: username, type: activeTab }, "-created_at", 50),
-    enabled: !!username,
+    enabled: !!username && isAuthorized === true,
   });
 
   useEffect(() => {
@@ -204,13 +231,15 @@ export default function CashCreditPage() {
     }
   };
 
-  if (isFetchingClient) {
+  if (isAuthorized === null || isFetchingClient) {
     return (
       <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
       </div>
     );
   }
+
+  if (isAuthorized === false) return null;
 
   if (!client) {
     return (

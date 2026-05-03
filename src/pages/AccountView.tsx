@@ -4,20 +4,41 @@ import { Client as ClientEntity } from "@/entities";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 
 export default function AccountView() {
   const { username } = useParams();
   const navigate = useNavigate();
   const session = getClientSession();
   const [activeTab, setActiveTab] = useState("Accounts");
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!session) {
       navigate("/login");
+      return;
     }
-  }, [session, navigate]);
+
+    async function checkAuthorization() {
+      if (!username) {
+        setIsAuthorized(false);
+        navigate("/accounts", { replace: true });
+        return;
+      }
+
+      const authorized = await verifyInHierarchy(username, session!.username, session!.role);
+      if (!authorized) {
+        setIsAuthorized(false);
+        navigate("/accounts", { replace: true });
+      } else {
+        setIsAuthorized(true);
+      }
+    }
+
+    checkAuthorization();
+  }, [session, navigate, username]);
 
   const { data: clients, isLoading, refetch } = useQuery({
     queryKey: ["clients", username],
@@ -25,12 +46,22 @@ export default function AccountView() {
       if (!username) return [];
       return ClientEntity.filter({ parent_username: username }, "-created_at");
     },
-    enabled: !!username && !!session,
+    enabled: !!username && !!session && isAuthorized === true,
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchInterval: 15000,
     select: (data: any) => data ? data.map((c: any) => ({ ...c })) : [],
   });
+
+  if (isAuthorized === null) {
+    return (
+      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
+      </div>
+    );
+  }
+
+  if (isAuthorized === false) return null;
 
   const clientsKey = clients ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
 

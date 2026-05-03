@@ -8,18 +8,47 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getClientSession } from "@/hooks/useClientAuth";
+import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 
 export default function EditClientPage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const session = getClientSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+
+    async function checkAuthorization() {
+      if (!username) {
+        setIsAuthorized(false);
+        navigate("/accounts", { replace: true });
+        return;
+      }
+
+      const authorized = await verifyInHierarchy(username, session.username, session.role);
+      if (!authorized) {
+        setIsAuthorized(false);
+        navigate("/accounts", { replace: true });
+      } else {
+        setIsAuthorized(true);
+      }
+    }
+
+    checkAuthorization();
+  }, [session, navigate, username]);
 
   const { data: clients, isLoading: isFetching } = useQuery({
     queryKey: ["client", username],
     queryFn: () => Client.filter({ username }),
-    enabled: !!username,
+    enabled: !!username && isAuthorized === true,
   });
 
   const client = clients?.[0];
@@ -98,13 +127,15 @@ export default function EditClientPage() {
     }
   };
 
-  if (isFetching) {
+  if (isAuthorized === null || isFetching) {
     return (
       <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
       </div>
     );
   }
+
+  if (isAuthorized === false) return null;
 
   if (!client) {
     return (
