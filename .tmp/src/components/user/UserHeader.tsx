@@ -163,7 +163,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                 right: 0,
                 marginTop: 8,
                 backgroundColor: "white",
-                minWidth: 160,
+                minWidth: 130,
                 borderRadius: 4,
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                 border: "1px solid rgba(0,0,0,0.1)",
@@ -177,8 +177,8 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                   onClick={() => handleMenuItemClick(item.path)}
                   style={{
                     display: "block",
-                    padding: "10px 16px",
-                    fontSize: 13,
+                    padding: "7px 12px",
+                    fontSize: 12,
                     color: "#212529",
                     textAlign: "left",
                     cursor: "pointer",
@@ -195,8 +195,8 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                 onClick={handleLogout}
                 style={{
                   display: "block",
-                  padding: "10px 16px",
-                  fontSize: 13,
+                  padding: "7px 12px",
+                  fontSize: 12,
                   color: "#212529",
                   textAlign: "left",
                   cursor: "pointer",
