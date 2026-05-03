@@ -11,6 +11,8 @@
 
 
 
+
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -34,12 +36,12 @@ function SidebarItem({ iconEl, label, onClick }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 w-full px-3 py-1.5 border-b border-white/5 bg-transparent hover:bg-white/10 transition-colors text-left"
+      className="flex items-center gap-2 w-full px-2 py-2 border-b border-white/5 bg-transparent hover:bg-white/10 transition-colors text-left"
     >
-      <div className="w-[24px] flex items-center justify-center shrink-0">
+      <div className="w-[22px] flex items-center justify-center shrink-0">
         {iconEl}
       </div>
-      <span className="text-[12px] text-white font-medium tracking-wide truncate">
+      <span className="text-[11px] text-white font-medium tracking-wide truncate">
         {label}
       </span>
     </button>
@@ -90,7 +92,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 bottom-0 w-[170px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
+            className="fixed top-0 left-0 bottom-0 w-[150px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
           >
             {/* Close Button Header */}
             <div className="p-2.5">
