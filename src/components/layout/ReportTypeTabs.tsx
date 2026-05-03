@@ -71,12 +71,12 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "7px 10px",
+                padding: "5px 6px",
                 border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
                 color: isActive ? "#ffffff" : "#17a2b8",
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 500,
                 fontFamily: "inherit",
                 cursor: "pointer",
@@ -87,7 +87,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 whiteSpace: "nowrap",
                 lineHeight: "1.5",
                 boxSizing: "border-box",
-                width: isLast ? "auto" : "calc(33.33% - 3px)",
+                width: isLast ? "auto" : "calc(30% - 3px)",
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
