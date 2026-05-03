@@ -51,31 +51,30 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         </strong>
       </div>
 
-      {/* Button Grid Area */}
+      {/* Button Flex Area */}
       <div style={{
         backgroundColor: "#ffffff",
-        padding: "6px 8px",
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "3px",
+        padding: "8px",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "6px",
       }}>
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const isActive =
             location.pathname === tab.path ||
             (tab.path === "/accounts" && location.pathname.startsWith("/accounts"));
-          const isLast = index === tabs.length - 1;
 
           return (
             <button
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "5px 6px",
-                border: `1px solid ${isActive ? "#17a2b8" : "#17a2b8"}`,
+                padding: "4px 10px",
+                border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
                 color: isActive ? "#ffffff" : "#17a2b8",
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 500,
                 fontFamily: "inherit",
                 cursor: "pointer",
@@ -84,19 +83,9 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 alignItems: "center",
                 justifyContent: "center",
                 whiteSpace: "nowrap",
-                overflow: "hidden",
                 lineHeight: "1.5",
                 boxSizing: "border-box",
-                width: "100%",
-                ...(isLast ? { 
-                  gridColumn: "1 / -1", 
-                  width: "fit-content",
-                  margin: "0 auto",
-                  whiteSpace: "nowrap",
-                  fontSize: "13px",
-                  lineHeight: "1.5",
-                  textAlign: "center"
-                } : {}),
+                width: "auto",
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
