@@ -23,6 +23,8 @@
 
 
 
+
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -131,14 +133,14 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             {/* Menu Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar">
               <div className="flex flex-col">
-                <SidebarItem iconEl={<span className="svg-soccer sprite-icon-white" />} label="Soccer" onClick={() => handleFilter("Soccer")} />
-                <SidebarItem iconEl={<span className="svg-tennis sprite-icon-white" />} label="Tennis" onClick={() => handleFilter("Tennis")} />
-                <SidebarItem iconEl={<span className="svg-cricket sprite-icon-white" />} label="Cricket" onClick={() => handleFilter("Cricket")} />
-                <SidebarItem iconEl={<span className="svg-horse sprite-icon-white" />} label="Horse Race" onClick={() => handleFilter("Inplay")} />
-                <SidebarItem iconEl={<span className="svg-greyhound-racing sprite-icon-white" />} label="Greyhound" onClick={() => handleFilter("Inplay")} />
+                <SidebarItem iconEl={<Trophy className="w-5 h-5 text-white" />} label="Soccer" onClick={() => handleFilter("Soccer")} />
+                <SidebarItem iconEl={<Target className="w-5 h-5 text-white" />} label="Tennis" onClick={() => handleFilter("Tennis")} />
+                <SidebarItem iconEl={<Award className="w-5 h-5 text-white" />} label="Cricket" onClick={() => handleFilter("Cricket")} />
+                <SidebarItem iconEl={<Zap className="w-5 h-5 text-white" />} label="Horse Race" onClick={() => handleFilter("Inplay")} />
+                <SidebarItem iconEl={<Dog className="w-5 h-5 text-white" />} label="Greyhound" onClick={() => handleFilter("Inplay")} />
                 <SidebarItem iconEl={<BookOpen className="w-5 h-5 text-white" />} label="Sports Book" onClick={() => handleFilter("Inplay")} />
-                <SidebarItem iconEl={<span className="svg-live-casino sprite-icon-white" />} label="RoyalStar Casino" onClick={() => handleFilter("Casino")} />
-                <SidebarItem iconEl={<span className="svg-Casino sprite-icon-white" />} label="Star Casino" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<Dices className="w-5 h-5 text-white" />} label="RoyalStar Casino" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<Club className="w-5 h-5 text-white" />} label="Star Casino" onClick={() => handleFilter("Casino")} />
                 <SidebarItem iconEl={<Globe className="w-5 h-5 text-white" />} label="World Casino" onClick={() => handleFilter("Casino")} />
                 <SidebarItem iconEl={<Gem className="w-5 h-5 text-white" />} label="Royal Casino" onClick={() => handleFilter("Casino")} />
                 <SidebarItem iconEl={<Gamepad2 className="w-5 h-5 text-white" />} label="BetFairGames" onClick={() => handleFilter("Casino")} />
@@ -151,7 +153,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
 
               <div className="flex flex-col pb-10">
                 <SidebarItem iconEl={<Trash2 className="w-5 h-5 text-white" />} label="Current Position" onClick={() => handleNav("/play/current-position")} />
-                <SidebarItem iconEl={<span className="svg-az-sport sprite-icon-white" />} label="All Sports" onClick={() => handleFilter("Inplay")} />
+                <SidebarItem iconEl={<Menu className="w-5 h-5 text-white" />} label="All Sports" onClick={() => handleFilter("Inplay")} />
                 <SidebarItem iconEl={<FileText className="w-5 h-5 text-white" />} label="Results" onClick={() => handleNav("/play/result")} />
               </div>
             </div>
