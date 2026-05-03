@@ -413,7 +413,7 @@ export function ClientSummaryCard({
                     <>
                       <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74", fontWeight: 700, color: "#fff", fontSize: 13 }}>Total</td>
                       <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74" }}></td>
-                      <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74", fontWeight: 700, color: "#fff", fontSize: 13, textAlign: "right" }}>{summaryData.credit_received.toLocaleString()}</td>
+                      <td style={{ background: "#00b181", padding: "6px 8px", border: "1px solid #4dbd74", fontWeight: 700, color: "#fff", fontSize: 13, textAlign: "right" }}></td>
                     </>
                   )}
                 </tr>
