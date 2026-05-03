@@ -54,13 +54,14 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       {/* Button Flex Area */}
       <div style={{
         backgroundColor: "#ffffff",
-        padding: "20px 8px",
+        padding: "14px 8px",
         display: "flex",
         flexWrap: "wrap",
-        gap: "6px",
+        gap: "4px",
         justifyContent: "center",
       }}>
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
+          const isLast = index === tabs.length - 1;
           const isActive =
             location.pathname === tab.path ||
             (tab.path === "/accounts" && location.pathname.startsWith("/accounts"));
@@ -70,7 +71,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "8px 18px",
+                padding: "7px 10px",
                 border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
@@ -86,7 +87,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 whiteSpace: "nowrap",
                 lineHeight: "1.5",
                 boxSizing: "border-box",
-                width: "auto",
+                width: isLast ? "auto" : "calc(33.33% - 3px)",
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
