@@ -47,9 +47,9 @@ export default function Dashboard() {
 
         {/* 1. Search-Users Card */}
         <div style={{ background: "#fff", borderRadius: 8, border: "1px solid #d0d0d0", marginBottom: 14, overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "#f0f0f0", borderBottom: "1px solid #d0d0d0" }}>
-            <Filter size={14} color="#000000" />
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#000000" }}>Search-Users</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
+            <Filter size={14} color="#212529" />
+            <span style={{ fontWeight: 700, fontSize: "14px", color: "#212529" }}>Search-Users</span>
           </div>
           <div style={{ padding: "14px 14px" }}>
             <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, alignItems: "center" }}>

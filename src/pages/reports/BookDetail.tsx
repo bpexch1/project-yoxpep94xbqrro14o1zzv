@@ -129,9 +129,9 @@ export default function BookDetail() {
         {/* Filters Card */}
         <div className="mb-3">
           <section className="bg-white border border-[#c8c8c8] rounded-[4px] overflow-hidden shadow-sm">
-            <div className="bg-[#dcdcdc] border-b border-[#c8c8c8] px-3 py-2 flex items-center gap-2">
-              <Filter className="w-4 h-4 fill-[#2d2d2d] text-[#2d2d2d]" />
-              <strong className="text-sm font-bold text-[#2d2d2d]">Filters</strong>
+            <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
+              <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
+              <strong className="text-sm font-bold text-[#212529]">Filters</strong>
             </div>
             <div className="p-3">
               {/* Row 1: Username */}
@@ -189,9 +189,9 @@ export default function BookDetail() {
         {/* Results Card */}
         <div>
           <section className="bg-white border border-[#c8c8c8] rounded-[4px] overflow-hidden shadow-sm">
-            <div className="bg-[#dcdcdc] border-b border-[#c8c8c8] px-3 py-2 flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#2d2d2d]" />
-              <strong className="text-sm font-bold text-[#2d2d2d]">
+            <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#212529]" />
+              <strong className="text-sm font-bold text-[#212529]">
                 {usernameFilter ? `${usernameFilter} — Book Detail` : "Book Detail"}
               </strong>
               <ExportButtons 

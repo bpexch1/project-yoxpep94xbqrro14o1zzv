@@ -100,9 +100,9 @@ export default function CurrentPosition() {
         {/* Filters Card */}
         <div className="mx-[5px] mb-4">
           <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#c8c8c8] bg-[#dcdcdc]">
-              <Filter className="w-4 h-4 fill-[#2d2d2d] text-[#2d2d2d]" />
-              <span className="font-bold text-[#2d2d2d] text-sm">Filter Pending Bets</span>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#dee2e6] bg-[#f8f9fa]">
+              <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
+              <span className="font-bold text-[#212529] text-sm">Filter Pending Bets</span>
             </div>
             <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <div>

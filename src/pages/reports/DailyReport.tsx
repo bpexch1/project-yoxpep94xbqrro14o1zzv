@@ -107,9 +107,9 @@ export default function DailyReport() {
         {/* Filters Card */}
         <div className="mb-2">
           <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#c8c8c8] bg-[#dcdcdc]">
-              <Filter className="w-4 h-4 fill-[#2d2d2d] text-[#2d2d2d]" />
-              <span className="font-bold text-[#2d2d2d] text-sm">Filters</span>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#dee2e6] bg-[#f8f9fa]">
+              <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
+              <span className="font-bold text-[#212529] text-sm">Filters</span>
             </div>
             <div className="p-4 flex flex-col gap-3">
               <div className="flex gap-2">
@@ -156,8 +156,8 @@ export default function DailyReport() {
         {/* Report Table */}
         <div>
           <section className="bg-white border border-[#c8c8c8] overflow-hidden">
-            <div className="bg-[#dcdcdc] border-b border-[#c8c8c8] px-3 py-2 flex items-center gap-2">
-              <strong className="text-sm font-bold text-[#2d2d2d]">Daily Report</strong>
+            <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
+              <strong className="text-sm font-bold text-[#212529]">Daily Report</strong>
               <ExportButtons 
                 data={exportData} 
                 columns={exportColumns} 

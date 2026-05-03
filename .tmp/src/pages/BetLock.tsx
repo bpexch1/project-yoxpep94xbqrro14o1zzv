@@ -83,8 +83,8 @@ export default function BetLock() {
               <div key={cat.id}>
                 {idx > 0 && <div style={{ borderTop: "1px solid #eee" }} />}
                 <div style={{ padding: "0" }}>
-                  <div style={{ background: "#f0f0f0", padding: "10px 16px", borderBottom: "1px solid #d0d0d0" }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: 700, fontSize: "14px", color: "#000000" }}>
+                  <div style={{ background: "#f8f9fa", padding: "10px 16px", borderBottom: "1px solid #dee2e6" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: 700, fontSize: "14px", color: "#212529" }}>
                       <input
                         type="checkbox"
                         checked={catChecked}
