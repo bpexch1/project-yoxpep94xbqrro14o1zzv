@@ -165,7 +165,7 @@ export default function Accounts() {
             <Filter style={{ width: "16px", height: "16px", color: "#212529", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
-          <div style={{ padding: "20px 16px" }}>
+          <div style={{ padding: "20px 16px 40px 16px" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
               <div style={{ flex: "0 0 60%", minWidth: "300px", display: "flex", gap: 0 }}>
                 <div ref={dropdownRef} style={{ position: "relative", flex: "none", width: "160px" }}>
