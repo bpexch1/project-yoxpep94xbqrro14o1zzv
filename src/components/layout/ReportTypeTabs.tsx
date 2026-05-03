@@ -44,34 +44,41 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         <span style={{ fontWeight: 700, fontSize: "14px", color: "#000000" }}>Report Type</span>
       </div>
 
-      <div style={{ padding: "10px 10px", backgroundColor: "#ffffff" }}>
+      <div style={{ padding: "12px", backgroundColor: "#ffffff" }}>
         <div style={{ 
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "6px",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "8px",
         }}>
-          {tabs.map((tab) => {
+          {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
+            const isLast = index === tabs.length - 1;
+
             const baseStyle: React.CSSProperties = {
-              fontSize: "13px",
-              padding: "4px 10px",
+              fontSize: "15px",
+              padding: "12px 8px",
               lineHeight: "1.5",
-              borderRadius: "4px",
-              border: "1px solid #2bbbad",
-              display: "inline-block",
+              borderRadius: "8px",
+              border: "1.5px solid #2bbbad",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               cursor: "pointer",
               fontFamily: "inherit",
               whiteSpace: "nowrap",
               textAlign: "center",
               boxSizing: "border-box",
               fontWeight: 400,
+              width: "100%",
+              transition: "all 0.2s ease",
             };
 
             const activeStyle: React.CSSProperties = {
               ...baseStyle,
-              background: "#2bbbad",
+              background: "#00b181",
               color: "#fff",
+              border: "1.5px solid #00b181",
             };
 
             const inactiveStyle: React.CSSProperties = {
@@ -80,7 +87,10 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               color: "#2bbbad",
             };
 
-            const btnStyle: React.CSSProperties = isActive ? { ...activeStyle } : { ...inactiveStyle };
+            const btnStyle: React.CSSProperties = {
+              ...(isActive ? activeStyle : inactiveStyle),
+              ...(isLast ? { gridColumn: "2 / 3" } : {})
+            };
 
             return (
               <button
@@ -89,14 +99,16 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 style={btnStyle}
                 onMouseOver={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = "#2bbbad";
+                    e.currentTarget.style.backgroundColor = "#00b181";
                     e.currentTarget.style.color = "#fff";
+                    e.currentTarget.style.borderColor = "#00b181";
                   }
                 }}
                 onMouseOut={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.backgroundColor = "#ffffff";
                     e.currentTarget.style.color = "#2bbbad";
+                    e.currentTarget.style.borderColor = "#2bbbad";
                   }
                 }}
               >
