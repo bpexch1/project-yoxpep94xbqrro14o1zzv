@@ -51,7 +51,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       </div>
 
       <div style={{ 
-        padding: "2px", 
+        padding: "0px", 
         backgroundColor: "#007bff",
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
@@ -61,9 +61,9 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
             const baseStyle: React.CSSProperties = {
-              height: "26px",
-              fontSize: "10px",
-              fontWeight: 600,
+              height: "30px",
+              fontSize: "11px",
+              fontWeight: 700,
               textTransform: "uppercase",
               borderRadius: "0px",
               padding: "0px",
@@ -90,7 +90,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
             const inactiveStyle: React.CSSProperties = {
               ...baseStyle,
-              background: "#ffffff",
+              background: "#f8f9fa",
               color: "#007bff",
             };
 
@@ -109,7 +109,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 }}
                 onMouseOut={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = "#ffffff";
+                    e.currentTarget.style.backgroundColor = "#f8f9fa";
                     e.currentTarget.style.color = "#007bff";
                   }
                 }}
