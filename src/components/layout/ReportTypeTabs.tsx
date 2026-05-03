@@ -34,14 +34,14 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div style={{
         backgroundColor: "#f8f9fa",
         borderBottom: "1px solid #dee2e6",
-        padding: "10px 15px",
+        padding: "6px 12px",
         display: "flex",
         alignItems: "center",
         gap: "8px",
       }}>
-        <Filter style={{ width: "18px", height: "18px", color: "#212529", flexShrink: 0 }} />
+        <Filter style={{ width: "16px", height: "16px", color: "#212529", flexShrink: 0 }} />
         <strong style={{
-          fontSize: "16px",
+          fontSize: "13px",
           fontWeight: 700,
           color: "#212529",
           fontFamily: "inherit",
@@ -54,7 +54,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       {/* Button Flex Area */}
       <div style={{
         backgroundColor: "#ffffff",
-        padding: "14px 8px",
+        padding: "20px 8px",
         display: "flex",
         flexWrap: "wrap",
         gap: "6px",
@@ -70,12 +70,12 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "4px 10px",
+                padding: "8px 18px",
                 border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
                 color: isActive ? "#ffffff" : "#17a2b8",
-                fontSize: "12px",
+                fontSize: "13px",
                 fontWeight: 500,
                 fontFamily: "inherit",
                 cursor: "pointer",
