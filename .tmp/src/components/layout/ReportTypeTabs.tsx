@@ -57,7 +57,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         padding: "20px 8px",
         display: "flex",
         flexWrap: "wrap",
-        gap: "6px",
+        gap: "3px",
         justifyContent: "center",
       }}>
         {tabs.map((tab) => {
