@@ -21,6 +21,7 @@
 
 
 
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -33,6 +34,14 @@ import {
   Rocket,
   Trash2,
   FileText,
+  Trophy,
+  Target,
+  Award,
+  Zap,
+  Dog,
+  Dices,
+  Clubs,
+  Menu,
 } from "lucide-react";
 
 interface SidebarItemProps {
