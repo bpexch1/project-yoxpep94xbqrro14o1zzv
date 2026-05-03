@@ -88,7 +88,13 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 lineHeight: "1.5",
                 boxSizing: "border-box",
                 width: "100%",
-                ...(isLast ? { gridColumn: "2" } : {}),
+                ...(isLast ? { 
+                  gridColumn: "2", 
+                  whiteSpace: "normal", 
+                  textAlign: "center", 
+                  fontSize: "11px", 
+                  lineHeight: "1.2" 
+                } : {}),
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
