@@ -71,10 +71,10 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               onClick={() => navigate(tab.path)}
               style={{
                 padding: "5px 12px",
-                border: "1px solid #17a2b8",
+                border: "1px solid #00b181",
                 borderRadius: "4px",
-                backgroundColor: isActive ? "#17a2b8" : "#ffffff",
-                color: isActive ? "#ffffff" : "#17a2b8",
+                backgroundColor: isActive ? "#00b181" : "#ffffff",
+                color: isActive ? "#ffffff" : "#00b181",
                 fontSize: "13px",
                 fontWeight: 500,
                 fontFamily: "inherit",
@@ -90,16 +90,16 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#17a2b8";
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#00b181";
                   (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#17a2b8";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#00b181";
                 }
               }}
               onMouseOut={(e) => {
                 if (!isActive) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#ffffff";
-                  (e.currentTarget as HTMLButtonElement).style.color = "#17a2b8";
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#17a2b8";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#00b181";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#00b181";
                 }
               }}
             >
