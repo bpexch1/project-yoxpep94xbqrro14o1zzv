@@ -13,6 +13,8 @@
 
 
 
+
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,7 +25,8 @@ import {
   Gamepad2,
   LayoutGrid,
   Rocket,
-  Target,
+  Trash2,
+  FileText,
 } from "lucide-react";
 
 interface SidebarItemProps {
@@ -36,12 +39,14 @@ function SidebarItem({ iconEl, label, onClick }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 w-full px-2 py-2 border-b border-white/5 bg-transparent hover:bg-white/10 transition-colors text-left"
+      className="flex items-center w-full h-[54px] bg-transparent hover:bg-white/10 transition-colors text-left"
     >
-      <div className="w-[22px] flex items-center justify-center shrink-0">
-        {iconEl}
+      <div className="w-[68px] flex items-center justify-center shrink-0">
+        <div className="scale-[1.2]">
+          {iconEl}
+        </div>
       </div>
-      <span className="text-[11px] text-white font-medium tracking-wide truncate">
+      <span className="text-[15.5px] text-white font-medium tracking-tight truncate">
         {label}
       </span>
     </button>
@@ -92,20 +97,20 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 bottom-0 w-[150px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
+            className="fixed top-0 left-0 bottom-0 w-[190px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
           >
             {/* Close Button Header */}
-            <div className="p-2.5">
+            <div className="flex items-start">
               <button
                 onClick={onClose}
-                className="w-7 h-7 flex items-center justify-center border border-white/20 bg-black/10 hover:bg-black/30 transition-colors rounded-sm"
+                className="w-[54px] h-[54px] flex items-center justify-center border-r border-b border-white/20 bg-black/5 hover:bg-black/20 transition-colors rounded-none"
               >
-                <X className="w-3.5 h-3.5 text-white" />
+                <X className="w-8 h-8 text-white stroke-[2.5]" />
               </button>
             </div>
 
-            {/* Top Separator */}
-            <div className="border-t border-white/10 w-full" />
+            {/* Top Separator - visible after first item in screenshot but also one at top */}
+            <div className="h-[1px] bg-white/20 w-[85%] mx-auto mt-4 mb-2" />
 
             {/* Menu Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar">
@@ -115,22 +120,23 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 <SidebarItem iconEl={<span className="svg-cricket sprite-icon-white" />} label="Cricket" onClick={() => handleFilter("Cricket")} />
                 <SidebarItem iconEl={<span className="svg-horse sprite-icon-white" />} label="Horse Race" onClick={() => handleFilter("Inplay")} />
                 <SidebarItem iconEl={<span className="svg-greyhound-racing sprite-icon-white" />} label="Greyhound" onClick={() => handleFilter("Inplay")} />
-                <SidebarItem iconEl={<BookOpen className="w-4 h-4 text-white" />} label="Sports Book" onClick={() => handleFilter("Inplay")} />
+                <SidebarItem iconEl={<BookOpen className="w-5 h-5 text-white" />} label="Sports Book" onClick={() => handleFilter("Inplay")} />
                 <SidebarItem iconEl={<span className="svg-live-casino sprite-icon-white" />} label="RoyalStar Casino" onClick={() => handleFilter("Casino")} />
                 <SidebarItem iconEl={<span className="svg-Casino sprite-icon-white" />} label="Star Casino" onClick={() => handleFilter("Casino")} />
-                <SidebarItem iconEl={<Globe className="w-4 h-4 text-white" />} label="World Casino" onClick={() => handleFilter("Casino")} />
-                <SidebarItem iconEl={<Gem className="w-4 h-4 text-white" />} label="Royal Casino" onClick={() => handleFilter("Casino")} />
-                <SidebarItem iconEl={<Gamepad2 className="w-4 h-4 text-white" />} label="BetFairGames" onClick={() => handleFilter("Casino")} />
-                <SidebarItem iconEl={<LayoutGrid className="w-4 h-4 text-white" />} label="TeenPatti Studio" onClick={() => handleFilter("Casino")} />
-                <SidebarItem iconEl={<Rocket className="w-4 h-4 text-white" />} label="Galaxy Casino" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<Globe className="w-5 h-5 text-white" />} label="World Casino" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<Gem className="w-5 h-5 text-white" />} label="Royal Casino" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<Gamepad2 className="w-5 h-5 text-white" />} label="BetFairGames" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<LayoutGrid className="w-5 h-5 text-white" />} label="TeenPatti Studio" onClick={() => handleFilter("Casino")} />
+                <SidebarItem iconEl={<Rocket className="w-5 h-5 text-white" />} label="Galaxy Casino" onClick={() => handleFilter("Casino")} />
               </div>
 
-              {/* Divider between Galaxy Casino and Current Position */}
-              <div className="h-[1px] bg-white/10 my-1 w-full" />
+              {/* Divider before Current Position */}
+              <div className="h-[1px] bg-white/20 mt-4 mb-2 w-[85%] mx-auto" />
 
-              <div className="flex flex-col pb-4">
-                <SidebarItem iconEl={<Target className="w-4 h-4 text-white" />} label="Current Position" onClick={() => handleNav("/play/current-position")} />
+              <div className="flex flex-col pb-10">
+                <SidebarItem iconEl={<Trash2 className="w-5 h-5 text-white" />} label="Current Position" onClick={() => handleNav("/play/current-position")} />
                 <SidebarItem iconEl={<span className="svg-az-sport sprite-icon-white" />} label="All Sports" onClick={() => handleFilter("Inplay")} />
+                <SidebarItem iconEl={<FileText className="w-5 h-5 text-white" />} label="Results" onClick={() => handleNav("/play/result")} />
               </div>
             </div>
           </motion.div>
