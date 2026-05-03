@@ -1,6 +1,10 @@
 
 
 
+
+
+
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,12 +34,12 @@ function SidebarItem({ iconEl, label, onClick }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-4 w-full px-5 py-[16px] border-b border-white/10 bg-transparent hover:bg-white/10 transition-colors text-left"
+      className="flex items-center gap-3 w-full px-4 py-2.5 border-b border-white/5 bg-transparent hover:bg-white/10 transition-colors text-left"
     >
-      <div className="w-[28px] flex items-center justify-center shrink-0">
+      <div className="w-[26px] flex items-center justify-center shrink-0">
         {iconEl}
       </div>
-      <span className="text-[15px] text-white font-normal tracking-wide">
+      <span className="text-sm text-white font-medium tracking-wide">
         {label}
       </span>
     </button>
@@ -74,32 +78,32 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 bottom-0 w-[270px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
+            className="fixed top-0 left-0 bottom-0 w-[240px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
           >
             {/* Close Button Header */}
-            <div className="p-4">
+            <div className="p-3">
               <button
                 onClick={onClose}
-                className="w-9 h-9 flex items-center justify-center border border-white/20 bg-black/20 hover:bg-black/40 transition-colors rounded-sm"
+                className="w-8 h-8 flex items-center justify-center border border-white/20 bg-black/20 hover:bg-black/40 transition-colors rounded-sm"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-4 h-4 text-white" />
               </button>
             </div>
 
             {/* Top Separator */}
-            <div className="border-t border-white/15 w-full" />
+            <div className="border-t border-white/10 w-full" />
 
             {/* Menu Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar">
               <div className="flex flex-col">
-                <SidebarItem iconEl={<span className="svg-soccer" />} label="Soccer" />
-                <SidebarItem iconEl={<span className="svg-tennis" />} label="Tennis" />
-                <SidebarItem iconEl={<span className="svg-cricket" />} label="Cricket" />
-                <SidebarItem iconEl={<span className="svg-horse" />} label="Horse Race" />
-                <SidebarItem iconEl={<span className="svg-greyhound-racing" />} label="Greyhound" />
+                <SidebarItem iconEl={<span className="svg-soccer sprite-icon-white scale-110" />} label="Soccer" />
+                <SidebarItem iconEl={<span className="svg-tennis sprite-icon-white scale-110" />} label="Tennis" />
+                <SidebarItem iconEl={<span className="svg-cricket sprite-icon-white scale-110" />} label="Cricket" />
+                <SidebarItem iconEl={<span className="svg-horse sprite-icon-white scale-110" />} label="Horse Race" />
+                <SidebarItem iconEl={<span className="svg-greyhound-racing sprite-icon-white scale-110" />} label="Greyhound" />
                 <SidebarItem iconEl={<BookOpen className="w-5 h-5 text-white" />} label="Sports Book" />
-                <SidebarItem iconEl={<span className="svg-live-casino" />} label="RoyalStar Casino" />
-                <SidebarItem iconEl={<span className="svg-Casino" />} label="Star Casino" />
+                <SidebarItem iconEl={<span className="svg-live-casino sprite-icon-white scale-110" />} label="RoyalStar Casino" />
+                <SidebarItem iconEl={<span className="svg-Casino sprite-icon-white scale-110" />} label="Star Casino" />
                 <SidebarItem iconEl={<Globe className="w-5 h-5 text-white" />} label="World Casino" />
                 <SidebarItem iconEl={<Gem className="w-5 h-5 text-white" />} label="Royal Casino" />
                 <SidebarItem iconEl={<Gamepad2 className="w-5 h-5 text-white" />} label="BetFairGames" />
@@ -108,9 +112,9 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
               </div>
 
               {/* Divider between Galaxy Casino and Current Position */}
-              <div className="h-[1px] bg-white/20 my-1 w-full" />
+              <div className="h-[1px] bg-white/10 my-1 w-full" />
 
-              <div className="flex flex-col">
+              <div className="flex flex-col pb-4">
                 <SidebarItem iconEl={<BarChart3 className="w-5 h-5 text-white" />} label="Profit Loss" onClick={() => handleNav("/play/profit-loss")} />
                 <SidebarItem iconEl={<ReceiptText className="w-5 h-5 text-white" />} label="Statement" onClick={() => handleNav("/play/statement")} />
                 <SidebarItem iconEl={<History className="w-5 h-5 text-white" />} label="Bet History" onClick={() => handleNav("/play/bets")} />
