@@ -86,7 +86,7 @@ export default function CurrentPosition() {
       <main className="px-0 pt-0 pb-8 max-w-6xl mx-auto font-sans">
         <div className="h-4" />
         
-        <div className="mx-2 mb-4 flex items-end justify-between">
+        <div className="mx-[5px] mb-4 flex items-end justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#254465]">Current Position</h1>
             <p className="text-sm text-gray-500">View all active exposures and pending bets</p>
@@ -98,7 +98,7 @@ export default function CurrentPosition() {
         </div>
 
         {/* Filters Card */}
-        <div className="mx-2 mb-4">
+        <div className="mx-[5px] mb-4">
           <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[#c8c8c8] bg-[#dcdcdc]">
               <Filter className="w-4 h-4 fill-[#2d2d2d] text-[#2d2d2d]" />
@@ -154,7 +154,7 @@ export default function CurrentPosition() {
         </div>
 
         {/* Summary Stats */}
-        <div className="mx-2 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="mx-[5px] mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div className="bg-white p-3 border border-[#d5d8dc]">
             <div className="text-[10px] text-gray-400 uppercase font-bold">Total Bets</div>
             <div className="text-lg font-bold text-[#254465]">{filteredBets?.length || 0}</div>
@@ -176,7 +176,7 @@ export default function CurrentPosition() {
         </div>
 
         {/* Report Table */}
-        <div className="mx-2">
+        <div className="mx-[5px]">
           <section className="bg-white border border-[#c8c8c8] overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">

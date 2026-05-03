@@ -43,7 +43,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#e8e8e8", fontFamily: "Roboto, system-ui, sans-serif" }}>
-      <main style={{ width: "100%", padding: "12px 15px 80px" }}>
+      <main style={{ width: "100%", padding: "12px 5px 80px" }}>
 
         {/* 1. Search-Users Card */}
         <div style={{ background: "#fff", borderRadius: 8, border: "1px solid #d0d0d0", marginBottom: 14, overflow: "hidden" }}>

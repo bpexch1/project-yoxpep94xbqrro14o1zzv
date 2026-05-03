@@ -100,7 +100,7 @@ export default function FinalSheet() {
 
   return (
     <div className="bg-[#f4f6f7] pb-16 min-h-screen">
-      <main className="pt-0 pb-8 max-w-5xl mx-auto px-[15px]" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
+      <main className="pt-0 pb-8 max-w-5xl mx-auto px-[5px]" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
         <div className="h-2" />
 
         {/* Report Type Tabs */}

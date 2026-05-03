@@ -93,7 +93,7 @@ export default function BookDetail2() {
 
   return (
     <div className="bg-[#e8e8e8] min-h-screen pb-16">
-      <main className="pt-0 pb-8 max-w-5xl mx-auto font-sans px-[15px]">
+      <main className="pt-0 pb-8 max-w-5xl mx-auto font-sans px-[5px]">
         <div className="h-2" />
         
         <div className="mb-2">
