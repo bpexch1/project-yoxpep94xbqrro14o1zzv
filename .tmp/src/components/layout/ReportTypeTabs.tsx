@@ -70,9 +70,9 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
             const isLast = index === tabs.length - 1;
 
             const baseStyle: React.CSSProperties = {
-              fontSize: "16px",
+              fontSize: "14px",
               padding: "6px 12px",
-              lineHeight: "24px",
+              lineHeight: "21px",
               borderRadius: "4px",
               border: "1px solid",
               display: "flex",
@@ -90,16 +90,16 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
             const activeStyle: React.CSSProperties = {
               ...baseStyle,
-              background: "#2bbbad",
+              background: "#20a8d8",
               color: "#ffffff",
-              border: "1px solid #2bbbad",
+              border: "1px solid #20a8d8",
             };
 
             const inactiveStyle: React.CSSProperties = {
               ...baseStyle,
               background: "#ffffff",
-              color: "#2bbbad",
-              border: "1px solid #2bbbad",
+              color: "#20a8d8",
+              border: "1px solid #20a8d8",
             };
 
             const btnStyle: React.CSSProperties = {
@@ -114,16 +114,16 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 style={btnStyle}
                 onMouseOver={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = "#2bbbad";
+                    e.currentTarget.style.backgroundColor = "#20a8d8";
                     e.currentTarget.style.color = "#fff";
-                    e.currentTarget.style.borderColor = "#2bbbad";
+                    e.currentTarget.style.borderColor = "#20a8d8";
                   }
                 }}
                 onMouseOut={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.backgroundColor = "#ffffff";
-                    e.currentTarget.style.color = "#2bbbad";
-                    e.currentTarget.style.borderColor = "#2bbbad";
+                    e.currentTarget.style.color = "#20a8d8";
+                    e.currentTarget.style.borderColor = "#20a8d8";
                   }
                 }}
               >
