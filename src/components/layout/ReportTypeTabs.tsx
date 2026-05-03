@@ -35,12 +35,19 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         display: "flex",
         alignItems: "center",
         gap: 8,
-        padding: "10px 14px",
-        backgroundColor: "#f0f0f0",
-        borderBottom: "1px solid #d0d0d0"
+        padding: "4.8px 20px",
+        backgroundColor: "#f0f3f5",
+        borderBottom: "1px solid #d0d0d0",
+        borderRadius: "3px 3px 0px 0px",
+        color: "#23282c",
+        fontSize: "16px",
+        fontWeight: 400,
+        lineHeight: "24px",
+        flexDirection: "row",
+        flexWrap: "nowrap"
       }}>
-        <i className="fa fa-filter" style={{ fontSize: "14px", color: "#000000", flexShrink: 0 }} />
-        <strong style={{ fontWeight: 700, fontSize: "14px", color: "#000000" }}>Report Type</strong>
+        <i className="fa fa-filter" style={{ fontSize: "16px", color: "#23282c", flexShrink: 0 }} />
+        <strong style={{ fontWeight: 700, fontSize: "16px", color: "#23282c" }}>Report Type</strong>
       </div>
 
       <div style={{ padding: "12px", backgroundColor: "#ffffff" }}>
