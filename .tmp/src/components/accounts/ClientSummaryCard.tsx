@@ -311,16 +311,16 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[11px] py-0.5 px-2 rounded-[3px] flex items-center gap-1 transition-colors"
+                className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[10px] py-px px-1.5 rounded-[3px] flex items-center gap-1 transition-colors"
               >
-                <User className="w-3 h-3" /> New User
+                <User className="w-2.5 h-2.5" /> New User
               </button>
             )}
             <button
               onClick={() => navigate(`/reports/daily`)}
-              className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[11px] py-0.5 px-2 rounded-[3px] flex items-center gap-1 transition-colors"
+              className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold text-[10px] py-px px-1.5 rounded-[3px] flex items-center gap-1 transition-colors"
             >
-              <Book className="w-3 h-3" /> Account Ledger
+              <Book className="w-2.5 h-2.5" /> Account Ledger
             </button>
           </div>
 
