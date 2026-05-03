@@ -46,57 +46,59 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
       <div style={{ padding: "10px 10px", backgroundColor: "#ffffff" }}>
         <div style={{ 
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          display: "flex",
+          flexWrap: "wrap",
           gap: "6px",
         }}>
-          {tabs.map((tab, index) => {
+          {tabs.map((tab) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
             const baseStyle: React.CSSProperties = {
-              fontSize: "12px",
-              padding: "4px 8px",
-              lineHeight: "1.4",
-              borderRadius: "8px",
-              border: "1.5px solid #2bbbad",
-              display: "block",
+              fontSize: "13px",
+              padding: "4px 10px",
+              lineHeight: "1.5",
+              borderRadius: "4px",
+              border: "1px solid #2bbbad",
+              display: "inline-block",
               cursor: "pointer",
               fontFamily: "inherit",
               whiteSpace: "nowrap",
-              width: "100%",
               textAlign: "center",
               boxSizing: "border-box",
+              fontWeight: 400,
             };
 
             const activeStyle: React.CSSProperties = {
               ...baseStyle,
-              background: "#00b181",
+              background: "#2bbbad",
               color: "#fff",
-              fontWeight: 600,
-              border: "1.5px solid #00b181",
             };
 
             const inactiveStyle: React.CSSProperties = {
               ...baseStyle,
               background: "#ffffff",
               color: "#2bbbad",
-              fontWeight: 500,
             };
 
             const btnStyle: React.CSSProperties = isActive ? { ...activeStyle } : { ...inactiveStyle };
-
-            if (index === 6) {
-              btnStyle.gridColumn = "1 / -1";
-              btnStyle.width = "calc(66.666% - 4px)";
-              btnStyle.margin = "0 auto";
-              btnStyle.display = "block";
-            }
 
             return (
               <button
                 key={tab.label}
                 onClick={() => navigate(tab.path)}
                 style={btnStyle}
+                onMouseOver={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = "#2bbbad";
+                    e.currentTarget.style.color = "#fff";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = "#ffffff";
+                    e.currentTarget.style.color = "#2bbbad";
+                  }
+                }}
               >
                 {tab.label}
               </button>
