@@ -16,6 +16,7 @@
 
 
 
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -98,15 +99,15 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 bottom-0 w-[190px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
+            className="fixed top-0 left-0 bottom-0 w-[120px] bg-[#254465] z-[101] flex flex-col shadow-2xl"
           >
             {/* Close Button Header */}
             <div className="flex items-start">
               <button
                 onClick={onClose}
-                className="w-[54px] h-[54px] flex items-center justify-center border-r border-b border-white/20 bg-black/5 hover:bg-black/20 transition-colors rounded-none"
+                className="w-[48px] h-[48px] flex items-center justify-center border-r border-b border-white/20 bg-black/5 hover:bg-black/20 transition-colors rounded-none"
               >
-                <X className="w-8 h-8 text-white stroke-[2.5]" />
+                <X className="w-6 h-6 text-white stroke-[2.5]" />
               </button>
             </div>
 
