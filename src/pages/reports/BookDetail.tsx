@@ -119,15 +119,15 @@ export default function BookDetail() {
 
   return (
     <div className="bg-[#e8e8e8] min-h-screen pb-16">
-      <main className="max-w-5xl mx-auto font-sans">
+      <main className="max-w-5xl mx-auto font-sans px-[15px]">
         <div className="h-2" />
         
-        <div className="mx-4 mt-2 mb-3">
+        <div className="mt-2 mb-3">
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* Filters Card */}
-        <div className="mx-4 mb-3">
+        <div className="mb-3">
           <section className="bg-white border border-[#c8c8c8] rounded-[4px] overflow-hidden shadow-sm">
             <div className="bg-[#dcdcdc] border-b border-[#c8c8c8] px-3 py-2 flex items-center gap-2">
               <Filter className="w-4 h-4 fill-[#2d2d2d] text-[#2d2d2d]" />
@@ -187,7 +187,7 @@ export default function BookDetail() {
         </div>
 
         {/* Results Card */}
-        <div className="mx-4">
+        <div>
           <section className="bg-white border border-[#c8c8c8] rounded-[4px] overflow-hidden shadow-sm">
             <div className="bg-[#dcdcdc] border-b border-[#c8c8c8] px-3 py-2 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-[#2d2d2d]" />

@@ -117,15 +117,15 @@ export default function DailyPL() {
 
   return (
     <div className="bg-[#e8e8e8] min-h-screen pb-16">
-      <main className="px-0 pt-0 pb-8 max-w-5xl mx-auto font-sans">
+      <main className="pt-0 pb-8 max-w-5xl mx-auto font-sans px-[15px]">
         <div className="h-2" />
         
-        <div className="mx-2 mb-2">
+        <div className="mb-2">
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* Date Filter Card */}
-        <div className="mx-2 mb-2">
+        <div className="mb-2">
           <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[#c8c8c8] bg-[#dcdcdc]">
               <Filter className="w-4 h-4 fill-[#2d2d2d] text-[#2d2d2d]" />
@@ -164,7 +164,7 @@ export default function DailyPL() {
         </div>
 
         {/* Report Table */}
-        <div className="mx-2">
+        <div>
           <section className="bg-white border border-[#c8c8c8] overflow-hidden">
             <div className="bg-[#dcdcdc] border-b border-[#c8c8c8] px-3 py-2 flex items-center gap-2">
               <strong className="text-sm font-bold text-[#2d2d2d]">Daily P&L</strong>
