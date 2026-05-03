@@ -20,6 +20,7 @@
 
 
 
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -523,8 +524,8 @@ export default function UserDashboard() {
         </div>
 
         {/* Content Area */}
-        {activeFilter === "Casino" ? (
-          <CasinoSection />
+        {activeFilter === "Casino" || activeFilter === "Horse Race" || activeFilter === "Greyhound" ? (
+          <CasinoSection title={activeFilter === "Casino" ? "Premium Casino" : `${activeFilter} Feed`} />
         ) : (
           <div className="flex flex-col">
             {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
