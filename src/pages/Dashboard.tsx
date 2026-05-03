@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -45,30 +46,49 @@ export default function Dashboard() {
     refetchAtd();
   };
 
+  const normalizeMatch = (m: any) => {
+    const status = String(m.status || m.api_status || '').toLowerCase();
+    const isLive = status === 'live' || status === 'inplay' || status === 'started';
+    return {
+      ...m,
+      status: isLive ? 'live' : 'upcoming'
+    };
+  };
+
   // Build highlights rows from DB matches and API matches
-  const dbCricket = (dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'cricket');
-  const atdCricket = (atdData?.matches || []).filter((atd: any) => {
+  const dbCricket = (dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'cricket').map(normalizeMatch);
+  const atdCricket = (atdData?.matches || []).map(normalizeMatch).filter((atd: any) => {
     // Avoid duplicating DB matches if they exist
     return !dbCricket.some((db: any) => 
       db.title?.toLowerCase().includes(atd.team1.toLowerCase()) && 
       db.title?.toLowerCase().includes(atd.team2.toLowerCase())
     );
   });
-  const bfCricket = (betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'cricket');
+  const bfCricket = (betfairData || []).map(normalizeMatch).filter((bf: any) => bf.sport?.toLowerCase() === 'cricket');
 
   // Combine all cricket matches, avoiding duplicates by title keywords
   const allCricket = [...dbCricket];
   [...atdCricket, ...bfCricket].forEach((apiMatch: any) => {
-    const exists = allCricket.some(m => 
-      (m.title || '').toLowerCase().includes(apiMatch.team1.toLowerCase()) && 
-      (m.title || '').toLowerCase().includes(apiMatch.team2.toLowerCase())
-    );
+    const exists = allCricket.some(m => {
+      const t1 = apiMatch.team1?.toLowerCase() || '';
+      const t2 = apiMatch.team2?.toLowerCase() || '';
+      if (!t1 || !t2) return false;
+      return (m.title || '').toLowerCase().includes(t1) && (m.title || '').toLowerCase().includes(t2);
+    });
     if (!exists) allCricket.push(apiMatch);
   });
 
-  const cricketMatches = allCricket;
-  const footballMatches = [...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer'), ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football')];
-  const tennisMatches = [...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'tennis'), ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'tennis')];
+  const cricketMatches = allCricket.sort((a, b) => (a.status === 'live' ? -1 : 1));
+  
+  const footballMatches = [
+    ...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer'), 
+    ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football')
+  ].map(normalizeMatch);
+  
+  const tennisMatches = [
+    ...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'tennis'), 
+    ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'tennis')
+  ].map(normalizeMatch);
 
   const formatAmount = (n: number) => n.toLocaleString('en-IN');
   const getAmount = (match: any, idx: number) => {

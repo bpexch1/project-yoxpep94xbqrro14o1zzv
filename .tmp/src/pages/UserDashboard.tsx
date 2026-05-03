@@ -1,6 +1,5 @@
 
 
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -141,19 +140,25 @@ export default function UserDashboard() {
   });
 
   // Auto-sync Betfair odds for all visible matches every 10 seconds
-  const matchesWithBetfair = (matches || []).filter((m: any) => m.betfair_event_id);
+  const matchesWithBetfair = (matches || []).filter((m: any) => 
+    m.betfair_event_id && !String(m.id).startsWith('atd-')
+  );
 
   useQuery({
     queryKey: ['betfair-bulk-sync', matchesWithBetfair.map((m: any) => m.id).join(',')],
     queryFn: async () => {
       if (matchesWithBetfair.length === 0) return null;
-      await oddsEngine({
-        action: 'syncAllFromBetfair',
-        matches: matchesWithBetfair.slice(0, 10).map((m: any) => ({
-          matchId: m.id,
-          betfairEventId: m.betfair_event_id
-        }))
-      });
+      try {
+        await oddsEngine({
+          action: 'syncAllFromBetfair',
+          matches: matchesWithBetfair.slice(0, 10).map((m: any) => ({
+            matchId: m.id,
+            betfairEventId: m.betfair_event_id
+          }))
+        });
+      } catch (err) {
+        console.error("Bulk sync failed:", err);
+      }
       return true;
     },
     // Only sync if we have matches to sync AND we have some betfair events loaded
@@ -225,20 +230,32 @@ export default function UserDashboard() {
     );
   }
 
+  // Helper to normalize match data for UI
+  const normalizeMatch = (m: any) => {
+    const status = String(m.status || m.api_status || '').toLowerCase();
+    const isLive = status === 'live' || status === 'inplay' || status === 'started';
+    return {
+      ...m,
+      status: isLive ? 'live' : 'upcoming'
+    };
+  };
+
   // Filter the match list to only show real matches:
   // 1. Matches directly from Betfair API
   // 2. Matches from AllThingsDev Cricket API
   // 3. DB matches that have a betfair_event_id (linked to real events)
   const matchesList = [
-    ...(betfairEvents || []),
-    ...(atdData?.matches || []).filter((atd: any) => {
-      // Don't duplicate if already in Betfair (check by title)
-      return !(betfairEvents || []).some((bf: any) => 
-        bf.title.toLowerCase().includes(atd.team1.toLowerCase()) && 
-        bf.title.toLowerCase().includes(atd.team2.toLowerCase())
-      );
+    ...(betfairEvents || []).map(normalizeMatch),
+    ...(atdData?.matches || []).map(normalizeMatch).filter((atd: any) => {
+      // Don't duplicate if already in Betfair (check by title keyword overlap)
+      return !(betfairEvents || []).some((bf: any) => {
+        const t1 = atd.team1?.toLowerCase() || '';
+        const t2 = atd.team2?.toLowerCase() || '';
+        if (!t1 || !t2) return false;
+        return bf.title.toLowerCase().includes(t1) && bf.title.toLowerCase().includes(t2);
+      });
     }),
-    ...(matches || []).filter((m: any) => {
+    ...(matches || []).map(normalizeMatch).filter((m: any) => {
       // Only include DB matches that:
       // 1. Have a real betfair_event_id (admin linked to real event)
       // 2. Are NOT already shown from betfairEvents (no duplicate)
@@ -250,10 +267,12 @@ export default function UserDashboard() {
 
       // Also check against ATD matches if it's cricket
       if (m.sport?.toLowerCase() === 'cricket') {
-        return !(atdData?.matches || []).some((atd: any) => 
-          atd.title.toLowerCase().includes(m.team1?.toLowerCase() || '') && 
-          atd.title.toLowerCase().includes(m.team2?.toLowerCase() || '')
-        );
+        return !(atdData?.matches || []).some((atd: any) => {
+          const t1 = m.team1?.toLowerCase() || '';
+          const t2 = m.team2?.toLowerCase() || '';
+          if (!t1 || !t2) return false;
+          return atd.title.toLowerCase().includes(t1) && atd.title.toLowerCase().includes(t2);
+        });
       }
       return true;
     })
@@ -277,12 +296,27 @@ export default function UserDashboard() {
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
-    if (activeFilter === "Inplay") return true; // Show all when Inplay is active
+    const status = String(m.status || '').toLowerCase();
+    const isLive = status === 'live' || status === 'inplay';
+
+    if (activeFilter === "Inplay") return isLive;
+    
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === 'soccer') return sport === 'football' || sport === 'soccer';
     return sport === filter;
   });
+
+  // Auto-switch away from Inplay if it's empty but other sports have matches
+  useEffect(() => {
+    if (activeFilter === "Inplay" && !matchesLoading && !betfairLoading && !atdLoading) {
+      if (inplayCount === 0) {
+        if (cricketCount > 0) setActiveFilter("Cricket");
+        else if (soccerCount > 0) setActiveFilter("Soccer");
+        else if (tennisCount > 0) setActiveFilter("Tennis");
+      }
+    }
+  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, betfairLoading, atdLoading]);
 
   const displayMatches = filteredMatches;
 

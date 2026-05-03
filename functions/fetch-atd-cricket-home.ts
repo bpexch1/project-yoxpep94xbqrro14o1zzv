@@ -17,27 +17,58 @@ const parseTeams = (name: string) => {
 
 const extractList = (raw: any): any[] => {
   if (Array.isArray(raw)) return raw;
-  return raw?.data || raw?.matches || raw?.matchList || raw?.results || raw?.response || raw?.list || [];
+  // Deep search for any array that looks like matches
+  const search = (obj: any): any[] | null => {
+    if (!obj || typeof obj !== 'object') return null;
+    for (const key in obj) {
+      if (Array.isArray(obj[key]) && obj[key].length > 0) {
+        const first = obj[key][0];
+        if (first && (first.match_id || first.match_name || first.team_a || first.title || first.matchId)) {
+          return obj[key];
+        }
+      }
+      const nested = search(obj[key]);
+      if (nested) return nested;
+    }
+    return null;
+  };
+
+  const found = search(raw);
+  if (found) return found;
+
+  return raw?.data || raw?.matches || raw?.matchList || raw?.results || raw?.response || raw?.list || raw?.home || raw?.live || raw?.upcoming || [];
 };
 
 function mapAll(matches: any[]): any[] {
   return matches
     .map((item: any, index: number) => {
-      const name = item.title || item.match || item.match_name || item.name || '';
-      const teamA = item.team_a || item.teamA || item.team_a_short || '';
-      const teamB = item.team_b || item.teamB || item.team_b_short || '';
+      const name = item.title || item.match || item.match_name || item.name || item.match_title || '';
+      const teamA = item.team_a || item.teamA || item.team_a_short || item.team_a_name || item.localteam || (item.team_a && item.team_a.name) || '';
+      const teamB = item.team_b || item.teamB || item.team_b_short || item.team_b_name || item.visitorteam || (item.team_b && item.team_b.name) || '';
       
       const title = name || (teamA && teamB ? `${teamA} v ${teamB}` : '');
       if (!title) return null;
 
-      const teams = teamA && teamB ? { team1: teamA, team2: teamB } : parseTeams(title);
+      const teams = teamA && teamB ? { team1: String(teamA), team2: String(teamB) } : parseTeams(title);
       
-      // AllThingsDev IDs can be numeric or strings
       const rawId = item.match_id || item.matchId || item.id || item.series_id || index;
       const id = `atd-${rawId}`;
 
-      const isLive = item.status === 'live' || item.live === 1 || item.inplay === 1 || item.is_live === true;
+      // Status logic: live vs upcoming vs completed
+      const rawStatus = String(item.status || item.match_status || item.matchStatus || item.state || '').toLowerCase();
+      const liveIndicators = ['live', 'inplay', 'running', 'started', '2', 'true'];
+      const completedIndicators = ['completed', 'finished', 'result', 'ended', '3'];
+      
+      let status = 'upcoming';
+      if (liveIndicators.some(ind => rawStatus.includes(ind)) || item.live === 1 || item.inplay === 1 || item.is_live === true) {
+        status = 'live';
+      } else if (completedIndicators.some(ind => rawStatus.includes(ind))) {
+        status = 'completed';
+      }
 
+      // Time parsing
+      let matchTime = item.match_time || item.match_date || item.date || item.start_date || new Date().toISOString();
+      
       return {
         id,
         atd_match_id: String(rawId),
@@ -46,16 +77,17 @@ function mapAll(matches: any[]): any[] {
         team1: teams.team1,
         team2: teams.team2,
         sport: 'Cricket',
-        status: isLive ? 'live' : 'upcoming',
-        match_time: item.match_time || item.match_date || item.date || new Date().toISOString(),
-        back_odds: 1.9, // Default for UI if not present in API
+        status,
+        match_time: matchTime,
+        back_odds: 1.9,
         lay_odds: 2.0,
         back_odds2: 1.9,
         lay_odds2: 2.0,
         source: 'atd-cricket',
+        api_status: rawStatus,
       };
     })
-    .filter((e): e is NonNullable<typeof e> => !!e && !!e.title);
+    .filter((e): e is NonNullable<typeof e> => !!e && !!e.title && e.status !== 'completed');
 }
 
 Deno.serve(async (req) => {
@@ -65,8 +97,7 @@ Deno.serve(async (req) => {
 
   const apiKey = Deno.env.get('ATD_API_KEY');
   if (!apiKey) {
-    console.log('[ATD] No API key set');
-    return new Response(JSON.stringify({ matches: [], error: 'No ATD_API_KEY' }), {
+    return new Response(JSON.stringify({ matches: [], error: 'No ATD_API_KEY set in secrets' }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -82,25 +113,25 @@ Deno.serve(async (req) => {
   const urls = [
     'https://Cricket-Live-Line-API.allthingsdev.co/Home?type=1&per_paged=100&highlight_com=1',
     'https://allthingsdev.co/Home?type=1&per_paged=100&highlight_com=1',
+    'https://allthingsdev.co/api?type=1&per_paged=100&highlight_com=1',
+    'https://api.allthingsdev.co/Home?type=1&per_paged=100&highlight_com=1',
     'https://Cricket-Live-Line-API.allthingsdev.co/?type=1&per_paged=100&highlight_com=1',
   ];
 
   let rawData = null;
   let lastError = null;
+  let successUrl = null;
 
   for (const url of urls) {
     try {
-      console.log(`[ATD] Fetching ${url}`);
       const res = await fetch(url, { headers });
-      console.log(`[ATD] Status: ${res.status}`);
-      
       const bodyText = await res.text();
-      console.log(`[ATD] Body snippet: ${bodyText.substring(0, 400)}`);
 
       if (res.ok) {
         try {
           rawData = JSON.parse(bodyText);
-          break; // Success
+          successUrl = url;
+          break;
         } catch (e) {
           lastError = `JSON Parse Error: ${e.message}`;
         }
@@ -108,21 +139,29 @@ Deno.serve(async (req) => {
         lastError = `HTTP ${res.status}: ${bodyText.substring(0, 100)}`;
       }
     } catch (err) {
-      console.log(`[ATD] Error fetching ${url}: ${err.message}`);
       lastError = err.message;
     }
   }
 
   if (!rawData) {
-    return new Response(JSON.stringify({ matches: [], error: lastError }), {
+    return new Response(JSON.stringify({ matches: [], error: lastError, debug: { tried_urls: urls } }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
-  const matches = mapAll(extractList(rawData));
+  const rawList = extractList(rawData);
+  const matches = mapAll(rawList);
 
-  return new Response(JSON.stringify({ matches, raw: rawData }), {
+  return new Response(JSON.stringify({ 
+    matches, 
+    debug: { 
+      success_url: successUrl,
+      raw_count: rawList.length,
+      mapped_count: matches.length,
+      top_keys: Object.keys(rawData)
+    } 
+  }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
