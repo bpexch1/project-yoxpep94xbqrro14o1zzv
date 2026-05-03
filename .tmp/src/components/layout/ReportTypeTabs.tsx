@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Filter } from "lucide-react";
 
 interface ReportTypeTabsProps {
   activeTab?: string;
@@ -22,41 +23,45 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
 
   return (
     <div style={{
-      border: "2px solid #007bff",
-      borderRadius: "0px",
+      backgroundColor: "#ffffff",
+      border: "1px solid #dee2e6",
+      borderRadius: "4px",
       overflow: "hidden",
       marginBottom: "12px",
-      boxShadow: "0 1px 3px rgba(0,123,255,0.15)"
+      boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
     }}>
-      {/* Header Bar - Dark Grey */}
+      {/* Header Bar */}
       <div style={{
-        backgroundColor: "#333333",
-        padding: "5px 10px",
+        backgroundColor: "#f8f9fa",
+        borderBottom: "1px solid #dee2e6",
+        padding: "10px 15px",
         display: "flex",
         alignItems: "center",
+        gap: "8px",
       }}>
-        <span style={{
-          color: "#ffffff",
-          fontSize: "12px",
+        <Filter style={{ width: "18px", height: "18px", color: "#212529", flexShrink: 0 }} />
+        <strong style={{
+          fontSize: "16px",
           fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "0.5px",
+          color: "#212529",
           fontFamily: "inherit",
+          lineHeight: "1",
         }}>
           Report Type
-        </span>
+        </strong>
       </div>
 
-      {/* Button Grid Container */}
+      {/* Button Grid Area */}
       <div style={{
+        backgroundColor: "#ffffff",
+        padding: "15px 20px",
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "1px",
-        backgroundColor: "#007bff",   // blue bg = blue 1px gaps between buttons
-        padding: "0px",
+        gap: "6px",
       }}>
         {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path ||
+          const isActive =
+            location.pathname === tab.path ||
             (tab.path === "/accounts" && location.pathname.startsWith("/accounts"));
 
           return (
@@ -64,38 +69,37 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                height: "30px",
-                margin: "0px",
-                padding: "0px",
-                border: "none",
-                borderRadius: "0px",
-                fontSize: "11px",
-                fontWeight: 700,
-                textTransform: "uppercase",
+                padding: "6px 8px",
+                border: `1px solid ${isActive ? "#17a2b8" : "#007bff"}`,
+                borderRadius: "4px",
+                backgroundColor: isActive ? "#17a2b8" : "#ffffff",
+                color: isActive ? "#ffffff" : "#007bff",
+                fontSize: "13px",
+                fontWeight: 500,
                 fontFamily: "inherit",
+                cursor: "pointer",
+                transition: "all 0.15s ease-in-out",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                cursor: "pointer",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
-                lineHeight: "1",
+                lineHeight: "1.5",
                 boxSizing: "border-box",
                 width: "100%",
-                transition: "background-color 0.15s ease-in-out, color 0.15s ease-in-out",
-                backgroundColor: isActive ? "#007bff" : "#ffffff",
-                color: isActive ? "#ffffff" : "#007bff",
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#007bff";
                   (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#007bff";
                 }
               }}
               onMouseOut={(e) => {
                 if (!isActive) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#ffffff";
                   (e.currentTarget as HTMLButtonElement).style.color = "#007bff";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#007bff";
                 }
               }}
             >
