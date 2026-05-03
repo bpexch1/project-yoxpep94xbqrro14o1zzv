@@ -15,6 +15,7 @@
 
 
 
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -39,14 +40,14 @@ function SidebarItem({ iconEl, label, onClick }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center w-full h-[54px] bg-transparent hover:bg-white/10 transition-colors text-left"
+      className="flex items-center w-full h-[52px] bg-transparent hover:bg-white/10 transition-colors text-left"
     >
-      <div className="w-[68px] flex items-center justify-center shrink-0">
-        <div className="scale-[1.2]">
+      <div className="w-[48px] flex items-center justify-center shrink-0">
+        <div className="scale-[1.1]">
           {iconEl}
         </div>
       </div>
-      <span className="text-[15.5px] text-white font-medium tracking-tight truncate">
+      <span className="text-[14px] text-white font-medium tracking-tight truncate pr-2">
         {label}
       </span>
     </button>
