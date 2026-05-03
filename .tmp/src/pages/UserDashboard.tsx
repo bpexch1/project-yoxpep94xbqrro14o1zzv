@@ -21,6 +21,7 @@
 
 
 
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -529,6 +530,9 @@ export default function UserDashboard() {
         ) : (
           <div className="flex flex-col">
             {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
+              const liveMatches = sportMatches.filter((m: any) => m.status === 'live');
+              const upcomingMatches = sportMatches.filter((m: any) => m.status !== 'live');
+
               return (
                 <div key={sport} className="flex flex-col">
                   {/* Sport section header */}
@@ -550,15 +554,44 @@ export default function UserDashboard() {
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "#666" }}>Matched</span>
                   </div>
+                  
                   <div className="flex flex-col">
-                    {sportMatches.map((match: any) => (
-                      <BettingMatchCard 
-                        key={match.id} 
-                        match={match} 
-                        onSelectBet={handleSelectBet} 
-                        mongoOdds={null}
-                      />
-                    ))}
+                    {/* Live Section */}
+                    {liveMatches.length > 0 && (
+                      <>
+                        {activeFilter !== "Inplay" && (
+                          <div className="bg-[#f8fafc] px-3 py-1.5 flex items-center gap-2 border-b border-[#e2e8f0]">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                            <span className="text-[10px] font-bold uppercase text-red-700 tracking-widest">Live Now</span>
+                          </div>
+                        )}
+                        {liveMatches.map((match: any) => (
+                          <BettingMatchCard 
+                            key={match.id} 
+                            match={match} 
+                            onSelectBet={handleSelectBet} 
+                            mongoOdds={null}
+                          />
+                        ))}
+                      </>
+                    )}
+
+                    {/* Upcoming Section */}
+                    {upcomingMatches.length > 0 && (
+                      <>
+                        <div className="bg-[#f8fafc] px-3 py-1.5 flex items-center gap-2 border-b border-[#e2e8f0]">
+                          <span className="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Upcoming Matches</span>
+                        </div>
+                        {upcomingMatches.map((match: any) => (
+                          <BettingMatchCard 
+                            key={match.id} 
+                            match={match} 
+                            onSelectBet={handleSelectBet} 
+                            mongoOdds={null}
+                          />
+                        ))}
+                      </>
+                    )}
                   </div>
                 </div>
               );
@@ -571,12 +604,12 @@ export default function UserDashboard() {
                   <Trophy className="w-8 h-8 text-[#254465]/20" />
                 </div>
                 <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/60">
-                  {activeFilter === 'Inplay' ? 'No Live Matches' : `No ${activeFilter} Matches`}
+                  {activeFilter === 'Inplay' ? 'No Live Matches' : `No Real ${activeFilter} Matches Found`}
                 </h3>
                 <p className="text-xs text-[#254465]/40 mt-2 max-w-[200px] mx-auto leading-relaxed">
                   {activeFilter === 'Inplay' 
-                    ? 'There are no matches currently in play. Check upcoming matches in other tabs.'
-                    : `We couldn't find any ${activeFilter} matches right now. Please check back later.`}
+                    ? 'There are no real matches currently in play. All fake data has been removed for your security.'
+                    : `We couldn't find any real ${activeFilter} matches from our live feeds right now. Please check back later.`}
                 </p>
                 
                 <div className="flex flex-col gap-3 mt-8 w-full max-w-[220px]">
