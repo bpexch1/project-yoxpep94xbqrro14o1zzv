@@ -58,6 +58,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         display: "flex",
         flexWrap: "wrap",
         gap: "6px",
+        justifyContent: "center",
       }}>
         {tabs.map((tab) => {
           const isActive =
