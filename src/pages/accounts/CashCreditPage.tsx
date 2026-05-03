@@ -89,7 +89,8 @@ export default function CashCreditPage() {
         beforeBalance = client.cash || 0;
         afterBalance = beforeBalance + amount;
         const newBalanceUpline = (client.balance_upline || 0) + amount;
-        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline };
+        const newCreditRemaining = (client.credit_remaining || 0) + amount;
+        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline, credit_remaining: newCreditRemaining };
       } else {
         beforeBalance = client.credit_remaining || 0;
         afterBalance = beforeBalance + amount;
@@ -162,7 +163,8 @@ export default function CashCreditPage() {
         beforeBalance = client.cash || 0;
         afterBalance = Math.max(0, beforeBalance - amount);
         const newBalanceUpline = Math.max(0, (client.balance_upline || 0) - amount);
-        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline };
+        const newCreditRemaining = Math.max(0, (client.credit_remaining || 0) - amount);
+        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline, credit_remaining: newCreditRemaining };
       } else {
         beforeBalance = client.credit_remaining || 0;
         afterBalance = Math.max(0, beforeBalance - amount);
