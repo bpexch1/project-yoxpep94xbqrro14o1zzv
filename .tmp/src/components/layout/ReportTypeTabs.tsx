@@ -70,7 +70,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "8px 18px",
+                padding: "5px 12px",
                 border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
