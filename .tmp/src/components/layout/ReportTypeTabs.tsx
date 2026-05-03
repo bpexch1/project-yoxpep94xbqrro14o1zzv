@@ -60,8 +60,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         gap: "4px",
         justifyContent: "center",
       }}>
-        {tabs.map((tab, index) => {
-          const isLast = index === tabs.length - 1;
+        {tabs.map((tab) => {
           const isActive =
             location.pathname === tab.path ||
             (tab.path === "/accounts" && location.pathname.startsWith("/accounts"));
@@ -71,7 +70,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "5px 6px",
+                padding: "3px 6px",
                 border: "1px solid #17a2b8",
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
@@ -87,7 +86,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 whiteSpace: "nowrap",
                 lineHeight: "1.5",
                 boxSizing: "border-box",
-                width: isLast ? "auto" : "calc(30% - 3px)",
+                width: "auto",
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
