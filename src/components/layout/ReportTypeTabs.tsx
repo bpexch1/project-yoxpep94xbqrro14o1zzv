@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Filter } from "lucide-react";
 
 interface ReportTypeTabsProps {
   activeTab?: string;
@@ -40,8 +39,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         backgroundColor: "#f0f0f0",
         borderBottom: "1px solid #d0d0d0"
       }}>
-        <Filter style={{ width: 18, height: 18, color: "#000000", flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: "14px", color: "#000000" }}>Report Type</span>
+        <i className="fa fa-filter" style={{ fontSize: "14px", color: "#000000", flexShrink: 0 }} />
+        <strong style={{ fontWeight: 700, fontSize: "14px", color: "#000000" }}>Report Type</strong>
       </div>
 
       <div style={{ padding: "12px", backgroundColor: "#ffffff" }}>
