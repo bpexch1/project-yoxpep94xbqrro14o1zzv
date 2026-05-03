@@ -5,7 +5,7 @@ import { Header } from "./Header";
 import { cn } from "@/lib/utils";
 import { getClientSession } from "@/hooks/useClientAuth";
 
-const ADMIN_ROLES = ["superadmin", "admin", "agent", "company", "supermaster"];
+const ADMIN_ROLES = ["company", "superadmin", "admin", "supermaster", "master"];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
