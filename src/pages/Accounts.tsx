@@ -165,10 +165,10 @@ export default function Accounts() {
             <Filter style={{ width: "16px", height: "16px", color: "#212529", flexShrink: 0 }} />
             <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
           </div>
-          <div style={{ padding: "12px 16px" }}>
+          <div style={{ padding: "20px 16px" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div style={{ flex: "0 0 60%", minWidth: "300px", display: "flex", gap: 8 }}>
-                <div ref={dropdownRef} style={{ position: "relative", flex: 1 }}>
+              <div style={{ flex: "0 0 60%", minWidth: "300px", display: "flex", gap: 0 }}>
+                <div ref={dropdownRef} style={{ position: "relative", flex: "none", width: "160px" }}>
                   <div style={{ position: "relative" }}>
                     <input
                       ref={inputRef}
@@ -189,7 +189,8 @@ export default function Accounts() {
                         minHeight: "40px",
                         maxHeight: "40px",
                         border: "1px solid #d1d5db",
-                        borderRadius: "4px",
+                        borderRight: "none",
+                        borderRadius: "4px 0 0 4px",
                         padding: "0 32px 0 12px",
                         fontSize: "14px",
                         color: "#374151",
@@ -293,7 +294,7 @@ export default function Accounts() {
                     background: isSearchHovered ? "#4dbd74" : "#00b181",
                     color: "#fff",
                     border: "none",
-                    borderRadius: "5px",
+                    borderRadius: "0 4px 4px 0",
                     fontSize: "14px",
                     fontWeight: 600,
                     fontFamily: "Roboto, system-ui, sans-serif",
