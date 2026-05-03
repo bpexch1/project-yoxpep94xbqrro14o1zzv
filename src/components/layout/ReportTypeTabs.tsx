@@ -51,8 +51,8 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       </div>
 
       <div style={{ 
-        padding: "0px", 
-        backgroundColor: "#ffffff",
+        padding: "2px", 
+        backgroundColor: "#007bff",
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: "1px",
@@ -60,15 +60,14 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
-            const isLast = index === tabs.length - 1;
-
             const baseStyle: React.CSSProperties = {
               height: "26px",
               fontSize: "10px",
               fontWeight: 600,
               textTransform: "uppercase",
               borderRadius: "0px",
-              padding: "0px 4px",
+              padding: "0px",
+              margin: "0px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -76,7 +75,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               whiteSpace: "nowrap",
               overflow: "hidden",
               width: "100%",
-              border: "0.5px solid #007bff",
+              border: "none",
               transition: "all 0.15s ease-in-out",
               lineHeight: "1",
               fontFamily: "inherit",
@@ -95,10 +94,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               color: "#007bff",
             };
 
-            const btnStyle: React.CSSProperties = {
-              ...(isActive ? activeStyle : inactiveStyle),
-              ...(isLast ? { gridColumn: "2 / 3" } : {})
-            };
+            const btnStyle: React.CSSProperties = isActive ? activeStyle : inactiveStyle;
 
             return (
               <button
