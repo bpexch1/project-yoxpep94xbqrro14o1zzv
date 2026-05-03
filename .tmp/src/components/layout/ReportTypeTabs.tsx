@@ -54,7 +54,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       {/* Button Flex Area */}
       <div style={{
         backgroundColor: "#ffffff",
-        padding: "8px",
+        padding: "14px 8px",
         display: "flex",
         flexWrap: "wrap",
         gap: "6px",
