@@ -3,6 +3,10 @@
 
 
 
+
+
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -226,9 +230,20 @@ export default function UserDashboard() {
   // Helper to normalize match data for UI
   const normalizeMatch = (m: any) => {
     const status = String(m.status || m.api_status || '').toLowerCase();
-    const isLive = status === 'live' || status === 'inplay' || status === 'started';
+    const isLive = status === 'live' || status === 'inplay' || status === 'started' || status === '1' || status === '2';
+    
+    // Guess sport if missing
+    let sport = m.sport || '';
+    if (!sport) {
+      const title = (m.title || '').toLowerCase();
+      if (title.includes('cricket')) sport = 'Cricket';
+      else if (title.includes('soccer') || title.includes('football')) sport = 'Soccer';
+      else if (title.includes('tennis')) sport = 'Tennis';
+    }
+
     return {
       ...m,
+      sport: sport || 'Others',
       status: isLive ? 'live' : 'upcoming'
     };
   };
@@ -236,7 +251,7 @@ export default function UserDashboard() {
   // Filter the match list to only show real matches:
   // 1. Matches directly from Betfair API
   // 2. Matches from AllThingsDev Cricket API
-  // 3. DB matches that have a betfair_event_id (linked to real events)
+  // 3. DB matches that have a betfair_event_id OR are manually created cricket matches
   const matchesList = [
     ...(betfairEvents || []).map(normalizeMatch),
     ...(atdData?.matches || []).map(normalizeMatch).filter((atd: any) => {
@@ -251,22 +266,30 @@ export default function UserDashboard() {
     ...(matches || []).map(normalizeMatch).filter((m: any) => {
       // Only include DB matches that:
       // 1. Have a real betfair_event_id (admin linked to real event)
-      // 2. Are NOT already shown from betfairEvents (no duplicate)
-      if (!m.betfair_event_id) return false; 
-      const isDuplicate = (betfairEvents || []).some((bf: any) => 
-        bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
-      );
-      if (isDuplicate) return false;
+      // 2. OR are manually created matches (id doesn't start with bf- or atd-)
+      
+      const isExternal = String(m.id).startsWith('bf-') || String(m.id).startsWith('atd-');
+      if (isExternal) return false; // Already coming from API sources above
+
+      // If it has betfair_event_id, check if we already have it from Betfair API
+      if (m.betfair_event_id) {
+        const isDuplicate = (betfairEvents || []).some((bf: any) => 
+          bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
+        );
+        if (isDuplicate) return false;
+      }
 
       // Also check against ATD matches if it's cricket
       if (m.sport?.toLowerCase() === 'cricket') {
-        return !(atdData?.matches || []).some((atd: any) => {
+        const isDuplicateAtd = (atdData?.matches || []).some((atd: any) => {
           const t1 = m.team1?.toLowerCase() || '';
           const t2 = m.team2?.toLowerCase() || '';
           if (!t1 || !t2) return false;
           return atd.title.toLowerCase().includes(t1) && atd.title.toLowerCase().includes(t2);
         });
+        if (isDuplicateAtd) return false;
       }
+      
       return true;
     })
   ].sort((a: any, b: any) => {
@@ -283,18 +306,20 @@ export default function UserDashboard() {
 
   // Auto-switch away from Inplay if it's empty but other sports have matches
   useEffect(() => {
-    if (activeFilter === "Inplay" && !matchesLoading && !betfairLoading && !atdLoading) {
-      if (inplayCount === 0) {
+    if (activeFilter === "Inplay") {
+      // If we have data from at least one source and inplay is 0, but others exist, switch.
+      // We don't wait for ALL to finish, just check if we have results.
+      if (inplayCount === 0 && !matchesLoading) {
         if (cricketCount > 0) setActiveFilter("Cricket");
         else if (soccerCount > 0) setActiveFilter("Soccer");
         else if (tennisCount > 0) setActiveFilter("Tennis");
       }
     }
-  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, betfairLoading, atdLoading, activeFilter]);
+  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, activeFilter]);
 
   if (!session) return null;
 
-  if (matchesLoading && !matches) {
+  if (matchesLoading && !matches && !atdData && !betfairEvents) {
     return (
       <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
@@ -493,24 +518,52 @@ export default function UserDashboard() {
             })}
 
             {/* Empty state */}
-            {filteredMatches.length === 0 && !betfairLoading && !matchesLoading && (
-              <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+            {filteredMatches.length === 0 && !betfairLoading && !matchesLoading && !atdLoading && (
+              <div className="flex flex-col items-center justify-center py-16 text-center px-4 bg-white mx-4 my-6 rounded-xl border border-[#ccd9e5] shadow-sm">
                 <div className="w-16 h-16 bg-[#254465]/5 rounded-full flex items-center justify-center mb-4">
                   <Trophy className="w-8 h-8 text-[#254465]/20" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/40">No Matches Available</h3>
-                <p className="text-xs text-[#254465]/30 mt-1">
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#254465]/60">
+                  {activeFilter === 'Inplay' ? 'No Live Matches' : `No ${activeFilter} Matches`}
+                </h3>
+                <p className="text-xs text-[#254465]/40 mt-2 max-w-[200px] mx-auto leading-relaxed">
                   {activeFilter === 'Inplay' 
-                    ? 'No live or upcoming matches right now. Live matches will appear here automatically.'
-                    : `No ${activeFilter} matches available right now.`}
+                    ? 'There are no matches currently in play. Check upcoming matches in other tabs.'
+                    : `We couldn't find any ${activeFilter} matches right now. Please check back later.`}
                 </p>
+                
+                <div className="flex flex-col gap-3 mt-8 w-full max-w-[220px]">
+                  {activeFilter === 'Inplay' && (cricketCount > 0 || soccerCount > 0 || tennisCount > 0) && (
+                    <button 
+                      onClick={() => {
+                        if (cricketCount > 0) setActiveFilter("Cricket");
+                        else if (soccerCount > 0) setActiveFilter("Soccer");
+                        else setActiveFilter("Tennis");
+                      }}
+                      className="px-6 py-3 bg-[#00b181] text-white text-[11px] font-black rounded-lg shadow-md uppercase tracking-wider active:scale-95 transition-transform"
+                    >
+                      View Upcoming Matches
+                    </button>
+                  )}
+                  
+                  <button 
+                    onClick={() => {
+                      queryClient.invalidateQueries({ queryKey: ['matches'] });
+                      queryClient.invalidateQueries({ queryKey: ['betfair-events'] });
+                      queryClient.invalidateQueries({ queryKey: ['atd-cricket-home'] });
+                    }}
+                    className="px-6 py-3 bg-[#254465] text-white text-[11px] font-black rounded-lg shadow-md uppercase tracking-wider active:scale-95 transition-transform"
+                  >
+                    Refresh List
+                  </button>
+                </div>
               </div>
             )}
 
-            {filteredMatches.length === 0 && (betfairLoading || matchesLoading) && (
+            {filteredMatches.length === 0 && (betfairLoading || matchesLoading || atdLoading) && (
               <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-                <Loader2 className="w-8 h-8 text-[#254465]/40 animate-spin mb-4" />
-                <p className="text-xs text-[#254465]/40">Fetching live matches...</p>
+                <Loader2 className="w-8 h-8 text-[#00b181] animate-spin mb-4" />
+                <p className="text-xs font-bold text-[#254465]/60 uppercase tracking-widest">Finding Live Matches...</p>
               </div>
             )}
           </div>
