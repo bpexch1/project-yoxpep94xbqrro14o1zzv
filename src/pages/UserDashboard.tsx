@@ -7,6 +7,9 @@
 
 
 
+
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -124,55 +127,80 @@ export default function UserDashboard() {
   }, [session, navigate]);
 
   // Fetch matches from DB
-  const { data: matches, isLoading: matchesLoading } = useQuery({
+  const { data: matches, isLoading: matchesLoading, isError: matchesError } = useQuery({
     queryKey: ['matches'],
     queryFn: () => Match.list(),
-    refetchInterval: 10000 // Refresh list every 10 seconds
+    refetchInterval: 15000, // Refresh list every 15 seconds
+    retry: 2
   });
 
   // Fetch live Betfair events from API
-  const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
+  const { data: betfairEvents, isLoading: betfairLoading, isError: betfairError } = useQuery({
     queryKey: ['betfair-events'],
-    queryFn: () => fetchBetfairEvents({}),
+    queryFn: async () => {
+      try {
+        return await fetchBetfairEvents({});
+      } catch (err) {
+        console.debug("Failed to fetch betfair events:", err);
+        return [];
+      }
+    },
     refetchInterval: 60000, // Refresh every 60 seconds
     retry: 1
   });
 
   // Fetch live ATD Cricket matches from API
-  const { data: atdData, isLoading: atdLoading } = useQuery({
+  const { data: atdData, isLoading: atdLoading, isError: atdError } = useQuery({
     queryKey: ['atd-cricket-home'],
-    queryFn: () => fetchAtdCricketHome({}),
+    queryFn: async () => {
+      try {
+        return await fetchAtdCricketHome({});
+      } catch (err) {
+        console.debug("Failed to fetch atd cricket:", err);
+        return { matches: [] };
+      }
+    },
     refetchInterval: 60000,
     retry: 1
   });
 
-  // Auto-sync Betfair odds for all visible matches every 10 seconds
+  // Auto-sync Betfair odds for all visible matches every 15 seconds
   const matchesWithBetfair = (matches || []).filter((m: any) => 
-    m.betfair_event_id && !String(m.id).startsWith('atd-')
+    m.betfair_event_id && 
+    !String(m.id).startsWith('atd-') && 
+    m.betfair_event_id !== 'undefined' && 
+    m.betfair_event_id !== ''
   );
 
   useQuery({
     queryKey: ['betfair-bulk-sync', matchesWithBetfair.map((m: any) => m.id).join(',')],
     queryFn: async () => {
-      if (matchesWithBetfair.length === 0) return null;
+      if (matchesWithBetfair.length === 0) return { success: true, skipped: true };
       try {
+        // Only sync up to 10 matches to avoid large payloads/timeout
+        const syncMatches = matchesWithBetfair.slice(0, 10).map((m: any) => ({
+          matchId: m.id,
+          betfairEventId: m.betfair_event_id
+        }));
+
         await oddsEngine({
           action: 'syncAllFromBetfair',
-          matches: matchesWithBetfair.slice(0, 10).map((m: any) => ({
-            matchId: m.id,
-            betfairEventId: m.betfair_event_id
-          }))
+          matches: syncMatches
         });
+        return { success: true };
       } catch (err) {
-        console.error("Bulk sync failed:", err);
+        // Silent failure for background sync - do not log as error to avoid user-facing error messages
+        console.debug("Background bulk sync skipped or failed:", err);
+        return { success: false, error: "Failed to fetch" };
       }
-      return true;
     },
     // Only sync if we have matches to sync AND we have some betfair events loaded
     // to avoid hammering Betfair/MongoDB unnecessarily
     enabled: matchesWithBetfair.length > 0 && !!betfairEvents,
-    refetchInterval: 10000,  // every 10 seconds
-    staleTime: 0,
+    refetchInterval: 15000,  // every 15 seconds
+    retry: false,            // do not retry background sync on failure
+    staleTime: 5000,
+    gcTime: 0,               // don't keep this data in cache
   });
 
   // Fetch real-time client data for balance and credits
@@ -308,21 +336,27 @@ export default function UserDashboard() {
   useEffect(() => {
     if (activeFilter === "Inplay") {
       // If we have data from at least one source and inplay is 0, but others exist, switch.
-      // We don't wait for ALL to finish, just check if we have results.
-      if (inplayCount === 0 && !matchesLoading) {
+      // We wait for primary API calls to finish or fail before deciding to switch.
+      const isLoadingSources = matchesLoading || betfairLoading || atdLoading;
+      if (inplayCount === 0 && !isLoadingSources) {
         if (cricketCount > 0) setActiveFilter("Cricket");
         else if (soccerCount > 0) setActiveFilter("Soccer");
         else if (tennisCount > 0) setActiveFilter("Tennis");
       }
     }
-  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, activeFilter]);
+  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, betfairLoading, atdLoading, activeFilter]);
 
   if (!session) return null;
 
-  if (matchesLoading && !matches && !atdData && !betfairEvents) {
+  const isInitialLoading = (matchesLoading && !matches) || (betfairLoading && !betfairEvents) || (atdLoading && !atdData);
+
+  if (isInitialLoading && matchesList.length === 0) {
     return (
       <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
+          <p className="text-xs font-bold text-[#254465]/60 uppercase tracking-widest animate-pulse">Loading Live Markets...</p>
+        </div>
       </div>
     );
   }
