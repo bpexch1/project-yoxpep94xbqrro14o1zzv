@@ -54,10 +54,10 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       {/* Button Grid Area */}
       <div style={{
         backgroundColor: "#ffffff",
-        padding: "15px 20px",
+        padding: "8px 10px",
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "6px",
+        gap: "5px",
       }}>
         {tabs.map((tab, index) => {
           const isActive =
@@ -70,7 +70,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               key={tab.label}
               onClick={() => navigate(tab.path)}
               style={{
-                padding: "6px 8px",
+                padding: "5px 6px",
                 border: `1px solid ${isActive ? "#17a2b8" : "#17a2b8"}`,
                 borderRadius: "4px",
                 backgroundColor: isActive ? "#17a2b8" : "#ffffff",
