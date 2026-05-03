@@ -1,5 +1,8 @@
 
 
+
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -220,16 +223,6 @@ export default function UserDashboard() {
     }
   });
 
-  if (!session) return null;
-
-  if (matchesLoading && !matches) {
-    return (
-      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
-      </div>
-    );
-  }
-
   // Helper to normalize match data for UI
   const normalizeMatch = (m: any) => {
     const status = String(m.status || m.api_status || '').toLowerCase();
@@ -288,6 +281,27 @@ export default function UserDashboard() {
   const tennisCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length;
   const soccerCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length;
 
+  // Auto-switch away from Inplay if it's empty but other sports have matches
+  useEffect(() => {
+    if (activeFilter === "Inplay" && !matchesLoading && !betfairLoading && !atdLoading) {
+      if (inplayCount === 0) {
+        if (cricketCount > 0) setActiveFilter("Cricket");
+        else if (soccerCount > 0) setActiveFilter("Soccer");
+        else if (tennisCount > 0) setActiveFilter("Tennis");
+      }
+    }
+  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, betfairLoading, atdLoading, activeFilter]);
+
+  if (!session) return null;
+
+  if (matchesLoading && !matches) {
+    return (
+      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
+      </div>
+    );
+  }
+
   const categories = [
     { id: "Inplay", label: "Inplay", count: inplayCount },
     { id: "Cricket", label: "Cricket", count: cricketCount },
@@ -306,17 +320,6 @@ export default function UserDashboard() {
     if (filter === 'soccer') return sport === 'football' || sport === 'soccer';
     return sport === filter;
   });
-
-  // Auto-switch away from Inplay if it's empty but other sports have matches
-  useEffect(() => {
-    if (activeFilter === "Inplay" && !matchesLoading && !betfairLoading && !atdLoading) {
-      if (inplayCount === 0) {
-        if (cricketCount > 0) setActiveFilter("Cricket");
-        else if (soccerCount > 0) setActiveFilter("Soccer");
-        else if (tennisCount > 0) setActiveFilter("Tennis");
-      }
-    }
-  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, betfairLoading, atdLoading]);
 
   const displayMatches = filteredMatches;
 

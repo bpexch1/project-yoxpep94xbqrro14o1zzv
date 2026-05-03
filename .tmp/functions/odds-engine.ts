@@ -1,4 +1,6 @@
 
+
+
 import { MongoClient, ObjectId } from "npm:mongodb@6.3.0";
 
 const MONGODB_URI = Deno.env.get("MONGODB_URI") || "";
@@ -47,7 +49,14 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const { action, matchId, odds, isSuspended, matchMeta } = body;
-    const col = await getDb();
+    let col;
+    try {
+      col = await getDb();
+    } catch (dbErr: any) {
+      console.error("[odds-engine] DB connection failed:", dbErr.message);
+      return json({ error: "Database connection failed", success: false }, 200); // Return 200 with success: false to avoid console 500s
+    }
+
     const rapidApiKey = Deno.env.get("BETFAIR_RAPIDAPI_KEY");
 
     switch (action) {
@@ -123,6 +132,8 @@ Deno.serve(async (req) => {
         const results = await Promise.allSettled(
           matches.slice(0, 10).map(async (m: any) => {
             const { matchId, betfairEventId } = m;
+            if (!matchId || !betfairEventId) return { matchId, error: "Missing IDs" };
+
             const existing = await col.findOne({ matchId });
             if (existing?.lastManualOverride) {
               const secsSince = (Date.now() - new Date(existing.lastManualOverride).getTime()) / 1000;
