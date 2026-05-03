@@ -185,14 +185,14 @@ export default function Accounts() {
                       onKeyDown={handleKeyDown}
                       style={{
                         width: "100%",
-                        height: "40px",
-                        minHeight: "40px",
-                        maxHeight: "40px",
+                        height: "28px",
+                        minHeight: "28px",
+                        maxHeight: "28px",
                         border: "1px solid #d1d5db",
                         borderRight: "none",
                         borderRadius: "4px 0 0 4px",
-                        padding: "0 32px 0 12px",
-                        fontSize: "14px",
+                        padding: "0 28px 0 8px",
+                        fontSize: "12px",
                         color: "#374151",
                         fontFamily: "Roboto, system-ui, sans-serif",
                         outline: "none",
@@ -237,7 +237,7 @@ export default function Accounts() {
                           justifyContent: "center"
                         }}
                       >
-                        <X style={{ width: 14, height: 14 }} />
+                        <X style={{ width: 12, height: 12 }} />
                       </button>
                     )}
                   </div>
@@ -287,15 +287,15 @@ export default function Accounts() {
                   onMouseEnter={() => setIsSearchHovered(true)}
                   onMouseLeave={() => setIsSearchHovered(false)}
                   style={{
-                    height: "40px",
-                    minHeight: "40px",
-                    maxHeight: "40px",
-                    padding: "0 18px",
+                    height: "28px",
+                    minHeight: "28px",
+                    maxHeight: "28px",
+                    padding: "0 12px",
                     background: isSearchHovered ? "#4dbd74" : "#00b181",
                     color: "#fff",
                     border: "none",
                     borderRadius: "0 4px 4px 0",
-                    fontSize: "14px",
+                    fontSize: "12px",
                     fontWeight: 600,
                     fontFamily: "Roboto, system-ui, sans-serif",
                     cursor: "pointer",
