@@ -22,6 +22,7 @@
 
 
 
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -40,7 +41,7 @@ import {
   Zap,
   Dog,
   Dices,
-  Clubs,
+  Club,
   Menu,
 } from "lucide-react";
 
