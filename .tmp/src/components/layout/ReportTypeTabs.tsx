@@ -59,10 +59,11 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: "6px",
       }}>
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const isActive =
             location.pathname === tab.path ||
             (tab.path === "/accounts" && location.pathname.startsWith("/accounts"));
+          const isLast = index === tabs.length - 1;
 
           return (
             <button
@@ -87,6 +88,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
                 lineHeight: "1.5",
                 boxSizing: "border-box",
                 width: "100%",
+                ...(isLast ? { gridColumn: "2" } : {}),
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
