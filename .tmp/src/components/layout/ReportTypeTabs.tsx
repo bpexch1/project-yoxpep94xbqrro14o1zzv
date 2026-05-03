@@ -24,7 +24,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <div style={{
       backgroundColor: "#fff",
       border: "1px solid #dee2e6",
-      borderRadius: 4,
+      borderRadius: 0,
       boxShadow: "0 1px 2px rgba(0,0,0,.06)",
       marginBottom: 12,
       padding: 0,
@@ -38,7 +38,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
         padding: "4.8px 20px",
         backgroundColor: "#f0f3f5",
         borderBottom: "1px solid #d0d0d0",
-        borderRadius: "3px 3px 0px 0px",
+        borderRadius: "0",
         color: "#23282c",
         fontSize: "16px",
         fontWeight: 400,
@@ -53,18 +53,21 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div style={{ 
         padding: "0px", 
         backgroundColor: "#007bff",
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
+        display: "flex",
+        flexWrap: "wrap",
         gap: "1px",
       }}>
         {tabs.map((tab, index) => {
             const isActive = location.pathname === tab.path || (tab.path === "/accounts" && location.pathname === "/accounts");
             
             const baseStyle: React.CSSProperties = {
+              flex: "0 0 calc(33.333% - 0.667px)",
+              maxWidth: "calc(33.333% - 0.667px)",
+              minWidth: 0,
               height: "30px",
               fontSize: "11px",
               fontWeight: 700,
-              textTransform: "uppercase",
+              textTransform: "uppercase" as const,
               borderRadius: "0px",
               padding: "0px",
               margin: "0px",
@@ -72,14 +75,13 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              whiteSpace: "nowrap",
+              whiteSpace: "nowrap" as const,
               overflow: "hidden",
-              width: "100%",
               border: "none",
-              transition: "all 0.15s ease-in-out",
+              transition: "background-color 0.15s ease-in-out, color 0.15s ease-in-out",
               lineHeight: "1",
               fontFamily: "inherit",
-              boxSizing: "border-box",
+              boxSizing: "border-box" as const,
             };
 
             const activeStyle: React.CSSProperties = {
