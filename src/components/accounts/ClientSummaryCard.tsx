@@ -307,7 +307,7 @@ export function ClientSummaryCard({
 
         {/* Action bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-[48px]">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
