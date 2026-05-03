@@ -472,7 +472,7 @@ export function ClientSummaryCard({
                         <tr className="bg-white">
                           <td colSpan={3} className="px-4 py-3 border-b border-[#d5d8dc]">
                             <ul className="text-[15px] text-[#212529] space-y-2 mb-2">
-                              <li>• Balance <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.balance ?? 0) : "#212529" }}>
+                              <li>• Balance <span className="font-bold" style={{ color: display.isLoaded ? "#212529" : "#212529" }}>
                                 {display.isLoaded ? display.balance?.toLocaleString() : '-'}
                               </span></li>
                               <li>• Client (P/L) <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.plDownline ?? 0) : "#212529" }}>
@@ -480,7 +480,7 @@ export function ClientSummaryCard({
                               </span></li>
                               <li>• Share <span className="font-bold" style={{ color: "#212529" }}>{display.isLoaded ? display.share : '-'}</span></li>
                               <li>• Exposure <span className="font-bold" style={{ color: "#212529" }}>0</span></li>
-                              <li>• Available Balance <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.available ?? 0) : "#212529" }}>
+                              <li>• Available Balance <span className="font-bold" style={{ color: display.isLoaded ? "#212529" : "#212529" }}>
                                 {display.isLoaded ? display.available?.toLocaleString() : '-'}
                               </span></li>
                             </ul>
