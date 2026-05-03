@@ -15,6 +15,11 @@
 
 
 
+
+
+
+
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +31,6 @@ import { BettingMatchCard } from "@/components/user/BettingMatchCard";
 import { BetSlip } from "@/components/user/BetSlip";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { GameBanners } from "@/components/user/GameBanners";
-import { RaceSection } from "@/components/user/RaceSection";
 import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -286,6 +290,9 @@ export default function UserDashboard() {
       else if (title.includes('tennis')) sport = 'Tennis';
     }
 
+    // Normalize sport names
+    if (sport.toLowerCase() === 'football') sport = 'Soccer';
+
     return {
       ...m,
       sport: sport || 'Others',
@@ -297,6 +304,7 @@ export default function UserDashboard() {
   // 1. Matches directly from Betfair API
   // 2. Matches from AllThingsDev Cricket API
   // 3. DB matches that have a betfair_event_id OR are manually created cricket matches
+  const now = new Date();
   const matchesList = [
     ...(betfairEvents || []).map(normalizeMatch),
     ...(atdData?.matches || []).map(normalizeMatch).filter((atd: any) => {
@@ -309,39 +317,51 @@ export default function UserDashboard() {
       });
     }),
     ...(matches || []).map(normalizeMatch).filter((m: any) => {
-      // Only include DB matches that:
-      // 1. Have a real betfair_event_id (admin linked to real event)
-      // 2. OR are manually created matches (id doesn't start with bf- or atd-)
+      // Only include DB matches that have a real betfair_event_id (admin linked to real event)
+      // This ensures we only show matches that the user explicitly wants to track via feed
       
       const isExternal = String(m.id).startsWith('bf-') || String(m.id).startsWith('atd-');
       if (isExternal) return false; // Already coming from API sources above
 
-      // If it has betfair_event_id, check if we already have it from Betfair API
-      if (m.betfair_event_id) {
-        const isDuplicate = (betfairEvents || []).some((bf: any) => 
-          bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
-        );
-        if (isDuplicate) return false;
+      // Exclude matches that don't have a linked feed ID - these are likely the "fake" matches
+      if (!m.betfair_event_id || m.betfair_event_id === 'undefined' || m.betfair_event_id === '') return false;
+
+      // Exclude completed or stale matches
+      if (m.status === 'completed' || m.status === 'finished') return false;
+
+      // If it has a match_time, exclude if it's more than 6 hours old and not live
+      if (m.match_time && m.status !== 'live') {
+        try {
+          const matchDate = new Date(m.match_time);
+          if (isNaN(matchDate.getTime())) return true;
+          const diffHours = (now.getTime() - matchDate.getTime()) / (1000 * 60 * 60);
+          if (diffHours > 6) return false;
+        } catch {
+          // skip
+        }
       }
 
-      // Also check against ATD matches if it's cricket
-      if (m.sport?.toLowerCase() === 'cricket') {
-        const isDuplicateAtd = (atdData?.matches || []).some((atd: any) => {
-          const t1 = m.team1?.toLowerCase() || '';
-          const t2 = m.team2?.toLowerCase() || '';
-          if (!t1 || !t2) return false;
-          return atd.title.toLowerCase().includes(t1) && atd.title.toLowerCase().includes(t2);
-        });
-        if (isDuplicateAtd) return false;
-      }
-      
+      // Check if we already have it from Betfair API to avoid duplicates
+      const isDuplicate = (betfairEvents || []).some((bf: any) => 
+        bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
+      );
+      if (isDuplicate) return false;
+
       return true;
     })
-  ].sort((a: any, b: any) => {
+  ].filter((m: any) => {
+    // Final filter: only real sports the user wants
+    const sport = m.sport?.toLowerCase();
+    return sport === 'cricket' || sport === 'soccer' || sport === 'tennis';
+  }).sort((a: any, b: any) => {
     // Live first, then upcoming
     if (a.status === 'live' && b.status !== 'live') return -1;
     if (b.status === 'live' && a.status !== 'live') return 1;
-    return 0;
+    
+    // Then sort by time if available
+    const timeA = a.match_time ? new Date(a.match_time).getTime() : 0;
+    const timeB = b.match_time ? new Date(b.match_time).getTime() : 0;
+    return timeA - timeB;
   });
   
   const inplayCount = matchesList.filter((m: any) => m.status === 'live').length;
@@ -410,28 +430,6 @@ export default function UserDashboard() {
     setActiveBet({ match, selection, betType, odds });
   };
 
-  const horseRaceSlots = [
-    {time:"11:55 PM", venue:"Philadelphia (US)"}, 
-    {time:"12:00 AM", venue:"Newcastle (GB)"}, 
-    {time:"12:14 AM", venue:"Will Rogers Downs (US)"}, 
-    {time:"12:30 AM", venue:"Ascot (AU)"}, 
-    {time:"2:30 PM", venue:"Ascot (AU)"}, 
-    {time:"2:33 PM", venue:"Globe Derby (AU)"}, 
-    {time:"2:36 PM", venue:"Mildura (AU)"}, 
-    {time:"2:40 PM", venue:"Randwick (AU)"}
-  ];
-
-  const greyhoundSlots = [
-    {time:"11:56 PM", venue:"Yarmouth (GB)"}, 
-    {time:"11:58 PM", venue:"Harlow (GB)"}, 
-    {time:"12:01 AM", venue:"Nottingham (GB)"}, 
-    {time:"2:31 PM", venue:"The Gardens (AU)"}, 
-    {time:"2:34 PM", venue:"The Meadows (AU)"}, 
-    {time:"2:39 PM", venue:"Ballarat (AU)"}, 
-    {time:"2:42 PM", venue:"Cannington (AU)"}, 
-    {time:"2:45 PM", venue:"Dapto (AU)"}
-  ];
-
   return (
     <div className="min-h-screen text-[#212529]" style={{ 
       fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -471,10 +469,6 @@ export default function UserDashboard() {
       <main className="flex flex-col">
         {/* Game Banners */}
         <GameBanners onFilterChange={setActiveFilter} />
-
-        {/* Race Sections */}
-        <RaceSection title="Horse Race" iconType="horse" slots={horseRaceSlots} />
-        <RaceSection title="Grey Hound" iconType="greyhound" slots={greyhoundSlots} />
 
         {/* Bottom Tabs - Inline Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>

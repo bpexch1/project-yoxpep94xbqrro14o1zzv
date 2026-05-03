@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Gamepad2, 
@@ -6,7 +7,11 @@ import {
   Lock
 } from "lucide-react";
 
-export function CasinoSection() {
+interface CasinoSectionProps {
+  title?: string;
+}
+
+export function CasinoSection({ title = "Premium Casino" }: CasinoSectionProps) {
   return (
     <div className="flex flex-col bg-[#0a0f14] min-h-[60vh] relative overflow-hidden">
       {/* Decorative Background Elements */}
@@ -22,7 +27,7 @@ export function CasinoSection() {
              <Lock className="w-3.5 h-3.5 text-white" />
           </div>
           <h2 className="text-white font-black text-[15px] uppercase tracking-wider">
-            Premium Casino <span className="text-[#00b181] ml-1">Coming Soon</span>
+            {title} <span className="text-[#00b181] ml-1">Coming Soon</span>
           </h2>
         </div>
       </div>
