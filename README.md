@@ -1,1 +1,1 @@
-# Welcome to your Superdev project buildy.ai
+# Welcome to your Superdev project
