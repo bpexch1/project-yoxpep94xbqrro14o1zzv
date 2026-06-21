@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "echo Skipping Build",
+    "build": "vite Build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
