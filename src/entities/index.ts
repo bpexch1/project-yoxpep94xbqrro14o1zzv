@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Aapka Node.js backend ka base URL (Production me empty rahega agar proxy hai, ya live backend URL)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 const createEntityHandler = (entityName: string) => {
@@ -44,7 +43,6 @@ const createEntityHandler = (entityName: string) => {
   };
 };
 
-// Exports jo aapki Login.tsx aur Downline custom hooks me use ho rahe hain
 export const User = createEntityHandler("users");
 export const Client = createEntityHandler("clients");
 export const Transaction = createEntityHandler("transactions");
