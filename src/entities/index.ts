@@ -1,9 +1,8 @@
 import axios from "axios";
 
-// Node.js backend ka base URL (Production/Vercel par live domain, local par empty string kaam karegi agar proxy set hai)
+// Aapka Node.js backend ka base URL (Production me empty rahega agar proxy hai, ya live backend URL)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-// Custom Handler jo 'Client.filter' ya 'Transaction.filter' jaisi calls ko custom API par route karega
 const createEntityHandler = (entityName: string) => {
   return {
     filter: async (query: any) => {
@@ -45,7 +44,7 @@ const createEntityHandler = (entityName: string) => {
   };
 };
 
-// Purane exports ko naye mock wrappers se match kar diya taake baqi files me errors na aayein
+// Exports jo aapki Login.tsx aur Downline custom hooks me use ho rahe hain
 export const User = createEntityHandler("users");
 export const Client = createEntityHandler("clients");
 export const Transaction = createEntityHandler("transactions");
