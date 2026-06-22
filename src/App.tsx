@@ -49,29 +49,30 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Direct Login Page path "/" aur "/login" dono par set hai */}
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
-            
-            {/* Protected Admin Routes */}
-            <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
-            <Route path="/accounts" element={<AppLayout><Accounts /></AppLayout>} />
-            <Route path="/accounts/create" element={<AppLayout><CreateUser /></AppLayout>} />
-            <Route path="/accounts/create-company" element={<AppLayout><CreateCompanyAccount /></AppLayout>} />
-            <Route path="/reports/book-detail" element={<AppLayout><BookDetail /></AppLayout>} />
-            <Route path="/reports/book-detail-2" element={<AppLayout><BookDetail2 /></AppLayout>} />
-            <Route path="/reports/daily-pl" element={<AppLayout><DailyPL /></AppLayout>} />
-            <Route path="/reports/daily" element={<AppLayout><DailyReport /></AppLayout>} />
-            <Route path="/reports/final-sheet" element={<AppLayout><FinalSheet /></AppLayout>} />
-            <Route path="/reports/commission" element={<AppLayout><Accounts /></AppLayout>} />
-            <Route path="/current-position" element={<AppLayout><CurrentPosition /></AppLayout>} />
+
+            {/* Admin & Other Routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/accounts/create" element={<CreateAccount />} />
+            <Route path="/accounts/create-company" element={<CreateCompanyAccount />} />
+            <Route path="/reports/book-detail" element={<BookDetail />} />
+            <Route path="/reports/book-detail-2" element={<BookDetail2 />} />
+            <Route path="/reports/daily-pl" element={<DailyPL />} />
+            <Route path="/reports/daily" element={<DailyReport />} />
+            <Route path="/reports/final-sheet" element={<FinalSheet />} />
+            <Route path="/reports/commission" element={<Commission />} />
+            <Route path="/current-position" element={<CurrentPosition />} />
             <Route path="/play/current-position" element={<CurrentPosition />} />
-            <Route path="/accounts/view/:username" element={<AppLayout><AccountView /></AppLayout>} />
-            <Route path="/accounts/edit/:username" element={<AppLayout><EditClientPage /></AppLayout>} />
-            <Route path="/accounts/cash-credit/:username" element={<AppLayout><CashCreditPage /></AppLayout>} />
-            <Route path="/accounts/settle-pl/:username" element={<AppLayout><SettlePLPage /></AppLayout>} />
-            <Route path="/accounts/ledger/:username" element={<AppLayout><LedgerPage /></AppLayout>} />
-            <Route path="/bet-lock" element={<AppLayout><BetLock /></AppLayout>} />
-            <Route path="/settle-match" element={<AppLayout><SettleMatch /></AppLayout>} />
+            <Route path="/accounts/view/:username" element={<AccountView />} />
+            <Route path="/accounts/edit/:username" element={<AccountEdit />} />
+            <Route path="/accounts/cash-credit/:username" element={<CashCredit />} />
+            <Route path="/accounts/settle-pl/:username" element={<SettlePL />} />
+            <Route path="/accounts/ledger/:username" element={<Ledger />} />
+            <Route path="/bet-lock" element={<BetLock />} />
+            <Route path="/settle-match" element={<SettleMatch />} />
             <Route path="/play" element={<UserDashboard />} />
             <Route path="/casino" element={<UserDashboard />} />
             <Route path="/play/profile" element={<UserProfile />} />
@@ -81,11 +82,10 @@ const App = () => (
             <Route path="/play/bets" element={<UserBetHistory />} />
             <Route path="/play/match/:matchId" element={<MatchDetail />} />
             
+            {/* 404 Fallback */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-        <BrandingBadge />
-        <Analytics />
       </TooltipProvider>
     </QueryClientProvider>
   </HelmetProvider>
