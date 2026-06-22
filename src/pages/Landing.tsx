@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
-import { superdevClient } from "@/lib/superdev/client";
 import { Button } from "@/components/ui/button";
 import { Shield, Zap, TrendingUp, Trophy } from "lucide-react";
 
 export default function Landing() {
-  const currentPath = encodeURIComponent(window.location.href);
-  const loginUrl = (superdevClient.auth.client.options.loginUrl + "&from_url=" + currentPath).replace("/api", "");
-  const signupUrl = loginUrl.replace("app-login", "app-signup");
+  // Purani dead lines hata kar direct local paths set kar diye
+  const loginUrl = "/login";
+  const signupUrl = "/login"; // Betting exchange me admin khud account bana kar deta hai
 
   const features = [
     {
