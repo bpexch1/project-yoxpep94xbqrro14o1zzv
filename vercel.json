@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/integrations/(.*)",
+      "destination": "https://superdev.build/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+}
