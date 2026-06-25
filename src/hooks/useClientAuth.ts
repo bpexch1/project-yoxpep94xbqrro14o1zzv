@@ -17,7 +17,7 @@ export async function loginClient(username: string, password: string) {
   }
 }
 
-// 2. setClientSession function jo Login.tsx demand kar rahi hai (Local Storage management)
+// 2. setClientSession function jo Login.tsx demand kar rahi hai
 export const setClientSession = (sessionData: any) => {
   if (sessionData) {
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
@@ -30,4 +30,9 @@ export const setClientSession = (sessionData: any) => {
 export const getClientSession = () => {
   const data = localStorage.getItem(SESSION_KEY);
   return data ? JSON.parse(data) : null;
+};
+
+// 4. Logout function jo UserHeader.tsx ko chahiye (Session clear karne ke liye)
+export const clearClientSession = () => {
+  localStorage.removeItem(SESSION_KEY);
 };
