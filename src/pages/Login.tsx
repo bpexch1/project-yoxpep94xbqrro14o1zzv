@@ -1,356 +1,101 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Lock, Loader2, Key } from "lucide-react";
-import { Client } from "@/entities";
-import { setClientSession } from "@/hooks/useClientAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function Login() {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [forcedModal, setForcedModal] = useState(false);
-  const [pendingClient, setPendingClient] = useState<any>(null);
-  const [newPw, setNewPw] = useState('');
-  const [pwError, setPwError] = useState('');
-  const [changingPw, setChangingPw] = useState(false);
-  const [successModal, setSuccessModal] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter username and password.",
-      });
-      return;
-    }
-    setLoading(true);
+    setIsLoading(true);
+
     try {
-      // First try targeted filter by username (faster, less data)
-      let results = await (Client as any).filter({ username: username.trim() }, '-created_at', 10);
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-      // Fallback: case-insensitive search from a broader set if not found
-      if (!results || results.length === 0) {
-        const allClients = await Client.list('-created_at', 500);
-        results = allClients.filter((c: any) =>
-          c.username?.toLowerCase().trim() === username.trim().toLowerCase()
-        );
-      }
+      const data = await response.json();
 
-      const client = results.find((c: any) =>
-        c.username?.toLowerCase().trim() === username.trim().toLowerCase() &&
-        c.password === password
-      );
-      
-      if (client) {
-        if (client.password === client.username) {
-          setPendingClient(client);
-          setForcedModal(true);
-          setLoading(false);
-          return;
-        }
-
-        setClientSession({
-          id: client.id,
-          username: client.username,
-          full_name: client.full_name || client.username,
-          role: client.role || 'client',
-          credit_received: client.credit_received || 0,
-          credit_remaining: client.credit_remaining || 0,
-          cash: client.cash || 0,
-          pl_downline: client.pl_downline || 0,
-          balance_upline: client.balance_upline || 0,
-          status: client.status || 'active',
-        });
-        if (client.role === 'client') {
-          navigate("/play");
-        } else {
-          navigate("/dashboard");
-        }
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast({ title: "Success", description: "Login successful!" });
+        navigate("/dashboard");
       } else {
-        toast({
+        toast({ 
           variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid username or password.",
+          title: "Error", 
+          description: data.message || "Invalid credentials" 
         });
       }
-    } catch (err) {
-      console.error(err);
-      toast({
+    } catch (error) {
+      toast({ 
         variant: "destructive",
-        title: "Error",
-        description: "Something went wrong. Try again.",
+        title: "Error", 
+        description: "Something went wrong" 
       });
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!newPw || newPw.length < 4) { 
-      setPwError('Password must be at least 4 characters'); 
-      return; 
-    }
-    if (newPw === pendingClient?.username) { 
-      setPwError('New password cannot be same as username'); 
-      return; 
-    }
-    setChangingPw(true);
-    try {
-      await Client.update(pendingClient.id, { password: newPw });
-      setForcedModal(false);
-      setSuccessModal(true);
-      setTimeout(() => { 
-        setSuccessModal(false); 
-        setUsername('');
-        setPassword('');
-        setNewPw('');
-        setPwError('');
-        setPendingClient(null);
-        // Refresh page or clear state to allow login again
-      }, 2500);
-    } catch(e) {
-      setPwError('Failed to update password. Try again.');
-    } finally { 
-      setChangingPw(false); 
+      setIsLoading(false);
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
-        display: "flex",
-        flexDirection: "column",
-        paddingBottom: "8px",
-      }}
-    >
-      <style>{`
-        .login-input::placeholder { color: rgba(255,255,255,0.65); }
-        .login-input:focus { outline: none; }
-      `}</style>
-
-      {/* Login Card — upper portion, not vertically centered */}
-      <div
-        style={{
-          margin: "40px 16px 0",
-          borderRadius: 18,
-          background: "linear-gradient(180deg, #3a7490 0%, #1a4a6e 50%, #0d2640 100%)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
-          padding: "36px 28px 36px",
-          overflow: "hidden",
-        }}
-      >
-        {/* BP Logo Circle — centered inside card */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-          <div
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: "50%",
-              backgroundColor: "#3dd6c8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "Pacifico, cursive",
-                fontSize: "3.2rem",
-                color: "#0d1f30",
-                lineHeight: 1,
-                fontStyle: "italic",
-              }}
-            >
-              BP
-            </span>
-          </div>
-        </div>
-
-        <form onSubmit={handleLogin}>
-          {/* Username field */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
-              <User size={22} color="rgba(255,255,255,0.85)" />
-              <input
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <Card className="w-full max-w-md mx-4 bg-slate-800/50 border-slate-700">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold text-white">
+            BPEXCH
+          </CardTitle>
+          <p className="text-slate-400 mt-2">Exchange Admin Panel</p>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-white">Username</Label>
+              <Input
+                id="username"
                 type="text"
-                placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
                 required
-                className="login-input"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 17,
-                  fontFamily: '"Roboto Condensed", sans-serif',
-                }}
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
               />
             </div>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
-          </div>
-
-          {/* Password field */}
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
-              <Lock size={22} color="rgba(255,255,255,0.85)" />
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-white">Password</Label>
+              <Input
+                id="password"
                 type="password"
-                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
                 required
-                className="login-input"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 17,
-                  fontFamily: '"Roboto Condensed", sans-serif',
-                }}
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
               />
             </div>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
-          </div>
-
-          {/* Login Button — pill shape, centered */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "65%",
-                borderRadius: 50,
-                background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                fontWeight: 500,
-                padding: "14px 0",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                boxShadow: "0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                fontFamily: '"Roboto Condensed", sans-serif',
-                letterSpacing: 0.3,
-                transition: "opacity 0.2s",
-              }}
+            <Button 
+              type="submit" 
+              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              disabled={isLoading}
             >
-              {loading ? <Loader2 size={20} className="animate-spin" /> : "Login"}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Blue bar at bottom of screen */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: "#1a6090",
-        }}
-      />
-
-      {/* Forced Password Change Modal */}
-      {forcedModal && (
-        <div 
-          className="fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4"
-          style={{ backdropFilter: 'blur(4px)' }}
-        >
-          <div className="w-full max-w-[500px] bg-white rounded-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-            {/* Header */}
-            <div className="bg-[#1a4a6e] px-6 py-4 border-b border-white/10">
-              <h2 className="text-white text-lg font-bold flex items-center gap-2">
-                <Lock className="w-5 h-5" />
-                Change Your Password
-              </h2>
-            </div>
-            
-            {/* Body */}
-            <div className="p-8 text-center border-b border-gray-100">
-              <h3 className="text-2xl font-bold text-red-600 mb-4 blink_me">
-                Change Your Password ⚠️
-              </h3>
-              <p className="text-gray-700 font-semibold text-lg mb-2">
-                Password Checkup Detected that your password is no longer safe!
-              </p>
-              <p className="text-gray-500">
-                You should change your password now to use the Exchange.
-              </p>
-            </div>
-
-            {/* Form section */}
-            <div className="p-8 bg-gray-50">
-              <div className="flex items-center gap-2 mb-4 text-[#1a4a6e] font-bold">
-                <Key className="w-5 h-5" />
-                <label>Enter Your New Password Here!</label>
-              </div>
-              <input
-                type="password"
-                placeholder="New Password"
-                value={newPw}
-                onChange={(e) => {
-                  setNewPw(e.target.value);
-                  setPwError('');
-                }}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1a4a6e] focus:border-transparent outline-none transition-all"
-                autoFocus
-              />
-              {pwError && (
-                <div className="mt-2 text-red-500 text-sm font-semibold animate-bounce">
-                  {pwError}
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-6 flex justify-center bg-white">
-              <button
-                onClick={handleChangePassword}
-                disabled={changingPw}
-                className="w-full max-w-[200px] bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {changingPw ? <Loader2 className="w-5 h-5 animate-spin" /> : "Change Now"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Success Modal */}
-      {successModal && (
-        <div className="fixed inset-0 z-[1001] bg-black/80 flex items-center justify-center p-4">
-          <div className="w-full max-w-[400px] bg-white rounded-xl shadow-2xl p-8 text-center animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Password Changed Successfully</h2>
-            <p className="text-gray-600">Your password has been updated. Please login again with your new password.</p>
-          </div>
-        </div>
-      )}
+              {isLoading ? "Loading..." : "Login"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
-}
+};
+
+export default Login;
