@@ -1,6 +1,3 @@
-
-
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import Index from "./pages/Index";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Accounts from "./pages/Accounts";
@@ -36,58 +33,52 @@ import BetLock from "./pages/BetLock";
 import SettleMatch from "./pages/SettleMatch";
 import NotFound from "./pages/NotFound";
 import { BrandingBadge } from "./components/BrandingBadge";
-import { AppLayout } from "./components/layout/AppLayout";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+  <QueryClientProvider client={queryClient}>
+    <HelmetProvider>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
-            
-            {/* Protected Admin Routes */}
-            <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
-            <Route path="/accounts" element={<AppLayout><Accounts /></AppLayout>} />
-            <Route path="/accounts/create" element={<AppLayout><CreateUser /></AppLayout>} />
-            <Route path="/accounts/create-company" element={<AppLayout><CreateCompanyAccount /></AppLayout>} />
-            <Route path="/reports/book-detail" element={<AppLayout><BookDetail /></AppLayout>} />
-            <Route path="/reports/book-detail-2" element={<AppLayout><BookDetail2 /></AppLayout>} />
-            <Route path="/reports/daily-pl" element={<AppLayout><DailyPL /></AppLayout>} />
-            <Route path="/reports/daily" element={<AppLayout><DailyReport /></AppLayout>} />
-            <Route path="/reports/final-sheet" element={<AppLayout><FinalSheet /></AppLayout>} />
-            <Route path="/reports/commission" element={<AppLayout><Accounts /></AppLayout>} />
-            <Route path="/current-position" element={<AppLayout><CurrentPosition /></AppLayout>} />
-            <Route path="/play/current-position" element={<CurrentPosition />} />
-            <Route path="/accounts/view/:username" element={<AppLayout><AccountView /></AppLayout>} />
-            <Route path="/accounts/edit/:username" element={<AppLayout><EditClientPage /></AppLayout>} />
-            <Route path="/accounts/cash-credit/:username" element={<AppLayout><CashCreditPage /></AppLayout>} />
-            <Route path="/accounts/settle-pl/:username" element={<AppLayout><SettlePLPage /></AppLayout>} />
-            <Route path="/accounts/ledger/:username" element={<AppLayout><LedgerPage /></AppLayout>} />
-            <Route path="/bet-lock" element={<AppLayout><BetLock /></AppLayout>} />
-            <Route path="/settle-match" element={<AppLayout><SettleMatch /></AppLayout>} />
-            <Route path="/play" element={<UserDashboard />} />
-            <Route path="/casino" element={<UserDashboard />} />
-            <Route path="/play/profile" element={<UserProfile />} />
-            <Route path="/play/statement" element={<UserStatement />} />
-            <Route path="/play/result" element={<UserResult />} />
-            <Route path="/play/profit-loss" element={<UserProfitLoss />} />
-            <Route path="/play/bets" element={<UserBetHistory />} />
-            <Route path="/play/match/:matchId" element={<MatchDetail />} />
-            
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/create-user" element={<CreateUser />} />
+            <Route path="/create-company-account" element={<CreateCompanyAccount />} />
+            <Route path="/reports/book-detail" element={<BookDetail />} />
+            <Route path="/reports/book-detail-2" element={<BookDetail2 />} />
+            <Route path="/reports/daily-pl" element={<DailyPL />} />
+            <Route path="/reports/daily-report" element={<DailyReport />} />
+            <Route path="/reports/final-sheet" element={<FinalSheet />} />
+            <Route path="/current-position" element={<CurrentPosition />} />
+            <Route path="/account-view" element={<AccountView />} />
+            <Route path="/user-dashboard" element={<UserDashboard />} />
+            <Route path="/user-profile" element={<UserProfile />} />
+            <Route path="/user-statement" element={<UserStatement />} />
+            <Route path="/user-result" element={<UserResult />} />
+            <Route path="/user-profit-loss" element={<UserProfitLoss />} />
+            <Route path="/user-bet-history" element={<UserBetHistory />} />
+            <Route path="/match-detail" element={<MatchDetail />} />
+            <Route path="/accounts/edit-client" element={<EditClientPage />} />
+            <Route path="/accounts/cash-credit" element={<CashCreditPage />} />
+            <Route path="/accounts/settle-pl" element={<SettlePLPage />} />
+            <Route path="/accounts/ledger" element={<LedgerPage />} />
+            <Route path="/bet-lock" element={<BetLock />} />
+            <Route path="/settle-match" element={<SettleMatch />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-        <BrandingBadge />
-        <Analytics />
-      </TooltipProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
+          <Analytics />
+          <SpeedInsights />
+          <BrandingBadge />
+        </TooltipProvider>
+      </BrowserRouter>
+    </HelmetProvider>
+  </QueryClientProvider>
 );
 
 export default App;
