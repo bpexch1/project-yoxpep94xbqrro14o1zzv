@@ -11,35 +11,44 @@ export default function Dashboard() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // FIXED: Forward slashes ko hata kar backticks (`) use kiye hain
     if (searchUsername.trim()) navigate(`/accounts?search=${searchUsername.trim()}`);
   };
 
-  // Fetch DB matches for highlights
+  // 1. Fetch DB matches for highlights (Hum har response key ko deeply check karenge)
   const { data: dbMatches = [] } = useQuery({
     queryKey: ["admin-matches"],
     queryFn: async () => {
       const res = await Match.list("-created_at", 50);
-      // Backend object return kare ya array, crash nahi hoga
-      return Array.isArray(res) ? res : ((res as any)?.data || []);
+      if (!res) return [];
+      if (Array.isArray(res)) return res;
+      if ((res as any).data && Array.isArray((res as any).data)) return (res as any).data;
+      if ((res as any).matches && Array.isArray((res as any).matches)) return (res as any).matches;
+      return [];
     },
   });
 
-  // Fetch Betfair live events for highlights
-  const { data: betfairData, refetch: refetchBetfair, isFetching: isFetchingBetfair } = useQuery({
+  // 2. Fetch Betfair live events for highlights
+  const { data: betfairData = [], refetch: refetchBetfair, isFetching: isFetchingBetfair } = useQuery({
     queryKey: ['betfair-highlights'],
     queryFn: async () => {
       const res = await fetchBetfairEvents({});
-      return Array.isArray(res) ? res : ((res as any)?.data || []);
+      if (!res) return [];
+      if (Array.isArray(res)) return res;
+      if ((res as any).data && Array.isArray((res as any).data)) return (res as any).data;
+      if ((res as any).matches && Array.isArray((res as any).matches)) return (res as any).matches;
+      return [];
     },
     refetchInterval: 60000,
     retry: 1,
   });
 
-  // Fetch ATD Cricket matches for highlights
+  // 3. Fetch ATD Cricket matches for highlights
   const { data: atdData, refetch: refetchAtd, isFetching: isFetchingAtd } = useQuery({
     queryKey: ['atd-highlights'],
-    queryFn: () => fetchAtdCricketHome({}),
+    queryFn: async () => {
+      const res = await fetchAtdCricketHome({});
+      return res || {};
+    },
     refetchInterval: 60000,
     retry: 1,
   });
@@ -60,13 +69,17 @@ export default function Dashboard() {
     };
   };
 
-  // Safe Extraction for Cricket
+  // --- SAFE DATA PARSING ---
+
+  // CRICKET
   const dbCricket = Array.isArray(dbMatches)
-    ? (dbMatches as any[]).filter(m => m && m.sport?.toLowerCase() === 'cricket').map(normalizeMatch).filter(Boolean)
+    ? (dbMatches as any[]).filter(m => m && String(m.sport || m.sport_type || '').toLowerCase() === 'cricket').map(normalizeMatch).filter(Boolean)
     : [];
 
-  const atdCricket = (atdData && (atdData as any).matches && Array.isArray((atdData as any).matches))
-    ? ((atdData as any).matches as any[]).map(normalizeMatch).filter(Boolean).filter((atd: any) => {
+  // ATD Cricket Matches key handling
+  const rawAtdMatches = atdData ? ((atdData as any).matches || (atdData as any).data || (Array.isArray(atdData) ? atdData : [])) : [];
+  const atdCricket = Array.isArray(rawAtdMatches)
+    ? (rawAtdMatches as any[]).map(normalizeMatch).filter(Boolean).filter((atd: any) => {
         return !dbCricket.some((db: any) =>
           db.title?.toLowerCase().includes(atd.team1?.toLowerCase()) &&
           db.title?.toLowerCase().includes(atd.team2?.toLowerCase())
@@ -75,10 +88,9 @@ export default function Dashboard() {
     : [];
 
   const bfCricket = Array.isArray(betfairData)
-    ? (betfairData as any[]).filter(bf => bf && bf.sport?.toLowerCase() === 'cricket').map(normalizeMatch).filter(Boolean)
+    ? (betfairData as any[]).filter(bf => bf && String(bf.sport || bf.sport_type || '').toLowerCase() === 'cricket').map(normalizeMatch).filter(Boolean)
     : [];
 
-  // Combine all cricket matches
   const allCricket = [...dbCricket];
   [...atdCricket, ...bfCricket].forEach((apiMatch: any) => {
     if (!apiMatch) return;
@@ -93,16 +105,16 @@ export default function Dashboard() {
 
   const cricketMatches = allCricket.sort((a, b) => (a.status === 'live' ? -1 : 1));
 
-  // Safe Extraction for Football
+  // FOOTBALL (Soccer aur Football dono key text check)
   const footballMatches = [
-    ...(Array.isArray(dbMatches) ? (dbMatches as any[]).filter(m => m && (m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer')) : []),
-    ...(Array.isArray(betfairData) ? (betfairData as any[]).filter(bf => bf && (bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football')) : [])
+    ...(Array.isArray(dbMatches) ? (dbMatches as any[]).filter(m => m && (String(m.sport || m.sport_type || '').toLowerCase() === 'football' || String(m.sport || m.sport_type || '').toLowerCase() === 'soccer')) : []),
+    ...(Array.isArray(betfairData) ? (betfairData as any[]).filter(bf => bf && (String(bf.sport || bf.sport_type || '').toLowerCase() === 'soccer' || String(bf.sport || bf.sport_type || '').toLowerCase() === 'football')) : [])
   ].map(normalizeMatch).filter(Boolean);
 
-  // Safe Extraction for Tennis
+  // TENNIS
   const tennisMatches = [
-    ...(Array.isArray(dbMatches) ? (dbMatches as any[]).filter(m => m && m.sport?.toLowerCase() === 'tennis') : []),
-    ...(Array.isArray(betfairData) ? (betfairData as any[]).filter(bf => bf && bf.sport?.toLowerCase() === 'tennis') : [])
+    ...(Array.isArray(dbMatches) ? (dbMatches as any[]).filter(m => m && String(m.sport || m.sport_type || '').toLowerCase() === 'tennis') : []),
+    ...(Array.isArray(betfairData) ? (betfairData as any[]).filter(bf => bf && String(bf.sport || bf.sport_type || '').toLowerCase() === 'tennis') : [])
   ].map(normalizeMatch).filter(Boolean);
 
   const formatAmount = (n: number) => n.toLocaleString('en-IN');
@@ -140,7 +152,6 @@ export default function Dashboard() {
 
         {/* 2. Sport Highlights Card */}  
         <div style={{ background: "#fff", borderRadius: 8, border: "1px solid #d0d0d0", marginBottom: 14, overflow: "hidden" }}>  
-          {/* Header */}  
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: "#f0f0f0", borderBottom: "1px solid #d0d0d0" }}>  
             <span style={{ fontWeight: 700, fontSize: "14px", color: "#000000" }}>Sport Highlights</span>  
             <button  
