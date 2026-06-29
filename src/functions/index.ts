@@ -4,20 +4,26 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 export const fetchBetfairEvents = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/api/betfair/events`);
+    const res = await axios.get(
+      `${API_BASE_URL}/api/betfair/events`
+    );
+
     return res.data;
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return [];
   }
 };
 
 export const fetchAtdCricketHome = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/api/cricket/home`);
+    const res = await axios.get(
+      `${API_BASE_URL}/api/cricket/home`
+    );
+
     return res.data;
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return { matches: [] };
   }
 };
