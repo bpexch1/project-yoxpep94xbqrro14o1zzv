@@ -1,4 +1,5 @@
-// Purane dead client ko bypass kar ke direct application models export karna
+import { core } from "@/integrations/core";
+
 export const User = {
   auth: {
     currentUser: () => {
@@ -8,8 +9,22 @@ export const User = {
   }
 };
 
-// Entities definitions jo views backup ke liye use kar rahe hain
-export const Client = "Client";
-export const Transaction = "Transaction";
-export const Match = "Match";
-export const Bet = "Bet";
+export const Client = {
+  list: (options?: any) => core.list("Client", options),
+  filter: (query: any) => core.filter("Client", query)
+};
+
+export const Transaction = {
+  list: (options?: any) => core.list("Transaction", options),
+  filter: (query: any) => core.filter("Transaction", query)
+};
+
+export const Match = {
+  list: (options?: any) => core.list("Match", options),
+  filter: (query: any) => core.filter("Match", query)
+};
+
+export const Bet = {
+  list: (options?: any) => core.list("Bet", options),
+  filter: (query: any) => core.filter("Bet", query)
+};
