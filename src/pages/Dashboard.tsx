@@ -18,13 +18,20 @@ export default function Dashboard() {
   // Fetch DB matches for highlights
   const { data: dbMatches = [] } = useQuery({
     queryKey: ["admin-matches"],
-    queryFn: () => Match.list("-created_at", 50),
+    queryFn: async () => {
+      const res = await Match.list("-created_at", 50);
+      // Backend object return kare ya array, crash nahi hoga
+      return Array.isArray(res) ? res : ((res as any)?.data || []);
+    },
   });
 
   // Fetch Betfair live events for highlights
   const { data: betfairData, refetch: refetchBetfair, isFetching: isFetchingBetfair } = useQuery({
     queryKey: ['betfair-highlights'],
-    queryFn: () => fetchBetfairEvents({}),
+    queryFn: async () => {
+      const res = await fetchBetfairEvents({});
+      return Array.isArray(res) ? res : ((res as any)?.data || []);
+    },
     refetchInterval: 60000,
     retry: 1,
   });
@@ -44,6 +51,7 @@ export default function Dashboard() {
   };
 
   const normalizeMatch = (m: any) => {
+    if (!m) return null;
     const status = String(m.status || m.api_status || '').toLowerCase();
     const isLive = status === 'live' || status === 'inplay' || status === 'started';
     return {
@@ -52,20 +60,28 @@ export default function Dashboard() {
     };
   };
 
-  // Build highlights rows from DB matches and API matches
-  const dbCricket = (dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'cricket').map(normalizeMatch);
-  const atdCricket = (atdData?.matches || []).map(normalizeMatch).filter((atd: any) => {
-    // Avoid duplicating DB matches if they exist
-    return !dbCricket.some((db: any) =>
-      db.title?.toLowerCase().includes(atd.team1.toLowerCase()) &&
-      db.title?.toLowerCase().includes(atd.team2.toLowerCase())
-    );
-  });
-  const bfCricket = (betfairData || []).map(normalizeMatch).filter((bf: any) => bf.sport?.toLowerCase() === 'cricket');
+  // Safe Extraction for Cricket
+  const dbCricket = Array.isArray(dbMatches)
+    ? (dbMatches as any[]).filter(m => m && m.sport?.toLowerCase() === 'cricket').map(normalizeMatch).filter(Boolean)
+    : [];
 
-  // Combine all cricket matches, avoiding duplicates by title keywords
+  const atdCricket = (atdData && (atdData as any).matches && Array.isArray((atdData as any).matches))
+    ? ((atdData as any).matches as any[]).map(normalizeMatch).filter(Boolean).filter((atd: any) => {
+        return !dbCricket.some((db: any) =>
+          db.title?.toLowerCase().includes(atd.team1?.toLowerCase()) &&
+          db.title?.toLowerCase().includes(atd.team2?.toLowerCase())
+        );
+      })
+    : [];
+
+  const bfCricket = Array.isArray(betfairData)
+    ? (betfairData as any[]).filter(bf => bf && bf.sport?.toLowerCase() === 'cricket').map(normalizeMatch).filter(Boolean)
+    : [];
+
+  // Combine all cricket matches
   const allCricket = [...dbCricket];
   [...atdCricket, ...bfCricket].forEach((apiMatch: any) => {
+    if (!apiMatch) return;
     const exists = allCricket.some(m => {
       const t1 = apiMatch.team1?.toLowerCase() || '';
       const t2 = apiMatch.team2?.toLowerCase() || '';
@@ -77,20 +93,21 @@ export default function Dashboard() {
 
   const cricketMatches = allCricket.sort((a, b) => (a.status === 'live' ? -1 : 1));
 
+  // Safe Extraction for Football
   const footballMatches = [
-    ...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer'),
-    ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football')
-  ].map(normalizeMatch);
+    ...(Array.isArray(dbMatches) ? (dbMatches as any[]).filter(m => m && (m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer')) : []),
+    ...(Array.isArray(betfairData) ? (betfairData as any[]).filter(bf => bf && (bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football')) : [])
+  ].map(normalizeMatch).filter(Boolean);
 
+  // Safe Extraction for Tennis
   const tennisMatches = [
-    ...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'tennis'),
-    ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'tennis')
-  ].map(normalizeMatch);
+    ...(Array.isArray(dbMatches) ? (dbMatches as any[]).filter(m => m && m.sport?.toLowerCase() === 'tennis') : []),
+    ...(Array.isArray(betfairData) ? (betfairData as any[]).filter(bf => bf && bf.sport?.toLowerCase() === 'tennis') : [])
+  ].map(normalizeMatch).filter(Boolean);
 
   const formatAmount = (n: number) => n.toLocaleString('en-IN');
   const getAmount = (match: any, idx: number) => {
-    // Use a seeded random amount based on match id for consistency
-    const seed = match.id?.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) ?? idx;
+    const seed = match?.id?.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) ?? idx;
     const amounts = [18279968, 72620, 713, 65522, 83, 1090606, 965, 137243, 22836844, 457428941];
     return formatAmount(amounts[seed % amounts.length] + (idx * 1237));
   };
@@ -147,7 +164,7 @@ export default function Dashboard() {
               </thead>  
               <tbody>  
                 {cricketMatches.map((match: any, idx: number) => (  
-                  <tr key={match.id} style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: idx % 2 === 0 ? "#fff" : "#fafafa" }}>  
+                  <tr key={match.id || idx} style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: idx % 2 === 0 ? "#fff" : "#fafafa" }}>  
                     <td style={{ padding: "9px 12px", borderRight: "1px solid #dee2e6" }}>  
                       <div style={{ color: "#00b181", fontWeight: 500, fontSize: 13, lineHeight: 1.4, cursor: "pointer" }}>  
                         {match.title || `${match.team1} v ${match.team2}`} / Match Odds  
@@ -177,7 +194,7 @@ export default function Dashboard() {
               </thead>  
               <tbody>  
                 {footballMatches.map((match: any, idx: number) => (  
-                  <tr key={match.id} style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: idx % 2 === 0 ? "#fff" : "#fafafa" }}>  
+                  <tr key={match.id || idx} style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: idx % 2 === 0 ? "#fff" : "#fafafa" }}>  
                     <td style={{ padding: "9px 12px", borderRight: "1px solid #dee2e6" }}>  
                       <div style={{ color: "#00b181", fontWeight: 500, fontSize: 13, lineHeight: 1.4, cursor: "pointer" }}>  
                         {match.title || `${match.team1} v ${match.team2}`} / Match Odds  
@@ -207,7 +224,7 @@ export default function Dashboard() {
               </thead>  
               <tbody>  
                 {tennisMatches.map((match: any, idx: number) => (  
-                  <tr key={match.id} style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: idx % 2 === 0 ? "#fff" : "#fafafa" }}>  
+                  <tr key={match.id || idx} style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: idx % 2 === 0 ? "#fff" : "#fafafa" }}>  
                     <td style={{ padding: "9px 12px", borderRight: "1px solid #dee2e6" }}>  
                       <div style={{ color: "#00b181", fontWeight: 500, fontSize: 13, lineHeight: 1.4, cursor: "pointer" }}>  
                         {match.title || `${match.team1} v ${match.team2}`} / Match Odds  
