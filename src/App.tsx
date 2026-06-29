@@ -1,27 +1,20 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HelmetProvider } from "react-helmet-async";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 
-// Pages
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Accounts from "./pages/Accounts";
 import CreateUser from "./pages/CreateUser";
 import CreateCompanyAccount from "./pages/CreateCompanyAccount";
-
-import BookDetail from "./pages/reports/BookDetail";
-import BookDetail2 from "./pages/reports/BookDetail2";
-import DailyPL from "./pages/reports/DailyPL";
-import DailyReport from "./pages/reports/DailyReport";
-import FinalSheet from "./pages/reports/FinalSheet";
-// import Commission from "./pages/reports/Commission";
-
 import CurrentPosition from "./pages/CurrentPosition";
 import AccountView from "./pages/AccountView";
+import BetLock from "./pages/BetLock";
+import SettleMatch from "./pages/SettleMatch";
 
 import UserDashboard from "./pages/UserDashboard";
 import UserProfile from "./pages/UserProfile";
@@ -31,19 +24,14 @@ import UserProfitLoss from "./pages/UserProfitLoss";
 import UserBetHistory from "./pages/UserBetHistory";
 
 import MatchDetail from "./pages/MatchDetail";
+import FootballMatchDetail from "./pages/FootballMatchDetail";
+import TennisMatchDetail from "./pages/TennisMatchDetail";
 
-import EditClientPage from "./pages/accounts/EditClientPage";
-import CashCreditPage from "./pages/accounts/CashCreditPage";
-import SettlePLPage from "./pages/accounts/SettlePLPage";
-import LedgerPage from "./pages/accounts/LedgerPage";
-
-import BetLock from "./pages/BetLock";
-import SettleMatch from "./pages/SettleMatch";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function App() {
+export default function App() {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
@@ -53,6 +41,7 @@ function App() {
 
           <BrowserRouter>
             <Routes>
+
               {/* Login */}
               <Route path="/" element={<Login />} />
               <Route path="/login" element={<Login />} />
@@ -65,96 +54,72 @@ function App() {
                 path="/accounts/create-company"
                 element={<CreateCompanyAccount />}
               />
-
-              {/* Reports */}
-              <Route
-                path="/reports/book-detail"
-                element={<BookDetail />}
-              />
-              <Route
-                path="/reports/book-detail-2"
-                element={<BookDetail2 />}
-              />
-              <Route path="/reports/daily-pl" element={<DailyPL />} />
-              <Route path="/reports/daily" element={<DailyReport />} />
-              <Route
-                path="/reports/final-sheet"
-                element={<FinalSheet />}
-              />
-
-              {/* Uncomment only if file exists */}
-              {/*
-              <Route
-                path="/reports/commission"
-                element={<Commission />}
-              />
-              */}
-
-              {/* Positions */}
-              <Route
-                path="/current-position"
-                element={<CurrentPosition />}
-              />
-              <Route
-                path="/play/current-position"
-                element={<CurrentPosition />}
-              />
-
-              {/* Accounts */}
               <Route
                 path="/accounts/view/:username"
                 element={<AccountView />}
               />
+
               <Route
-                path="/accounts/edit/:username"
-                element={<EditClientPage />}
-              />
-              <Route
-                path="/accounts/cash-credit/:username"
-                element={<CashCreditPage />}
-              />
-              <Route
-                path="/accounts/settle-pl/:username"
-                element={<SettlePLPage />}
-              />
-              <Route
-                path="/accounts/ledger/:username"
-                element={<LedgerPage />}
+                path="/current-position"
+                element={<CurrentPosition />}
               />
 
-              {/* Betting */}
               <Route path="/bet-lock" element={<BetLock />} />
               <Route path="/settle-match" element={<SettleMatch />} />
 
               {/* User */}
               <Route path="/play" element={<UserDashboard />} />
               <Route path="/casino" element={<UserDashboard />} />
-              <Route path="/play/profile" element={<UserProfile />} />
-              <Route path="/play/statement" element={<UserStatement />} />
-              <Route path="/play/result" element={<UserResult />} />
+
+              <Route
+                path="/play/profile"
+                element={<UserProfile />}
+              />
+
+              <Route
+                path="/play/statement"
+                element={<UserStatement />}
+              />
+
+              <Route
+                path="/play/result"
+                element={<UserResult />}
+              />
+
               <Route
                 path="/play/profit-loss"
                 element={<UserProfitLoss />}
               />
+
               <Route
                 path="/play/bets"
                 element={<UserBetHistory />}
               />
+
+              {/* Match Pages */}
               <Route
                 path="/play/match/:matchId"
                 element={<MatchDetail />}
               />
 
+              <Route
+                path="/football/:matchId"
+                element={<FootballMatchDetail />}
+              />
+
+              <Route
+                path="/tennis/:matchId"
+                element={<TennisMatchDetail />}
+              />
+
               {/* 404 */}
               <Route path="*" element={<NotFound />} />
+
             </Routes>
           </BrowserRouter>
 
-          <SpeedInsights />
         </TooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>
   );
 }
-
-export default App;
