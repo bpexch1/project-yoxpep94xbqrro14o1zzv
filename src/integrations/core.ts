@@ -3,12 +3,26 @@ import axios from "axios";
 // Aapke Node.js backend ka base URL (agar local hai to http://localhost:5000 ya jo bhi port hai)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
+/**
+ * Ensures the response is always a valid array, even on partial API failures
+ */
+function ensureArray(data: any): any[] {
+  if (Array.isArray(data)) return data;
+  if (data === null || data === undefined) return [];
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    // If it's an error response object or similar, return empty
+    console.warn("API returned non-array data:", data);
+    return [];
+  }
+  return [];
+}
+
 // Custom local object jo SuperdevClient ki jagah aapke Node.js endpoints ko hit karega
 export const core = {
   filter: async (entityName: string, query: any) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/entities/filter`, { entityName, query });
-      return response.data;
+      return ensureArray(response.data);
     } catch (error) {
       console.error("Entity filtering error:", error);
       return [];
@@ -17,7 +31,7 @@ export const core = {
   list: async (entityName: string, options?: any) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/entities/list/${entityName}`);
-      return response.data;
+      return ensureArray(response.data);
     } catch (error) {
       console.error("Entity list error:", error);
       return [];
