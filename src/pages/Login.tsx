@@ -1,219 +1,131 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Lock, Loader2 } from "lucide-react";
-import { setClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Login() {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter username and password.",
-      });
-      return;
-    }
-    setLoading(true);
-    
+    setIsLoading(true);
+
     try {
-      const trimmedUser = username.trim().toLowerCase();
-      const trimmedPass = password.trim();
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-      // HARDCODED CREDENTIALS FOR TESTING & FIRST LOGIN
-      // Baad me aap isko apne naye backend/database se jor sakte hain
-      if (
-        (trimmedUser === "superadmin" && trimmedPass === "admin123") || 
-        (trimmedUser === "admin" && trimmedPass === "pass123")
-      ) {
-        setClientSession({
-          id: "local-session-id",
-          username: trimmedUser,
-          full_name: trimmedUser === "superadmin" ? "Super Admin" : "Admin Master",
-          role: trimmedUser === "superadmin" ? "superadmin" : "admin",
-          credit_received: 100000,
-          credit_remaining: 100000,
-          cash: 50000,
-          pl_downline: 0,
-          balance_upline: 0,
-          status: "active",
-        });
+      const data = await response.json();
 
-        toast({
-          title: "Success",
-          description: "Logged in successfully!",
-        });
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast({ title: "Success", description: "Logged in successfully!" });
 
-        // Direct dashboard par redirect karein
-        navigate("/dashboard");
+        // Navigate to dashboard after successful login
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
       } else {
-        toast({
+        toast({ 
           variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid local username or password.",
+          title: "Error", 
+          description: data.message || "Invalid credentials" 
         });
       }
-    } catch (err) {
-      console.error(err);
-      toast({
+    } catch (error) {
+      toast({ 
         variant: "destructive",
-        title: "Error",
-        description: "Something went wrong.",
+        title: "Error", 
+        description: "Something went wrong" 
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div
+    <div 
+      className="min-h-screen flex items-center justify-center"
       style={{
-        minHeight: "100vh",
-        background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
-        display: "flex",
-        flexDirection: "column",
-        paddingBottom: "8px",
+        background: "linear-gradient(135deg, #1a3a52 0%, #0d2137 100%)",
       }}
     >
-      <style>{`
-        .login-input::placeholder { color: rgba(255,255,255,0.65); }
-        .login-input:focus { outline: none; }
-      `}</style>
-
-      <div
+      <div 
+        className="w-full max-w-sm mx-4 p-8 rounded-2xl"
         style={{
-          margin: "40px 16px 0",
-          borderRadius: 18,
-          background: "linear-gradient(180deg, #3a7490 0%, #1a4a6e 50%, #0d2640 100%)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
-          padding: "36px 28px 36px",
-          overflow: "hidden",
+          background: "linear-gradient(135deg, #1e4d6b 0%, #0f2d44 100%)",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-          <div
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <div 
+            className="w-24 h-24 rounded-full flex items-center justify-center"
             style={{
-              width: 120,
-              height: 120,
-              borderRadius: "50%",
-              backgroundColor: "#3dd6c8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+              background: "linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%)",
             }}
           >
-            <span
-              style={{
-                fontFamily: "Pacifico, cursive",
-                fontSize: "3.2rem",
-                color: "#0d1f30",
-                lineHeight: 1,
-                fontStyle: "italic",
-              }}
-            >
+            <span className="text-4xl font-bold text-slate-900" style={{ fontFamily: '"Playfair Display", serif' }}>
               BP
             </span>
           </div>
         </div>
 
-        <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
-              <User size={22} color="rgba(255,255,255,0.85)" />
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="login-input"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 17,
-                  fontFamily: '"Roboto Condensed", sans-serif',
-                }}
-              />
-            </div>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Username */}
+          <div className="flex items-center gap-3 border-b border-slate-500 pb-2">
+            <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              required
+              className="flex-1 bg-transparent border-none outline-none text-white text-lg"
+              style={{ fontFamily: '"Roboto Condensed", sans-serif' }}
+            />
           </div>
 
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
-              <Lock size={22} color="rgba(255,255,255,0.85)" />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="login-input"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 17,
-                  fontFamily: '"Roboto Condensed", sans-serif',
-                }}
-              />
-            </div>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
+          {/* Password */}
+          <div className="flex items-center gap-3 border-b border-slate-500 pb-2">
+            <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="flex-1 bg-transparent border-none outline-none text-white text-lg"
+              style={{ fontFamily: '"Roboto Condensed", sans-serif' }}
+            />
           </div>
 
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "65%",
-                borderRadius: 50,
-                background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                fontWeight: 500,
-                padding: "14px 0",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                boxShadow: "0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                fontFamily: '"Roboto Condensed", sans-serif',
-                letterSpacing: 0.3,
-                transition: "opacity 0.2s",
-              }}
-            >
-              {loading ? <Loader2 size={20} className="animate-spin" /> : "Login"}
-            </button>
-          </div>
+          {/* Login Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 rounded-full text-white font-semibold text-lg mt-4"
+            style={{
+              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+              boxShadow: "0 4px 15px rgba(59, 130, 246, 0.4)",
+            }}
+          >
+            {isLoading ? "Loading..." : "Login"}
+          </button>
         </form>
       </div>
-
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: "#1a6090",
-        }}
-      />
     </div>
   );
-}
+};
+
+export default Login;
