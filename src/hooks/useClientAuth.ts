@@ -1,24 +1,49 @@
-import axios from "axios";
+import { supabase } from "@/integrations/supabase";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 const SESSION_KEY = "clientSession";
 
-// 1. Login function jo aapke Node.js backend ko hit karega
-export async function loginClient(username: string, password: string) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { username, password });
-    if (response.data && response.data.token) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(response.data));
-      return response.data;
-    }
-    throw new Error("Invalid response from server");
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || "Login failed");
-  }
+export interface ClientSession {
+  id: string;
+  username: string;
+  full_name: string;
+  role: string;
+  credit_received: number;
+  credit_remaining: number;
+  cash: number;
+  pl_downline: number;
+  balance_upline: number;
+  status: string;
 }
 
-// 2. setClientSession function jo Login.tsx demand kar rahi hai
-export const setClientSession = (sessionData: any) => {
+export async function loginClient(username: string, password: string): Promise<ClientSession> {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("username", username)
+    .eq("password", password)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Invalid username or password");
+
+  const session: ClientSession = {
+    id: data.id,
+    username: data.username,
+    full_name: data.full_name || data.username,
+    role: data.role || "client",
+    credit_received: data.credit_received || 0,
+    credit_remaining: data.credit_remaining || 0,
+    cash: data.cash || 0,
+    pl_downline: data.pl_downline || 0,
+    balance_upline: data.balance_upline || 0,
+    status: data.status || "active",
+  };
+
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  return session;
+}
+
+export const setClientSession = (sessionData: ClientSession | null) => {
   if (sessionData) {
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
   } else {
@@ -26,13 +51,11 @@ export const setClientSession = (sessionData: any) => {
   }
 };
 
-// 3. Current session read karne ka hook function
-export const getClientSession = () => {
+export const getClientSession = (): ClientSession | null => {
   const data = localStorage.getItem(SESSION_KEY);
   return data ? JSON.parse(data) : null;
 };
 
-// 4. Logout function jo UserHeader.tsx ko chahiye (Session clear karne ke liye)
 export const clearClientSession = () => {
   localStorage.removeItem(SESSION_KEY);
 };
