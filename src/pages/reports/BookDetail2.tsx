@@ -32,6 +32,7 @@ export default function BookDetail2() {
       if (!session || downlineUsernames === undefined) return [];
       
       let query = BetEntity.query().sort("-created_at");
+      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
       
       // Ownership check: Only Company sees all
       if (downlineUsernames === null) {
@@ -40,13 +41,15 @@ export default function BookDetail2() {
         query = query.where("user_email", session.username);
       } else {
         // Admin/Agent roles: see self + downline
-        const allowedUsernames = [session.username, ...(downlineUsernames || [])];
+        const allowedUsernames = [session.username, ...safeDownlineUsernames];
         query = query.in("user_email", allowedUsernames);
       }
       
       const all = await query.exec();
+      const safeAll = Array.isArray(all) ? all : [];
       
-      return all.filter(b => {
+      return safeAll.filter(b => {
+        if (!b?.created_at) return false;
         const date = b.created_at.split('T')[0];
         return date >= fromDate && date <= toDate;
       });
@@ -59,13 +62,17 @@ export default function BookDetail2() {
   };
 
   const getPL = (bet: any) => {
+    if (!bet) return 0;
     if (bet.status === "won") return bet.potential_win || 0;
     if (bet.status === "lost") return -(bet.stake || 0);
     return 0;
   };
 
-  const totalStake = bets?.reduce((acc, b) => acc + (b.stake || 0), 0) || 0;
-  const totalPL = bets?.reduce((acc, b) => acc + getPL(b), 0) || 0;
+  // Safe array conversion for reduce and map functions
+  const safeBets = Array.isArray(bets) ? bets : [];
+
+  const totalStake = safeBets.reduce((acc, b) => acc + (b?.stake || 0), 0) || 0;
+  const totalPL = safeBets.reduce((acc, b) => acc + getPL(b), 0) || 0;
 
   const exportColumns = [
     { key: "sno", label: "S.No" },
@@ -79,16 +86,16 @@ export default function BookDetail2() {
     { key: "status", label: "Status" },
   ];
 
-  const exportData = (bets || []).map((b, i) => ({
+  const exportData = safeBets.map((b, i) => ({
     sno: i + 1,
-    dateStr: new Date(b.created_at).toLocaleString(),
-    client: b.user_email || "",
-    match_title: b.match_title || "",
-    selection: b.selection || "",
-    bet_type: b.bet_type || "",
-    stake: (b.stake || 0).toFixed(2),
+    dateStr: b?.created_at ? new Date(b.created_at).toLocaleString() : "—",
+    client: b?.user_email || "",
+    match_title: b?.match_title || "",
+    selection: b?.selection || "",
+    bet_type: b?.bet_type || "",
+    stake: (b?.stake || 0).toFixed(2),
     pl: getPL(b).toFixed(2),
-    status: b.status || "",
+    status: b?.status || "",
   }));
 
   return (
@@ -148,7 +155,7 @@ export default function BookDetail2() {
                 data={exportData} 
                 columns={exportColumns} 
                 filename={`Book-Detail-2-${fromDate}-${toDate}`} 
-                disabled={!bets?.length} 
+                disabled={!safeBets.length} 
               />
             </div>
             <div className="overflow-x-auto">
@@ -173,41 +180,41 @@ export default function BookDetail2() {
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto" />
                       </td>
                     </tr>
-                  ) : bets && bets.length > 0 ? (
-                    bets.map((b, i) => (
-                      <tr key={b.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]")}>
+                  ) : safeBets.length > 0 ? (
+                    safeBets.map((b, i) => (
+                      <tr key={b?.id || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]")}>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700">{i + 1}</td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 whitespace-nowrap">
-                          {new Date(b.created_at).toLocaleDateString()}
+                          {b?.created_at ? new Date(b.created_at).toLocaleDateString() : "—"}
                         </td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 min-w-[120px] font-medium">
-                          {b.match_title}
+                          {b?.match_title || "—"}
                         </td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700">{b.selection}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700">{b?.selection || "—"}</td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-center">
                           <span className={cn(
                             "px-1.5 py-0.5 rounded-[2px] text-[10px] font-bold uppercase",
-                            b.bet_type === "back" ? "bg-blue-100 text-blue-600" : "bg-pink-100 text-pink-600"
+                            b?.bet_type === "back" ? "bg-blue-100 text-blue-600" : "bg-pink-100 text-pink-600"
                           )}>
-                            {b.bet_type}
+                            {b?.bet_type || "—"}
                           </span>
                         </td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-medium text-gray-700">{b.odds}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-medium text-gray-700">{b.stake}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-medium text-gray-700">{b?.odds || 0}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-medium text-gray-700">{b?.stake || 0}</td>
                         <td className={cn(
                           "border border-[#d5d8dc] px-2 py-1.5 text-right font-bold",
                           getPL(b) > 0 ? "text-[#00b181]" : getPL(b) < 0 ? "text-[#e74c3c]" : "text-gray-400"
                         )}>
-                          {getPL(b) > 0 ? `+${getPL(b)}` : getPL(b)}
+                          {getPL(b) > 0 ? `+${getPL(b).toFixed(2)}` : getPL(b).toFixed(2)}
                         </td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-center">
                           <span className={cn(
                             "px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase",
-                            b.status === "won" ? "bg-[#00b181] text-white" : 
-                            b.status === "lost" ? "bg-[#e74c3c] text-white" : 
+                            b?.status === "won" ? "bg-[#00b181] text-white" : 
+                            b?.status === "lost" ? "bg-[#e74c3c] text-white" : 
                             "bg-gray-200 text-gray-600"
                           )}>
-                            {b.status}
+                            {b?.status || "—"}
                           </span>
                         </td>
                       </tr>
@@ -220,7 +227,7 @@ export default function BookDetail2() {
                     </tr>
                   )}
                 </tbody>
-                {bets && bets.length > 0 && (
+                {safeBets.length > 0 && (
                   <tfoot>
                     <tr className="bg-[#ecf0f1] font-bold">
                       <td colSpan={6} className="border border-[#d5d8dc] px-2 py-2 text-right text-[#2c3e50]">Total:</td>
