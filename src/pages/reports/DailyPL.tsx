@@ -32,20 +32,26 @@ export default function DailyPL() {
       if (!session) return [];
       
       // Fetch bets based on role
-      let all: any[];
+      let all: any[] = [];
+      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
+
       if (downlineUsernames === null) {
         // Company role: see all bets
-        all = await BetEntity.query().sort("-created_at").exec();
+        const res = await BetEntity.query().sort("-created_at").exec();
+        all = Array.isArray(res) ? res : [];
       } else if (session.role === 'client') {
-        all = await BetEntity.query().where("user_email", session.username).sort("-created_at").exec();
+        const res = await BetEntity.query().where("user_email", session.username).sort("-created_at").exec();
+        all = Array.isArray(res) ? res : [];
       } else {
         // Admin/agent: see downline bets
-        if (!downlineUsernames || downlineUsernames.length === 0) return [];
+        if (safeDownlineUsernames.length === 0) return [];
         const allBets = await BetEntity.query().sort("-created_at").exec();
-        all = allBets.filter((b: any) => downlineUsernames.includes(b.user_email));
+        const safeAllBets = Array.isArray(allBets) ? allBets : [];
+        all = safeAllBets.filter((b: any) => b?.user_email && safeDownlineUsernames.includes(b.user_email));
       }
       
       const filtered = all.filter(b => {
+        if (!b?.created_at) return false;
         const date = b.created_at.split('T')[0];
         return date >= fromDate && date <= toDate;
       });
@@ -53,6 +59,7 @@ export default function DailyPL() {
       // Group by date
       const groups: Record<string, any> = {};
       filtered.forEach(b => {
+        if (!b?.created_at) return;
         const date = b.created_at.split('T')[0];
         if (!groups[date]) {
           groups[date] = {
@@ -86,13 +93,16 @@ export default function DailyPL() {
     setSearchTrigger(prev => prev + 1);
   };
 
-  const grandTotal = dailyData?.reduce((acc, day) => ({
-    totalBets: acc.totalBets + day.totalBets,
-    totalStake: acc.totalStake + day.totalStake,
-    totalWon: acc.totalWon + day.totalWon,
-    totalLost: acc.totalLost + day.totalLost,
-    netPL: acc.netPL + day.netPL,
-    commission: acc.commission + day.commission,
+  // Safe array conversion for render logic
+  const safeDailyData = Array.isArray(dailyData) ? dailyData : [];
+
+  const grandTotal = safeDailyData.reduce((acc, day) => ({
+    totalBets: acc.totalBets + (day?.totalBets || 0),
+    totalStake: acc.totalStake + (day?.totalStake || 0),
+    totalWon: acc.totalWon + (day?.totalWon || 0),
+    totalLost: acc.totalLost + (day?.totalLost || 0),
+    netPL: acc.netPL + (day?.netPL || 0),
+    commission: acc.commission + (day?.commission || 0),
   }), { totalBets: 0, totalStake: 0, totalWon: 0, totalLost: 0, netPL: 0, commission: 0 });
 
   const exportColumns = [
@@ -105,14 +115,14 @@ export default function DailyPL() {
     { key: "commission", label: "Commission" },
   ];
 
-  const exportData = (dailyData || []).map((day) => ({
-    date: day.date,
-    totalBets: day.totalBets,
-    totalStake: day.totalStake.toFixed(2),
-    totalWon: day.totalWon.toFixed(2),
-    totalLost: day.totalLost.toFixed(2),
-    netPL: day.netPL.toFixed(2),
-    commission: day.commission.toFixed(2),
+  const exportData = safeDailyData.map((day) => ({
+    date: day?.date || "—",
+    totalBets: day?.totalBets || 0,
+    totalStake: (day?.totalStake || 0).toFixed(2),
+    totalWon: (day?.totalWon || 0).toFixed(2),
+    totalLost: (day?.totalLost || 0).toFixed(2),
+    netPL: (day?.netPL || 0).toFixed(2),
+    commission: (day?.commission || 0).toFixed(2),
   }));
 
   return (
@@ -172,7 +182,7 @@ export default function DailyPL() {
                 data={exportData} 
                 columns={exportColumns} 
                 filename={`Daily-PL-${fromDate}-${toDate}`} 
-                disabled={!dailyData?.length} 
+                disabled={!safeDailyData.length} 
               />
             </div>
             <div className="overflow-x-auto">
@@ -195,22 +205,22 @@ export default function DailyPL() {
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto" />
                       </td>
                     </tr>
-                  ) : dailyData && dailyData.length > 0 ? (
-                    dailyData.map((day, i) => (
-                      <tr key={day.date} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]")}>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 font-medium">{day.date}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-center text-gray-700">{day.totalBets}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-gray-700 font-medium">{day.totalStake.toFixed(2)}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-[#00b181] font-medium">{day.totalWon.toFixed(2)}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-[#e74c3c] font-medium">{day.totalLost.toFixed(2)}</td>
+                  ) : safeDailyData.length > 0 ? (
+                    safeDailyData.map((day, i) => (
+                      <tr key={day?.date || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]")}>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 font-medium">{day?.date || "—"}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-center text-gray-700">{day?.totalBets || 0}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-gray-700 font-medium">{(day?.totalStake || 0).toFixed(2)}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-[#00b181] font-medium">{(day?.totalWon || 0).toFixed(2)}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-[#e74c3c] font-medium">{(day?.totalLost || 0).toFixed(2)}</td>
                         <td className={cn(
                           "border border-[#d5d8dc] px-2 py-1.5 text-right font-bold",
-                          day.netPL >= 0 ? "text-[#00b181]" : "text-[#e74c3c]"
+                          (day?.netPL || 0) >= 0 ? "text-[#00b181]" : "text-[#e74c3c]"
                         )}>
-                          {day.netPL.toFixed(2)}
+                          {(day?.netPL || 0).toFixed(2)}
                         </td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-gray-500 italic">
-                          {day.commission.toFixed(2)}
+                          {(day?.commission || 0).toFixed(2)}
                         </td>
                       </tr>
                     ))
@@ -222,7 +232,7 @@ export default function DailyPL() {
                     </tr>
                   )}
                 </tbody>
-                {dailyData && dailyData.length > 0 && grandTotal && (
+                {safeDailyData.length > 0 && grandTotal && (
                   <tfoot>
                     <tr className="bg-[#ecf0f1] font-bold">
                       <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#2c3e50]">Total:</td>
