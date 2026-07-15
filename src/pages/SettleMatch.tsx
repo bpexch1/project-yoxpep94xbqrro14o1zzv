@@ -29,8 +29,7 @@ import {
   Activity, 
   CheckCircle2, 
   AlertTriangle,
-  Loader2,
-  ArrowRight
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +53,7 @@ export default function SettleMatch() {
     mutationFn: (variables: { matchId: string; winningSide: string }) => 
       settleBets(variables),
     onSuccess: (data: any) => {
-      if (data.success) {
+      if (data?.success) {
         setSettlementResult(data);
         toast({
           title: "Settlement Successful",
@@ -65,7 +64,7 @@ export default function SettleMatch() {
         toast({
           variant: "destructive",
           title: "Settlement Failed",
-          description: data.error || "An unknown error occurred.",
+          description: data?.error || "An unknown error occurred.",
         });
       }
     },
@@ -100,6 +99,9 @@ export default function SettleMatch() {
     );
   }
 
+  // Helper variable to check if settlements is a valid array
+  const safeSettlements = Array.isArray(settlementResult?.settlements) ? settlementResult.settlements : [];
+
   return (
     <div className="py-6 px-[5px] max-w-7xl mx-auto space-y-6">
       <div className="space-y-2">
@@ -112,7 +114,7 @@ export default function SettleMatch() {
         </p>
       </div>
 
-      {!matches || matches.length === 0 ? (
+      {!Array.isArray(matches) || matches.length === 0 ? (
         <Card className="border-dashed border-2">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Activity className="w-12 h-12 text-muted-foreground mb-4" />
@@ -191,7 +193,7 @@ export default function SettleMatch() {
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertTitle className="text-green-800 font-semibold">Settlement Complete</AlertTitle>
                 <AlertDescription className="text-green-700">
-                  Successfully processed {settlementResult.totalBetsSettled} bets for {settlementResult.winningSide}.
+                  Successfully processed {settlementResult?.totalBetsSettled || 0} bets for {settlementResult?.winningSide}.
                 </AlertDescription>
               </Alert>
 
@@ -208,26 +210,34 @@ export default function SettleMatch() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {settlementResult.settlements.map((s: any, idx: number) => (
-                      <TableRow key={idx}>
-                        <TableCell className="font-medium">{s.username}</TableCell>
-                        <TableCell>{s.stake}</TableCell>
-                        <TableCell>
-                          <Badge variant={s.status === "won" ? "default" : "destructive"}>
-                            {s.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className={s.pl_raw >= 0 ? "text-green-600" : "text-red-600"}>
-                          {s.pl_raw >= 0 ? "+" : ""}{s.pl_raw.toFixed(2)}
-                        </TableCell>
-                        <TableCell className={s.pl_downline >= 0 ? "text-green-600" : "text-red-600"}>
-                          {s.pl_downline >= 0 ? "+" : ""}{s.pl_downline.toFixed(2)}
-                        </TableCell>
-                        <TableCell className={s.pl_upline >= 0 ? "text-green-600" : "text-red-600"}>
-                          {s.pl_upline >= 0 ? "+" : ""}{s.pl_upline.toFixed(2)}
+                    {safeSettlements.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-4">
+                          No settlements details available.
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : (
+                      safeSettlements.map((s: any, idx: number) => (
+                        <TableRow key={idx}>
+                          <TableCell className="font-medium">{s?.username || "—"}</TableCell>
+                          <TableCell>{s?.stake || 0}</TableCell>
+                          <TableCell>
+                            <Badge variant={s?.status === "won" ? "default" : "destructive"}>
+                              {s?.status || "lost"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className={(s?.pl_raw || 0) >= 0 ? "text-green-600" : "text-red-600"}>
+                            {(s?.pl_raw || 0) >= 0 ? "+" : ""}{(s?.pl_raw || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell className={(s?.pl_downline || 0) >= 0 ? "text-green-600" : "text-red-600"}>
+                            {(s?.pl_downline || 0) >= 0 ? "+" : ""}{(s?.pl_downline || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell className={(s?.pl_upline || 0) >= 0 ? "text-green-600" : "text-red-600"}>
+                            {(s?.pl_upline || 0) >= 0 ? "+" : ""}{(s?.pl_upline || 0).toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -235,7 +245,7 @@ export default function SettleMatch() {
               <div className="grid grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="pt-6">
-                    <div className="text-2xl font-bold">{settlementResult.totalBetsSettled}</div>
+                    <div className="text-2xl font-bold">{settlementResult?.totalBetsSettled || 0}</div>
                     <div className="text-xs text-muted-foreground">Total Bets</div>
                   </CardContent>
                 </Card>
@@ -243,9 +253,9 @@ export default function SettleMatch() {
                   <CardContent className="pt-6">
                     <div className={cn(
                       "text-2xl font-bold",
-                      settlementResult.settlements.reduce((acc: number, s: any) => acc + s.pl_downline, 0) >= 0 ? "text-green-600" : "text-red-600"
+                      safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_downline || 0), 0) >= 0 ? "text-green-600" : "text-red-600"
                     )}>
-                      {settlementResult.settlements.reduce((acc: number, s: any) => acc + s.pl_downline, 0).toFixed(2)}
+                      {safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_downline || 0), 0).toFixed(2)}
                     </div>
                     <div className="text-xs text-muted-foreground">Admin Total</div>
                   </CardContent>
@@ -254,9 +264,9 @@ export default function SettleMatch() {
                   <CardContent className="pt-6">
                     <div className={cn(
                       "text-2xl font-bold",
-                      settlementResult.settlements.reduce((acc: number, s: any) => acc + s.pl_upline, 0) >= 0 ? "text-green-600" : "text-red-600"
+                      safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_upline || 0), 0) >= 0 ? "text-green-600" : "text-red-600"
                     )}>
-                      {settlementResult.settlements.reduce((acc: number, s: any) => acc + s.pl_upline, 0).toFixed(2)}
+                      {safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_upline || 0), 0).toFixed(2)}
                     </div>
                     <div className="text-xs text-muted-foreground">Company Total</div>
                   </CardContent>
