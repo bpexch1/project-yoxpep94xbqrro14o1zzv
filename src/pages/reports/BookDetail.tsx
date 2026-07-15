@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Filter, Search, Loader2, BookOpen } from "lucide-react";
-import { Transaction as TransactionEntity, Client } from "@/entities";
+import { Transaction as TransactionEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { cn } from "@/lib/utils";
@@ -33,11 +33,12 @@ export default function BookDetail() {
       if (!session || searchTrigger === 0) return [];
       
       let all: any[];
+      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
       
       // If a specific username is filtered
       if (usernameFilter.trim() !== "") {
         // Still check if the user is allowed to see this client
-        const isAllowed = downlineUsernames === null || (downlineUsernames && downlineUsernames.includes(usernameFilter)) || usernameFilter === session.username;
+        const isAllowed = downlineUsernames === null || (safeDownlineUsernames.includes(usernameFilter)) || usernameFilter === session.username;
         
         if (!isAllowed) {
           return [];
@@ -53,19 +54,22 @@ export default function BookDetail() {
           all = await TransactionEntity.query().where("client_username", session.username).sort("-created_at").exec();
         } else {
           // Admin/agent: see downline transactions
-          if (!downlineUsernames || downlineUsernames.length === 0) {
+          if (safeDownlineUsernames.length === 0) {
             // Also show own transactions
             all = await TransactionEntity.query().where("client_username", session.username).sort("-created_at").exec();
           } else {
             const allTxns = await TransactionEntity.query().sort("-created_at").exec();
-            const allAllowed = [session.username, ...downlineUsernames];
-            all = allTxns.filter((t: any) => allAllowed.includes(t.client_username));
+            const allAllowed = [session.username, ...safeDownlineUsernames];
+            const safeAllTxns = Array.isArray(allTxns) ? allTxns : [];
+            all = safeAllTxns.filter((t: any) => allAllowed.includes(t?.client_username));
           }
         }
       }
       
+      const safeAll = Array.isArray(all) ? all : [];
       // Filter by date range
-      return all.filter(t => {
+      return safeAll.filter(t => {
+        if (!t?.created_at) return false;
         const date = t.created_at.split('T')[0];
         return date >= fromDate && date <= toDate;
       }).reverse(); // Reverse to chronological for running balance calculation
@@ -77,16 +81,18 @@ export default function BookDetail() {
     setSearchTrigger(prev => prev + 1);
   };
 
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+
   // Calculate running balance starting from the first transaction in the period
   let runningBalance = 0;
-  const processedTransactions = transactions?.map((t) => {
-    const amount = t.amount || 0;
+  const processedTransactions = safeTransactions.map((t) => {
+    const amount = t?.amount || 0;
     const isCredit = amount > 0;
     const dr = isCredit ? 0 : Math.abs(amount);
     const cr = isCredit ? amount : 0;
     
     // Use the entity's recorded balance if present
-    const balance = t.after_balance !== undefined ? t.after_balance : (runningBalance += amount);
+    const balance = t?.after_balance !== undefined ? t.after_balance : (runningBalance += amount);
     
     return {
       ...t,
@@ -96,8 +102,10 @@ export default function BookDetail() {
     };
   }).reverse(); // Back to reverse chronological for table display
 
-  const totalDr = processedTransactions?.reduce((acc, t) => acc + t.dr, 0) || 0;
-  const totalCr = processedTransactions?.reduce((acc, t) => acc + t.cr, 0) || 0;
+  const safeProcessedTransactions = Array.isArray(processedTransactions) ? processedTransactions : [];
+
+  const totalDr = safeProcessedTransactions.reduce((acc, t) => acc + (t?.dr || 0), 0) || 0;
+  const totalCr = safeProcessedTransactions.reduce((acc, t) => acc + (t?.cr || 0), 0) || 0;
 
   const exportColumns = [
     { key: "sno", label: "S.No" },
@@ -108,14 +116,16 @@ export default function BookDetail() {
     { key: "balance", label: "Balance" },
   ];
 
-  const exportData = processedTransactions?.map((t, i) => ({
+  const exportData = safeProcessedTransactions.map((t, i) => ({
     sno: i + 1,
-    dateStr: new Date(t.created_at).toLocaleString(),
-    description: t.description || "",
-    dr: t.dr.toFixed(2),
-    cr: t.cr.toFixed(2),
-    balance: t.balance.toFixed(2),
-  })) || [];
+    dateStr: t?.created_at ? new Date(t.created_at).toLocaleString() : "—",
+    description: t?.description || "",
+    dr: (t?.dr || 0).toFixed(2),
+    cr: (t?.cr || 0).toFixed(2),
+    balance: (t?.balance || 0).toFixed(2),
+  }));
+
+  const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
 
   return (
     <div className="bg-[#e8e8e8] min-h-screen pb-16">
@@ -146,7 +156,7 @@ export default function BookDetail() {
                   className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors"
                 />
                 <datalist id="downline-users-list">
-                  {downlineUsernames?.map((name: string) => (
+                  {safeDownlineUsernames.map((name: string) => (
                     <option key={name} value={name} />
                   ))}
                   <option value={session?.username} />
@@ -198,7 +208,7 @@ export default function BookDetail() {
                 data={exportData} 
                 columns={exportColumns} 
                 filename={`Book-Detail-${fromDate}-${toDate}`} 
-                disabled={!processedTransactions?.length} 
+                disabled={!safeProcessedTransactions.length} 
               />
             </div>
 
@@ -227,23 +237,25 @@ export default function BookDetail() {
                         <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71] mx-auto" />
                       </td>
                     </tr>
-                  ) : processedTransactions && processedTransactions.length > 0 ? (
-                    processedTransactions.map((t, i) => (
-                      <tr key={t.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa]")}>
+                  ) : safeProcessedTransactions.length > 0 ? (
+                    safeProcessedTransactions.map((t, i) => (
+                      <tr key={t?.id || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa]")}>
                         <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057]">{i + 1}</td>
                         <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057]">
-                          {new Date(t.created_at).toLocaleDateString()}<br/>
-                          <span className="text-[10px] text-gray-400">{new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          {t?.created_at ? new Date(t.created_at).toLocaleDateString() : "—"}<br/>
+                          <span className="text-[10px] text-gray-400">
+                            {t?.created_at ? new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
+                          </span>
                         </td>
-                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057] min-w-[150px]">{t.description}</td>
-                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", t.dr > 0 ? "text-[#e74c3c]" : "text-gray-400")}>
-                          {t.dr > 0 ? t.dr.toFixed(2) : "0.00"}
+                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057] min-w-[150px]">{t?.description || "—"}</td>
+                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", (t?.dr || 0) > 0 ? "text-[#e74c3c]" : "text-gray-400")}>
+                          {(t?.dr || 0) > 0 ? (t?.dr || 0).toFixed(2) : "0.00"}
                         </td>
-                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", t.cr > 0 ? "text-[#1a9e71]" : "text-gray-400")}>
-                          {t.cr > 0 ? t.cr.toFixed(2) : "0.00"}
+                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", (t?.cr || 0) > 0 ? "text-[#1a9e71]" : "text-gray-400")}>
+                          {(t?.cr || 0) > 0 ? (t?.cr || 0).toFixed(2) : "0.00"}
                         </td>
                         <td className="border border-[#dee2e6] px-3 py-1.5 text-right font-bold text-[#254465]">
-                          {t.balance.toFixed(2)}
+                          {(t?.balance || 0).toFixed(2)}
                         </td>
                       </tr>
                     ))
@@ -255,7 +267,7 @@ export default function BookDetail() {
                     </tr>
                   )}
                 </tbody>
-                {processedTransactions && processedTransactions.length > 0 && (
+                {safeProcessedTransactions.length > 0 && (
                   <tfoot>
                     <tr className="bg-[#ecf0f1] font-bold">
                       <td colSpan={3} className="border border-[#dee2e6] px-3 py-2 text-right text-[#2c3e50]">Total:</td>
@@ -272,7 +284,7 @@ export default function BookDetail() {
 
             {searchTrigger > 0 && !isLoading && (
               <div className="px-3 py-2 text-[11px] text-[#555] bg-[#f8f9fa] border-t border-[#d0d0d0]">
-                Showing {processedTransactions?.length || 0} entries
+                Showing {safeProcessedTransactions.length} entries
               </div>
             )}
           </section>
