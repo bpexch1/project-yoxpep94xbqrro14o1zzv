@@ -32,27 +32,38 @@ export default function DailyReport() {
     queryFn: async () => {
       if (!session) return [];
       
+      // Build safe execution and fetch all records to do in-memory robust filtering 
+      // preventing any query builder execution errors (like undefined '.in()' or '.where()' issues)
       let query = BetEntity.query().sort("-created_at");
-      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
-      
-      // Ownership check: Only Company sees all
-      if (downlineUsernames === null) {
-        // Company role: sees all
-      } else if (session.role === 'client') {
-        query = query.where("user_email", session.username);
-      } else {
-        // Admin/Agent roles: see self + downline
-        const allowedUsernames = [session.username, ...safeDownlineUsernames].filter(Boolean);
-        query = query.in("user_email", allowedUsernames);
-      }
-
       const all = await query.exec();
       const safeAll = Array.isArray(all) ? all : [];
-      
+      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
+
       return safeAll.filter((b: any) => {
-        if (!b?.created_at) return false;
+        if (!b) return false;
+
+        // 1. Ownership & Role-based filtering
+        let isAuthorized = false;
+        if (downlineUsernames === null) {
+          // Company role: sees everything
+          isAuthorized = true;
+        } else if (session.role === 'client') {
+          // Client only sees their own
+          isAuthorized = b.user_email === session.username;
+        } else {
+          // Admin/Agent roles: see self + downline list
+          const allowedUsernames = [session.username, ...safeDownlineUsernames].filter(Boolean);
+          isAuthorized = allowedUsernames.includes(b.user_email);
+        }
+
+        if (!isAuthorized) return false;
+
+        // 2. Date Filter
+        if (!b.created_at) return false;
         const date = b.created_at.split('T')[0];
         const dateMatch = date >= fromDate && date <= toDate;
+
+        // 3. Username Search Filter
         const userMatch = usernameFilter 
           ? b.user_email?.toLowerCase().includes(usernameFilter.toLowerCase()) 
           : true;
@@ -74,7 +85,6 @@ export default function DailyReport() {
     return 0;
   };
 
-  // Safe array conversion for calculations
   const safeBets = Array.isArray(bets) ? bets : [];
 
   const totalStake = safeBets.reduce((acc, b) => acc + (b?.stake || 0), 0) || 0;
