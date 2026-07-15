@@ -33,6 +33,7 @@ export default function DailyReport() {
       if (!session || downlineUsernames === undefined) return [];
       
       let query = BetEntity.query().sort("-created_at");
+      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
       
       // Ownership check: Only Company sees all
       if (downlineUsernames === null) {
@@ -41,13 +42,15 @@ export default function DailyReport() {
         query = query.where("user_email", session.username);
       } else {
         // Admin/Agent roles: see self + downline
-        const allowedUsernames = [session.username, ...(downlineUsernames || [])];
+        const allowedUsernames = [session.username, ...safeDownlineUsernames];
         query = query.in("user_email", allowedUsernames);
       }
 
       const all = await query.exec();
+      const safeAll = Array.isArray(all) ? all : [];
       
-      return all.filter(b => {
+      return safeAll.filter(b => {
+        if (!b?.created_at) return false;
         const date = b.created_at.split('T')[0];
         const dateMatch = date >= fromDate && date <= toDate;
         const userMatch = usernameFilter ? b.user_email?.toLowerCase().includes(usernameFilter.toLowerCase()) : true;
@@ -63,13 +66,17 @@ export default function DailyReport() {
   };
 
   const getPL = (bet: any) => {
+    if (!bet) return 0;
     if (bet.status === "won") return bet.potential_win || 0;
     if (bet.status === "lost") return -(bet.stake || 0);
     return 0;
   };
 
-  const totalStake = bets?.reduce((acc, b) => acc + (b.stake || 0), 0) || 0;
-  const totalPL = bets?.reduce((acc, b) => acc + getPL(b), 0) || 0;
+  // Safe array conversion for reduce calculations
+  const safeBets = Array.isArray(bets) ? bets : [];
+
+  const totalStake = safeBets.reduce((acc, b) => acc + (b?.stake || 0), 0) || 0;
+  const totalPL = safeBets.reduce((acc, b) => acc + getPL(b), 0) || 0;
 
   const exportColumns = [
     { key: "sno", label: "S.No" },
@@ -83,16 +90,16 @@ export default function DailyReport() {
     { key: "status", label: "Status" },
   ];
 
-  const exportData = (bets || []).map((b, i) => ({
+  const exportData = safeBets.map((b, i) => ({
     sno: i + 1,
-    dateStr: new Date(b.created_at).toLocaleString(),
-    client: b.user_email || "",
-    match_title: b.match_title || "",
-    selection: b.selection || "",
-    bet_type: b.bet_type || "",
-    stake: (b.stake || 0).toFixed(2),
+    dateStr: b?.created_at ? new Date(b.created_at).toLocaleString() : "—",
+    client: b?.user_email || "",
+    match_title: b?.match_title || "",
+    selection: b?.selection || "",
+    bet_type: b?.bet_type || "",
+    stake: (b?.stake || 0).toFixed(2),
     pl: getPL(b).toFixed(2),
-    status: b.status || "",
+    status: b?.status || "",
   }));
 
   return (
@@ -162,7 +169,7 @@ export default function DailyReport() {
                 data={exportData} 
                 columns={exportColumns} 
                 filename={`Daily-Report-${fromDate}-${toDate}`} 
-                disabled={!bets?.length} 
+                disabled={!safeBets.length} 
               />
             </div>
             <div className="overflow-x-auto">
@@ -186,29 +193,29 @@ export default function DailyReport() {
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto" />
                       </td>
                     </tr>
-                  ) : bets && bets.length > 0 ? (
-                    bets.map((b, i) => (
-                      <tr key={b.id} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa] hover:bg-gray-50 transition-colors")}>
+                  ) : safeBets.length > 0 ? (
+                    safeBets.map((b, i) => (
+                      <tr key={b?.id || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa] hover:bg-gray-50 transition-colors")}>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-500">{i + 1}</td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 whitespace-nowrap">
-                          {new Date(b.created_at).toLocaleDateString()}
+                          {b?.created_at ? new Date(b.created_at).toLocaleDateString() : "—"}
                         </td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-[#254465] font-bold">
-                          {b.user_email?.split('@')[0]}
+                          {b?.user_email ? b.user_email.split('@')[0] : "—"}
                         </td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 min-w-[100px]">
-                          <div className="font-medium">{b.match_title}</div>
-                          <div className="text-[10px] text-gray-400 italic">{b.selection}</div>
+                          <div className="font-medium">{b?.match_title || "—"}</div>
+                          <div className="text-[10px] text-gray-400 italic">{b?.selection || "—"}</div>
                         </td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-center">
                           <span className={cn(
                             "px-1 py-0.5 rounded text-[9px] font-bold uppercase",
-                            b.bet_type === "back" ? "bg-blue-100 text-blue-600" : "bg-pink-100 text-pink-600"
+                            b?.bet_type === "back" ? "bg-blue-100 text-blue-600" : "bg-pink-100 text-pink-600"
                           )}>
-                            {b.bet_type?.charAt(0)}
+                            {b?.bet_type ? b.bet_type.charAt(0) : "—"}
                           </span>
                         </td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-medium text-gray-700">{b.stake}</td>
+                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right font-medium text-gray-700">{b?.stake || 0}</td>
                         <td className={cn(
                           "border border-[#d5d8dc] px-2 py-1.5 text-right font-bold",
                           getPL(b) > 0 ? "text-[#00b181]" : getPL(b) < 0 ? "text-[#e74c3c]" : "text-gray-400"
@@ -218,8 +225,8 @@ export default function DailyReport() {
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-center">
                           <span className={cn(
                             "w-2 h-2 rounded-full inline-block",
-                            b.status === "won" ? "bg-[#00b181]" : 
-                            b.status === "lost" ? "bg-[#e74c3c]" : 
+                            b?.status === "won" ? "bg-[#00b181]" : 
+                            b?.status === "lost" ? "bg-[#e74c3c]" : 
                             "bg-gray-300"
                           )} />
                         </td>
@@ -233,7 +240,7 @@ export default function DailyReport() {
                     </tr>
                   )}
                 </tbody>
-                {bets && bets.length > 0 && (
+                {safeBets.length > 0 && (
                   <tfoot>
                     <tr className="bg-[#ecf0f1] font-bold text-[#2c3e50]">
                       <td colSpan={5} className="border border-[#d5d8dc] px-2 py-2 text-right uppercase text-[10px]">Grand Total</td>
