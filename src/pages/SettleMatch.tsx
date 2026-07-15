@@ -41,13 +41,19 @@ export default function SettleMatch() {
   const [settlementResult, setSettlementResult] = useState<any>(null);
 
   // Fetch active matches
-  const { data: matches, isLoading } = useQuery({
+  const { data: rawMatches, isLoading } = useQuery({
     queryKey: ["matches-active"],
-    queryFn: () => Match.query()
-      .where("status", "in", ["live", "upcoming"])
-      .sort("-match_time")
-      .exec(),
+    queryFn: async () => {
+      const res = await Match.query()
+        .where("status", "in", ["live", "upcoming"])
+        .sort("-match_time")
+        .exec();
+      return Array.isArray(res) ? res : [];
+    },
   });
+
+  // Ensure matches is always treated as an array
+  const matches = Array.isArray(rawMatches) ? rawMatches : [];
 
   const settleMutation = useMutation({
     mutationFn: (variables: { matchId: string; winningSide: string }) => 
@@ -57,7 +63,7 @@ export default function SettleMatch() {
         setSettlementResult(data);
         toast({
           title: "Settlement Successful",
-          description: `Settled ${data.totalBetsSettled} bets for match.`,
+          description: `Settled ${data?.totalBetsSettled || 0} bets for match.`,
         });
         queryClient.invalidateQueries({ queryKey: ["matches-active"] });
       } else {
@@ -72,7 +78,7 @@ export default function SettleMatch() {
       toast({
         variant: "destructive",
         title: "Settlement Failed",
-        description: error.message || "An error occurred during settlement.",
+        description: error?.message || "An error occurred during settlement.",
       });
     },
   });
@@ -84,7 +90,7 @@ export default function SettleMatch() {
   };
 
   const handleConfirmSettle = (winningSide: string) => {
-    if (!selectedMatch) return;
+    if (!selectedMatch?.id || !winningSide) return;
     settleMutation.mutate({
       matchId: selectedMatch.id,
       winningSide,
@@ -100,7 +106,9 @@ export default function SettleMatch() {
   }
 
   // Helper variable to check if settlements is a valid array
-  const safeSettlements = Array.isArray(settlementResult?.settlements) ? settlementResult.settlements : [];
+  const safeSettlements = settlementResult && Array.isArray(settlementResult.settlements) 
+    ? settlementResult.settlements 
+    : [];
 
   return (
     <div className="py-6 px-[5px] max-w-7xl mx-auto space-y-6">
@@ -114,7 +122,7 @@ export default function SettleMatch() {
         </p>
       </div>
 
-      {!Array.isArray(matches) || matches.length === 0 ? (
+      {matches.length === 0 ? (
         <Card className="border-dashed border-2">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Activity className="w-12 h-12 text-muted-foreground mb-4" />
@@ -124,55 +132,58 @@ export default function SettleMatch() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {matches.map((match: any) => (
-            <Card key={match.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <CardHeader className="bg-muted/50 pb-4">
-                <div className="flex justify-between items-start mb-2">
-                  <Badge variant={match.status === "live" ? "destructive" : "secondary"} className="capitalize">
-                    {match.status}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {new Date(match.match_time).toLocaleDateString()}
-                  </span>
-                </div>
-                <CardTitle className="text-lg line-clamp-2">{match.title}</CardTitle>
-                <CardDescription className="capitalize">{match.sport}</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground uppercase">{match.team1}</span>
-                    <div className="flex gap-2">
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        {match.back_odds || "—"}
-                      </Badge>
-                      <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">
-                        {match.lay_odds || "—"}
-                      </Badge>
+          {matches.map((match: any) => {
+            if (!match) return null;
+            return (
+              <Card key={match.id || Math.random()} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <CardHeader className="bg-muted/50 pb-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <Badge variant={match.status === "live" ? "destructive" : "secondary"} className="capitalize">
+                      {match.status || "Upcoming"}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {match.match_time ? new Date(match.match_time).toLocaleDateString() : "—"}
+                    </span>
+                  </div>
+                  <CardTitle className="text-lg line-clamp-2">{match.title || "Untitled Match"}</CardTitle>
+                  <CardDescription className="capitalize">{match.sport || "General"}</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">{match.team1 || "Team 1"}</span>
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          {match.back_odds || "—"}
+                        </Badge>
+                        <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">
+                          {match.lay_odds || "—"}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-right">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">{match.team2 || "Team 2"}</span>
+                      <div className="flex gap-2 justify-end">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          {match.back_odds2 || "—"}
+                        </Badge>
+                        <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">
+                          {match.lay_odds2 || "—"}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-1 text-right">
-                    <span className="text-xs font-medium text-muted-foreground uppercase">{match.team2}</span>
-                    <div className="flex gap-2 justify-end">
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        {match.back_odds2 || "—"}
-                      </Badge>
-                      <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">
-                        {match.lay_odds2 || "—"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <Button 
-                  onClick={() => handleOpenSettle(match)}
-                  className="w-full bg-brand-green hover:bg-brand-green-hover text-white"
-                >
-                  Settle Match
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                  <Button 
+                    onClick={() => handleOpenSettle(match)}
+                    className="w-full bg-brand-green hover:bg-brand-green-hover text-white"
+                  >
+                    Settle Match
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -180,7 +191,7 @@ export default function SettleMatch() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl flex items-center gap-2">
-              Settling: {selectedMatch?.title}
+              Settling: {selectedMatch?.title || "Match"}
             </DialogTitle>
             <DialogDescription>
               Choose the winning side to distribute P/L across all pending bets.
@@ -193,7 +204,7 @@ export default function SettleMatch() {
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertTitle className="text-green-800 font-semibold">Settlement Complete</AlertTitle>
                 <AlertDescription className="text-green-700">
-                  Successfully processed {settlementResult?.totalBetsSettled || 0} bets for {settlementResult?.winningSide}.
+                  Successfully processed {settlementResult?.totalBetsSettled || 0} bets for {settlementResult?.winningSide || "Selected Side"}.
                 </AlertDescription>
               </Alert>
 
@@ -293,7 +304,7 @@ export default function SettleMatch() {
                     disabled={settleMutation.isPending}
                   >
                     <span className="text-xs text-muted-foreground uppercase">Team 1</span>
-                    <span className="text-lg font-bold">{selectedMatch?.team1}</span>
+                    <span className="text-lg font-bold">{selectedMatch?.team1 || "Team 1"}</span>
                   </Button>
                   <Button 
                     variant="outline"
@@ -302,7 +313,7 @@ export default function SettleMatch() {
                     disabled={settleMutation.isPending}
                   >
                     <span className="text-xs text-muted-foreground uppercase">Team 2</span>
-                    <span className="text-lg font-bold">{selectedMatch?.team2}</span>
+                    <span className="text-lg font-bold">{selectedMatch?.team2 || "Team 2"}</span>
                   </Button>
                 </div>
                 <Button 
