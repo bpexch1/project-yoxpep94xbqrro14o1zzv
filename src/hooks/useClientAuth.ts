@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase";
 
 const SESSION_KEY = "clientSession";
 
@@ -15,36 +15,12 @@ export interface ClientSession {
   status: string;
 }
 
-export const useClientSession = () => {
-  const [user, setUser] = useState<ClientSession | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    try {
-      const data = localStorage.getItem(SESSION_KEY);
-
-      if (data) {
-        setUser(JSON.parse(data));
-      }
-    } catch (err) {
-      console.error(err);
-      localStorage.removeItem(SESSION_KEY);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const logout = () => {
+export const setClientSession = (session: ClientSession | null) => {
+  if (session) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } else {
     localStorage.removeItem(SESSION_KEY);
-    setUser(null);
-    window.location.href = "/login";
-  };
-
-  return {
-    user,
-    isLoading,
-    logout,
-  };
+  }
 };
 
 export const getClientSession = (): ClientSession | null => {
@@ -56,3 +32,36 @@ export const getClientSession = (): ClientSession | null => {
     return null;
   }
 };
+
+export const clearClientSession = () => {
+  localStorage.removeItem(SESSION_KEY);
+};
+
+export async function loginClient(username: string, password: string): Promise<ClientSession> {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("username", username)
+    .eq("password", password)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Invalid username or password");
+
+  const session: ClientSession = {
+    id: data.id,
+    username: data.username,
+    full_name: data.full_name || data.username,
+    role: data.role || "client",
+    credit_received: data.credit_received || 0,
+    credit_remaining: data.credit_remaining || 0,
+    cash: data.cash || 0,
+    pl_downline: data.pl_downline || 0,
+    balance_upline: data.balance_upline || 0,
+    status: data.status || "active",
+  };
+
+  setClientSession(session);
+
+  return session;
+}
