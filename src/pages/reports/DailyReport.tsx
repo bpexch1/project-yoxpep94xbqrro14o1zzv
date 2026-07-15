@@ -30,7 +30,7 @@ export default function DailyReport() {
   const { data: bets, isLoading } = useQuery({
     queryKey: ["daily-report", session?.username, fromDate, toDate, usernameFilter, searchTrigger, downlineUsernames],
     queryFn: async () => {
-      if (!session || downlineUsernames === undefined) return [];
+      if (!session) return [];
       
       let query = BetEntity.query().sort("-created_at");
       const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
@@ -42,18 +42,20 @@ export default function DailyReport() {
         query = query.where("user_email", session.username);
       } else {
         // Admin/Agent roles: see self + downline
-        const allowedUsernames = [session.username, ...safeDownlineUsernames];
+        const allowedUsernames = [session.username, ...safeDownlineUsernames].filter(Boolean);
         query = query.in("user_email", allowedUsernames);
       }
 
       const all = await query.exec();
       const safeAll = Array.isArray(all) ? all : [];
       
-      return safeAll.filter(b => {
+      return safeAll.filter((b: any) => {
         if (!b?.created_at) return false;
         const date = b.created_at.split('T')[0];
         const dateMatch = date >= fromDate && date <= toDate;
-        const userMatch = usernameFilter ? b.user_email?.toLowerCase().includes(usernameFilter.toLowerCase()) : true;
+        const userMatch = usernameFilter 
+          ? b.user_email?.toLowerCase().includes(usernameFilter.toLowerCase()) 
+          : true;
         
         return dateMatch && userMatch;
       });
@@ -72,7 +74,7 @@ export default function DailyReport() {
     return 0;
   };
 
-  // Safe array conversion for reduce calculations
+  // Safe array conversion for calculations
   const safeBets = Array.isArray(bets) ? bets : [];
 
   const totalStake = safeBets.reduce((acc, b) => acc + (b?.stake || 0), 0) || 0;
@@ -194,7 +196,7 @@ export default function DailyReport() {
                       </td>
                     </tr>
                   ) : safeBets.length > 0 ? (
-                    safeBets.map((b, i) => (
+                    safeBets.map((b: any, i) => (
                       <tr key={b?.id || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa] hover:bg-gray-50 transition-colors")}>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-500">{i + 1}</td>
                         <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 whitespace-nowrap">
