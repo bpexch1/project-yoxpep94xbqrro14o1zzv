@@ -50,7 +50,7 @@ export default function AccountView() {
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchInterval: 15000,
-    select: (data: any) => data ? data.map((c: any) => ({ ...c })) : [],
+    select: (data: any) => Array.isArray(data) ? data.map((c: any) => ({ ...c })) : [],
   });
 
   if (isAuthorized === null) {
@@ -63,7 +63,7 @@ export default function AccountView() {
 
   if (isAuthorized === false) return null;
 
-  const clientsKey = clients ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
+  const clientsKey = Array.isArray(clients) ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
 
   return (
     <div className="bg-[#f0f0f0] min-h-screen pb-16">

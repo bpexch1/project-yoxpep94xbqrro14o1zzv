@@ -254,6 +254,69 @@ export default function Login() {
               {loading ? <Loader2 size={20} className="animate-spin" /> : "Login"}
             </button>
           </div>
+
+          {/* Demo account quick login helpers */}
+          <div style={{ marginTop: 24, textAlign: "center" }}>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginBottom: 8 }}>
+              Quick Demo Accounts:
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("Book");
+                  setPassword("admin");
+                }}
+                style={{
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  color: "#fff",
+                  borderRadius: 14,
+                  padding: "4px 12px",
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
+                Company (Book)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("admin");
+                  setPassword("admin");
+                }}
+                style={{
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  color: "#fff",
+                  borderRadius: 14,
+                  padding: "4px 12px",
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
+                Admin (admin)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("client1");
+                  setPassword("client1");
+                }}
+                style={{
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  color: "#fff",
+                  borderRadius: 14,
+                  padding: "4px 12px",
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
+                Player (client1)
+              </button>
+            </div>
+          </div>
         </form>
       </div>
 

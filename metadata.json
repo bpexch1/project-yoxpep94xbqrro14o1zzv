@@ -1,0 +1,6 @@
+{
+  "name": "Exchange Admin Panel",
+  "description": "Professional sports betting exchange admin panel and player dashboard with live odds, ledger, client management, and report generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

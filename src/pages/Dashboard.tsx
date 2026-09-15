@@ -23,7 +23,14 @@ export default function Dashboard() {
   // Fetch Betfair live events for highlights
   const { data: betfairData, refetch: refetchBetfair, isFetching: isFetchingBetfair } = useQuery({
     queryKey: ['betfair-highlights'],
-    queryFn: () => fetchBetfairEvents({}),
+    queryFn: async () => {
+      try {
+        const res = await fetchBetfairEvents({});
+        return Array.isArray(res) ? res : [];
+      } catch {
+        return [];
+      }
+    },
     refetchInterval: 60000,
     retry: 1,
   });
@@ -31,7 +38,14 @@ export default function Dashboard() {
   // Fetch ATD Cricket matches for highlights
   const { data: atdData, refetch: refetchAtd, isFetching: isFetchingAtd } = useQuery({
     queryKey: ['atd-highlights'],
-    queryFn: () => fetchAtdCricketHome({}),
+    queryFn: async () => {
+      try {
+        const res = await fetchAtdCricketHome({});
+        return (res && typeof res === 'object' && Array.isArray(res.matches)) ? res : { matches: [] };
+      } catch {
+        return { matches: [] };
+      }
+    },
     refetchInterval: 60000,
     retry: 1,
   });
@@ -43,6 +57,7 @@ export default function Dashboard() {
   };
 
   const normalizeMatch = (m: any) => {
+    if (!m || typeof m !== 'object') return null;
     const status = String(m.status || m.api_status || '').toLowerCase();
     const isLive = status === 'live' || status === 'inplay' || status === 'started';
     return {
@@ -52,19 +67,36 @@ export default function Dashboard() {
   };
 
   // Build highlights rows from DB matches and API matches
-  const dbCricket = (dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'cricket').map(normalizeMatch);
-  const atdCricket = (atdData?.matches || []).map(normalizeMatch).filter((atd: any) => {
-    // Avoid duplicating DB matches if they exist
-    return !dbCricket.some((db: any) => 
-      db.title?.toLowerCase().includes(atd.team1.toLowerCase()) && 
-      db.title?.toLowerCase().includes(atd.team2.toLowerCase())
-    );
-  });
-  const bfCricket = (betfairData || []).map(normalizeMatch).filter((bf: any) => bf.sport?.toLowerCase() === 'cricket');
+  const safeDbList = Array.isArray(dbMatches) ? dbMatches : [];
+  const safeBetfairList = Array.isArray(betfairData) ? betfairData : [];
+  const safeAtdList = Array.isArray(atdData?.matches) ? atdData.matches : [];
+
+  const dbCricket = safeDbList
+    .filter(m => m && m.sport?.toLowerCase() === 'cricket')
+    .map(normalizeMatch)
+    .filter(Boolean);
+
+  const atdCricket = safeAtdList
+    .map(normalizeMatch)
+    .filter((atd: any) => {
+      if (!atd) return false;
+      const t1 = (atd.team1 || '').toLowerCase();
+      const t2 = (atd.team2 || '').toLowerCase();
+      // Avoid duplicating DB matches if they exist
+      return !dbCricket.some((db: any) => 
+        (t1 && db.title?.toLowerCase().includes(t1)) && 
+        (t2 && db.title?.toLowerCase().includes(t2))
+      );
+    });
+
+  const bfCricket = safeBetfairList
+    .map(normalizeMatch)
+    .filter((bf: any) => bf && bf.sport?.toLowerCase() === 'cricket');
 
   // Combine all cricket matches, avoiding duplicates by title keywords
   const allCricket = [...dbCricket];
   [...atdCricket, ...bfCricket].forEach((apiMatch: any) => {
+    if (!apiMatch) return;
     const exists = allCricket.some(m => {
       const t1 = apiMatch.team1?.toLowerCase() || '';
       const t2 = apiMatch.team2?.toLowerCase() || '';
@@ -77,14 +109,14 @@ export default function Dashboard() {
   const cricketMatches = allCricket.sort((a, b) => (a.status === 'live' ? -1 : 1));
   
   const footballMatches = [
-    ...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer'), 
-    ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football')
-  ].map(normalizeMatch);
+    ...safeDbList.filter(m => m && (m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer')), 
+    ...safeBetfairList.filter((bf: any) => bf && (bf.sport?.toLowerCase() === 'soccer' || bf.sport?.toLowerCase() === 'football'))
+  ].map(normalizeMatch).filter(Boolean);
   
   const tennisMatches = [
-    ...(dbMatches as any[]).filter(m => m.sport?.toLowerCase() === 'tennis'), 
-    ...(betfairData || []).filter((bf: any) => bf.sport?.toLowerCase() === 'tennis')
-  ].map(normalizeMatch);
+    ...safeDbList.filter(m => m && m.sport?.toLowerCase() === 'tennis'), 
+    ...safeBetfairList.filter((bf: any) => bf && bf.sport?.toLowerCase() === 'tennis')
+  ].map(normalizeMatch).filter(Boolean);
 
   const formatAmount = (n: number) => n.toLocaleString('en-IN');
   const getAmount = (match: any, idx: number) => {

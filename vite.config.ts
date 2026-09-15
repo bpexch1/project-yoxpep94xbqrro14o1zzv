@@ -12,9 +12,8 @@ if (isDev) {
 export default defineConfig(({ mode }) => ({
   base: "/", 
   server: {
-    allowedHosts: [".mysuperdev.app", ".superdev.r"],
-    host: "::",
-    port: 8080,
+    host: "0.0.0.0",
+    port: 3000,
     proxy: {
       "/api/integrations": {
         target: "https://superdev.build",

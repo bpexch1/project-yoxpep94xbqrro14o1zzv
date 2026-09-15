@@ -63,7 +63,7 @@ export default function Accounts() {
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchInterval: 15000,
-    select: (data: any) => data ? data.map((c: any) => ({ ...c })) : [],
+    select: (data: any) => Array.isArray(data) ? data.map((c: any) => ({ ...c })) : [],
   });
 
   // Admin's own record to show in summary table
@@ -75,9 +75,9 @@ export default function Accounts() {
   });
   const adminRecord = adminOwnData?.[0];
 
-  const clientsKey = clients ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
+  const clientsKey = Array.isArray(clients) ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
 
-  const suggestions = (clients || [])
+  const suggestions = (Array.isArray(clients) ? clients : [])
     .filter(c => 
       searchQuery.length >= 3 && 
       (c.username?.toLowerCase().includes(searchQuery.toLowerCase()) || 

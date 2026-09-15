@@ -79,10 +79,10 @@ function SportDropdown({
     onNavigate();
   };
 
-  const filteredEvents = allEvents 
+  const filteredEvents = Array.isArray(allEvents) 
     ? Array.from(new Map(
         (allEvents as any[])
-          .filter((e: any) => e.sport === sportName)
+          .filter((e: any) => e && e.sport === sportName)
           .map((e: any) => [e.eventName, e])
       ).values())
     : [];

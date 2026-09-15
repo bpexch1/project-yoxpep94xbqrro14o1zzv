@@ -208,7 +208,7 @@ export function ClientSummaryCard({
       const newStatus = client.status === "active" ? "inactive" : "active";
       await Client.update(client.id, { status: newStatus });
       toast({ title: "Status Updated", description: `${client.username} is now ${newStatus}` });
-      onRefresh && onRefresh();
+      onRefresh?.();
     } catch (e) {
       console.error(e);
       toast({ variant: "destructive", title: "Update Failed" });
