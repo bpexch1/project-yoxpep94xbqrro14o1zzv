@@ -112,6 +112,53 @@ class BatchBuilder {
   }
 }
 
+const BUILTIN_RESERVED_USERNAMES = ["book", "admin", "client1", "demo_user"];
+
+/**
+ * Checks if a username already exists in the system (case-insensitive).
+ */
+export async function checkUsernameExists(username: string): Promise<boolean> {
+  if (!username || !username.trim()) return false;
+  const clean = username.trim().toLowerCase();
+
+  // 1. Check reserved / fallback usernames
+  if (BUILTIN_RESERVED_USERNAMES.includes(clean)) {
+    return true;
+  }
+
+  // 2. Check Supabase clients table case-insensitively using ilike
+  try {
+    const { data, error } = await supabase
+      .from("clients")
+      .select("id, username")
+      .ilike("username", clean);
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const match = data.some(
+        (c: any) => (c.username || "").trim().toLowerCase() === clean
+      );
+      if (match) return true;
+    }
+
+    // Secondary fallback in case ilike is not indexed or exact matching
+    const { data: allData, error: allErr } = await supabase
+      .from("clients")
+      .select("username")
+      .limit(1000);
+
+    if (!allErr && Array.isArray(allData)) {
+      const exists = allData.some(
+        (c: any) => (c.username || "").trim().toLowerCase() === clean
+      );
+      if (exists) return true;
+    }
+  } catch (err) {
+    console.debug("checkUsernameExists check error:", err);
+  }
+
+  return false;
+}
+
 // Core entity factory
 function createEntity(entityName: string) {
   const table = getTable(entityName);
@@ -165,6 +212,13 @@ function createEntity(entityName: string) {
     },
 
     create: async (payload: Record<string, any>): Promise<any> => {
+      if (entityName === "Client" && payload.username) {
+        const isDuplicate = await checkUsernameExists(payload.username);
+        if (isDuplicate) {
+          throw new Error("Username already exists. Please choose a different username");
+        }
+      }
+
       const { data, error } = await supabase
         .from(table)
         .insert(payload)

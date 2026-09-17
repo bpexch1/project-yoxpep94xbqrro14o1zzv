@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Client } from "@/entities";
+import { Client, checkUsernameExists } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
@@ -34,15 +34,52 @@ export default function CreateUser() {
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const rowStyle: React.CSSProperties = { display: "flex", alignItems: "flex-start", marginBottom: "12px" };
   const labelStyle: React.CSSProperties = { width: "180px", fontSize: "13px", paddingTop: "6px", color: "#212529" };
   const inputStyle: React.CSSProperties = { flex: 1, border: "1px solid #ccc", borderRadius: "3px", padding: "5px 8px", fontSize: "13px", outline: "none", backgroundColor: "#fff" };
 
-  const validate = () => {
+  const handleUsernameBlur = async () => {
+    const raw = formData.username.trim();
+    if (!raw) return;
+    setCheckingUsername(true);
+    try {
+      const exists = await checkUsernameExists(raw);
+      if (exists) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists. Please choose a different username",
+        }));
+      } else {
+        setErrors((prev) => {
+          const next = { ...prev };
+          if (next.username === "Username already exists. Please choose a different username") {
+            delete next.username;
+          }
+          return next;
+        });
+      }
+    } catch {
+      // ignore check error on blur
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  const validate = async () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.username.trim()) newErrors.username = "Username is required";
+    const trimmedUsername = formData.username.trim();
+    if (!trimmedUsername) {
+      newErrors.username = "Username is required";
+    } else {
+      const exists = await checkUsernameExists(trimmedUsername);
+      if (exists) {
+        newErrors.username = "Username already exists. Please choose a different username";
+      }
+    }
+
     if (!formData.password.trim()) newErrors.password = "Password is required";
     else if (formData.password.length < 6) newErrors.password = "Min 6 characters";
     if (formData.downlineShare < 0 || formData.downlineShare > 85)
@@ -52,11 +89,21 @@ export default function CreateUser() {
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    const isValid = await validate();
+    if (!isValid) {
+      if (errors.username || !formData.username.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Validation Error",
+          description: errors.username || "Please fix form errors.",
+        });
+      }
+      return;
+    }
     setIsSubmitting(true);
     try {
       await Client.create({
-        username: formData.username,
+        username: formData.username.trim(),
         role: formData.type === "admin_type" ? creatableRole.role : "client",
         credit_received: 0,
         credit_remaining: 0,
@@ -73,9 +120,16 @@ export default function CreateUser() {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({ title: "User Created", description: `${formData.username} created successfully.` });
       navigate("/accounts");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({ variant: "destructive", title: "Error", description: "Failed to create user." });
+      const msg = error?.message || "Failed to create user.";
+      if (msg.includes("Username already exists")) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists. Please choose a different username",
+        }));
+      }
+      toast({ variant: "destructive", title: "Error", description: msg });
     } finally {
       setIsSubmitting(false);
     }
@@ -95,10 +149,24 @@ export default function CreateUser() {
             <input
               type="text"
               value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              style={inputStyle}
+              onChange={(e) => {
+                setFormData({ ...formData, username: e.target.value });
+                if (errors.username) {
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.username;
+                    return next;
+                  });
+                }
+              }}
+              onBlur={handleUsernameBlur}
+              style={{
+                ...inputStyle,
+                borderColor: errors.username ? "#dc3545" : "#ccc",
+              }}
             />
-            {errors.username && <p style={{ fontSize: "11px", color: "#dc3545", marginTop: "2px" }}>{errors.username}</p>}
+            {checkingUsername && <p style={{ fontSize: "11px", color: "#6c757d", marginTop: "2px" }}>Checking availability...</p>}
+            {errors.username && <p style={{ fontSize: "11px", color: "#dc3545", marginTop: "2px", fontWeight: 600 }}>{errors.username}</p>}
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Client } from "@/entities";
+import { Client, checkUsernameExists } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Shield } from "lucide-react";
@@ -19,11 +19,48 @@ export default function CreateCompanyAccount() {
   const [reference, setReference] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validate = () => {
+  const handleUsernameBlur = async () => {
+    const raw = username.trim();
+    if (!raw) return;
+    setCheckingUsername(true);
+    try {
+      const exists = await checkUsernameExists(raw);
+      if (exists) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists. Please choose a different username",
+        }));
+      } else {
+        setErrors((prev) => {
+          const next = { ...prev };
+          if (next.username === "Username already exists. Please choose a different username") {
+            delete next.username;
+          }
+          return next;
+        });
+      }
+    } catch {
+      // ignore check error on blur
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  const validate = async () => {
     const newErrors: Record<string, string> = {};
-    if (!username) newErrors.username = "Username is required";
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      newErrors.username = "Username is required";
+    } else {
+      const exists = await checkUsernameExists(trimmedUsername);
+      if (exists) {
+        newErrors.username = "Username already exists. Please choose a different username";
+      }
+    }
+
     if (!password) newErrors.password = "Password is required";
     else if (password.length < 6) newErrors.password = "Password must be at least 6 characters";
     if (downlineShare < 0 || downlineShare > 100) {
@@ -35,12 +72,22 @@ export default function CreateCompanyAccount() {
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    const isValid = await validate();
+    if (!isValid) {
+      if (errors.username || !username.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Validation Error",
+          description: errors.username || "Please fix form errors.",
+        });
+      }
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       await Client.create({
-        username,
+        username: username.trim(),
         full_name: fullName,
         role: "company",
         credit_received: 0,
@@ -62,12 +109,19 @@ export default function CreateCompanyAccount() {
         description: `Company Account ${username} has been created successfully.`,
       });
       navigate("/accounts");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating company account:", error);
+      const msg = error?.message || "Failed to create company account. Please try again.";
+      if (msg.includes("Username already exists")) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists. Please choose a different username",
+        }));
+      }
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create company account. Please try again.",
+        description: msg,
       });
     } finally {
       setIsSubmitting(false);
@@ -106,10 +160,23 @@ export default function CreateCompanyAccount() {
                 <input
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:border-[#16a085] shadow-inner"
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    if (errors.username) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.username;
+                        return next;
+                      });
+                    }
+                  }}
+                  onBlur={handleUsernameBlur}
+                  className={`w-full border rounded px-3 py-2.5 text-sm text-[#2c3e50] focus:outline-none shadow-inner ${
+                    errors.username ? "border-[#e74c3c] focus:border-[#e74c3c]" : "border-[#d5d8dc] focus:border-[#16a085]"
+                  }`}
                   placeholder="e.g. company_main"
                 />
+                {checkingUsername && <p className="text-[10px] text-[#7f8c8d] mt-1">Checking availability...</p>}
                 {errors.username && <p className="text-[10px] text-[#e74c3c] mt-1 font-bold">{errors.username}</p>}
               </div>
 

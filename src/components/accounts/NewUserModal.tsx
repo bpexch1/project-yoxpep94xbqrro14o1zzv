@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, CreditCard, Lock, Eye, EyeOff, Loader2, AlertCircle, Phone } from "lucide-react";
-import { Client } from "@/entities";
+import { Client, checkUsernameExists } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
   const isCompany = session?.role === "company";
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -42,7 +43,7 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     setFormData({
       username: "",
       fullName: "",
-      role: "client",
+      role: isCompany ? "superadmin" : "client",
       creditLimit: "",
       mobile: "",
       password: "",
@@ -51,12 +52,46 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     setErrors({});
   };
 
-  const validate = () => {
+  const handleUsernameBlur = async () => {
+    const raw = formData.username.trim();
+    if (!raw) return;
+    setCheckingUsername(true);
+    try {
+      const exists = await checkUsernameExists(raw);
+      if (exists) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists. Please choose a different username",
+        }));
+      } else {
+        setErrors((prev) => {
+          const next = { ...prev };
+          if (next.username === "Username already exists. Please choose a different username") {
+            delete next.username;
+          }
+          return next;
+        });
+      }
+    } catch {
+      // ignore
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  const validate = async () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.username) newErrors.username = "Username is required";
-    else if (formData.username.length < 3) newErrors.username = "Min 3 characters";
-    else if (/\s/.test(formData.username)) newErrors.username = "No spaces allowed";
-    else if (!/^[a-zA-Z0-9_@]+$/.test(formData.username)) newErrors.username = "Only letters, numbers, _, @";
+    const trimmedUsername = formData.username.trim();
+    if (!trimmedUsername) newErrors.username = "Username is required";
+    else if (trimmedUsername.length < 3) newErrors.username = "Min 3 characters";
+    else if (/\s/.test(trimmedUsername)) newErrors.username = "No spaces allowed";
+    else if (!/^[a-zA-Z0-9_@]+$/.test(trimmedUsername)) newErrors.username = "Only letters, numbers, _, @";
+    else {
+      const exists = await checkUsernameExists(trimmedUsername);
+      if (exists) {
+        newErrors.username = "Username already exists. Please choose a different username";
+      }
+    }
 
     if (!formData.fullName) newErrors.fullName = "Full name is required";
     else if (formData.fullName.length < 2) newErrors.fullName = "Min 2 characters";
@@ -77,12 +112,22 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    const isValid = await validate();
+    if (!isValid) {
+      if (errors.username || !formData.username.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Validation Error",
+          description: errors.username || "Please fix errors before submitting.",
+        });
+      }
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       await Client.create({
-        username: formData.username,
+        username: formData.username.trim(),
         full_name: formData.fullName,
         role: formData.role,
         credit_received: Number(formData.creditLimit),
@@ -101,12 +146,19 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
       });
       resetForm();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating user:", error);
+      const msg = error?.message || "An error occurred while creating the user.";
+      if (msg.includes("Username already exists")) {
+        setErrors((prev) => ({
+          ...prev,
+          username: "Username already exists. Please choose a different username",
+        }));
+      }
       toast({
         variant: "destructive",
         title: "Registration Failed",
-        description: "An error occurred while creating the user.",
+        description: msg,
       });
     } finally {
       setIsSubmitting(false);
@@ -154,7 +206,17 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, username: e.target.value });
+                    if (errors.username) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.username;
+                        return next;
+                      });
+                    }
+                  }}
+                  onBlur={handleUsernameBlur}
                   placeholder="Enter username"
                   className={cn(
                     "pl-9 h-11 text-sm bg-slate-50 border-slate-200 focus:bg-white transition-all",
@@ -162,6 +224,11 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                   )}
                 />
               </div>
+              {checkingUsername && (
+                <p className="text-[10px] text-slate-400 flex items-center gap-1 font-medium">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Checking availability...
+                </p>
+              )}
               {errors.username && (
                 <p className="text-[10px] text-red-500 flex items-center gap-1 font-medium">
                   <AlertCircle className="w-3 h-3" /> {errors.username}
