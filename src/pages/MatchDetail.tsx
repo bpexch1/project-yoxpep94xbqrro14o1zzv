@@ -12,7 +12,7 @@ import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Volume2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { getLiveOdds, getCricketScore, oddsEngine } from "@/functions";
+import { getLiveOdds, getCricketScore, oddsEngine, fetchBetfairEvents } from "@/functions";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -40,10 +40,25 @@ export default function MatchDetail() {
     queryKey: ['match', matchId],
     queryFn: async () => {
       const results = await Match.list();
-      return results.find((m: any) => m.id === matchId);
+      const found = (Array.isArray(results) ? results : []).find(
+        (m: any) => m.id === matchId || m.betfair_event_id === matchId
+      );
+      if (found) return found;
+
+      // Fallback lookup in live API events
+      try {
+        const liveEvents = await fetchBetfairEvents({});
+        const eventMatch = (Array.isArray(liveEvents) ? liveEvents : []).find(
+          (e: any) => e.id === matchId || e.betfair_event_id === matchId || String(e.id) === String(matchId)
+        );
+        if (eventMatch) return eventMatch;
+      } catch (err) {
+        console.debug("Live events lookup fallback error:", err);
+      }
+      return null;
     },
     enabled: !!matchId && !stateMatch,
-    refetchInterval: stateMatch ? false : 4000
+    refetchInterval: stateMatch ? false : 8000
   });
 
   // Use state match (Betfair event) OR DB match
@@ -101,15 +116,16 @@ export default function MatchDetail() {
 
   // Fetch real-time cricket score every 5 seconds (Cricbuzz or ATD)
   const { data: cricketScoreData } = useQuery({
-    queryKey: ['cricket-score', match?.atd_match_id || match?.cricbuzz_match_id || match?.id],
+    queryKey: ['cricket-score', match?.cricbuzz_match_id || match?.betfair_event_id || match?.atd_match_id || match?.id],
     queryFn: async () => {
       const result = await getCricketScore({ 
-        matchId: match.cricbuzz_match_id || match.id,
+        matchId: match.cricbuzz_match_id || match.betfair_event_id || match.atd_match_id || match.id,
+        cricbuzzMatchId: match.cricbuzz_match_id || match.betfair_event_id,
         atdMatchId: match.atd_match_id 
       });
       return result;
     },
-    enabled: (!!match?.cricbuzz_match_id || !!match?.atd_match_id || String(match?.id).startsWith('atd-')) && match?.sport?.toLowerCase() === 'cricket',
+    enabled: !!match && match?.sport?.toLowerCase() === 'cricket',
     refetchInterval: 5000,
     staleTime: 0,
   });
@@ -365,11 +381,34 @@ export default function MatchDetail() {
           </div>
         </div>
         
-        {/* Row 2: This Over balls */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-          <span style={{ color: "#6c757d", fontSize: 12, fontWeight: 700, marginRight: 2 }}>This Over :</span>
-          {thisOverBalls.map((ball, i) => <ThisOverBall key={i} value={ball} />)}
+        {/* Row 2: This Over balls & match status */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ color: "#6c757d", fontSize: 12, fontWeight: 700, marginRight: 2 }}>This Over :</span>
+            {thisOverBalls.map((ball, i) => <ThisOverBall key={i} value={ball} />)}
+          </div>
+          {cricketScoreData?.score?.status && (
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#00875a", backgroundColor: "rgba(0,177,129,0.12)", padding: "2px 8px", borderRadius: 4 }}>
+              {cricketScoreData.score.status}
+            </span>
+          )}
         </div>
+
+        {/* Optional Batsman & Bowler row if present from Cricbuzz miniscore */}
+        {(cricketScoreData?.miniscore?.batsmanStriker || cricketScoreData?.miniscore?.bowlerStriker) && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, color: "#495057", marginTop: 6, paddingTop: 4, borderTop: "1px dashed rgba(0,0,0,0.1)" }}>
+            {cricketScoreData.miniscore.batsmanStriker && (
+              <span>
+                🏏 <strong>{cricketScoreData.miniscore.batsmanStriker.batName || 'Striker'}</strong>: {cricketScoreData.miniscore.batsmanStriker.batRuns ?? 0} ({cricketScoreData.miniscore.batsmanStriker.batBalls ?? 0})
+              </span>
+            )}
+            {cricketScoreData.miniscore.bowlerStriker && (
+              <span>
+                ⚾ <strong>{cricketScoreData.miniscore.bowlerStriker.bowlName || 'Bowler'}</strong>: {cricketScoreData.miniscore.bowlerStriker.bowlWkts ?? 0}/{cricketScoreData.miniscore.bowlerStriker.bowlRuns ?? 0} ({cricketScoreData.miniscore.bowlerStriker.bowlOvs ?? 0})
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <main style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
@@ -436,23 +475,31 @@ export default function MatchDetail() {
         {(activeTab === "ALL" || activeTab === "BetFair-Fancy" || activeTab === "Fancy-2") && (
           <div style={{ marginTop: 15 }}>
             {fancyMarkets.length > 0 ? (
-              fancyMarkets.map((market: any) => (
-                <div key={market.marketId} style={{ marginBottom: 15 }}>
-                  <CombinedSectionHeader title={market.marketName || 'FANCY MARKET'} />
-                  {market.runners?.map((runner: any) => (
-                    <TeamRow2
-                      key={runner.selectionId}
-                      name={runner.runnerName}
-                      odds={runner.backPrice}
-                      layOdds={runner.layPrice}
-                      backSize={formatSize(runner.backSize)}
-                      laySize={formatSize(runner.laySize)}
-                      suspended={market.status === 'SUSPENDED' || market.status === 'CLOSED'}
-                      onBet={(t, o) => setActiveBet({ match, selection: runner.runnerName, betType: t, odds: o })}
-                    />
-                  ))}
-                </div>
-              ))
+              fancyMarkets.map((market: any, mIdx: number) => {
+                const marketKey = market.marketId || `mkt-${mIdx}`;
+                return (
+                  <div key={marketKey} style={{ marginBottom: 15 }}>
+                    <CombinedSectionHeader title={market.marketName || 'FANCY MARKET'} />
+                    {market.runners?.map((runner: any, rIdx: number) => {
+                      const runnerKey = runner.selectionId 
+                        ? `${marketKey}-sel-${runner.selectionId}`
+                        : `${marketKey}-runner-${rIdx}-${runner.runnerName || 'unnamed'}`;
+                      return (
+                        <TeamRow2
+                          key={runnerKey}
+                          name={runner.runnerName}
+                          odds={runner.backPrice}
+                          layOdds={runner.layPrice}
+                          backSize={formatSize(runner.backSize)}
+                          laySize={formatSize(runner.laySize)}
+                          suspended={market.status === 'SUSPENDED' || market.status === 'CLOSED'}
+                          onBet={(t: any, o: any) => setActiveBet({ match, selection: runner.runnerName, betType: t, odds: o })}
+                        />
+                      );
+                    })}
+                  </div>
+                );
+              })
             ) : (
               <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
                 No Fancy markets available for this match.
@@ -489,8 +536,12 @@ function CombinedSectionHeader({ title }: { title: string }) {
 }
 
 function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, onBet }: any) {
-  const displayBackSize = backSize || `${(Math.random() * 3 + 0.5).toFixed(1)}M`;
-  const displayLaySize = laySize || `${(Math.random() * 2 + 0.2).toFixed(1)}M`;
+  // Deterministic default sizes based on name length to avoid Math.random re-render churn
+  const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+  const defaultBack = `${((hash % 30) / 10 + 0.5).toFixed(1)}M`;
+  const defaultLay = `${((hash % 20) / 10 + 0.2).toFixed(1)}M`;
+  const displayBackSize = backSize || defaultBack;
+  const displayLaySize = laySize || defaultLay;
   return (
     <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 44 }}>
       <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "6px 12px" }}>
@@ -503,11 +554,11 @@ function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, 
       ) : (
         <>
           <div onClick={() => onBet('back', odds)} style={{ width: 60, backgroundColor: "#a5d9fe", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
-            <span style={{ fontWeight: 700, fontSize: 13 }}>{odds?.toFixed(2)}</span>
+            <span style={{ fontWeight: 700, fontSize: 13 }}>{odds ? odds.toFixed(2) : '-'}</span>
             <span style={{ fontSize: 9, color: "#666" }}>{displayBackSize}</span>
           </div>
           <div onClick={() => onBet('lay', layOdds)} style={{ width: 60, backgroundColor: "#f8d0ce", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
-            <span style={{ fontWeight: 700, fontSize: 13 }}>{layOdds?.toFixed(2)}</span>
+            <span style={{ fontWeight: 700, fontSize: 13 }}>{layOdds ? layOdds.toFixed(2) : '-'}</span>
             <span style={{ fontSize: 9, color: "#666" }}>{displayLaySize}</span>
           </div>
         </>

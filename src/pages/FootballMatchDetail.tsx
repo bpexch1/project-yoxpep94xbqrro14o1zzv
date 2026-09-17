@@ -5,6 +5,7 @@ import { Bet, Client } from "@/entities";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
+import { FootballShotmap } from "@/components/football/FootballShotmap";
 import { useToast } from "@/hooks/use-toast";
 import { Clock } from "lucide-react";
 
@@ -20,7 +21,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("ALL");
-  const [activeMediaTab, setActiveMediaTab] = useState<'tv'|'scorecard'>('tv');
+  const [activeMediaTab, setActiveMediaTab] = useState<'tv' | 'scorecard' | 'shotmap'>('shotmap');
   const [activeBet, setActiveBet] = useState<{ match: any; selection: string; betType: 'back' | 'lay'; odds: number } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [keepDisplayOn, setKeepDisplayOn] = useState(true);
@@ -176,17 +177,64 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
         <GoalsSection title="OVER/UNDER 1.5 GOALS (MaxBet: 250K)" underOdds={3.85} underLay={3.95} overOdds={1.34} overLay={1.35} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />
         <GoalsSection title="OVER/UNDER 2.5 GOALS (MaxBet: 250K)" underOdds={1.98} underLay={1.99} overOdds={2.0} overLay={2.04} onBet={(s, t, o) => setActiveBet({ match, selection: s, betType: t, odds: o })} />
 
-        {/* TV / SCORE CARD */}
+        {/* TV / SCORE CARD / SHOTMAP */}
         <div style={{ marginTop: 4 }}>
           <div style={{ display: "flex" }}>
-            <button onClick={() => setActiveMediaTab('tv')} style={{ flex: 1, padding: "11px 0", backgroundColor: activeMediaTab === 'tv' ? "#00b181" : "#00a070", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer", borderRight: "1px solid rgba(255,255,255,0.25)" }}>Tv</button>
-            <button onClick={() => setActiveMediaTab('scorecard')} style={{ flex: 1, padding: "11px 0", backgroundColor: activeMediaTab === 'scorecard' ? "#00b181" : "#00a070", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>Score Card</button>
+            <button
+              onClick={() => setActiveMediaTab('shotmap')}
+              style={{
+                flex: 1,
+                padding: "11px 0",
+                backgroundColor: activeMediaTab === 'shotmap' ? "#00b181" : "#00a070",
+                color: "white",
+                fontWeight: 700,
+                fontSize: 14,
+                border: "none",
+                cursor: "pointer",
+                borderRight: "1px solid rgba(255,255,255,0.25)"
+              }}
+            >
+              Shotmap &amp; xG
+            </button>
+            <button
+              onClick={() => setActiveMediaTab('scorecard')}
+              style={{
+                flex: 1,
+                padding: "11px 0",
+                backgroundColor: activeMediaTab === 'scorecard' ? "#00b181" : "#00a070",
+                color: "white",
+                fontWeight: 700,
+                fontSize: 14,
+                border: "none",
+                cursor: "pointer",
+                borderRight: "1px solid rgba(255,255,255,0.25)"
+              }}
+            >
+              Score Card
+            </button>
+            <button
+              onClick={() => setActiveMediaTab('tv')}
+              style={{
+                flex: 1,
+                padding: "11px 0",
+                backgroundColor: activeMediaTab === 'tv' ? "#00b181" : "#00a070",
+                color: "white",
+                fontWeight: 700,
+                fontSize: 14,
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Live Tv
+            </button>
           </div>
-          <div style={{ backgroundColor: "#111", minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "3px solid #00b181" }}>
-            {activeMediaTab === 'tv' ? (
-              <div style={{ textAlign: "center", padding: 20 }}>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>📺 Live stream unavailable</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Stream will appear when match is live</div>
+          <div style={{ backgroundColor: "#111", minHeight: 120, borderBottom: "3px solid #00b181" }}>
+            {activeMediaTab === 'shotmap' ? (
+              <FootballShotmap match={match} />
+            ) : activeMediaTab === 'tv' ? (
+              <div style={{ textAlign: "center", padding: 24, minHeight: 140, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", marginBottom: 6 }}>📺 Live stream video player</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Stream will connect automatically when match broadcast goes live</div>
               </div>
             ) : (
               <FootballScoreCard match={match} />

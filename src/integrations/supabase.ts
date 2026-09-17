@@ -99,129 +99,9 @@ const SEED_CLIENTS = [
   },
 ];
 
-const SEED_MATCHES = [
-  {
-    id: "match-01",
-    title: "India vs Australia",
-    sport: "cricket",
-    team1: "India",
-    team2: "Australia",
-    match_time: new Date(Date.now() + 1800000).toISOString(),
-    status: "live",
-    back_odds: 1.85,
-    lay_odds: 1.88,
-    back_odds2: 2.12,
-    lay_odds2: 2.16,
-    category: "ICC T20 Series",
-    betfair_event_id: "331001",
-    cricbuzz_match_id: "8801",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "match-02",
-    title: "England vs South Africa",
-    sport: "cricket",
-    team1: "England",
-    team2: "South Africa",
-    match_time: new Date(Date.now() + 7200000).toISOString(),
-    status: "upcoming",
-    back_odds: 1.92,
-    lay_odds: 1.95,
-    back_odds2: 1.98,
-    lay_odds2: 2.02,
-    category: "ODI World Series",
-    betfair_event_id: "331002",
-    cricbuzz_match_id: "8802",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "match-03",
-    title: "Real Madrid vs Barcelona",
-    sport: "football",
-    team1: "Real Madrid",
-    team2: "Barcelona",
-    match_time: new Date(Date.now() + 3600000).toISOString(),
-    status: "live",
-    back_odds: 2.20,
-    lay_odds: 2.25,
-    back_odds2: 3.10,
-    lay_odds2: 3.20,
-    category: "La Liga",
-    betfair_event_id: "331003",
-    cricbuzz_match_id: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "match-04",
-    title: "Novak Djokovic vs Carlos Alcaraz",
-    sport: "tennis",
-    team1: "Novak Djokovic",
-    team2: "Carlos Alcaraz",
-    match_time: new Date(Date.now() + 5400000).toISOString(),
-    status: "live",
-    back_odds: 1.75,
-    lay_odds: 1.80,
-    back_odds2: 2.20,
-    lay_odds2: 2.26,
-    category: "Wimbledon Championship",
-    betfair_event_id: "331004",
-    cricbuzz_match_id: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "match-05",
-    title: "Chennai Super Kings vs Mumbai Indians",
-    sport: "cricket",
-    team1: "Chennai Super Kings",
-    team2: "Mumbai Indians",
-    match_time: new Date(Date.now() + 86400000).toISOString(),
-    status: "upcoming",
-    back_odds: 1.90,
-    lay_odds: 1.94,
-    back_odds2: 1.96,
-    lay_odds2: 2.00,
-    category: "Indian Premier League",
-    betfair_event_id: "331005",
-    cricbuzz_match_id: "8805",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+const SEED_MATCHES: any[] = [];
 
-const SEED_BETS = [
-  {
-    id: "bet-01",
-    user_email: "client1",
-    match_id: "match-01",
-    match_title: "India vs Australia",
-    selection: "India",
-    bet_type: "back",
-    stake: 5000,
-    odds: 1.85,
-    potential_win: 4250,
-    status: "pending",
-    created_at: new Date(Date.now() - 1800000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "bet-02",
-    user_email: "demo_user",
-    match_id: "match-03",
-    match_title: "Real Madrid vs Barcelona",
-    selection: "Real Madrid",
-    bet_type: "back",
-    stake: 1500,
-    odds: 2.20,
-    potential_win: 1800,
-    status: "pending",
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+const SEED_BETS: any[] = [];
 
 const SEED_TRANSACTIONS = [
   {
@@ -251,7 +131,24 @@ function getLocalTable(table: string): any[] {
   try {
     const key = `exchange_db_${table}`;
     const raw = localStorage.getItem(key);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      let items = JSON.parse(raw);
+      if (table === "matches" && Array.isArray(items)) {
+        // Filter out any legacy dummy seed matches
+        items = items.filter(
+          (m: any) =>
+            m &&
+            !["match-01", "match-02", "match-03", "match-04", "match-05"].includes(m.id) &&
+            m.title !== "India vs Australia" &&
+            m.title !== "Chennai Super Kings vs Mumbai Indians" &&
+            m.title !== "Real Madrid vs Barcelona" &&
+            m.title !== "England vs South Africa" &&
+            m.title !== "Novak Djokovic vs Carlos Alcaraz"
+        );
+        localStorage.setItem(key, JSON.stringify(items));
+      }
+      return items;
+    }
 
     let seed: any[] = [];
     if (table === "clients") seed = SEED_CLIENTS;

@@ -1,217 +1,7 @@
-// Mock sports dataset used when VITE_API_BASE_URL or ATD_API_KEY are not configured.
+// Mock sports dataset - Hardcoded dummy matches removed.
+export const MOCK_BETFAIR_EVENTS: any[] = [];
 
-export const MOCK_BETFAIR_EVENTS = [
-  {
-    id: "bf-331001",
-    betfair_event_id: "331001",
-    eventName: "India vs Australia",
-    title: "India vs Australia",
-    team1: "India",
-    team2: "Australia",
-    sport: "Cricket",
-    status: "live",
-    match_time: new Date(Date.now() - 3600000).toISOString(),
-    back_odds: 1.85,
-    lay_odds: 1.88,
-    back_odds2: 2.12,
-    lay_odds2: 2.16,
-    category: "ICC T20 World Cup",
-    source: "betfair",
-  },
-  {
-    id: "bf-331002",
-    betfair_event_id: "331002",
-    eventName: "England vs South Africa",
-    title: "England vs South Africa",
-    team1: "England",
-    team2: "South Africa",
-    sport: "Cricket",
-    status: "upcoming",
-    match_time: new Date(Date.now() + 7200000).toISOString(),
-    back_odds: 1.92,
-    lay_odds: 1.95,
-    back_odds2: 1.98,
-    lay_odds2: 2.02,
-    category: "ODI World Series",
-    source: "betfair",
-  },
-  {
-    id: "bf-331010",
-    betfair_event_id: "331010",
-    eventName: "Pakistan vs New Zealand",
-    title: "Pakistan vs New Zealand",
-    team1: "Pakistan",
-    team2: "New Zealand",
-    sport: "Cricket",
-    status: "live",
-    match_time: new Date(Date.now() - 1800000).toISOString(),
-    back_odds: 1.96,
-    lay_odds: 2.00,
-    back_odds2: 1.90,
-    lay_odds2: 1.94,
-    category: "T20 International",
-    source: "betfair",
-  },
-  {
-    id: "bf-331003",
-    betfair_event_id: "331003",
-    eventName: "Real Madrid vs Barcelona",
-    title: "Real Madrid vs Barcelona",
-    team1: "Real Madrid",
-    team2: "Barcelona",
-    sport: "Soccer",
-    status: "live",
-    match_time: new Date(Date.now() - 2700000).toISOString(),
-    back_odds: 2.20,
-    lay_odds: 2.25,
-    back_odds2: 3.10,
-    lay_odds2: 3.20,
-    category: "La Liga",
-    source: "betfair",
-  },
-  {
-    id: "bf-331005",
-    betfair_event_id: "331005",
-    eventName: "Manchester City vs Arsenal",
-    title: "Manchester City vs Arsenal",
-    team1: "Manchester City",
-    team2: "Arsenal",
-    sport: "Soccer",
-    status: "upcoming",
-    match_time: new Date(Date.now() + 14400000).toISOString(),
-    back_odds: 2.05,
-    lay_odds: 2.10,
-    back_odds2: 3.40,
-    lay_odds2: 3.50,
-    category: "Premier League",
-    source: "betfair",
-  },
-  {
-    id: "bf-331011",
-    betfair_event_id: "331011",
-    eventName: "Bayern Munich vs Borussia Dortmund",
-    title: "Bayern Munich vs Borussia Dortmund",
-    team1: "Bayern Munich",
-    team2: "Borussia Dortmund",
-    sport: "Soccer",
-    status: "upcoming",
-    match_time: new Date(Date.now() + 28800000).toISOString(),
-    back_odds: 1.62,
-    lay_odds: 1.66,
-    back_odds2: 4.80,
-    lay_odds2: 5.10,
-    category: "Bundesliga",
-    source: "betfair",
-  },
-  {
-    id: "bf-331004",
-    betfair_event_id: "331004",
-    eventName: "Novak Djokovic vs Carlos Alcaraz",
-    title: "Novak Djokovic vs Carlos Alcaraz",
-    team1: "Novak Djokovic",
-    team2: "Carlos Alcaraz",
-    sport: "Tennis",
-    status: "live",
-    match_time: new Date(Date.now() - 1200000).toISOString(),
-    back_odds: 1.75,
-    lay_odds: 1.80,
-    back_odds2: 2.20,
-    lay_odds2: 2.26,
-    category: "Wimbledon Championship",
-    source: "betfair",
-  },
-  {
-    id: "bf-331006",
-    betfair_event_id: "331006",
-    eventName: "Jannik Sinner vs Daniil Medvedev",
-    title: "Jannik Sinner vs Daniil Medvedev",
-    team1: "Jannik Sinner",
-    team2: "Daniil Medvedev",
-    sport: "Tennis",
-    status: "upcoming",
-    match_time: new Date(Date.now() + 21600000).toISOString(),
-    back_odds: 1.65,
-    lay_odds: 1.70,
-    back_odds2: 2.35,
-    lay_odds2: 2.45,
-    category: "US Open",
-    source: "betfair",
-  },
-  {
-    id: "bf-331012",
-    betfair_event_id: "331012",
-    eventName: "Aryna Sabalenka vs Iga Swiatek",
-    title: "Aryna Sabalenka vs Iga Swiatek",
-    team1: "Aryna Sabalenka",
-    team2: "Iga Swiatek",
-    sport: "Tennis",
-    status: "live",
-    match_time: new Date(Date.now() - 3000000).toISOString(),
-    back_odds: 2.05,
-    lay_odds: 2.10,
-    back_odds2: 1.82,
-    lay_odds2: 1.86,
-    category: "Roland Garros",
-    source: "betfair",
-  },
-];
-
-export const MOCK_ATD_MATCHES = [
-  {
-    id: "atd-201",
-    atd_match_id: "atd-cricket-1",
-    betfair_event_id: "331007",
-    eventName: "Chennai Super Kings vs Mumbai Indians",
-    title: "Chennai Super Kings vs Mumbai Indians",
-    team1: "Chennai Super Kings",
-    team2: "Mumbai Indians",
-    sport: "Cricket",
-    status: "live",
-    match_time: new Date(Date.now() - 2400000).toISOString(),
-    back_odds: 1.90,
-    lay_odds: 1.94,
-    back_odds2: 1.96,
-    lay_odds2: 2.00,
-    category: "Indian Premier League",
-    source: "atd",
-  },
-  {
-    id: "atd-202",
-    atd_match_id: "atd-cricket-2",
-    betfair_event_id: "331008",
-    eventName: "Royal Challengers Bengaluru vs Kolkata Knight Riders",
-    title: "Royal Challengers Bengaluru vs Kolkata Knight Riders",
-    team1: "Royal Challengers Bengaluru",
-    team2: "Kolkata Knight Riders",
-    sport: "Cricket",
-    status: "upcoming",
-    match_time: new Date(Date.now() + 43200000).toISOString(),
-    back_odds: 1.88,
-    lay_odds: 1.92,
-    back_odds2: 2.02,
-    lay_odds2: 2.06,
-    category: "Indian Premier League",
-    source: "atd",
-  },
-  {
-    id: "atd-203",
-    atd_match_id: "atd-cricket-3",
-    betfair_event_id: "331009",
-    eventName: "Gujarat Titans vs Rajasthan Royals",
-    title: "Gujarat Titans vs Rajasthan Royals",
-    team1: "Gujarat Titans",
-    team2: "Rajasthan Royals",
-    sport: "Cricket",
-    status: "upcoming",
-    match_time: new Date(Date.now() + 86400000).toISOString(),
-    back_odds: 1.94,
-    lay_odds: 1.98,
-    back_odds2: 1.92,
-    lay_odds2: 1.96,
-    category: "Indian Premier League",
-    source: "atd",
-  },
-];
+export const MOCK_ATD_MATCHES: any[] = [];
 
 export function getMockLiveOdds(matchOrId?: any) {
   const identifier = typeof matchOrId === "object" ? (matchOrId?.eventId || matchOrId?.matchId || "default") : String(matchOrId || "default");
@@ -309,3 +99,202 @@ export function getMockOddsEngineResponse(data?: any) {
   }
   return { success: true };
 }
+
+export interface ShotmapItem {
+  id: number | string;
+  player: { name: string; slug?: string; id?: number; position?: string };
+  isHome: boolean;
+  shotType: 'goal' | 'save' | 'block' | 'miss' | 'post';
+  situation: 'regular' | 'assisted' | 'free-kick' | 'corner' | 'penalty' | 'fast-break';
+  bodyPart: 'right-foot' | 'left-foot' | 'head' | 'other';
+  time: number;
+  addedTime?: number;
+  draw: {
+    start: { x: number; y: number }; // 0 to 100 on pitch
+    end?: { x: number; y: number };
+    goal?: { x: number; y: number };
+  };
+  xg: number;
+  teamId?: number | string;
+}
+
+export const MOCK_SHOTMAP_ITEMS: ShotmapItem[] = [
+  // Home Team Shots (e.g. Real Madrid / Man City)
+  {
+    id: 101,
+    player: { name: "Vinícius Júnior", position: "FW" },
+    isHome: true,
+    shotType: "goal",
+    situation: "assisted",
+    bodyPart: "right-foot",
+    time: 23,
+    draw: { start: { x: 88, y: 46 }, end: { x: 100, y: 52 }, goal: { x: 98, y: 52 } },
+    xg: 0.42,
+    teamId: 1,
+  },
+  {
+    id: 102,
+    player: { name: "Jude Bellingham", position: "MF" },
+    isHome: true,
+    shotType: "save",
+    situation: "regular",
+    bodyPart: "left-foot",
+    time: 31,
+    draw: { start: { x: 81, y: 38 }, end: { x: 99, y: 48 }, goal: { x: 99, y: 48 } },
+    xg: 0.18,
+    teamId: 1,
+  },
+  {
+    id: 103,
+    player: { name: "Rodrygo", position: "FW" },
+    isHome: true,
+    shotType: "goal",
+    situation: "fast-break",
+    bodyPart: "right-foot",
+    time: 57,
+    draw: { start: { x: 91, y: 54 }, end: { x: 100, y: 46 }, goal: { x: 100, y: 46 } },
+    xg: 0.58,
+    teamId: 1,
+  },
+  {
+    id: 104,
+    player: { name: "Federico Valverde", position: "MF" },
+    isHome: true,
+    shotType: "miss",
+    situation: "regular",
+    bodyPart: "right-foot",
+    time: 68,
+    draw: { start: { x: 72, y: 62 }, end: { x: 100, y: 70 }, goal: { x: 100, y: 70 } },
+    xg: 0.06,
+    teamId: 1,
+  },
+  {
+    id: 105,
+    player: { name: "Kylian Mbappé", position: "FW" },
+    isHome: true,
+    shotType: "block",
+    situation: "regular",
+    bodyPart: "right-foot",
+    time: 74,
+    draw: { start: { x: 84, y: 48 }, end: { x: 89, y: 50 }, goal: { x: 90, y: 50 } },
+    xg: 0.24,
+    teamId: 1,
+  },
+  {
+    id: 106,
+    player: { name: "Vinícius Júnior", position: "FW" },
+    isHome: true,
+    shotType: "post",
+    situation: "corner",
+    bodyPart: "head",
+    time: 82,
+    draw: { start: { x: 94, y: 42 }, end: { x: 100, y: 44 }, goal: { x: 100, y: 44 } },
+    xg: 0.35,
+    teamId: 1,
+  },
+
+  // Away Team Shots (e.g. Barcelona / Arsenal)
+  {
+    id: 201,
+    player: { name: "Robert Lewandowski", position: "FW" },
+    isHome: false,
+    shotType: "goal",
+    situation: "assisted",
+    bodyPart: "head",
+    time: 14,
+    draw: { start: { x: 92, y: 51 }, end: { x: 100, y: 48 }, goal: { x: 100, y: 48 } },
+    xg: 0.49,
+    teamId: 2,
+  },
+  {
+    id: 202,
+    player: { name: "Lamine Yamal", position: "FW" },
+    isHome: false,
+    shotType: "save",
+    situation: "regular",
+    bodyPart: "left-foot",
+    time: 39,
+    draw: { start: { x: 79, y: 65 }, end: { x: 99, y: 53 }, goal: { x: 99, y: 53 } },
+    xg: 0.12,
+    teamId: 2,
+  },
+  {
+    id: 203,
+    player: { name: "Raphinha", position: "FW" },
+    isHome: false,
+    shotType: "block",
+    situation: "free-kick",
+    bodyPart: "left-foot",
+    time: 62,
+    draw: { start: { x: 76, y: 35 }, end: { x: 82, y: 40 }, goal: { x: 83, y: 40 } },
+    xg: 0.08,
+    teamId: 2,
+  },
+  {
+    id: 204,
+    player: { name: "Pedri", position: "MF" },
+    isHome: false,
+    shotType: "miss",
+    situation: "regular",
+    bodyPart: "right-foot",
+    time: 77,
+    draw: { start: { x: 80, y: 50 }, end: { x: 100, y: 30 }, goal: { x: 100, y: 30 } },
+    xg: 0.15,
+    teamId: 2,
+  },
+  {
+    id: 205,
+    player: { name: "Robert Lewandowski", position: "FW" },
+    isHome: false,
+    shotType: "save",
+    situation: "fast-break",
+    bodyPart: "right-foot",
+    time: 89,
+    draw: { start: { x: 87, y: 45 }, end: { x: 99, y: 49 }, goal: { x: 99, y: 49 } },
+    xg: 0.31,
+    teamId: 2,
+  }
+];
+
+export function getMockShotmap(eventId?: string | number, teamId?: string | number) {
+  let shotmap = [...MOCK_SHOTMAP_ITEMS];
+  if (teamId !== undefined && teamId !== null && teamId !== '') {
+    const tid = String(teamId).toLowerCase();
+    if (tid === '1' || tid === 'home') {
+      shotmap = shotmap.filter(s => s.isHome);
+    } else if (tid === '2' || tid === 'away') {
+      shotmap = shotmap.filter(s => !s.isHome);
+    }
+  }
+
+  const homeShots = shotmap.filter(s => s.isHome);
+  const awayShots = shotmap.filter(s => !s.isHome);
+
+  const homeXG = Number(homeShots.reduce((acc, s) => acc + s.xg, 0).toFixed(2));
+  const awayXG = Number(awayShots.reduce((acc, s) => acc + s.xg, 0).toFixed(2));
+
+  return {
+    success: true,
+    eventId: eventId || "demo-event-1",
+    shotmap,
+    stats: {
+      home: {
+        totalShots: homeShots.length,
+        onTarget: homeShots.filter(s => s.shotType === 'goal' || s.shotType === 'save').length,
+        goals: homeShots.filter(s => s.shotType === 'goal').length,
+        blocked: homeShots.filter(s => s.shotType === 'block').length,
+        missed: homeShots.filter(s => s.shotType === 'miss' || s.shotType === 'post').length,
+        xg: homeXG,
+      },
+      away: {
+        totalShots: awayShots.length,
+        onTarget: awayShots.filter(s => s.shotType === 'goal' || s.shotType === 'save').length,
+        goals: awayShots.filter(s => s.shotType === 'goal').length,
+        blocked: awayShots.filter(s => s.shotType === 'block').length,
+        missed: awayShots.filter(s => s.shotType === 'miss' || s.shotType === 'post').length,
+        xg: awayXG,
+      }
+    }
+  };
+}
+
