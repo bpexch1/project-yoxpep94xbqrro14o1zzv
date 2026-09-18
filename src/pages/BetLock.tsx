@@ -55,10 +55,6 @@ export default function BetLock() {
 
   const handleSave = () => {
     localStorage.setItem('betlock_settings', JSON.stringify(settings));
-    toast({
-      title: "Settings saved successfully",
-      variant: "default",
-    });
   };
 
   return (

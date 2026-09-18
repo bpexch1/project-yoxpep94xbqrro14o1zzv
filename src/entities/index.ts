@@ -112,8 +112,6 @@ class BatchBuilder {
   }
 }
 
-const BUILTIN_RESERVED_USERNAMES = ["book", "admin", "client1", "demo_user"];
-
 /**
  * Checks if a username already exists in the system (case-insensitive).
  */
@@ -121,12 +119,7 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
   if (!username || !username.trim()) return false;
   const clean = username.trim().toLowerCase();
 
-  // 1. Check reserved / fallback usernames
-  if (BUILTIN_RESERVED_USERNAMES.includes(clean)) {
-    return true;
-  }
-
-  // 2. Check Supabase clients table case-insensitively using ilike
+  // Check Supabase clients table case-insensitively using ilike
   try {
     const { data, error } = await supabase
       .from("clients")

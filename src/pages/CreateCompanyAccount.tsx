@@ -88,6 +88,7 @@ export default function CreateCompanyAccount() {
     try {
       await Client.create({
         username: username.trim(),
+        password: password.trim(),
         full_name: fullName,
         role: "company",
         credit_received: 0,
@@ -104,10 +105,6 @@ export default function CreateCompanyAccount() {
       });
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({
-        title: "Company Account Created",
-        description: `Company Account ${username} has been created successfully.`,
-      });
       navigate("/accounts");
     } catch (error: any) {
       console.error("Error creating company account:", error);

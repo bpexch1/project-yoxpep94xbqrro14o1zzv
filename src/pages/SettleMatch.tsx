@@ -61,10 +61,6 @@ export default function SettleMatch() {
     onSuccess: (data: any) => {
       if (data?.success) {
         setSettlementResult(data);
-        toast({
-          title: "Settlement Successful",
-          description: `Settled ${data?.totalBetsSettled || 0} bets for match.`,
-        });
         queryClient.invalidateQueries({ queryKey: ["matches-active"] });
       } else {
         toast({

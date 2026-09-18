@@ -4,61 +4,7 @@ import { User, Lock, Loader2, Key } from "lucide-react";
 import { Client } from "@/entities";
 import { setClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
-
-const DEMO_FALLBACK_ACCOUNTS = [
-  {
-    id: "client-book-01",
-    username: "Book",
-    full_name: "Company Super Admin",
-    password: "admin",
-    role: "company",
-    credit_received: 10000000,
-    credit_remaining: 10000000,
-    cash: 5000000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  },
-  {
-    id: "client-admin-01",
-    username: "admin",
-    full_name: "Exchange Senior Admin",
-    password: "admin",
-    role: "admin",
-    credit_received: 2000000,
-    credit_remaining: 2000000,
-    cash: 1000000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  },
-  {
-    id: "client-user-01",
-    username: "client1",
-    full_name: "John Player",
-    password: "client1",
-    role: "client",
-    credit_received: 50000,
-    credit_remaining: 45000,
-    cash: 25000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  },
-  {
-    id: "client-user-02",
-    username: "demo_user",
-    full_name: "Demo Player",
-    password: "demo",
-    role: "client",
-    credit_received: 20000,
-    credit_remaining: 18500,
-    cash: 10000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  }
-];
+import { BPLogo } from "@/components/icons/BPLogo";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -66,8 +12,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [forcedModal, setForcedModal] = useState(false);
   const [pendingClient, setPendingClient] = useState<any>(null);
-  const [newPw, setNewPw] = useState('');
-  const [pwError, setPwError] = useState('');
+  const [newPw, setNewPw] = useState("");
+  const [pwError, setPwError] = useState("");
   const [changingPw, setChangingPw] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const { toast } = useToast();
@@ -91,126 +37,125 @@ export default function Login() {
     try {
       let client: any = null;
 
-      // 1. Try querying database
-      try {
-        let results = await (Client as any).filter({ username: cleanUser }, '-created_at', 10);
+      // 1. Log localStorage raw state
+      console.log("[RUNTIME_TEST] 1. localStorage.getItem('exchange_db_clients'):", typeof window !== "undefined" ? localStorage.getItem("exchange_db_clients") : "N/A");
 
-        if (!results || results.length === 0) {
-          const allClients = await Client.list('-created_at', 500);
-          results = (Array.isArray(allClients) ? allClients : []).filter((c: any) =>
-            c.username?.toLowerCase().trim() === cleanUser.toLowerCase()
-          );
-        }
+      // 2. Query and log Client.filter({ username: cleanUser })
+      console.log("[RUNTIME_TEST] Entered username:", cleanUser);
+      const results = await Client.filter({ username: cleanUser }, "-created_at", 10);
+      console.log("[RUNTIME_TEST] 2. The result of Client.filter({ username: '" + cleanUser + "' }):", results);
 
-        if (Array.isArray(results) && results.length > 0) {
-          client = results.find((c: any) =>
-            c.username?.toLowerCase().trim() === cleanUser.toLowerCase() &&
-            (c.password === cleanPw || c.password === cleanUser || cleanPw === "admin" || cleanPw === "123456")
-          );
-        }
-      } catch (dbErr) {
-        console.warn("Database query encountered error, switching to mock auth fallback:", dbErr);
-      }
-
-      // 2. If not found in DB or DB failed, check built-in demo accounts
-      if (!client) {
-        client = DEMO_FALLBACK_ACCOUNTS.find((acc) =>
-          acc.username.toLowerCase() === cleanUser.toLowerCase() &&
-          (acc.password === cleanPw || cleanPw === "admin" || cleanPw === "123456" || cleanPw === acc.username)
+      if (Array.isArray(results) && results.length > 0) {
+        client = results.find(
+          (c: any) => (c.username || "").trim().toLowerCase() === cleanUser.toLowerCase()
         );
       }
 
-      if (client) {
-        setClientSession({
-          id: client.id,
-          username: client.username,
-          full_name: client.full_name || client.username,
-          role: client.role || 'client',
-          credit_received: client.credit_received || 0,
-          credit_remaining: client.credit_remaining || 0,
-          cash: client.cash || 0,
-          pl_downline: client.pl_downline || 0,
-          balance_upline: client.balance_upline || 0,
-          status: client.status || 'active',
-        });
+      // Case-insensitive secondary search if not found
+      if (!client) {
+        const allClients = await Client.list("-created_at", 500);
+        console.log("[RUNTIME_TEST] Secondary search Client.list() results:", allClients);
+        client = (Array.isArray(allClients) ? allClients : []).find(
+          (c: any) => (c.username || "").trim().toLowerCase() === cleanUser.toLowerCase()
+        );
+      }
 
-        toast({
-          title: "Login Successful",
-          description: `Logged in as ${client.full_name || client.username}`,
-        });
+      // Immediately before password validation print:
+      console.log("CLIENT FOUND:", client);
+      console.log("DB PASSWORD:", client?.password);
+      console.log("ENTERED PASSWORD:", cleanPw);
+      console.log("MATCH RESULT:", client?.password === cleanPw);
 
-        if (client.role === 'client') {
-          navigate("/play");
-        } else {
-          navigate("/dashboard");
-        }
-      } else {
+      // Validate password strictly against database record
+      if (!client) {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid username or password. You can click any of the Quick Demo buttons below.",
+          description: "Invalid username or password.",
         });
+        return;
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      // Failsafe demo login
-      const demo = DEMO_FALLBACK_ACCOUNTS.find(
-        (acc) => acc.username.toLowerCase() === cleanUser.toLowerCase()
-      );
-      if (demo) {
-        setClientSession({
-          id: demo.id,
-          username: demo.username,
-          full_name: demo.full_name,
-          role: demo.role,
-          credit_received: demo.credit_received,
-          credit_remaining: demo.credit_remaining,
-          cash: demo.cash,
-          pl_downline: demo.pl_downline,
-          balance_upline: demo.balance_upline,
-          status: demo.status,
-        });
-        if (demo.role === 'client') navigate("/play");
-        else navigate("/dashboard");
-      } else {
+
+      if (client.password !== cleanPw) {
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Something went wrong. Please use a quick demo account.",
+          title: "Login Failed",
+          description: "Invalid username or password.",
         });
+        return;
       }
+
+      // 3. Check account status
+      if (client.status === "inactive" || client.status === "locked" || client.status === "suspended") {
+        console.error("[LOGIN_DEBUG] 6. Login failed reason: Account disabled or inactive. Status:", client.status);
+        toast({
+          variant: "destructive",
+          title: "Account Disabled",
+          description: "Your account is currently inactive. Please contact your upline.",
+        });
+        return;
+      }
+
+      console.log("[LOGIN_DEBUG] Login verified successfully. Creating session for:", client.username, "Role:", client.role);
+
+      // 4. Create authenticated session
+      setClientSession({
+        id: client.id,
+        username: client.username,
+        full_name: client.full_name || client.username,
+        role: client.role || "client",
+        credit_received: client.credit_received || 0,
+        credit_remaining: client.credit_remaining || 0,
+        cash: client.cash || 0,
+        pl_downline: client.pl_downline || 0,
+        balance_upline: client.balance_upline || 0,
+        status: client.status || "active",
+      });
+
+      // 5. Redirect by role
+      if (client.role === "client") {
+        navigate("/play");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      toast({
+        variant: "destructive",
+        title: "Login Error",
+        description: err?.message || "Failed to process login. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleChangePassword = async () => {
-    if (!newPw || newPw.length < 4) { 
-      setPwError('Password must be at least 4 characters'); 
-      return; 
+    if (!newPw || newPw.length < 4) {
+      setPwError("Password must be at least 4 characters");
+      return;
     }
-    if (newPw === pendingClient?.username) { 
-      setPwError('New password cannot be same as username'); 
-      return; 
+    if (newPw === pendingClient?.username) {
+      setPwError("New password cannot be same as username");
+      return;
     }
     setChangingPw(true);
     try {
       await Client.update(pendingClient.id, { password: newPw });
       setForcedModal(false);
       setSuccessModal(true);
-      setTimeout(() => { 
-        setSuccessModal(false); 
-        setUsername('');
-        setPassword('');
-        setNewPw('');
-        setPwError('');
+      setTimeout(() => {
+        setSuccessModal(false);
+        setUsername("");
+        setPassword("");
+        setNewPw("");
+        setPwError("");
         setPendingClient(null);
-        // Refresh page or clear state to allow login again
       }, 2500);
-    } catch(e) {
-      setPwError('Failed to update password. Try again.');
-    } finally { 
-      setChangingPw(false); 
+    } catch (e) {
+      setPwError("Failed to update password. Try again.");
+    } finally {
+      setChangingPw(false);
     }
   };
 
@@ -218,30 +163,21 @@ export default function Login() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#1c1e21",
-        backgroundImage: `radial-gradient(#2a2d32 1px, transparent 1px), radial-gradient(#23262b 1px, #18191c 100%)`,
-        backgroundSize: "40px 40px, 100% 100%",
+        backgroundColor: "#191b1f",
+        backgroundImage: `
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill-rule='evenodd'%3E%3Cpolygon fill='%231f2227' points='0 0 100 0 50 80'/%3E%3Cpolygon fill='%2317191d' points='100 0 200 0 150 80'/%3E%3Cpolygon fill='%2322252b' points='200 0 300 0 250 80'/%3E%3Cpolygon fill='%231a1c20' points='300 0 400 0 350 80'/%3E%3Cpolygon fill='%2325292f' points='50 80 150 80 100 0'/%3E%3Cpolygon fill='%231c1f24' points='150 80 250 80 200 0'/%3E%3Cpolygon fill='%23282c33' points='250 80 350 80 300 0'/%3E%3Cpolygon fill='%23181a1d' points='0 0 50 80 0 160'/%3E%3Cpolygon fill='%2323272d' points='50 80 150 80 100 160'/%3E%3Cpolygon fill='%231e2126' points='150 80 250 80 200 160'/%3E%3Cpolygon fill='%232a2f36' points='250 80 350 80 300 160'/%3E%3Cpolygon fill='%23191b1e' points='350 80 400 0 400 160'/%3E%3Cpolygon fill='%231d2025' points='0 160 50 80 100 160'/%3E%3Cpolygon fill='%23292e35' points='100 160 150 80 200 160'/%3E%3Cpolygon fill='%231f2328' points='200 160 250 80 300 160'/%3E%3Cpolygon fill='%232c3139' points='300 160 350 80 400 160'/%3E%3Cpolygon fill='%231b1d22' points='0 160 100 160 50 240'/%3E%3Cpolygon fill='%2324282f' points='100 160 200 160 150 240'/%3E%3Cpolygon fill='%231a1c20' points='200 160 300 160 250 240'/%3E%3Cpolygon fill='%23272b32' points='300 160 400 160 350 240'/%3E%3Cpolygon fill='%23202329' points='50 240 150 240 100 160'/%3E%3Cpolygon fill='%23181a1d' points='150 240 250 240 200 160'/%3E%3Cpolygon fill='%23262a31' points='250 240 350 240 300 160'/%3E%3Cpolygon fill='%231e2126' points='0 160 50 240 0 320'/%3E%3Cpolygon fill='%232b3038' points='50 240 150 240 100 320'/%3E%3Cpolygon fill='%231a1c20' points='150 240 250 240 200 320'/%3E%3Cpolygon fill='%2325292f' points='250 240 350 240 300 320'/%3E%3Cpolygon fill='%231c1e23' points='350 240 400 160 400 320'/%3E%3Cpolygon fill='%2322262c' points='0 320 50 240 100 320'/%3E%3Cpolygon fill='%23191b1f' points='100 320 150 240 200 320'/%3E%3Cpolygon fill='%23282c33' points='200 320 250 240 300 320'/%3E%3Cpolygon fill='%231e2227' points='300 320 350 240 400 320'/%3E%3Cpolygon fill='%2317191d' points='0 320 100 320 50 400'/%3E%3Cpolygon fill='%2324282e' points='100 320 200 320 150 400'/%3E%3Cpolygon fill='%231d2025' points='200 320 300 320 250 400'/%3E%3Cpolygon fill='%23272b32' points='300 320 400 320 350 400'/%3E%3Cpolygon fill='%2321252b' points='50 400 150 400 100 320'/%3E%3Cpolygon fill='%231b1d22' points='150 400 250 400 200 320'/%3E%3Cpolygon fill='%23262a31' points='250 400 350 400 300 320'/%3E%3C/g%3E%3C/svg%3E")
+        `,
+        backgroundSize: "400px 400px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
-        paddingTop: "40px",
+        paddingTop: "20px",
         paddingBottom: "24px",
         position: "relative",
       }}
     >
-      {/* Subtle Low-Poly Triangular Overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: 0.14,
-          pointerEvents: "none",
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath fill='%23ffffff' fill-opacity='0.25' d='M0 0l80 40-80 40zM80 40l80-40v80zM80 40l80 40-80 40zM0 80l80 40-80 40zM80 120l80-40v80zM80 120l80 40-80 40z'/%3E%3C/svg%3E")`,
-          backgroundSize: "160px 160px",
-        }}
-      />
       <style>{`
-        .login-input::placeholder { color: rgba(255,255,255,0.7); }
+        .login-input::placeholder { color: #ffffff; opacity: 0.9; font-weight: 400; font-size: 16px; }
         .login-input:focus { outline: none; }
       `}</style>
 
@@ -249,73 +185,34 @@ export default function Login() {
       <div
         style={{
           width: "100%",
-          maxWidth: 420,
-          margin: "32px auto 0",
-          padding: "0 16px",
+          maxWidth: 440,
+          margin: "16px auto 0",
+          padding: "0 12px",
         }}
       >
         <div
           style={{
-            borderRadius: 16,
-            background: "linear-gradient(180deg, #326488 0%, #1b3d5b 45%, #0d1e31 100%)",
-            boxShadow: "0 12px 36px rgba(0,0,0,0.65)",
-            padding: "36px 28px 36px",
+            borderRadius: 14,
+            background: "linear-gradient(180deg, #2e567a 0%, #204261 48%, #132b40 100%)",
+            boxShadow: "0 14px 36px rgba(0,0,0,0.55)",
+            padding: "36px 24px 36px",
             overflow: "hidden",
             position: "relative",
           }}
         >
           {/* BP Logo Circle */}
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 36, marginTop: 4 }}>
-            <div
-              style={{
-                width: 126,
-                height: 126,
-                borderRadius: "50%",
-                backgroundColor: "#52e0cb",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-              }}
-            >
-              <svg width="86" height="86" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Stylized Italic BP Monogram */}
-                <text
-                  x="20"
-                  y="68"
-                  fill="#12202e"
-                  fontSize="52"
-                  fontWeight="900"
-                  fontStyle="italic"
-                  fontFamily="'Brush Script MT', 'Lucida Calligraphy', 'Segoe UI', cursive, sans-serif"
-                  letterSpacing="-2"
-                >
-                  B
-                </text>
-                <text
-                  x="48"
-                  y="68"
-                  fill="#12202e"
-                  fontSize="52"
-                  fontWeight="900"
-                  fontStyle="italic"
-                  fontFamily="'Brush Script MT', 'Lucida Calligraphy', 'Segoe UI', cursive, sans-serif"
-                  letterSpacing="-2"
-                >
-                  P
-                </text>
-              </svg>
-            </div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 38, marginTop: 4 }}>
+            <BPLogo size={132} />
           </div>
 
           <form onSubmit={handleLogin}>
             {/* Username field */}
             <div style={{ marginBottom: 30 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
-                <User size={20} color="#ffffff" strokeWidth={2.4} />
+                <User size={18} color="#ffffff" fill="#ffffff" strokeWidth={1} />
                 <input
                   type="text"
-                  placeholder=""
+                  placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -327,17 +224,17 @@ export default function Login() {
                     outline: "none",
                     color: "#ffffff",
                     fontSize: 16,
-                    fontWeight: 500,
+                    fontWeight: 400,
                   }}
                 />
               </div>
-              <div style={{ height: 1.5, background: "#ffffff", width: "100%" }} />
+              <div style={{ height: 1, background: "rgba(255,255,255,0.45)", width: "100%" }} />
             </div>
 
             {/* Password field */}
             <div style={{ marginBottom: 38 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
-                <Lock size={20} color="#ffffff" strokeWidth={2.4} />
+                <Lock size={18} color="#ffffff" fill="#ffffff" strokeWidth={1} />
                 <input
                   type="password"
                   placeholder="Password"
@@ -352,35 +249,36 @@ export default function Login() {
                     outline: "none",
                     color: "#ffffff",
                     fontSize: 16,
-                    fontWeight: 500,
+                    fontWeight: 400,
                   }}
                 />
               </div>
-              <div style={{ height: 1.5, background: "rgba(255,255,255,0.45)", width: "100%" }} />
+              <div style={{ height: 1, background: "rgba(255,255,255,0.45)", width: "100%" }} />
             </div>
 
-            {/* Login Button — centered rounded pill with gradient */}
+            {/* Login Button — centered rounded pill with 3D gradient & shadow */}
             <div style={{ display: "flex", justifyContent: "center" }}>
               <button
                 type="submit"
                 disabled={loading}
                 style={{
-                  minWidth: 136,
+                  minWidth: 146,
+                  height: 44,
                   borderRadius: 9999,
-                  background: "linear-gradient(180deg, #4f85aa 0%, #295577 50%, #173852 100%)",
+                  background: "linear-gradient(180deg, #4f82ac 0%, #35628b 50%, #224b70 100%)",
                   border: "1px solid rgba(255,255,255,0.18)",
                   color: "#ffffff",
                   fontSize: 16,
                   fontWeight: 600,
-                  padding: "11px 32px",
+                  padding: "0 38px",
                   cursor: loading ? "not-allowed" : "pointer",
                   opacity: loading ? 0.75 : 1,
-                  boxShadow: "0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3)",
+                  boxShadow: "0 10px 22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
-                  transition: "transform 0.1s, opacity 0.2s",
+                  transition: "transform 0.1s, opacity 0.2s, box-shadow 0.2s",
                 }}
                 onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
                 onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -389,69 +287,6 @@ export default function Login() {
               </button>
             </div>
           </form>
-        </div>
-
-        {/* Quick Demo Helper at bottom */}
-        <div style={{ marginTop: 24, textAlign: "center" }}>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>
-            Quick Demo Accounts
-          </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap" }}>
-            <button
-              type="button"
-              onClick={() => {
-                setUsername("client1");
-                setPassword("client1");
-              }}
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "rgba(255,255,255,0.8)",
-                borderRadius: 12,
-                padding: "3px 10px",
-                fontSize: 11,
-                cursor: "pointer",
-              }}
-            >
-              Player (client1)
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setUsername("admin");
-                setPassword("admin");
-              }}
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "rgba(255,255,255,0.8)",
-                borderRadius: 12,
-                padding: "3px 10px",
-                fontSize: 11,
-                cursor: "pointer",
-              }}
-            >
-              Admin (admin)
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setUsername("Book");
-                setPassword("admin");
-              }}
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "rgba(255,255,255,0.8)",
-                borderRadius: 12,
-                padding: "3px 10px",
-                fontSize: 11,
-                cursor: "pointer",
-              }}
-            >
-              Company (Book)
-            </button>
-          </div>
         </div>
       </div>
 

@@ -57,7 +57,6 @@ export default function UserProfile() {
     setChangingPassword(true);
     try {
       await Client.update(clientData.id, { password: newPassword });
-      toast({ title: "Password Changed", description: "Your password has been updated successfully." });
       setOldPassword(""); setNewPassword(""); setConfirmPassword("");
       queryClient.invalidateQueries({ queryKey: ["client-profile"] });
     } catch (err) {

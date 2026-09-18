@@ -138,16 +138,16 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
       </nav>
 
       {/* RIGHT: User + Stats */}
-      <div className="flex items-center justify-end ml-auto gap-2 sm:gap-4">
+      <div className="flex items-center justify-end ml-auto gap-2 sm:gap-3">
         {session ? (
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 text-[#495057]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-colors group">
-                  <span className="text-[#333] text-sm font-medium group-hover:text-[#00b181]">
-                    {session.username} ({session.role ? formatRole(session.role) : ''})
+                <div className="flex items-center gap-1 cursor-pointer hover:text-[#00b181] transition-colors group">
+                  <span className="text-[#6c757d] text-sm font-normal">
+                    {session.username} ({session.role ? formatRole(session.role) : 'Admin'})
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#00b181]" />
+                  <span className="text-[10px] text-[#6c757d]">▼</span>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white border border-[#d2d6de] shadow-lg rounded w-48 mt-1">
@@ -172,16 +172,12 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] text-[#212529] whitespace-nowrap font-bold">
-                B: <span className={cn(liveBalance > 0 ? "text-[#00b181]" : "text-[#212529]")}>
-                  {Math.max(0, liveBalance).toLocaleString('en-IN')}
-                </span>
+            <div className="flex items-center gap-1.5 text-sm">
+              <span className="text-[#212529] whitespace-nowrap font-bold">
+                B: <span className="font-normal text-[#212529]">{Math.max(0, liveBalance).toLocaleString('en-IN')}</span>
               </span>
-              <span className="text-[13px] text-[#212529] whitespace-nowrap font-bold">
-                Exp: <span className={cn(totalExposure > 0 ? "text-[#dc3545]" : "text-[#212529]")}>
-                  {totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}
-                </span>
+              <span className="text-[#212529] whitespace-nowrap font-bold">
+                Exp: <span className="font-normal text-[#212529]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
               </span>
             </div>
           </div>

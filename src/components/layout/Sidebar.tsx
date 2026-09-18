@@ -1,7 +1,7 @@
 import { 
   Gauge, Users, Coins, FileText, Lock, Star, Globe, 
   CircleDot, Crosshair, Swords, Zap, Rabbit,
-  X, ChevronLeft, ChevronDown, Loader2 
+  X, ChevronLeft, ChevronDown, Loader2, Activity 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -27,6 +27,7 @@ const mainMenuItems = [
   { label: "Star Casino", icon: Star, link: "/star-casino" },
   { label: "World Casino", icon: Globe, link: "/world-casino" },
   { label: "BetFair Games", icon: Globe, link: "/betfair-games" },
+  { label: "API Diagnostics", icon: Activity, link: "/api-settings" },
 ];
 
 const sportsItems = [

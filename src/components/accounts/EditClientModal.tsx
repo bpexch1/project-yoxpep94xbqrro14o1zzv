@@ -78,10 +78,6 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
       await Client.update(client.id, updateData);
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({
-        title: "Success",
-        description: `Account for ${client.username} has been updated.`,
-      });
       onClose();
     } catch (error: any) {
       console.error("Error updating client:", error);

@@ -53,7 +53,6 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data'] });
       queryClient.invalidateQueries({ queryKey: ['open-bets'] });
-      toast({ title: "Bet Placed", description: "Your bet has been recorded successfully." });
     },
     onError: (error: any) => {
       toast({ variant: "destructive", title: "Bet Failed", description: error.message });

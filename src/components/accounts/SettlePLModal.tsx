@@ -77,10 +77,6 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
       });
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({
-        title: "Success",
-        description: `Rs. ${settleAmount.toLocaleString()} settled to cash for ${client.username}`,
-      });
       onClose();
     } catch (err) {
       console.error("Settle P/L Error:", err);

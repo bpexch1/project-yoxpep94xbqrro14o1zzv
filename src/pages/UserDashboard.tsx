@@ -12,9 +12,12 @@ import { GameBanners } from "@/components/user/GameBanners";
 import { RaceSection } from "@/components/user/RaceSection";
 import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
+import { getHealthStatusMap } from "@/lib/apiManager";
 import { 
   Loader2, 
   Trophy, 
+  AlertTriangle,
+  Info,
 } from "lucide-react";
 import { Plus18Badge, BLogoIcon } from "@/components/icons/CustomIcons";
 
@@ -32,7 +35,6 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color
   };
 
   if (s.includes('inplay') || s.includes('live')) {
-    // Stopwatch icon
     return (
       <svg {...props}>
         <circle cx="12" cy="14" r="8"/>
@@ -44,17 +46,13 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color
   }
   
   if (s.includes('cricket')) {
-    // Cricket bat + wicket stumps (3 stumps + 2 bails + diagonal bat)
     return (
       <svg {...props}>
-        {/* 3 wicket stumps */}
         <line x1="14" y1="9" x2="14" y2="22"/>
         <line x1="17" y1="8" x2="17" y2="21"/>
         <line x1="20" y1="9" x2="20" y2="22"/>
-        {/* Bails on top of stumps */}
         <line x1="13.5" y1="9.5" x2="17.5" y2="8.5"/>
         <line x1="16.5" y1="8.5" x2="20.5" y2="9.5"/>
-        {/* Cricket bat - diagonal, wider blade at bottom-left */}
         <path d="M2 22L14 6" strokeWidth="3.5"/>
         <path d="M2 22L4 20" strokeWidth="2"/>
       </svg>
@@ -62,7 +60,6 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color
   }
 
   if (s.includes('tennis')) {
-    // Tennis racket — oval head with string lines, handle
     return (
       <svg {...props}>
         <ellipse cx="12" cy="9" rx="5.5" ry="7"/>
@@ -77,7 +74,6 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color
   }
 
   if (s.includes('soccer') || s.includes('football')) {
-    // Soccer ball — circle with pentagon patches
     return (
       <svg {...props}>
         <circle cx="12" cy="12" r="9.5"/>
@@ -95,7 +91,6 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color
     );
   }
 
-  // Default circle
   return <svg {...props}><circle cx="12" cy="12" r="9"/></svg>;
 };
 
@@ -128,15 +123,15 @@ export default function UserDashboard() {
   }, [session, navigate]);
 
   // Fetch matches from DB
-  const { data: matches, isLoading: matchesLoading, isError: matchesError } = useQuery({
+  const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ['matches'],
     queryFn: () => Match.list(),
-    refetchInterval: 15000, // Refresh list every 15 seconds
+    refetchInterval: 15000,
     retry: 2
   });
 
-  // Fetch live Betfair events from API
-  const { data: betfairEvents, isLoading: betfairLoading, isError: betfairError } = useQuery({
+  // Fetch live Betfair events from API (with automatic fallback)
+  const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
     queryKey: ['betfair-events'],
     queryFn: async () => {
       try {
@@ -147,12 +142,12 @@ export default function UserDashboard() {
         return [];
       }
     },
-    refetchInterval: 60000, // Refresh every 60 seconds
+    refetchInterval: 30000,
     retry: 1
   });
 
   // Fetch live ATD Cricket matches from API
-  const { data: atdData, isLoading: atdLoading, isError: atdError } = useQuery({
+  const { data: atdData, isLoading: atdLoading } = useQuery({
     queryKey: ['atd-cricket-home'],
     queryFn: async () => {
       try {
@@ -163,19 +158,18 @@ export default function UserDashboard() {
         return { matches: [] };
       }
     },
-    refetchInterval: 60000,
+    refetchInterval: 30000,
     retry: 1
   });
 
-  // Safe, guaranteed-array versions of all remote data sources.
-  // These guard against APIs returning error objects, null, or other
-  // truthy-but-non-array shapes, which previously caused `.map is not
-  // a function` crashes (white screen) for client/user logins.
+  // Real-time API Health status for banner notifications
+  const healthStatus = getHealthStatusMap();
+
   const safeMatches = Array.isArray(matches) ? matches : [];
   const safeBetfair = Array.isArray(betfairEvents) ? betfairEvents : [];
   const safeAtdMatches = Array.isArray(atdData?.matches) ? atdData.matches : [];
 
-  // Auto-sync Betfair odds for all visible matches every 15 seconds
+  // Auto-sync Betfair odds for matches
   const matchesWithBetfair = safeMatches.filter((m: any) => 
     m.betfair_event_id && 
     !String(m.id).startsWith('atd-') && 
@@ -188,7 +182,6 @@ export default function UserDashboard() {
     queryFn: async () => {
       if (matchesWithBetfair.length === 0) return { success: true, skipped: true };
       try {
-        // Only sync up to 10 matches to avoid large payloads/timeout
         const syncMatches = matchesWithBetfair.slice(0, 10).map((m: any) => ({
           matchId: m.id,
           betfairEventId: m.betfair_event_id
@@ -200,18 +193,14 @@ export default function UserDashboard() {
         });
         return { success: true };
       } catch (err) {
-        // Silent failure for background sync - do not log as error to avoid user-facing error messages
-        console.debug("Background bulk sync skipped or failed:", err);
         return { success: false, error: "Failed to fetch" };
       }
     },
-    // Only sync if we have matches to sync AND we have some betfair events loaded
-    // to avoid hammering Betfair/MongoDB unnecessarily
     enabled: matchesWithBetfair.length > 0 && !!betfairEvents,
-    refetchInterval: 15000,  // every 15 seconds
-    retry: false,            // do not retry background sync on failure
+    refetchInterval: 15000,
+    retry: false,
     staleTime: 5000,
-    gcTime: 0,               // don't keep this data in cache
+    gcTime: 0,
   });
 
   // Fetch real-time client data for balance and credits
@@ -226,7 +215,7 @@ export default function UserDashboard() {
   const clientCredit = typeof clientData?.credit_received === "number" ? clientData.credit_received : (parseFloat(String(clientData?.credit_received || 0)) || 0);
   const clientBalance = clientCash;
 
-  // Place bet mutation with explicit errors and complete type safety
+  // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
       if (!activeBet) {
@@ -251,7 +240,6 @@ export default function UserDashboard() {
       const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
       const potentialWin = (numericStake * oddsVal) - numericStake;
 
-      // Create bet record
       await Bet.create({
         user_email: session.username,
         match_id: activeBet.match?.id || "unknown-match",
@@ -264,7 +252,6 @@ export default function UserDashboard() {
         status: 'pending'
       });
 
-      // Deduct from client balance safely
       const updatedCash = Math.max(0, clientBalance - numericStake);
       await Client.update(clientData.id, {
         cash: updatedCash
@@ -274,10 +261,6 @@ export default function UserDashboard() {
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data', session?.username] });
       queryClient.invalidateQueries({ queryKey: ['bets'] });
-      toast({
-        title: "Bet Placed",
-        description: `Bet on ${activeBet?.selection || 'market'} placed successfully.`,
-      });
     },
     onError: (error: any) => {
       toast({
@@ -288,12 +271,10 @@ export default function UserDashboard() {
     }
   });
 
-  // Helper to normalize match data for UI
   const normalizeMatch = (m: any) => {
     const status = String(m.status || m.api_status || '').toLowerCase();
     const isLive = status === 'live' || status === 'inplay' || status === 'started' || status === '1' || status === '2';
     
-    // Guess sport if missing
     let sport = m.sport || '';
     if (!sport) {
       const title = (m.title || '').toLowerCase();
@@ -302,7 +283,6 @@ export default function UserDashboard() {
       else if (title.includes('tennis')) sport = 'Tennis';
     }
 
-    // Normalize sport names
     if (sport.toLowerCase() === 'football') sport = 'Soccer';
 
     return {
@@ -312,15 +292,10 @@ export default function UserDashboard() {
     };
   };
 
-  // Filter the match list to only show real matches:
-  // 1. Matches directly from Betfair API
-  // 2. Matches from AllThingsDev Cricket API
-  // 3. DB matches that have a betfair_event_id OR are manually created cricket matches
   const now = new Date();
   const matchesList = [
     ...safeBetfair.map(normalizeMatch),
     ...safeAtdMatches.map(normalizeMatch).filter((atd: any) => {
-      // Don't duplicate if already in Betfair (check by title keyword overlap)
       return !safeBetfair.some((bf: any) => {
         const t1 = atd.team1?.toLowerCase() || '';
         const t2 = atd.team2?.toLowerCase() || '';
@@ -329,31 +304,12 @@ export default function UserDashboard() {
       });
     }),
     ...safeMatches.map(normalizeMatch).filter((m: any) => {
-      // Only include DB matches that have a real betfair_event_id (admin linked to real event)
-      // This ensures we only show matches that the user explicitly wants to track via feed
-      
-      const isExternal = String(m.id).startsWith('bf-') || String(m.id).startsWith('atd-');
-      if (isExternal) return false; // Already coming from API sources above
+      const isExternal = String(m.id).startsWith('bf-') || String(m.id).startsWith('atd-') || String(m.id).startsWith('cb-') || String(m.id).startsWith('sportapi-');
+      if (isExternal) return false;
 
-      // Exclude matches that don't have a linked feed ID - these are likely the "fake" matches
       if (!m.betfair_event_id || m.betfair_event_id === 'undefined' || m.betfair_event_id === '') return false;
-
-      // Exclude completed or stale matches
       if (m.status === 'completed' || m.status === 'finished') return false;
 
-      // If it has a match_time, exclude if it's more than 6 hours old and not live
-      if (m.match_time && m.status !== 'live') {
-        try {
-          const matchDate = new Date(m.match_time);
-          if (isNaN(matchDate.getTime())) return true;
-          const diffHours = (now.getTime() - matchDate.getTime()) / (1000 * 60 * 60);
-          if (diffHours > 6) return false;
-        } catch {
-          // skip
-        }
-      }
-
-      // Check if we already have it from Betfair API to avoid duplicates
       const isDuplicate = safeBetfair.some((bf: any) => 
         bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
       );
@@ -362,15 +318,12 @@ export default function UserDashboard() {
       return true;
     })
   ].filter((m: any) => {
-    // Final filter: only real sports the user wants
     const sport = m.sport?.toLowerCase();
     return sport === 'cricket' || sport === 'soccer' || sport === 'tennis';
   }).sort((a: any, b: any) => {
-    // Live first, then upcoming
     if (a.status === 'live' && b.status !== 'live') return -1;
     if (b.status === 'live' && a.status !== 'live') return 1;
     
-    // Then sort by time if available
     const timeA = a.match_time ? new Date(a.match_time).getTime() : 0;
     const timeB = b.match_time ? new Date(b.match_time).getTime() : 0;
     return timeA - timeB;
@@ -381,23 +334,9 @@ export default function UserDashboard() {
   const tennisCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length;
   const soccerCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length;
 
-  // Auto-switch away from Inplay if it's empty but other sports have matches
-  useEffect(() => {
-    if (activeFilter === "Inplay") {
-      // If we have data from at least one source and inplay is 0, but others exist, switch.
-      // We wait for primary API calls to finish or fail before deciding to switch.
-      const isLoadingSources = matchesLoading || betfairLoading || atdLoading;
-      if (inplayCount === 0 && !isLoadingSources) {
-        if (cricketCount > 0) setActiveFilter("Cricket");
-        else if (soccerCount > 0) setActiveFilter("Soccer");
-        else if (tennisCount > 0) setActiveFilter("Tennis");
-      }
-    }
-  }, [inplayCount, cricketCount, soccerCount, tennisCount, matchesLoading, betfairLoading, atdLoading, activeFilter]);
-
   if (!session) return null;
 
-  const isInitialLoading = (matchesLoading && !matches) || (betfairLoading && !betfairEvents) || (atdLoading && !atdData);
+  const isInitialLoading = matchesLoading || betfairLoading || atdLoading;
 
   if (isInitialLoading && matchesList.length === 0) {
     return (
@@ -442,6 +381,34 @@ export default function UserDashboard() {
     setActiveBet({ match, selection, betType, odds });
   };
 
+  // Determine active API status notification based on current active tab
+  const getActiveTabApiStatusNotice = () => {
+    if (activeFilter === "Cricket" && (healthStatus.cricket?.statusType === "quota_exceeded" || healthStatus.cricket?.statusCode === 429)) {
+      return "Cricket feed unavailable - API quota exceeded";
+    }
+    if (activeFilter === "Soccer" && (healthStatus.football?.statusType === "subscription_required" || healthStatus.football?.statusCode === 403)) {
+      return "Football/Tennis feed unavailable - API subscription required";
+    }
+    if (activeFilter === "Tennis" && (healthStatus.tennis?.statusType === "subscription_required" || healthStatus.tennis?.statusCode === 403)) {
+      return "Football/Tennis feed unavailable - API subscription required";
+    }
+    if (activeFilter === "Inplay") {
+      const issues = [];
+      if (healthStatus.cricket?.statusType === "quota_exceeded" || healthStatus.cricket?.statusCode === 429) {
+        issues.push("Cricket feed unavailable - API quota exceeded");
+      }
+      if (healthStatus.football?.statusType === "subscription_required" || healthStatus.football?.statusCode === 403 || healthStatus.tennis?.statusType === "subscription_required" || healthStatus.tennis?.statusCode === 403) {
+        issues.push("Football/Tennis feed unavailable - API subscription required");
+      }
+      if (issues.length > 0) {
+        return issues.join(" • ");
+      }
+    }
+    return null;
+  };
+
+  const currentApiNotice = getActiveTabApiStatusNotice();
+
   return (
     <div className="min-h-screen text-[#212529]" style={{ 
       fontFamily: '"Roboto Condensed", HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -462,52 +429,78 @@ export default function UserDashboard() {
           justifyContent: "space-around",
           fontSize: 13,
           color: "white",
-          borderTop: "1px solid rgba(255,255,255,0.15)",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          borderBottom: "1px solid rgba(255,255,255,0.15)",
         }}
       >
-        <span>Credit: <strong>{clientCredit.toLocaleString('en-IN')}</strong></span>
-        <span>Balance: <strong>{clientBalance.toLocaleString('en-IN')}</strong></span>
-        <span>Liable: <strong>0</strong></span>
-        <span>Active Bets: <strong>*</strong></span>
+        <div>
+          <span style={{ color: "rgba(255,255,255,0.7)", marginRight: 5 }}>Pts:</span>
+          <span style={{ fontWeight: 800, color: "#ffffff" }}>
+            {clientCash.toLocaleString("en-IN")}
+          </span>
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.3)" }}>|</div>
+        <div>
+          <span style={{ color: "rgba(255,255,255,0.7)", marginRight: 5 }}>Exp:</span>
+          <span style={{ fontWeight: 800, color: "#ff6b6b" }}>
+            0
+          </span>
+        </div>
       </div>
 
-      <DashboardSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-        onFilterChange={setActiveFilter}
+      <DashboardSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        activeFilter={activeFilter}
+        onSelectFilter={(filter) => {
+          setActiveFilter(filter);
+          setSidebarOpen(false);
+        }}
       />
-      
-      <main className="flex flex-col">
-        {/* Game Banners */}
-        <GameBanners onFilterChange={setActiveFilter} />
 
-        {/* Horse Race & Greyhound Sliders */}
+      <main className="max-w-4xl mx-auto pb-20">
+        {/* Game Banners Slider */}
+        <GameBanners />
+
+        {/* Racing Quick Access Section */}
         <RaceSection 
-          title="Horse Race" 
-          iconType="horse" 
-          slots={[
-            { time: "9:32 PM", venue: "Naas (IE)" },
-            { time: "9:35 PM", venue: "Belterra Park (US)" },
-            { time: "9:40 PM", venue: "Delaware Park (US)" },
-            { time: "9:45 PM", venue: "Woodbine (CA)" },
-            { time: "9:50 PM", venue: "Remington Park (US)" }
-          ]} 
-        />
-        <RaceSection 
-          title="Grey Hound" 
-          iconType="greyhound" 
-          slots={[
-            { time: "9:37 PM", venue: "Dunstall Park (GB)" },
-            { time: "9:43 PM", venue: "Towcester (GB)" },
-            { time: "9:49 PM", venue: "Central Park (GB)" },
-            { time: "9:55 PM", venue: "Romford (GB)" },
-            { time: "10:01 PM", venue: "Sheffield (GB)" }
-          ]} 
+          onSelectRace={(race) => {
+            console.log("Selected race:", race);
+          }}
         />
 
-        {/* Bottom Tabs - Inline Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
+        {/* API Status Notice Strip when APIs hit quota or subscription limits */}
+        {currentApiNotice && (
+          <div 
+            style={{ 
+              backgroundColor: "#fff3cd", 
+              border: "1px solid #ffeeba", 
+              color: "#856404", 
+              padding: "6px 12px", 
+              fontSize: "12px", 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "space-between",
+              fontWeight: 600,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <AlertTriangle size={14} color="#856404" />
+              <span>{currentApiNotice}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Categories */}
+        <div 
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            backgroundColor: "#254465",
+            borderBottom: "2px solid #1a334d",
+            overflow: "hidden",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.12)",
+          }}
+        >
           {categories.map((cat) => {
             const isActive = activeFilter === cat.id;
             return (
@@ -519,8 +512,8 @@ export default function UserDashboard() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "8px 4px",
-                  backgroundColor: isActive ? "#00a676" : "#1e3a5f",
+                  padding: "6px 2px",
+                  backgroundColor: isActive ? "#15283c" : "transparent",
                   border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.12)",
                   cursor: "pointer",
@@ -529,7 +522,6 @@ export default function UserDashboard() {
                   position: "relative",
                 }}
               >
-                {/* Count number at top-right or top */}
                 <span style={{ 
                   color: 'white', 
                   fontSize: 14, 
@@ -541,12 +533,10 @@ export default function UserDashboard() {
                   {cat.count}
                 </span>
                 
-                {/* Sport icon */}
                 <div style={{ marginBottom: 3 }}>
                    <SportIcon sport={cat.id} color="white" size={20} />
                 </div>
 
-                {/* Label */}
                 <span style={{
                   color: "white",
                   fontSize: 11,
@@ -622,10 +612,13 @@ export default function UserDashboard() {
             })}
 
             {displayMatches.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <div className="flex flex-col items-center justify-center py-16 text-center px-4 bg-white m-3 rounded border border-gray-200">
                 <Trophy className="w-12 h-12 text-[#254465]/30 mb-3" />
-                <p className="text-sm font-bold text-[#254465]/50 uppercase tracking-wide">
-                  No matches available in {activeFilter}
+                <p className="text-sm font-bold text-[#254465] uppercase tracking-wide">
+                  {activeFilter} Matches
+                </p>
+                <p className="text-xs text-gray-600 mt-1 font-semibold">
+                  {currentApiNotice ? currentApiNotice : `No ${activeFilter} matches scheduled right now.`}
                 </p>
               </div>
             )}

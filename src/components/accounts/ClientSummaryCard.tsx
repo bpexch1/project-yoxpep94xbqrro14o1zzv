@@ -194,7 +194,6 @@ export function ClientSummaryCard({
         setRefreshedData(prev => ({ ...prev, [client.id]: results[0] }));
         setRowLoadedMap(prev => ({ ...prev, [client.id]: true }));
       }
-      toast({ title: "Updated", description: `Balance updated for ${client.username}` });
     } catch (e) {
       console.error(e);
       toast({ variant: "destructive", title: "Refresh Failed" });
@@ -207,7 +206,6 @@ export function ClientSummaryCard({
     try {
       const newStatus = client.status === "active" ? "inactive" : "active";
       await Client.update(client.id, { status: newStatus });
-      toast({ title: "Status Updated", description: `${client.username} is now ${newStatus}` });
       onRefresh?.();
     } catch (e) {
       console.error(e);

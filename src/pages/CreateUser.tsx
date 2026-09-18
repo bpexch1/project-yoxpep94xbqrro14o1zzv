@@ -4,7 +4,7 @@ import { Client, checkUsernameExists } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
-import { Settings, Loader2, Check, ArrowLeft } from "lucide-react";
+import { Loader2, Check, ArrowLeft } from "lucide-react";
 
 function getCreatableRole(sessionRole: string): { label: string; role: string } {
   const r = sessionRole?.toLowerCase();
@@ -111,6 +111,7 @@ export default function CreateUser() {
     try {
       await Client.create({
         username: formData.username.trim(),
+        password: formData.password.trim(),
         role: formData.type === "admin_type" ? creatableRole.role : "client",
         credit_received: 0,
         credit_remaining: 0,
@@ -126,10 +127,6 @@ export default function CreateUser() {
       });
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({ 
-        title: "User Created", 
-        description: `${formData.username} created successfully.` 
-      });
       navigate("/accounts");
     } catch (error: any) {
       console.error(error);
@@ -355,18 +352,6 @@ export default function CreateUser() {
             </div>
           </form>
         </div>
-      </div>
-
-      {/* Floating settings gear button in bottom right as seen in screenshot */}
-      <div className="fixed bottom-4 right-4 z-20">
-        <button
-          type="button"
-          onClick={() => {}}
-          className="w-10 h-10 rounded-md bg-[#6c757d] text-white flex items-center justify-center shadow-lg hover:bg-[#5a6268] transition-colors"
-          title="Settings"
-        >
-          <Settings className="w-5 h-5 animate-[spin_6s_linear_infinite]" />
-        </button>
       </div>
     </div>
   );

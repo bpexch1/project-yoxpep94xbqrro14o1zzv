@@ -84,10 +84,6 @@ export default function SettlePLPage() {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });
       
-      toast({
-        title: "Success",
-        description: `Rs. ${settleAmount.toLocaleString()} settled to cash for ${client.username}`,
-      });
       navigate(-1);
     } catch (err) {
       console.error("Settle P/L Error:", err);

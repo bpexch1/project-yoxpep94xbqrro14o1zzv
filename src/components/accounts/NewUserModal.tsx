@@ -140,10 +140,6 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
       });
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({
-        title: "User Created!",
-        description: `${formData.username} added successfully.`,
-      });
       resetForm();
       onClose();
     } catch (error: any) {

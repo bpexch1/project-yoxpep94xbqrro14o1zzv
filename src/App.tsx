@@ -30,6 +30,7 @@ import SettlePLPage from "@/pages/accounts/SettlePLPage";
 import LedgerPage from "@/pages/accounts/LedgerPage";
 import BetLock from "@/pages/BetLock";
 import SettleMatch from "@/pages/SettleMatch";
+import ApiSettings from "@/pages/ApiSettings";
 import NotFound from "@/pages/NotFound";
 import { BrandingBadge } from "@/components/BrandingBadge";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -46,6 +47,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/Users/Login" element={<Login />} />
+            <Route path="/users/login" element={<Login />} />
             
             {/* Protected Admin Routes */}
             <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
@@ -70,6 +73,10 @@ const App = () => (
             <Route path="/accounts/ledger/:username" element={<AppLayout><LedgerPage /></AppLayout>} />
             <Route path="/bet-lock" element={<AppLayout><BetLock /></AppLayout>} />
             <Route path="/settle-match" element={<AppLayout><SettleMatch /></AppLayout>} />
+            <Route path="/api-settings" element={<AppLayout><ApiSettings /></AppLayout>} />
+            <Route path="/api-diagnostics" element={<AppLayout><ApiSettings /></AppLayout>} />
+            
+            {/* User Client Routes */}
             <Route path="/play" element={<UserDashboard />} />
             <Route path="/casino" element={<UserDashboard />} />
             <Route path="/play/profile" element={<UserProfile />} />

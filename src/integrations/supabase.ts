@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const supabaseUrl = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_URL) || (typeof process !== "undefined" && process.env?.VITE_SUPABASE_URL) || "";
+const supabaseAnonKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_ANON_KEY) || (typeof process !== "undefined" && process.env?.VITE_SUPABASE_ANON_KEY) || "";
 
 // Initial seed data for offline / standalone preview
 const SEED_CLIENTS = [
@@ -9,7 +9,7 @@ const SEED_CLIENTS = [
     id: "client-book-01",
     username: "Book",
     full_name: "Company Super Admin",
-    password: "admin",
+    password: "book1234",
     role: "company",
     credit_received: 10000000,
     credit_remaining: 10000000,
@@ -127,6 +127,49 @@ const SEED_TRANSACTIONS = [
 ];
 
 // Helper to get / set localStorage table collections
+export function resetAndSeedDatabase(): void {
+  try {
+    const keysToRemove = [
+      "exchange_db_clients",
+      "exchange_db_matches",
+      "exchange_db_bets",
+      "exchange_db_transactions",
+      "exchange_db_game_settings",
+      "exchange_db_live_rates",
+      "clientSession",
+      "supabase.auth.token",
+    ];
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (
+        key &&
+        (key.startsWith("sb-") ||
+          key.startsWith("exchange_") ||
+          key.includes("auth") ||
+          key.includes("Session"))
+      ) {
+        localStorage.removeItem(key);
+      }
+    }
+
+    localStorage.setItem("exchange_db_clients", JSON.stringify(SEED_CLIENTS));
+    localStorage.setItem("exchange_db_matches", JSON.stringify(SEED_MATCHES));
+    localStorage.setItem("exchange_db_bets", JSON.stringify(SEED_BETS));
+    localStorage.setItem("exchange_db_transactions", JSON.stringify(SEED_TRANSACTIONS));
+    localStorage.setItem("exchange_db_initialized_v4", "true");
+    console.log("[DB_RESET] Database cleared and seeded successfully with Book / book1234");
+  } catch (err) {
+    console.error("[DB_RESET] Error during resetAndSeedDatabase:", err);
+  }
+}
+
+// Auto-run reset on first load of v4
+if (typeof window !== "undefined" && !localStorage.getItem("exchange_db_initialized_v4")) {
+  resetAndSeedDatabase();
+}
+
 function getLocalTable(table: string): any[] {
   try {
     const key = `exchange_db_${table}`;
@@ -147,6 +190,43 @@ function getLocalTable(table: string): any[] {
         );
         localStorage.setItem(key, JSON.stringify(items));
       }
+
+      if (table === "clients" && Array.isArray(items)) {
+        let changed = false;
+        // Ensure Book exists with company role and book1234 password
+        const bookIndex = items.findIndex(
+          (c: any) => c && String(c.username || "").toLowerCase() === "book"
+        );
+        if (bookIndex >= 0) {
+          if (
+            items[bookIndex].role !== "company" ||
+            items[bookIndex].password !== "book1234" ||
+            items[bookIndex].status !== "active"
+          ) {
+            items[bookIndex].role = "company";
+            items[bookIndex].password = "book1234";
+            items[bookIndex].status = "active";
+            changed = true;
+          }
+        } else {
+          items.unshift(SEED_CLIENTS[0]);
+          changed = true;
+        }
+
+        // Ensure client1 exists with client1 password
+        const client1Index = items.findIndex(
+          (c: any) => c && String(c.username || "").toLowerCase() === "client1"
+        );
+        if (client1Index === -1) {
+          items.push(SEED_CLIENTS[2]);
+          changed = true;
+        }
+
+        if (changed) {
+          localStorage.setItem(key, JSON.stringify(items));
+        }
+      }
+
       return items;
     }
 
@@ -215,6 +295,39 @@ class MockQueryBuilder {
         return itemVal.toLowerCase() === val.toLowerCase();
       }
       return itemVal === val;
+    });
+    return this;
+  }
+
+  ilike(col: string, val: string) {
+    this._filters.push((item) => {
+      const itemVal = String(item[col] ?? "").toLowerCase();
+      const cleanPattern = String(val ?? "").toLowerCase().replace(/%/g, ".*");
+      return new RegExp(`^${cleanPattern}$`, "i").test(itemVal);
+    });
+    return this;
+  }
+
+  like(col: string, val: string) {
+    this._filters.push((item) => {
+      const itemVal = String(item[col] ?? "");
+      const cleanPattern = String(val ?? "").replace(/%/g, ".*");
+      return new RegExp(`^${cleanPattern}$`).test(itemVal);
+    });
+    return this;
+  }
+
+  is(col: string, val: any) {
+    this._filters.push((item) => item[col] === val);
+    return this;
+  }
+
+  contains(col: string, val: any) {
+    this._filters.push((item) => {
+      const itemVal = item[col];
+      if (Array.isArray(itemVal)) return itemVal.includes(val);
+      if (typeof itemVal === "string") return itemVal.includes(String(val));
+      return false;
     });
     return this;
   }

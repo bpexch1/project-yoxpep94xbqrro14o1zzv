@@ -12,6 +12,11 @@ interface BettingMatchCardProps {
 
 export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
   const navigate = useNavigate();
+
+  if (!match || (!match.title && !match.team1 && !match.eventName)) {
+    return null;
+  }
+
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
   const isLive = match.status === 'live' || String(match.status || '').toLowerCase() === 'inplay';
 

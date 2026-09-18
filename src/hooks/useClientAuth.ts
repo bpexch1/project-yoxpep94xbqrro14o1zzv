@@ -37,57 +37,6 @@ export const clearClientSession = () => {
   localStorage.removeItem(SESSION_KEY);
 };
 
-const DEMO_FALLBACK_CLIENTS: ClientSession[] = [
-  {
-    id: "client-book-01",
-    username: "Book",
-    full_name: "Company Super Admin",
-    role: "company",
-    credit_received: 10000000,
-    credit_remaining: 10000000,
-    cash: 5000000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  },
-  {
-    id: "client-admin-01",
-    username: "admin",
-    full_name: "Exchange Senior Admin",
-    role: "admin",
-    credit_received: 2000000,
-    credit_remaining: 2000000,
-    cash: 1000000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  },
-  {
-    id: "client-user-01",
-    username: "client1",
-    full_name: "John Player",
-    role: "client",
-    credit_received: 50000,
-    credit_remaining: 45000,
-    cash: 25000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  },
-  {
-    id: "client-user-02",
-    username: "demo_user",
-    full_name: "Demo Player",
-    role: "client",
-    credit_received: 20000,
-    credit_remaining: 18500,
-    cash: 10000,
-    pl_downline: 0,
-    balance_upline: 0,
-    status: "active",
-  }
-];
-
 export async function loginClient(username: string, password: string): Promise<ClientSession> {
   const cleanUsername = username.trim();
   const cleanPassword = password;
@@ -96,11 +45,15 @@ export async function loginClient(username: string, password: string): Promise<C
     const { data, error } = await supabase
       .from("clients")
       .select("*")
-      .eq("username", cleanUsername)
+      .ilike("username", cleanUsername)
       .eq("password", cleanPassword)
       .maybeSingle();
 
     if (!error && data) {
+      if (data.status === "inactive" || data.status === "locked" || data.status === "suspended") {
+        throw new Error("Account is inactive or disabled");
+      }
+
       const session: ClientSession = {
         id: data.id,
         username: data.username,
@@ -116,24 +69,11 @@ export async function loginClient(username: string, password: string): Promise<C
       setClientSession(session);
       return session;
     }
-  } catch (err) {
-    console.warn("Backend auth query failed, using mock auth:", err);
-  }
-
-  // Fallback to demo mock credentials
-  const demo = DEMO_FALLBACK_CLIENTS.find(
-    (d) =>
-      d.username.toLowerCase() === cleanUsername.toLowerCase() &&
-      (cleanPassword === "admin" ||
-        cleanPassword === "123456" ||
-        cleanPassword === d.username ||
-        (d.username === "client1" && cleanPassword === "client1") ||
-        (d.username === "demo_user" && cleanPassword === "demo"))
-  );
-
-  if (demo) {
-    setClientSession(demo);
-    return demo;
+  } catch (err: any) {
+    if (err?.message === "Account is inactive or disabled") {
+      throw err;
+    }
+    console.error("Backend auth query error:", err);
   }
 
   throw new Error("Invalid username or password");

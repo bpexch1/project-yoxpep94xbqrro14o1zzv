@@ -110,10 +110,6 @@ export default function EditClientPage() {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });
       
-      toast({
-        title: "Success",
-        description: `Account for ${client.username} has been updated.`,
-      });
       navigate(-1);
     } catch (error: any) {
       console.error("Error updating client:", error);
