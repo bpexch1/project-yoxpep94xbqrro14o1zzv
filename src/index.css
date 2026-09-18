@@ -159,7 +159,133 @@ a:hover {
     width: 22px; height: 24px; display: inline-block;
 }
 
-/* White version of sprite icons for dark backgrounds */
-.sprite-icon-white {
-  filter: brightness(0) invert(1);
+/* ===== VIDEO STREAMING PLAYER CONTROLS (BPEXCH) ===== */
+.btn-primary #Alltab {
+  background-color: #000;
+  color: #fff;
+}
+
+.controls, .controls > * {
+  padding: 0;
+  margin: 0;
+}
+
+.controls {
+  background: #696969;
+  height: 38px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.controls[data-state=hidden] {
+  display: none;
+}
+
+.controls[data-state=visible] {
+  display: flex;
+}
+
+.controls > * {
+  width: 32px;
+  height: 100%;
+  margin-top: 3px;
+  display: block;
+}
+
+.controls > :first-child {
+  margin-left: 4px;
+}
+
+.controls button {
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  background-size: 24px 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+}
+
+.controls button:focus, .controls button:hover {
+  outline: 0;
+}
+
+/* Custom range slider for video volume / seek */
+input[type=range] {
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: rgba(255,255,255,0);
+  border-radius: 12px;
+  height: 8px;
+  margin: 5px;
+  border: none;
+  background: 0 0;
+  outline: 0;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  border: inherit;
+  background: #fff;
+  border-radius: 12px;
+  height: 6px;
+}
+
+input[type=range]::-moz-range-track {
+  border: inherit;
+  background: #fff;
+  border-radius: 12px;
+  height: 6px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: #00b181;
+  margin-top: -5px;
+  cursor: pointer;
+}
+
+/* ===== DATATABLES STYLING (BPEXCH) ===== */
+table.dataTable {
+  width: 100%;
+  margin: 0 auto;
+  clear: both;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table.dataTable thead th, table.dataTable tfoot th {
+  font-weight: 700;
+  background-color: #254465;
+  color: #fff;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+table.dataTable tbody tr {
+  background-color: #fff;
+  border-bottom: 1px solid #dee2e6;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+  background-color: #f8fafd;
+}
+
+table.dataTable tbody td {
+  padding: 8px 10px;
+  color: #212529;
+}
+
+table.dataTable tbody tr:hover {
+  background-color: #eaf3fa;
 }

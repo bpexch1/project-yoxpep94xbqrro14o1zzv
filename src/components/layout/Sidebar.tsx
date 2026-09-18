@@ -1,7 +1,7 @@
 import { 
-  Gauge, Users, Filter, CreditCard, Lock, Star, Globe, 
-  CircleDot, Crosshair, Swords, Zap, Rabbit, Trophy,
-  X, ChevronLeft, ChevronRight, ChevronDown, Loader2 
+  Gauge, Users, Coins, FileText, Lock, Star, Globe, 
+  CircleDot, Crosshair, Swords, Zap, Rabbit,
+  X, ChevronLeft, ChevronDown, Loader2 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -21,10 +21,9 @@ interface SidebarProps {
 const mainMenuItems = [
   { label: "Dashboard", icon: Gauge, link: "/dashboard" },
   { label: "Users", icon: Users, link: "/accounts" },
-  { label: "Current Position", icon: Filter, link: "/current-position" },
-  { label: "Reports", icon: CreditCard, link: "/reports/daily-pl" },
+  { label: "Current Position", icon: Coins, link: "/current-position" },
+  { label: "Reports", icon: FileText, link: "/reports/daily-pl" },
   { label: "Bet Lock", icon: Lock, link: "/bet-lock" },
-  { label: "Settle Match", icon: Trophy, link: "/settle-match" },
   { label: "Star Casino", icon: Star, link: "/star-casino" },
   { label: "World Casino", icon: Globe, link: "/world-casino" },
   { label: "BetFair Games", icon: Globe, link: "/betfair-games" },
@@ -90,28 +89,28 @@ function SportDropdown({
   const showLabels = !isCollapsed || isMobile;
 
   return (
-    <div className="flex flex-col border-b border-white/[0.04]">
+    <div className="flex flex-col border-b border-[#354354]/50">
       <button
         onClick={toggleOpen}
         className={cn(
           "flex items-center w-full text-left transition-colors group",
-          isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-3 px-4",
-          "text-[#b8c7ce] hover:bg-[#353c47] hover:text-white"
+          isCollapsed && !isMobile ? "justify-center py-3.5 px-0" : "gap-4 py-3 px-4",
+          "text-[#d1d5db] hover:bg-[#324052] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? label : undefined}
       >
         <Icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[18px] h-[18px]",
-          "text-[#3bc8c8] group-hover:text-white"
+          "text-[#9ca3af] group-hover:text-white"
         )} />
         {showLabels && (
           <>
-            <span className="flex-1 text-[14px] leading-6 whitespace-nowrap font-normal">{label}</span>
-            <ChevronDown 
+            <span className="flex-1 text-[14.5px] leading-6 whitespace-nowrap font-normal text-[#e5e7eb]">{label}</span>
+            <ChevronLeft 
               className={cn(
-                "w-4 h-4 text-[#3bc8c8]/60 transition-transform duration-200",
-                isOpen && "rotate-180"
+                "w-4 h-4 text-[#9ca3af] transition-transform duration-200",
+                isOpen && "-rotate-90"
               )} 
             />
           </>
@@ -125,11 +124,11 @@ function SportDropdown({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-visible bg-[#242a33]"
+            className="overflow-visible bg-[#1e2733]"
           >
             {isLoading ? (
-              <div className="py-2 px-10 flex items-center gap-2 text-[#b8c7ce]/60 text-[12px]">
-                <Loader2 className="w-3 h-3 animate-spin" />
+              <div className="py-2.5 px-8 flex items-center gap-2 text-[#9ca3af] text-[12px]">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>Loading...</span>
               </div>
             ) : filteredEvents && filteredEvents.length > 0 ? (
@@ -138,19 +137,19 @@ function SportDropdown({
                   <button
                     key={event.id}
                     onClick={() => handleMatchClick(event.marketId)}
-                    className="pl-12 pr-4 py-2 text-[12px] text-left text-[#b8c7ce] hover:text-white hover:bg-white/[0.04] transition-colors border-b border-white/[0.02] group flex items-center justify-between"
+                    className="pl-10 pr-4 py-2 text-[12.5px] text-left text-[#cbd5e1] hover:text-white hover:bg-white/[0.06] transition-colors border-b border-white/[0.03] group flex items-center justify-between"
                   >
                     <span className="truncate flex-1">
                       {event.eventName}
                     </span>
                     {event.status === "live" && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00b181] ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(0,166,90,0.6)]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00a676] ml-2 shrink-0 animate-pulse shadow-[0_0_8px_rgba(0,166,118,0.6)]" />
                     )}
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="py-2 px-10 text-[#b8c7ce]/60 text-[12px]">
+              <div className="py-2.5 px-8 text-[#9ca3af] text-[12px]">
                 No matches available
               </div>
             )}
@@ -170,8 +169,12 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
     onNavigate();
   };
 
-  const renderItem = (item: typeof mainMenuItems[0], showChevron = false) => {
-    const isActive = location.pathname === item.link || (item.link !== "/dashboard" && location.pathname.startsWith(item.link));
+  const renderItem = (item: typeof mainMenuItems[0]) => {
+    const isUsersTab = item.label === "Users" && (location.pathname.startsWith("/accounts") || location.pathname.startsWith("/Users"));
+    const isDashboardTab = item.label === "Dashboard" && location.pathname === "/dashboard";
+    const isOtherTab = item.link !== "/dashboard" && !location.pathname.startsWith("/accounts") && location.pathname.startsWith(item.link);
+    
+    const isActive = isUsersTab || isDashboardTab || isOtherTab;
     const showLabels = !isCollapsed || isMobile;
 
     return (
@@ -179,41 +182,41 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
         key={item.label}
         onClick={() => handleNavigate(item.link)}
         className={cn(
-          "flex items-center w-full text-left transition-colors group border-b border-white/[0.04]",
-          isCollapsed && !isMobile ? "justify-center py-4 px-0" : "gap-5 py-3 px-4",
+          "flex items-center w-full text-left transition-colors group border-b border-[#354354]/50",
+          isCollapsed && !isMobile ? "justify-center py-3.5 px-0" : "gap-4 py-3 px-4",
           isActive
-            ? "bg-[#242a33] text-white font-medium border-l-[3px] border-[#00b181]"
-            : "text-[#b8c7ce] hover:bg-[#353c47] hover:text-white"
+            ? "bg-[#334458] text-white font-medium"
+            : "text-[#d1d5db] hover:bg-[#324052] hover:text-white"
         )}
         title={isCollapsed && !isMobile ? item.label : undefined}
       >
         <item.icon className={cn(
           "shrink-0 transition-colors",
           isCollapsed && !isMobile ? "w-5 h-5" : "w-[18px] h-[18px]",
-          isActive ? "text-[#00b181]" : "text-[#3bc8c8] group-hover:text-white"
+          isActive && item.label === "Users" 
+            ? "text-[#38bdf8]" 
+            : isActive 
+              ? "text-[#38bdf8]" 
+              : "text-[#9ca3af] group-hover:text-white"
         )} />
         {showLabels && (
-          <>
-            <span className={cn(
-              "flex-1 text-[14px] leading-6 whitespace-nowrap",
-              isActive ? "font-medium" : "font-normal"
-            )}>{item.label}</span>
-            {showChevron && <ChevronLeft className="w-4 h-4 text-white/40 shrink-0" />}
-          </>
+          <span className={cn(
+            "flex-1 text-[14.5px] leading-6 whitespace-nowrap text-[#e5e7eb]",
+            isActive ? "font-semibold text-white" : "font-normal"
+          )}>
+            {item.label}
+          </span>
         )}
       </button>
     );
   };
 
   return (
-    <nav className="flex flex-col">
+    <nav className="flex flex-col bg-[#273444] min-h-full">
       {/* Main menu items */}
       <div className="flex flex-col">
         {mainMenuItems.map((item) => renderItem(item))}
       </div>
-
-      {/* Separator */}
-      <div className="h-px bg-white/[0.04] my-1" />
 
       {/* Sports items */}
       <div className="flex flex-col">
@@ -238,8 +241,8 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
     <>
       {/* DESKTOP SIDEBAR */}
       <aside className={cn(
-        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#2d323e] flex-col overflow-y-auto border-r border-white/[0.06] transition-all duration-200",
-        isCollapsed ? "w-[60px]" : "w-[200px]"
+        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#273444] flex-col overflow-y-auto border-r border-[#354354] transition-all duration-200",
+        isCollapsed ? "w-[60px]" : "w-[220px]"
       )}>
         <SidebarNavItems onNavigate={() => {}} isCollapsed={isCollapsed} />
       </aside>
@@ -263,17 +266,8 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "tween", duration: 0.2 }}
-              className="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#2d323e] flex flex-col overflow-y-auto lg:hidden"
+              className="fixed left-0 top-0 h-full w-[260px] max-w-[80vw] z-50 bg-[#273444] flex flex-col overflow-y-auto shadow-2xl lg:hidden"
             >
-              {/* Header for mobile sidebar */}
-              <div className="flex items-center justify-end px-4 h-14 border-b border-white/10 shrink-0">
-                <button
-                  onClick={onMobileClose}
-                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-5 h-5 text-white/70" />
-                </button>
-              </div>
               <SidebarNavItems onNavigate={onMobileClose} isCollapsed={false} isMobile={true} />
             </motion.div>
           </>

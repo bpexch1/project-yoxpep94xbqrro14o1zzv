@@ -16,15 +16,20 @@ export default function UserStatement() {
 
   const { data: transactions, isLoading: transLoading } = useQuery({
     queryKey: ["user-transactions", session?.username],
-    queryFn: () => Transaction.filter({ client_username: session?.username }),
+    queryFn: async () => {
+      if (!session?.username) return [];
+      const res = await Transaction.filter({ client_username: session.username });
+      return Array.isArray(res) ? res : [];
+    },
     enabled: !!session?.username,
   });
 
   const { data: clientData } = useQuery({
     queryKey: ["client-profile", session?.username],
     queryFn: async () => {
-      const clients = await Client.filter({ username: session?.username });
-      return clients?.[0];
+      if (!session?.username) return null;
+      const clients = await Client.filter({ username: session.username });
+      return (clients && clients.length > 0) ? clients[0] : null;
     },
     enabled: !!session?.username,
   });

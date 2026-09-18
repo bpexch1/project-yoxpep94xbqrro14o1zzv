@@ -1,5 +1,8 @@
 
 import { motion } from "framer-motion";
+import aviatorXImg from "@/assets/images/banner_aviator_x_1789663874611.jpg";
+import sportsBookImg from "@/assets/images/banner_sportsbook_1789663894265.jpg";
+import aviatorClassicImg from "@/assets/images/banner_aviator_red_1789663919683.jpg";
 
 interface GameBannersProps {
   onFilterChange?: (filter: string) => void;
@@ -8,44 +11,72 @@ interface GameBannersProps {
 export function GameBanners({ onFilterChange }: GameBannersProps) {
   const banners = [
     {
-      url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/7127ebd7-c31a-4215-ac7a-1f4d91158474.png",
-      alt: "Live Casino",
-      filter: "Casino"
+      id: "aviator-x",
+      title: "AviatorX",
+      image: aviatorXImg,
+      filter: "Casino",
+      alt: "AviatorX",
     },
     {
-      url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/86f70bd0-9f62-4e3f-b586-d29ef7fad6f6.png",
-      alt: "Slots & Games",
-      filter: "Casino"
-    },
-    {
-      url: "https://ellprnxjjzatijdxcogk.supabase.co/storage/v1/object/public/files/chat-generated-images/project-yoxpep94xbqrro14o1zzv/f9b27073-87e8-4854-9203-d0432cec440c.png",
+      id: "sports-book",
+      title: "Sports Book",
+      image: sportsBookImg,
+      filter: "Inplay",
       alt: "Sports Book",
-      filter: "Inplay"
+    },
+    {
+      id: "aviator-classic",
+      title: "Aviator",
+      image: aviatorClassicImg,
+      filter: "Casino",
+      alt: "Aviator",
     },
   ];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", width: "100%", gap: 0 }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        width: "100%",
+        backgroundColor: "#000",
+        borderBottom: "1px solid rgba(255,255,255,0.15)",
+        gap: 1,
+      }}
+    >
       {banners.map((banner, idx) => (
         <motion.div
-          key={idx}
-          whileTap={{ scale: 0.96 }}
+          key={banner.id || idx}
+          whileTap={{ scale: 0.97 }}
           onClick={() => onFilterChange?.(banner.filter)}
-          style={{ 
-            position: "relative", 
-            cursor: "pointer", 
-            overflow: "hidden", 
-            aspectRatio: "4/3",
-            transition: "transform 0.15s ease-out"
+          style={{
+            position: "relative",
+            aspectRatio: "1/1",
+            cursor: "pointer",
+            overflow: "hidden",
+            backgroundColor: "#0d1117",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <img
-            src={banner.url}
+            src={banner.image}
             alt={banner.alt}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            referrerPolicy="no-referrer"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+              transition: "transform 0.2s ease-in-out",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           />
         </motion.div>
       ))}
     </div>
   );
 }
+

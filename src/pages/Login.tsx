@@ -218,200 +218,241 @@ export default function Login() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
+        backgroundColor: "#1c1e21",
+        backgroundImage: `radial-gradient(#2a2d32 1px, transparent 1px), radial-gradient(#23262b 1px, #18191c 100%)`,
+        backgroundSize: "40px 40px, 100% 100%",
         display: "flex",
         flexDirection: "column",
-        paddingBottom: "8px",
+        justifyContent: "flex-start",
+        paddingTop: "40px",
+        paddingBottom: "24px",
+        position: "relative",
       }}
     >
+      {/* Subtle Low-Poly Triangular Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          opacity: 0.14,
+          pointerEvents: "none",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath fill='%23ffffff' fill-opacity='0.25' d='M0 0l80 40-80 40zM80 40l80-40v80zM80 40l80 40-80 40zM0 80l80 40-80 40zM80 120l80-40v80zM80 120l80 40-80 40z'/%3E%3C/svg%3E")`,
+          backgroundSize: "160px 160px",
+        }}
+      />
       <style>{`
-        .login-input::placeholder { color: rgba(255,255,255,0.65); }
+        .login-input::placeholder { color: rgba(255,255,255,0.7); }
         .login-input:focus { outline: none; }
       `}</style>
 
-      {/* Login Card — upper portion, not vertically centered */}
+      {/* Login Card Container */}
       <div
         style={{
-          margin: "40px 16px 0",
-          borderRadius: 18,
-          background: "linear-gradient(180deg, #3a7490 0%, #1a4a6e 50%, #0d2640 100%)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
-          padding: "36px 28px 36px",
-          overflow: "hidden",
+          width: "100%",
+          maxWidth: 420,
+          margin: "32px auto 0",
+          padding: "0 16px",
         }}
       >
-        {/* BP Logo Circle — centered inside card */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-          <div
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: "50%",
-              backgroundColor: "#3dd6c8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
-            }}
-          >
-            <span
+        <div
+          style={{
+            borderRadius: 16,
+            background: "linear-gradient(180deg, #326488 0%, #1b3d5b 45%, #0d1e31 100%)",
+            boxShadow: "0 12px 36px rgba(0,0,0,0.65)",
+            padding: "36px 28px 36px",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          {/* BP Logo Circle */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 36, marginTop: 4 }}>
+            <div
               style={{
-                fontFamily: "Pacifico, cursive",
-                fontSize: "3.2rem",
-                color: "#0d1f30",
-                lineHeight: 1,
-                fontStyle: "italic",
-              }}
-            >
-              BP
-            </span>
-          </div>
-        </div>
-
-        <form onSubmit={handleLogin}>
-          {/* Username field */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
-              <User size={22} color="rgba(255,255,255,0.85)" />
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="login-input"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 17,
-                  fontFamily: '"Roboto Condensed", sans-serif',
-                }}
-              />
-            </div>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
-          </div>
-
-          {/* Password field */}
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
-              <Lock size={22} color="rgba(255,255,255,0.85)" />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="login-input"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 17,
-                  fontFamily: '"Roboto Condensed", sans-serif',
-                }}
-              />
-            </div>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.35)" }} />
-          </div>
-
-          {/* Login Button — pill shape, centered */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "65%",
-                borderRadius: 50,
-                background: "linear-gradient(to bottom, #3e6d8d, #121d30)",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                fontWeight: 500,
-                padding: "14px 0",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                boxShadow: "0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18)",
+                width: 126,
+                height: 126,
+                borderRadius: "50%",
+                backgroundColor: "#52e0cb",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 8,
-                fontFamily: '"Roboto Condensed", sans-serif',
-                letterSpacing: 0.3,
-                transition: "opacity 0.2s",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
               }}
             >
-              {loading ? <Loader2 size={20} className="animate-spin" /> : "Login"}
-            </button>
-          </div>
-
-          {/* Demo account quick login helpers */}
-          <div style={{ marginTop: 24, textAlign: "center" }}>
-            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginBottom: 8 }}>
-              Quick Demo Accounts:
-            </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("Book");
-                  setPassword("admin");
-                }}
-                style={{
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                  color: "#fff",
-                  borderRadius: 14,
-                  padding: "4px 12px",
-                  fontSize: 12,
-                  cursor: "pointer",
-                }}
-              >
-                Company (Book)
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("admin");
-                  setPassword("admin");
-                }}
-                style={{
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                  color: "#fff",
-                  borderRadius: 14,
-                  padding: "4px 12px",
-                  fontSize: 12,
-                  cursor: "pointer",
-                }}
-              >
-                Admin (admin)
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("client1");
-                  setPassword("client1");
-                }}
-                style={{
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                  color: "#fff",
-                  borderRadius: 14,
-                  padding: "4px 12px",
-                  fontSize: 12,
-                  cursor: "pointer",
-                }}
-              >
-                Player (client1)
-              </button>
+              <svg width="86" height="86" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Stylized Italic BP Monogram */}
+                <text
+                  x="20"
+                  y="68"
+                  fill="#12202e"
+                  fontSize="52"
+                  fontWeight="900"
+                  fontStyle="italic"
+                  fontFamily="'Brush Script MT', 'Lucida Calligraphy', 'Segoe UI', cursive, sans-serif"
+                  letterSpacing="-2"
+                >
+                  B
+                </text>
+                <text
+                  x="48"
+                  y="68"
+                  fill="#12202e"
+                  fontSize="52"
+                  fontWeight="900"
+                  fontStyle="italic"
+                  fontFamily="'Brush Script MT', 'Lucida Calligraphy', 'Segoe UI', cursive, sans-serif"
+                  letterSpacing="-2"
+                >
+                  P
+                </text>
+              </svg>
             </div>
           </div>
-        </form>
+
+          <form onSubmit={handleLogin}>
+            {/* Username field */}
+            <div style={{ marginBottom: 30 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
+                <User size={20} color="#ffffff" strokeWidth={2.4} />
+                <input
+                  type="text"
+                  placeholder=""
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="login-input"
+                  style={{
+                    flex: 1,
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    color: "#ffffff",
+                    fontSize: 16,
+                    fontWeight: 500,
+                  }}
+                />
+              </div>
+              <div style={{ height: 1.5, background: "#ffffff", width: "100%" }} />
+            </div>
+
+            {/* Password field */}
+            <div style={{ marginBottom: 38 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
+                <Lock size={20} color="#ffffff" strokeWidth={2.4} />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="login-input"
+                  style={{
+                    flex: 1,
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    color: "#ffffff",
+                    fontSize: 16,
+                    fontWeight: 500,
+                  }}
+                />
+              </div>
+              <div style={{ height: 1.5, background: "rgba(255,255,255,0.45)", width: "100%" }} />
+            </div>
+
+            {/* Login Button — centered rounded pill with gradient */}
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  minWidth: 136,
+                  borderRadius: 9999,
+                  background: "linear-gradient(180deg, #4f85aa 0%, #295577 50%, #173852 100%)",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  color: "#ffffff",
+                  fontSize: 16,
+                  fontWeight: 600,
+                  padding: "11px 32px",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.75 : 1,
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  transition: "transform 0.1s, opacity 0.2s",
+                }}
+                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
+                {loading ? <Loader2 size={18} className="animate-spin" /> : "Login"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Quick Demo Helper at bottom */}
+        <div style={{ marginTop: 24, textAlign: "center" }}>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>
+            Quick Demo Accounts
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername("client1");
+                setPassword("client1");
+              }}
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.8)",
+                borderRadius: 12,
+                padding: "3px 10px",
+                fontSize: 11,
+                cursor: "pointer",
+              }}
+            >
+              Player (client1)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername("admin");
+                setPassword("admin");
+              }}
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.8)",
+                borderRadius: 12,
+                padding: "3px 10px",
+                fontSize: 11,
+                cursor: "pointer",
+              }}
+            >
+              Admin (admin)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername("Book");
+                setPassword("admin");
+              }}
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.8)",
+                borderRadius: 12,
+                padding: "3px 10px",
+                fontSize: 11,
+                cursor: "pointer",
+              }}
+            >
+              Company (Book)
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Blue bar at bottom of screen */}

@@ -51,6 +51,9 @@ const App = () => (
             <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
             <Route path="/accounts" element={<AppLayout><Accounts /></AppLayout>} />
             <Route path="/accounts/create" element={<AppLayout><CreateUser /></AppLayout>} />
+            <Route path="/Users/Create" element={<AppLayout><CreateUser /></AppLayout>} />
+            <Route path="/Users/Creat" element={<AppLayout><CreateUser /></AppLayout>} />
+            <Route path="/users/create" element={<AppLayout><CreateUser /></AppLayout>} />
             <Route path="/accounts/create-company" element={<AppLayout><CreateCompanyAccount /></AppLayout>} />
             <Route path="/reports/book-detail" element={<AppLayout><BookDetail /></AppLayout>} />
             <Route path="/reports/book-detail-2" element={<AppLayout><BookDetail2 /></AppLayout>} />

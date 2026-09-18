@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession } from "@/hooks/useClientAuth";
 import { Client } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
+import { BLogoIcon } from "@/components/icons/CustomIcons";
 
 interface UserHeaderProps {
   sidebarOpen?: boolean;
@@ -95,8 +96,8 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           minHeight: 56,
         }}
       >
-        {/* Left: hamburger + Dashboard label */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {/* Left: hamburger + BLogo + Dashboard label */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <button
             onClick={onMenuToggle}
             style={{
@@ -113,12 +114,30 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
             <span style={{ display: "block", width: 20, height: 2, backgroundColor: "white" }} />
             <span style={{ display: "block", width: 20, height: 2, backgroundColor: "white" }} />
           </button>
-          <span
+          <div
             onClick={handleDashboardClick}
-            style={{ color: "white", fontWeight: 700, fontSize: 13, cursor: "pointer", textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}
           >
-            Dashboard
-          </span>
+            <BLogoIcon className="w-4 h-4 text-[#00e676]" color="#00e676" />
+            <span
+              style={{ color: "white", fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            >
+              Dashboard
+            </span>
+          </div>
+        </div>
+
+        {/* Center: Marquee Ticker */}
+        <div style={{ flex: 1, overflow: "hidden", margin: "0 10px", display: "flex", alignItems: "center" }}>
+          <div style={{
+            whiteSpace: "nowrap",
+            animation: "marquee 15s linear infinite",
+            color: "rgba(255,255,255,0.85)",
+            fontSize: 12,
+            fontWeight: 600,
+          }}>
+            Welcome to BPEXCH Sports Trading Platform.
+          </div>
         </div>
 
         {/* Right: Dropdown with Balance and User */}

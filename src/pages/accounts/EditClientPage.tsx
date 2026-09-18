@@ -149,155 +149,275 @@ export default function EditClientPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] font-roboto">
-      <main className="max-w-[720px] mx-auto px-[5px] py-4 lg:py-6">
-        {/* Header Bar */}
-        <div className="flex items-center gap-3 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5 text-[#2c3e50]" />
-          </button>
-          <div>
-            <h1 className="text-xl font-bold text-[#2c3e50]">Edit: @{client.username}</h1>
-            <p className="text-sm text-[#7f8c8d] font-medium uppercase tracking-wider">
-              {client.role || "Client"} Account
-            </p>
+    <div className="bg-[#eef2f5] font-sans text-[#333333] pb-16">
+      <div className="max-w-[760px] mx-auto px-2 sm:px-4 pt-3">
+        {/* Top White Nav Box with 5 Green Buttons & Large Username */}
+        <div className="bg-white border border-[#dee2e6] rounded-[2px] p-3 mb-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+          <div className="flex flex-wrap items-center gap-1.5 mb-2">
+            <button
+              type="button"
+              className="bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm border border-[#007a57]"
+            >
+              Edit User
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/accounts/ledger/${username}`)}
+              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+            >
+              Ledger
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/reports/book-detail`)}
+              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+            >
+              Bets
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/reports/daily-pl`)}
+              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+            >
+              Profit Loss
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => navigate(`/current-position`)}
+              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+            >
+              Current Position
+            </button>
+
+            <span className="text-xl sm:text-2xl font-black text-[#111] tracking-tight">
+              {client.username}
+            </span>
           </div>
         </div>
 
-        {/* Form Card */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 space-y-0">
-            {/* Password Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Password</label>
-              <Input
-                type="text"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="flex-1 h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
-                placeholder="Enter new password to change"
-              />
-            </div>
-
-            {/* IsActive Row */}
-            <div className="flex items-center py-4 border-b border-gray-100">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">IsActive</label>
-              <div className="flex-1">
-                <Checkbox
-                  checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked === true })}
-                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
-                />
-              </div>
-            </div>
-
-            {/* Betting Allowed Row */}
-            <div className="flex items-center py-4 border-b border-gray-100">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">Betting Allowed</label>
-              <div className="flex-1">
-                <Checkbox
-                  checked={formData.bettingAllowed}
-                  onCheckedChange={(checked) => setFormData({ ...formData, bettingAllowed: checked === true })}
-                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
-                />
-              </div>
-            </div>
-
-            {/* Can Settle PL Row */}
-            <div className="flex items-center py-4 border-b border-gray-100">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">Can Settle PL</label>
-              <div className="flex-1 flex items-center gap-2">
-                <Checkbox
-                  checked={formData.canSettlePL}
-                  onCheckedChange={(checked) => setFormData({ ...formData, canSettlePL: checked === true })}
-                  className="w-5 h-5 border-gray-300 data-[state=checked]:bg-[#16a085] data-[state=checked]:border-[#16a085]"
-                />
-                <span className="text-xs text-gray-500 italic">Enables settlement features</span>
-              </div>
-            </div>
-
-            {/* Phone Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Phone</label>
-              <Input
-                type="text"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="flex-1 h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
-              />
-            </div>
-
-            {/* Reference Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Reference</label>
-              <Input
-                type="text"
-                value={formData.reference}
-                onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                className="flex-1 h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
-              />
-            </div>
-
-            {/* Notes Row */}
-            <div className="flex flex-col sm:flex-row sm:items-start py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50] pt-2">Notes</label>
-              <Textarea
-                rows={3}
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="flex-1 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085] resize-none"
-              />
-            </div>
-
-            {/* Commission Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-gray-100 gap-2 sm:gap-4">
-              <label className="sm:w-48 text-sm font-bold text-[#2c3e50]">Commission (%)</label>
-              <div className="flex-1 space-y-1">
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={formData.commission}
-                  onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
-                  className="w-full h-10 bg-gray-50 border-gray-200 text-sm focus:ring-1 focus:ring-[#16a085]"
-                />
-                <p className="text-[10px] text-gray-500 italic">Minimum commission is 2.00 %</p>
-              </div>
-            </div>
-
-            {/* UserDomain Row */}
-            <div className="flex items-center py-4">
-              <label className="w-48 text-sm font-bold text-[#2c3e50]">UserDomain</label>
-              <div className="flex-1 text-sm text-[#7f8c8d] font-semibold">
-                1 ( betproexch.com )
-              </div>
-            </div>
+        {/* Main Edit Client Table/Card */}
+        <div className="bg-white border border-[#dee2e6] rounded-[2px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+          {/* Header Row */}
+          <div className="bg-[#f1f4f8] px-3 py-2 border-b border-[#dee2e6]">
+            <h1 className="text-[15px] font-normal text-[#333]">
+              Edit Client - <strong className="font-bold text-[#111]">{client.username}</strong>
+            </h1>
           </div>
 
-          {/* Action Footer */}
-          <div className="px-6 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-[#16a085] hover:bg-[#138d75] text-white px-10 py-2.5 h-auto rounded-lg font-bold transition-all shadow-md active:scale-95 flex items-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </main>
+          {/* Form Content */}
+          <form onSubmit={handleSubmit} className="p-4 sm:p-5">
+            <div className="flex flex-col space-y-4 text-[15px]">
+              {/* ID */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  ID
+                </div>
+                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
+                  {client.id?.replace?.(/\D/g, "")?.slice?.(0, 7) || "8501292"}
+                </div>
+              </div>
+
+              {/* Username */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Username
+                </div>
+                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
+                  {client.username}
+                </div>
+              </div>
+
+              {/* Type */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Type
+                </div>
+                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
+                  {client.role === "client" || !client.role ? "Bettor" : (client.role.charAt(0).toUpperCase() + client.role.slice(1))}
+                </div>
+              </div>
+
+              {/* Currency */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Currency
+                </div>
+                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
+                  Rs.
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Password
+                </div>
+                <div className="col-span-8 sm:col-span-9">
+                  <input
+                    type="text"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Abc12345"
+                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border-2 border-[#9ed4f4] rounded-[4px] outline-none text-[#333] shadow-inner focus:border-[#4299e1]"
+                  />
+                </div>
+              </div>
+
+              {/* IsActive */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  IsActive
+                </div>
+                <div className="col-span-8 sm:col-span-9 flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="w-[18px] h-[18px] text-[#0d6efd] rounded-[3px] border-[#adb5bd] cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Betting Allowed */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal leading-tight">
+                  Betting<br />Allowed
+                </div>
+                <div className="col-span-8 sm:col-span-9 flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.bettingAllowed}
+                    onChange={(e) => setFormData({ ...formData, bettingAllowed: e.target.checked })}
+                    className="w-[18px] h-[18px] text-[#0d6efd] rounded-[3px] border-[#adb5bd] cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Can Settle PL */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal leading-tight">
+                  Can Settle<br />PL
+                </div>
+                <div className="col-span-8 sm:col-span-9 flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="enableSBtn"
+                    checked={formData.canSettlePL}
+                    onChange={(e) => setFormData({ ...formData, canSettlePL: e.target.checked })}
+                    className="w-[18px] h-[18px] text-[#0d6efd] rounded-[3px] border-[#adb5bd] cursor-pointer"
+                  />
+                  <label htmlFor="enableSBtn" className="text-[15px] text-[#212529] cursor-pointer select-none">
+                    Enable S button
+                  </label>
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Phone
+                </div>
+                <div className="col-span-8 sm:col-span-9">
+                  <input
+                    type="text"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] focus:border-[#86b7fe]"
+                  />
+                </div>
+              </div>
+
+              {/* Reference */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Reference
+                </div>
+                <div className="col-span-8 sm:col-span-9">
+                  <input
+                    type="text"
+                    value={formData.reference}
+                    onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] focus:border-[#86b7fe]"
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="grid grid-cols-12 items-start gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal pt-1">
+                  Notes
+                </div>
+                <div className="col-span-8 sm:col-span-9">
+                  <textarea
+                    rows={2}
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    className="w-full max-w-[340px] p-2 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] resize-none focus:border-[#86b7fe]"
+                  />
+                </div>
+              </div>
+
+              {/* Commission */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  Commission (%)
+                </div>
+                <div className="col-span-8 sm:col-span-9">
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.commission}
+                    onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
+                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] focus:border-[#86b7fe]"
+                  />
+                  <div className="text-[12px] text-[#6c757d] italic mt-0.5">
+                    Minimum commission is 2.00 %
+                  </div>
+                </div>
+              </div>
+
+              {/* UserDomain */}
+              <div className="grid grid-cols-12 items-center gap-2">
+                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
+                  UserDomain
+                </div>
+                <div className="col-span-8 sm:col-span-9 text-[#495057] text-[15px]">
+                  1 ( betproexch.com )
+                </div>
+              </div>
+            </div>
+
+            {/* Submit / Action Buttons */}
+            <div className="mt-8 pt-4 border-t border-[#dee2e6] flex items-center gap-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-[#00a676] hover:bg-[#008f66] text-white font-semibold text-[14px] px-5 py-2 rounded-[3px] transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Update Client"
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="bg-[#6c757d] hover:bg-[#5a6268] text-white font-semibold text-[14px] px-4 py-2 rounded-[3px] transition-colors shadow-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

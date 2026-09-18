@@ -24,7 +24,11 @@ export default function UserProfile() {
   // Fetch live client data
   const { data: clients, isLoading } = useQuery({
     queryKey: ["client-profile", session?.username],
-    queryFn: () => Client.filter({ username: session?.username }),
+    queryFn: async () => {
+      if (!session?.username) return [];
+      const res = await Client.filter({ username: session.username });
+      return Array.isArray(res) ? res : [];
+    },
     enabled: !!session?.username,
   });
 

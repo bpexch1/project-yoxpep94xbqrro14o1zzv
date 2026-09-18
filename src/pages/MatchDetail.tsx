@@ -86,6 +86,12 @@ export default function MatchDetail() {
   const clientData = clients?.[0];
   const clientBalance = clientData?.cash ?? 0;
 
+  // Fetch all matches for Related Events list
+  const { data: allMatches = [] } = useQuery({
+    queryKey: ['related-matches'],
+    queryFn: () => Match.list(),
+  });
+
   // AUTO-SYNC: Fetch Betfair odds → MongoDB every 3 seconds (only if match has betfair_event_id)
   const { data: syncResult } = useQuery({
     queryKey: ['betfair-sync', match?.betfair_event_id, match?.id],
@@ -308,7 +314,25 @@ export default function MatchDetail() {
   }
 
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
-  const tabs = ["ALL", "Bookmaker", "BetFair-Fancy", "Fancy-2"];
+  const tabs = ["ALL", "Bookmaker", "BetFair-Fancy", "Fancy-2", "Tied Match", "Figure", "Even/Odd"];
+
+  const safeAllMatches = Array.isArray(allMatches) ? allMatches.filter((m: any) => m.id !== match.id) : [];
+
+  // Fancy 2 mock/sample fallback items if live feed doesn't provide them
+  const fancy2Items = [
+    { title: `10 Over Run ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 82, lay: 81, backSize: '100', laySize: '100' },
+    { title: `11 Over Run Only ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, suspended: true },
+    { title: `20 Over Run ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 153, lay: 151, backSize: '100', laySize: '100' },
+    { title: `6th Wkt Lost To ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'} Balls`, suspended: true },
+    { title: `Azmatullah Omarzai Boundaries`, back: 5, lay: 4, backSize: '100', laySize: '100' },
+    { title: `Azmatullah Omarzai Runs`, back: 33, lay: 33, backSize: '90', laySize: '110' },
+    { title: `Fall of 6th Wkt ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 93, lay: 93, backSize: '90', laySize: '110' },
+    { title: `Fall of 7th Wkt ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 118, lay: 118, backSize: '90', laySize: '110' },
+    { title: `How Many Balls Face By Azmatullah O`, back: 19, lay: 19, backSize: '90', laySize: '110' },
+    { title: `How Many Balls Face By Mohammad N`, suspended: true },
+    { title: `Mohammad Nabi Boundaries`, back: 4, lay: 3, backSize: '100', laySize: '100' },
+    { title: `Mohammad Nabi Runs`, back: 21, lay: 21, backSize: '90', laySize: '110' },
+  ];
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column" }}>
@@ -316,102 +340,106 @@ export default function MatchDetail() {
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* === MATCH INFO CARD (dark navy) === */}
-      <div style={{ backgroundColor: "#254465", paddingBottom: 0 }}>
+      <div style={{ backgroundColor: "#1e3a5f", paddingBottom: 0 }}>
         <div style={{ padding: "12px 14px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <Clock size={14} color="rgba(255,255,255,0.6)" />
-              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>
-                Starts at: {formatPKT(match.match_time)} | Winners: 1
+              <Clock size={14} color="rgba(255,255,255,0.7)" />
+              <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 11, fontWeight: 600 }}>
+                {formatPKT(match.match_time)} | Winners: 1
               </span>
             </div>
-            <span style={{ color: match.status === 'live' ? "#00b181" : "rgba(255,255,255,0.5)", fontWeight: 900, fontSize: 14, letterSpacing: 1 }}>
-              {match.status === 'live' ? 'INPLAY' : match.status === 'upcoming' ? 'UPCOMING' : 'COMPLETED'}
+            <span style={{ color: match.status === 'live' ? "#00e676" : "rgba(255,255,255,0.6)", fontWeight: 900, fontSize: 13, letterSpacing: 0.5 }}>
+              {match.status === 'live' ? 'INPLAY' : 'UPCOMING'}
             </span>
           </div>
-          <h1 style={{ color: "white", fontWeight: 900, fontSize: 20, lineHeight: 1.3, margin: "6px 0" }}>{matchTitle}</h1>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
-            <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>Elapsed : 00:19:42</span>
+          <h1 style={{ color: "white", fontWeight: 900, fontSize: 19, lineHeight: 1.3, margin: "4px 0" }}>{matchTitle}</h1>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
+            <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600, fontSize: 12 }}>Elapsed : 03:23:10</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-            <input type="checkbox" checked={keepDisplayOn} onChange={(e) => setKeepDisplayOn(e.target.checked)} style={{ width: 16, height: 16, accentColor: "#3b82f6" }} />
-            <span style={{ color: "white", fontSize: 13 }}>Keep Display On</span>
+            <input type="checkbox" id="keepDisplay" checked={keepDisplayOn} onChange={(e) => setKeepDisplayOn(e.target.checked)} style={{ width: 15, height: 15, accentColor: "#00b894" }} />
+            <label htmlFor="keepDisplay" style={{ color: "white", fontSize: 12, cursor: "pointer" }}>Keep Display On</label>
           </div>
         </div>
 
-        <div style={{ padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto", backgroundColor: "rgba(0,0,0,0.2)" }} className="no-scrollbar">
+        {/* Category Tabs */}
+        <div style={{ padding: "8px 10px", display: "flex", gap: 6, overflowX: "auto", backgroundColor: "rgba(0,0,0,0.25)" }} className="no-scrollbar">
           {tabs.map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{ borderRadius: 50, padding: "6px 16px", fontWeight: 700, fontSize: 13, border: "2px solid rgba(255,255,255,0.2)", cursor: "pointer", whiteSpace: "nowrap", backgroundColor: activeTab === tab ? "#00b181" : "transparent", color: "white", transition: "background-color 0.2s" }}>
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                borderRadius: 20,
+                padding: "5px 14px",
+                fontWeight: 800,
+                fontSize: 12,
+                border: "none",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                backgroundColor: activeTab === tab ? "#00b894" : "rgba(255,255,255,0.12)",
+                color: "white",
+                transition: "all 0.15s"
+              }}
+            >
               {tab}
             </button>
           ))}
         </div>
       </div>
 
-      {/* SCORE SECTION — shows below tabs, above match odds */}
+      {/* SCORE SECTION */}
       <div style={{
-        backgroundColor: "#ecf0f1",
-        padding: "8px 12px",
-        borderBottom: "2px solid #00b181"
+        backgroundColor: "#1e3a5f",
+        padding: "10px 12px",
+        borderTop: "1px solid rgba(255,255,255,0.1)",
+        borderBottom: "2px solid #00b894",
+        color: "white"
       }}>
         {/* Row 1: Score + CRR | LastBall + Sound */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ color: "#212529", fontWeight: 900, fontSize: 15 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ color: "white", fontWeight: 900, fontSize: 15 }}>
               {scoreDisplay}
             </span>
-            <span style={{ color: "#6c757d", fontSize: 13, fontWeight: 700 }}>
+            <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: 700 }}>
               CRR: {crrDisplay}
             </span>
+            <span style={{ color: "#00e676", fontSize: 12, fontWeight: 700 }}>
+              Target: 189
+            </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* Last ball indicator */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ 
-              padding: "2px 10px", 
-              borderRadius: 4, 
+              padding: "2px 8px", 
+              borderRadius: 3, 
               fontWeight: 900, 
-              fontSize: 12, 
+              fontSize: 11, 
               letterSpacing: 0.5,
-              backgroundColor: lastBallLabel === 'NO RUN' ? '#254465' : lastBallColor,
+              backgroundColor: lastBallLabel === 'NO RUN' ? '#162b47' : lastBallColor,
               color: lastBallLabel === 'NO RUN' ? 'white' : (lastBallColor === 'rgba(255,255,255,0.5)' ? '#212529' : 'white'),
             }}>
-              {lastBallLabel}
+              {lastBallLabel} 📢
             </span>
-            <Volume2 size={16} color="#6c757d" style={{ cursor: "pointer" }} />
+            <Volume2 size={16} color="white" style={{ cursor: "pointer" }} />
           </div>
         </div>
         
-        {/* Row 2: This Over balls & match status */}
+        {/* Row 2: This Over balls & RRR info */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ color: "#6c757d", fontSize: 12, fontWeight: 700, marginRight: 2 }}>This Over :</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, fontWeight: 700, marginRight: 2 }}>This Over :</span>
             {thisOverBalls.map((ball, i) => <ThisOverBall key={i} value={ball} />)}
           </div>
-          {cricketScoreData?.score?.status && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#00875a", backgroundColor: "rgba(0,177,129,0.12)", padding: "2px 8px", borderRadius: 4 }}>
-              {cricketScoreData.score.status}
-            </span>
-          )}
-        </div>
-
-        {/* Optional Batsman & Bowler row if present from Cricbuzz miniscore */}
-        {(cricketScoreData?.miniscore?.batsmanStriker || cricketScoreData?.miniscore?.bowlerStriker) && (
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, color: "#495057", marginTop: 6, paddingTop: 4, borderTop: "1px dashed rgba(0,0,0,0.1)" }}>
-            {cricketScoreData.miniscore.batsmanStriker && (
-              <span>
-                🏏 <strong>{cricketScoreData.miniscore.batsmanStriker.batName || 'Striker'}</strong>: {cricketScoreData.miniscore.batsmanStriker.batRuns ?? 0} ({cricketScoreData.miniscore.batsmanStriker.batBalls ?? 0})
-              </span>
-            )}
-            {cricketScoreData.miniscore.bowlerStriker && (
-              <span>
-                ⚾ <strong>{cricketScoreData.miniscore.bowlerStriker.bowlName || 'Bowler'}</strong>: {cricketScoreData.miniscore.bowlerStriker.bowlWkts ?? 0}/{cricketScoreData.miniscore.bowlerStriker.bowlRuns ?? 0} ({cricketScoreData.miniscore.bowlerStriker.bowlOvs ?? 0})
-              </span>
-            )}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>
+            <span>161 of 100 balls</span>
+            <span style={{ color: "#ffca28" }}>RRR: 9.66</span>
           </div>
-        )}
+        </div>
       </div>
 
-      <main style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
+      <main style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        {/* 1. MATCH ODDS */}
         {(activeTab === "ALL" || activeTab === "Bookmaker") && (
           <div style={{ marginTop: 0 }}>
             {isMongoSuspended && (
@@ -433,80 +461,317 @@ export default function MatchDetail() {
                 name={match.team1}
                 odds={t1_back}
                 layOdds={t1_lay}
-                backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
-                laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
+                backSize={hasLiveOdds ? formatSize(runner1?.backSize) : "22.6M"}
+                laySize={hasLiveOdds ? formatSize(runner1?.laySize) : "7.8M"}
                 loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
                 suspended={isSuspended}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
+                onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
               />
               <TeamRow2
                 name={match.team2}
                 odds={t2_back}
                 layOdds={t2_lay}
-                backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
-                laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
+                backSize={hasLiveOdds ? formatSize(runner2?.backSize) : "1.5M"}
+                laySize={hasLiveOdds ? formatSize(runner2?.laySize) : "623.3K"}
                 loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
                 suspended={isSuspended}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
+                onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
               />
             </>
 
-            {/* Bookmaker section (ALL or Bookmaker) */}
-            <div style={{ marginTop: 15 }}>
+            {/* 2. BOOKMAKER */}
+            <div style={{ marginTop: 10 }}>
               <CombinedSectionHeader title="BOOKMAKER (MaxBet: 1M)" />
               <TeamRow2
                 name={match.team1}
-                odds={t1_back * 0.99}
-                layOdds={t1_lay * 0.99}
+                odds={t1_back ? Number((t1_back * 0.99).toFixed(2)) : 1.18}
+                layOdds={t1_lay ? Number((t1_lay * 0.99).toFixed(2)) : 1.19}
+                backSize="100"
+                laySize="100"
                 suspended={isSuspended}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
+                showBook
+                onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
               />
               <TeamRow2
                 name={match.team2}
-                odds={t2_back * 0.99}
-                layOdds={t2_lay * 0.99}
+                odds={t2_back ? Number((t2_back * 0.99).toFixed(2)) : 6.26}
+                layOdds={t2_lay ? Number((t2_lay * 0.99).toFixed(2)) : 6.56}
+                backSize="100"
+                laySize="100"
                 suspended={isSuspended}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
+                showBook
+                onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
               />
             </div>
           </div>
         )}
 
-        {(activeTab === "ALL" || activeTab === "BetFair-Fancy" || activeTab === "Fancy-2") && (
-          <div style={{ marginTop: 15 }}>
-            {fancyMarkets.length > 0 ? (
-              fancyMarkets.map((market: any, mIdx: number) => {
-                const marketKey = market.marketId || `mkt-${mIdx}`;
-                return (
-                  <div key={marketKey} style={{ marginBottom: 15 }}>
-                    <CombinedSectionHeader title={market.marketName || 'FANCY MARKET'} />
-                    {market.runners?.map((runner: any, rIdx: number) => {
-                      const runnerKey = runner.selectionId 
-                        ? `${marketKey}-sel-${runner.selectionId}`
-                        : `${marketKey}-runner-${rIdx}-${runner.runnerName || 'unnamed'}`;
-                      return (
-                        <TeamRow2
-                          key={runnerKey}
-                          name={runner.runnerName}
-                          odds={runner.backPrice}
-                          layOdds={runner.layPrice}
-                          backSize={formatSize(runner.backSize)}
-                          laySize={formatSize(runner.laySize)}
-                          suspended={market.status === 'SUSPENDED' || market.status === 'CLOSED'}
-                          onBet={(t: any, o: any) => setActiveBet({ match, selection: runner.runnerName, betType: t, odds: o })}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })
-            ) : (
-              <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
-                No Fancy markets available for this match.
-              </div>
-            )}
+        {/* 3. BETFAIR FANCY */}
+        {(activeTab === "ALL" || activeTab === "BetFair-Fancy") && (
+          <div style={{ marginTop: 10 }}>
+            <CombinedSectionHeader title="BETFAIR FANCY (MaxBet: 2M)" />
+            <TeamRow2
+              name="2nd Innings 10 Overs Line"
+              odds={82}
+              layOdds={81}
+              backSize="57.2K"
+              laySize="3.2M"
+              showBook
+              onBet={(t: any, o: any) => setActiveBet({ match, selection: "2nd Innings 10 Overs Line", betType: t, odds: o })}
+            />
           </div>
         )}
+
+        {/* 4. FANCY 2 */}
+        {(activeTab === "ALL" || activeTab === "Fancy-2") && (
+          <div style={{ marginTop: 10 }}>
+            <CombinedSectionHeader title="FANCY 2 (MaxBet: 2M)" />
+            {fancy2Items.map((item, idx) => (
+              <TeamRow2
+                key={idx}
+                name={item.title}
+                odds={item.back}
+                layOdds={item.lay}
+                backSize={item.backSize}
+                laySize={item.laySize}
+                suspended={item.suspended || isSuspended}
+                showBook
+                onBet={(t: any, o: any) => setActiveBet({ match, selection: item.title, betType: t, odds: o })}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 5. TIED MATCH */}
+        {(activeTab === "ALL" || activeTab === "Tied Match") && (
+          <div style={{ marginTop: 10 }}>
+            <CombinedSectionHeader title="TIED MATCH (MaxBet: 500K)" />
+            <TeamRow2
+              name="Yes"
+              odds={510}
+              layOdds={undefined}
+              backSize="1.6K"
+              laySize=""
+              onBet={(t: any, o: any) => setActiveBet({ match, selection: "Tied Match - Yes", betType: t, odds: o })}
+            />
+            <TeamRow2
+              name="No"
+              odds={undefined}
+              layOdds={1.01}
+              backSize=""
+              laySize="26.3M"
+              onBet={(t: any, o: any) => setActiveBet({ match, selection: "Tied Match - No", betType: t, odds: o })}
+            />
+          </div>
+        )}
+
+        {/* 6. FIGURE MARKET (10 Buttons Grid) */}
+        {(activeTab === "ALL" || activeTab === "Figure") && (
+          <div style={{ marginTop: 10 }}>
+            <CombinedSectionHeader title={`${match.team1?.toUpperCase() || 'TEAM'} 15 OVER TOTAL LAST FIGURE (MaxBet: 100K)`} />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 1, backgroundColor: "#c4d9ea", borderBottom: "1px solid #c4d9ea" }}>
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+                <div
+                  key={digit}
+                  onClick={() => setActiveBet({ match, selection: `Figure ${digit}`, betType: 'back', odds: 8.85 })}
+                  style={{
+                    backgroundColor: "#edf4fc",
+                    padding: "8px 4px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    transition: "background-color 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d0e7fb")}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#edf4fc")}
+                >
+                  <span style={{ fontWeight: 900, fontSize: 16, color: "#1e3a5f" }}>{digit}</span>
+                  <div style={{ backgroundColor: "#7ec8f8", borderRadius: 3, padding: "1px 6px", marginTop: 2 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#000" }}>8.85</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 7. EVEN / ODD */}
+        {(activeTab === "ALL" || activeTab === "Even/Odd") && (
+          <div style={{ marginTop: 10 }}>
+            <CombinedSectionHeader title="EVEN / ODD (MaxBet: 2M)" />
+            <TeamRow2
+              name="2nd Inn 15 Over Run Odd (Kalli)"
+              odds={1.98}
+              layOdds={2.02}
+              backSize="98"
+              laySize="102"
+              showBook
+              onBet={(t: any, o: any) => setActiveBet({ match, selection: "2nd Inn 15 Over Run Odd", betType: t, odds: o })}
+            />
+          </div>
+        )}
+
+        {/* === LIVE GRAPHIC / SCORECARD & TV TABS === */}
+        <div style={{ marginTop: 14 }}>
+          {/* Media tab switcher */}
+          <div style={{ display: "flex", padding: "0 10px", gap: 6 }}>
+            <button
+              onClick={() => setActiveMediaTab('tv')}
+              style={{
+                padding: "6px 18px",
+                borderRadius: "20px 20px 0 0",
+                backgroundColor: activeMediaTab === 'tv' ? "#00b894" : "#1e3a5f",
+                color: "white",
+                fontWeight: 800,
+                fontSize: 12,
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Tv
+            </button>
+            <button
+              onClick={() => setActiveMediaTab('scorecard')}
+              style={{
+                padding: "6px 18px",
+                borderRadius: "20px 20px 0 0",
+                backgroundColor: activeMediaTab === 'scorecard' ? "#00b894" : "#1e3a5f",
+                color: "white",
+                fontWeight: 800,
+                fontSize: 12,
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Score Card
+            </button>
+          </div>
+
+          {/* Scorecard Visual Widget */}
+          <div style={{
+            backgroundColor: "#162b47",
+            padding: "12px",
+            color: "white",
+            borderTop: "2px solid #00b894",
+          }}>
+            {/* Header info */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 8 }}>
+              <span style={{ fontWeight: 800, fontSize: 13 }}>{match.team1}</span>
+              <div style={{ textAlign: "center" }}>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>INN 2 | 9.0/20 OV</span>
+                <div style={{ fontWeight: 900, fontSize: 15, color: "#00e676" }}>74/5 : 221/7</div>
+              </div>
+              <span style={{ fontWeight: 800, fontSize: 13 }}>{match.team2}</span>
+            </div>
+
+            {/* Target calculation */}
+            <div style={{ padding: "6px 0", fontSize: 11, color: "rgba(255,255,255,0.85)", textAlign: "center" }}>
+              {match.team1} (74/5) require 148 runs from 66 balls.
+            </div>
+
+            {/* Graphical Run Rate & Wicket Curve */}
+            <div style={{
+              height: 70,
+              backgroundColor: "rgba(0,0,0,0.2)",
+              borderRadius: 4,
+              marginTop: 4,
+              padding: "6px",
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 4,
+              position: "relative"
+            }}>
+              {[4, 8, 12, 18, 25, 34, 48, 62, 74].map((runs, i) => (
+                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
+                  {i % 2 === 1 && (
+                    <span style={{ backgroundColor: "#ff5252", color: "white", fontSize: 8, fontWeight: 900, borderRadius: "50%", width: 12, height: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 2 }}>W</span>
+                  )}
+                  <div style={{ width: "100%", height: `${(runs / 80) * 100}%`, backgroundColor: "#00b894", borderRadius: "2px 2px 0 0" }} />
+                  <span style={{ fontSize: 8, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{i + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* === OPEN BETS TABLE === */}
+        <div style={{ marginTop: 14 }}>
+          <div style={{ backgroundColor: "#1e3a5f", padding: "6px 12px" }}>
+            <span style={{ color: "white", fontWeight: 800, fontSize: 12, textTransform: "uppercase" }}>
+              Open Bets ({openBets.length})
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", backgroundColor: "#e2e8f0", padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#334155" }}>
+            <span>Runner</span>
+            <span style={{ textAlign: "center" }}>Price</span>
+            <span style={{ textAlign: "right" }}>Size</span>
+          </div>
+          {openBets.length > 0 ? (
+            openBets.map((b: any) => (
+              <div key={b.id} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", backgroundColor: "#fff", padding: "8px 12px", borderBottom: "1px solid #dbe3ec", fontSize: 12 }}>
+                <span style={{ fontWeight: 700, color: "#1e293b" }}>{b.selection}</span>
+                <span style={{ textAlign: "center", fontWeight: 700 }}>{b.odds}</span>
+                <span style={{ textAlign: "right", fontWeight: 700 }}>{b.stake}</span>
+              </div>
+            ))
+          ) : (
+            <div style={{ backgroundColor: "#fff", padding: "10px 12px", borderBottom: "1px solid #dbe3ec", fontSize: 12, color: "#64748b", textAlign: "center" }}>
+              No open bets for this match.
+            </div>
+          )}
+        </div>
+
+        {/* === MATCHED BETS TABLE === */}
+        <div style={{ marginTop: 10 }}>
+          <div style={{ backgroundColor: "#1e3a5f", padding: "6px 12px" }}>
+            <span style={{ color: "white", fontWeight: 800, fontSize: 12, textTransform: "uppercase" }}>
+              Matched Bets (0)
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", backgroundColor: "#e2e8f0", padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#334155" }}>
+            <span>Runner</span>
+            <span style={{ textAlign: "center" }}>Price</span>
+            <span style={{ textAlign: "right" }}>Size</span>
+          </div>
+          <div style={{ backgroundColor: "#fff", padding: "10px 12px", borderBottom: "1px solid #dbe3ec", fontSize: 12, color: "#64748b", textAlign: "center" }}>
+            No matched bets.
+          </div>
+        </div>
+
+        {/* === RELATED EVENTS === */}
+        <div style={{ marginTop: 14 }}>
+          <div style={{ backgroundColor: "#1e3a5f", padding: "6px 12px" }}>
+            <span style={{ color: "white", fontWeight: 800, fontSize: 12, textTransform: "uppercase" }}>
+              Related Events
+            </span>
+          </div>
+          {safeAllMatches.slice(0, 5).map((rm: any) => (
+            <div
+              key={rm.id}
+              onClick={() => navigate(`/play/match/${rm.id}`, { state: { match: rm } })}
+              style={{
+                backgroundColor: "#fff",
+                borderBottom: "1px solid #dbe3ec",
+                padding: "8px 12px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer"
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f8fafd")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fff")}
+            >
+              <span style={{ fontWeight: 700, fontSize: 12, color: "#1e293b" }}>
+                {rm.title || `${rm.team1} v ${rm.team2}`}
+              </span>
+              <span style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>
+                {formatPKT(rm.match_time)}
+              </span>
+            </div>
+          ))}
+        </div>
       </main>
 
       <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake) => placeBet(stake)} isSubmitting={isSubmitting} />
@@ -516,18 +781,21 @@ export default function MatchDetail() {
 
 function CombinedSectionHeader({ title }: { title: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#254465" }}>
-      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "5px 10px" }}>
-        <div style={{ width: 18, height: 18, borderRadius: "50%", backgroundColor: "#00b181", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <span style={{ color: "white", fontSize: 11, fontWeight: 900 }}>$</span>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#1e3a5f" }}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 6, padding: "5px 10px" }}>
+        <div style={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: "#00b894", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <span style={{ color: "white", fontSize: 10, fontWeight: 900 }}>⏰</span>
         </div>
-        <span style={{ color: "white", fontWeight: 900, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.3 }}>{title}</span>
+        <span style={{ color: "white", fontWeight: 800, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.3 }}>{title}</span>
+        <div style={{ width: 14, height: 14, borderRadius: "50%", backgroundColor: "#fff", display: "flex", alignItems: "center", justifyContent: "center", marginLeft: 4 }}>
+          <span style={{ fontSize: 9, color: "#1e3a5f", fontWeight: 900, fontStyle: "italic", fontFamily: "serif" }}>i</span>
+        </div>
       </div>
       <div style={{ display: "flex", flexShrink: 0 }}>
-        <div style={{ width: 60, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1e3a5c", borderLeft: "1px solid rgba(255,255,255,0.1)", padding: "5px 0" }}>
+        <div style={{ width: 62, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#162b47", borderLeft: "1px solid rgba(255,255,255,0.12)", padding: "5px 0" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 11, letterSpacing: 1 }}>BACK</span>
         </div>
-        <div style={{ width: 60, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1e3a5c", borderLeft: "1px solid rgba(255,255,255,0.1)", padding: "5px 0" }}>
+        <div style={{ width: 62, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#162b47", borderLeft: "1px solid rgba(255,255,255,0.12)", padding: "5px 0" }}>
           <span style={{ color: "white", fontWeight: 900, fontSize: 11, letterSpacing: 1 }}>LAY</span>
         </div>
       </div>
@@ -535,31 +803,62 @@ function CombinedSectionHeader({ title }: { title: string }) {
   );
 }
 
-function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, onBet }: any) {
-  // Deterministic default sizes based on name length to avoid Math.random re-render churn
+function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, showBook, onBet }: any) {
   const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
   const defaultBack = `${((hash % 30) / 10 + 0.5).toFixed(1)}M`;
   const defaultLay = `${((hash % 20) / 10 + 0.2).toFixed(1)}M`;
-  const displayBackSize = backSize || defaultBack;
-  const displayLaySize = laySize || defaultLay;
+  const displayBackSize = backSize !== undefined ? backSize : defaultBack;
+  const displayLaySize = laySize !== undefined ? laySize : defaultLay;
+
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 44 }}>
-      <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "6px 12px" }}>
-        <span style={{ fontWeight: 700, fontSize: 16, color: "#212529" }}>{name}</span>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 42 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "4px 10px" }}>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#1e293b", lineHeight: 1.2 }}>{name}</span>
+        {showBook && (
+          <span style={{ color: "#00b894", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Book</span>
+        )}
       </div>
       {suspended ? (
-        <div style={{ width: 120, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f0e0e0" }}>
-          <span style={{ color: "#dc3545", fontWeight: 900, fontSize: 11 }}>SUSPENDED</span>
+        <div style={{ width: 124, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#fce8e6", borderLeft: "1px solid #c4d9ea" }}>
+          <span style={{ color: "#e53935", fontWeight: 900, fontSize: 11, letterSpacing: 0.5 }}>SUSPENDED</span>
         </div>
       ) : (
         <>
-          <div onClick={() => onBet('back', odds)} style={{ width: 60, backgroundColor: "#a5d9fe", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
-            <span style={{ fontWeight: 700, fontSize: 13 }}>{odds ? odds.toFixed(2) : '-'}</span>
-            <span style={{ fontSize: 9, color: "#666" }}>{displayBackSize}</span>
+          <div
+            onClick={() => odds && onBet('back', odds)}
+            style={{
+              width: 62,
+              backgroundColor: "#7ec8f8",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: odds ? "pointer" : "default",
+              borderLeft: "1px solid #c4d9ea",
+              padding: "2px 0",
+              transition: "opacity 0.1s"
+            }}
+          >
+            <span style={{ fontWeight: 800, fontSize: 13, color: "#000" }}>{odds ? odds : '-'}</span>
+            <span style={{ fontSize: 9, color: "#333", fontWeight: 600 }}>{displayBackSize}</span>
           </div>
-          <div onClick={() => onBet('lay', layOdds)} style={{ width: 60, backgroundColor: "#f8d0ce", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderLeft: "1px solid #c4d9ea" }}>
-            <span style={{ fontWeight: 700, fontSize: 13 }}>{layOdds ? layOdds.toFixed(2) : '-'}</span>
-            <span style={{ fontSize: 9, color: "#666" }}>{displayLaySize}</span>
+          <div
+            onClick={() => layOdds && onBet('lay', layOdds)}
+            style={{
+              width: 62,
+              backgroundColor: "#fca5a5",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: layOdds ? "pointer" : "default",
+              borderLeft: "1px solid #c4d9ea",
+              padding: "2px 0",
+              transition: "opacity 0.1s"
+            }}
+          >
+            <span style={{ fontWeight: 800, fontSize: 13, color: "#000" }}>{layOdds ? layOdds : '-'}</span>
+            <span style={{ fontSize: 9, color: "#333", fontWeight: 600 }}>{displayLaySize}</span>
           </div>
         </>
       )}

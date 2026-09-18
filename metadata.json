@@ -1,6 +1,7 @@
 {
-  "name": "Exchange Admin Panel",
-  "description": "Professional sports betting exchange admin panel and player dashboard with live odds, ledger, client management, and report generation.",
+  "name": "BPEXCH",
+  "description": "BPEXCH Sports Trading Platform and Betting Exchange with live odds, market feeds, and account management.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
+

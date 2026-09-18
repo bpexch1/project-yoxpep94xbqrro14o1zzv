@@ -9,12 +9,14 @@ import { BettingMatchCard } from "@/components/user/BettingMatchCard";
 import { BetSlip } from "@/components/user/BetSlip";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { GameBanners } from "@/components/user/GameBanners";
+import { RaceSection } from "@/components/user/RaceSection";
 import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
   Trophy, 
 } from "lucide-react";
+import { Plus18Badge, BLogoIcon } from "@/components/icons/CustomIcons";
 
 const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color?: string, size?: number }) => {
   const s = sport.toLowerCase();
@@ -215,51 +217,73 @@ export default function UserDashboard() {
   // Fetch real-time client data for balance and credits
   const { data: clients, isLoading: clientLoading } = useQuery({
     queryKey: ['client-data', session?.username],
-    queryFn: () => Client.filter({ username: session?.username }),
-    enabled: !!session?.username
+    queryFn: () => (session?.username ? Client.filter({ username: session.username }) : Promise.resolve([])),
+    enabled: !!session?.username,
   });
 
-  const clientData = clients?.[0];
-  const clientBalance = clientData?.cash ?? 0;
+  const clientData = Array.isArray(clients) && clients.length > 0 ? clients[0] : null;
+  const clientCash = typeof clientData?.cash === "number" ? clientData.cash : (parseFloat(String(clientData?.cash || 0)) || 0);
+  const clientCredit = typeof clientData?.credit_received === "number" ? clientData.credit_received : (parseFloat(String(clientData?.credit_received || 0)) || 0);
+  const clientBalance = clientCash;
 
-  // Place bet mutation
+  // Place bet mutation with explicit errors and complete type safety
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
-      if (!activeBet || !session || !clientData) return;
-
-      if (stake > clientBalance) {
-        throw new Error("Insufficient balance");
+      if (!activeBet) {
+        throw new Error("No active bet selected. Please select odds first.");
+      }
+      if (!session || !session.username) {
+        throw new Error("User session not found. Please log in again.");
+      }
+      if (!clientData) {
+        throw new Error("Client account data is not loaded. Please wait or refresh the page.");
       }
 
-      const potentialWin = (stake * activeBet.odds) - stake;
+      const numericStake = typeof stake === "number" ? stake : parseFloat(String(stake));
+      if (isNaN(numericStake) || numericStake <= 0) {
+        throw new Error("Please enter a valid positive stake amount.");
+      }
+
+      if (numericStake > clientBalance) {
+        throw new Error(`Insufficient balance. Current balance is ${clientBalance.toLocaleString('en-IN')}`);
+      }
+
+      const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
+      const potentialWin = (numericStake * oddsVal) - numericStake;
 
       // Create bet record
       await Bet.create({
         user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
+        match_id: activeBet.match?.id || "unknown-match",
+        match_title: activeBet.match?.title || `${activeBet.match?.team1 || ''} v ${activeBet.match?.team2 || ''}`.trim() || "Match Event",
         selection: activeBet.selection,
         bet_type: activeBet.betType,
-        stake,
-        odds: activeBet.odds,
-        potential_win: potentialWin,
+        stake: numericStake,
+        odds: oddsVal,
+        potential_win: potentialWin > 0 ? potentialWin : 0,
         status: 'pending'
       });
 
-      // Deduct from client balance
+      // Deduct from client balance safely
+      const updatedCash = Math.max(0, clientBalance - numericStake);
       await Client.update(clientData.id, {
-        cash: clientBalance - stake
+        cash: updatedCash
       });
     },
     onSuccess: () => {
       setActiveBet(null);
-      queryClient.invalidateQueries({ queryKey: ['client-data'] });
+      queryClient.invalidateQueries({ queryKey: ['client-data', session?.username] });
+      queryClient.invalidateQueries({ queryKey: ['bets'] });
+      toast({
+        title: "Bet Placed",
+        description: `Bet on ${activeBet?.selection || 'market'} placed successfully.`,
+      });
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
         title: "Bet Failed",
-        description: error.message || "Could not place bet. Please try again.",
+        description: error?.message || "Could not place bet. Please try again.",
       });
     }
   });
@@ -442,7 +466,7 @@ export default function UserDashboard() {
           borderBottom: "1px solid rgba(255,255,255,0.1)",
         }}
       >
-        <span>Credit: <strong>{clientData?.credit_received ?? 0}</strong></span>
+        <span>Credit: <strong>{clientCredit.toLocaleString('en-IN')}</strong></span>
         <span>Balance: <strong>{clientBalance.toLocaleString('en-IN')}</strong></span>
         <span>Liable: <strong>0</strong></span>
         <span>Active Bets: <strong>*</strong></span>
@@ -458,6 +482,30 @@ export default function UserDashboard() {
         {/* Game Banners */}
         <GameBanners onFilterChange={setActiveFilter} />
 
+        {/* Horse Race & Greyhound Sliders */}
+        <RaceSection 
+          title="Horse Race" 
+          iconType="horse" 
+          slots={[
+            { time: "9:32 PM", venue: "Naas (IE)" },
+            { time: "9:35 PM", venue: "Belterra Park (US)" },
+            { time: "9:40 PM", venue: "Delaware Park (US)" },
+            { time: "9:45 PM", venue: "Woodbine (CA)" },
+            { time: "9:50 PM", venue: "Remington Park (US)" }
+          ]} 
+        />
+        <RaceSection 
+          title="Grey Hound" 
+          iconType="greyhound" 
+          slots={[
+            { time: "9:37 PM", venue: "Dunstall Park (GB)" },
+            { time: "9:43 PM", venue: "Towcester (GB)" },
+            { time: "9:49 PM", venue: "Central Park (GB)" },
+            { time: "9:55 PM", venue: "Romford (GB)" },
+            { time: "10:01 PM", venue: "Sheffield (GB)" }
+          ]} 
+        />
+
         {/* Bottom Tabs - Inline Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", width: "100%" }}>
           {categories.map((cat) => {
@@ -472,38 +520,40 @@ export default function UserDashboard() {
                   alignItems: "center",
                   justifyContent: "center",
                   padding: "8px 4px",
-                  backgroundColor: isActive ? "#00b181" : "#254465",
+                  backgroundColor: isActive ? "#00a676" : "#1e3a5f",
                   border: "none",
-                  borderRight: "1px solid rgba(255,255,255,0.08)",
+                  borderRight: "1px solid rgba(255,255,255,0.12)",
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                   minHeight: 62,
+                  position: "relative",
                 }}
               >
-                {/* Count number at top */}
+                {/* Count number at top-right or top */}
                 <span style={{ 
                   color: 'white', 
                   fontSize: 14, 
                   fontWeight: 900, 
                   lineHeight: 1, 
-                  marginBottom: 4 
+                  marginBottom: 3,
+                  fontStyle: 'italic'
                 }}>
                   {cat.count}
                 </span>
                 
                 {/* Sport icon */}
-                <div style={{ marginBottom: 4 }}>
-                   <SportIcon sport={cat.id} color="white" size={22} />
+                <div style={{ marginBottom: 3 }}>
+                   <SportIcon sport={cat.id} color="white" size={20} />
                 </div>
 
                 {/* Label */}
                 <span style={{
                   color: "white",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 0.5,
-                  opacity: isActive ? 1 : 0.85,
-                  textTransform: 'uppercase'
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: 0.3,
+                  opacity: isActive ? 1 : 0.9,
+                  textTransform: 'capitalize'
                 }}>{cat.label}</span>
               </button>
             );
@@ -525,9 +575,9 @@ export default function UserDashboard() {
                   {/* Sport section header */}
                   <div
                     style={{
-                      backgroundColor: "#e8eef4",
-                      borderBottom: "1px solid #ccd9e5",
-                      padding: "5px 12px",
+                      backgroundColor: "#e2e8f0",
+                      borderBottom: "1px solid #cbd5e1",
+                      padding: "6px 12px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
@@ -535,20 +585,37 @@ export default function UserDashboard() {
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ display:'inline-block', verticalAlign:'middle' }}>
-                        <SportIcon sport={sport} color="#444" size={16} />
+                        <SportIcon sport={sport} color="#1e3a5f" size={16} />
                       </div>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "#254465" }}>{sport}</span>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: "#1e3a5f" }}>
+                        {sport === 'Soccer' ? 'Football' : sport}
+                      </span>
                     </div>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#334155" }}>
+                      Matched
+                    </span>
                   </div>
 
                   {/* Live matches */}
                   {liveMatches.map((m: any) => (
-                    <BettingMatchCard key={m.id} match={m} onSelectBet={handleSelectBet} />
+                    <BettingMatchCard 
+                      key={m.id} 
+                      match={m} 
+                      onSelectBet={handleSelectBet}
+                      onSelectOdds={handleSelectBet}
+                      setActiveBet={setActiveBet}
+                    />
                   ))}
 
                   {/* Upcoming matches */}
                   {upcomingMatches.map((m: any) => (
-                    <BettingMatchCard key={m.id} match={m} onSelectBet={handleSelectBet} />
+                    <BettingMatchCard 
+                      key={m.id} 
+                      match={m} 
+                      onSelectBet={handleSelectBet}
+                      onSelectOdds={handleSelectBet}
+                      setActiveBet={setActiveBet}
+                    />
                   ))}
                 </div>
               );
@@ -564,15 +631,37 @@ export default function UserDashboard() {
             )}
           </div>
         )}
+
+        {/* BPEXCH Platform Footer */}
+        <footer className="mt-8 bg-[#1e3a5f] text-white/80 py-6 px-4 border-t border-white/10 text-center">
+          <div className="max-w-md mx-auto flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2">
+              <BLogoIcon className="w-6 h-6 text-[#00e676]" color="#00e676" />
+              <span className="font-extrabold text-base tracking-wider text-white">BPEXCH</span>
+            </div>
+            <div className="flex items-center justify-center gap-4 text-xs font-semibold text-white/70">
+              <span>Terms & Conditions</span>
+              <span>•</span>
+              <span>Privacy Policy</span>
+              <span>•</span>
+              <span>Rules & Regulations</span>
+            </div>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <Plus18Badge className="w-7 h-7" />
+              <span className="text-[11px] text-white/60">
+                18+ Only. Please trade and gamble responsibly.
+              </span>
+            </div>
+          </div>
+        </footer>
       </main>
 
       {activeBet && (
         <BetSlip 
-          activeBet={activeBet} 
+          bet={activeBet} 
           onClose={() => setActiveBet(null)}
-          onPlaceBet={placeBet}
+          onSubmit={(stake: number) => placeBet(stake)}
           isSubmitting={isSubmitting}
-          balance={clientBalance}
         />
       )}
     </div>
