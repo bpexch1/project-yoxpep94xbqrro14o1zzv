@@ -13,22 +13,13 @@ import { RaceSection } from "@/components/user/RaceSection";
 import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { getHealthStatusMap } from "@/lib/apiManager";
-import { 
-  Loader2, 
-  AlertTriangle,
-} from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 
-const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color?: string, size?: number }) => {
-  const s = sport.toLowerCase();
+const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string; color?: string; size?: number }) => {
+  const s = String(sport || '').toLowerCase();
   const props = {
-    width: size, height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: color,
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    style: { display: 'block' }
+    width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color,
+    strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, style: { display: 'block' }
   };
 
   if (s.includes('inplay') || s.includes('live')) {
@@ -97,22 +88,29 @@ export default function UserDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState(() => {
-    if (location.pathname === "/casino") return "Casino";
-    return location.state?.activeFilter || "Inplay";
+    if (location?.pathname === "/casino") return "Casino";
+    return location?.state?.activeFilter || "Inplay";
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (location.pathname === "/casino") {
+    if (location?.pathname === "/casino") {
       setActiveFilter("Casino");
-    } else if (location.state?.activeFilter) {
+    } else if (location?.state?.activeFilter) {
       setActiveFilter(location.state.activeFilter);
     }
-  }, [location.pathname, location.state]);
+  }, [location?.pathname, location?.state]);
 
   const [activeBet, setActiveBet] = useState<{ match: any; selection: string; betType: 'back' | 'lay'; odds: number } | null>(null);
 
-  const session = getClientSession();
+  // Safe Session Fetching
+  const session = (() => {
+    try {
+      return getClientSession();
+    } catch (e) {
+      return null;
+    }
+  })();
 
   useEffect(() => {
     if (!session || session.role !== 'client') {
@@ -121,90 +119,67 @@ export default function UserDashboard() {
   }, [session, navigate]);
 
   // Fetch matches from DB
-  const { data: matches, isLoading: matchesLoading } = useQuery({
+  const { data: matches } = useQuery({
     queryKey: ['matches'],
-    queryFn: () => Match.list(),
+    queryFn: async () => {
+      try {
+        const res = await Match.list();
+        return Array.isArray(res) ? res : [];
+      } catch (e) {
+        return [];
+      }
+    },
     refetchInterval: 15000,
-    retry: 2
+    retry: false
   });
 
-  // Fetch live Betfair events from API (with automatic fallback)
-  const { data: betfairEvents, isLoading: betfairLoading } = useQuery({
+  // Fetch live Betfair events
+  const { data: betfairEvents } = useQuery({
     queryKey: ['betfair-events'],
     queryFn: async () => {
       try {
         const result = await fetchBetfairEvents({});
         return Array.isArray(result) ? result : [];
       } catch (err) {
-        console.debug("Failed to fetch betfair events:", err);
         return [];
       }
     },
     refetchInterval: 30000,
-    retry: 1
+    retry: false
   });
 
-  // Fetch live ATD Cricket matches from API
-  const { data: atdData, isLoading: atdLoading } = useQuery({
+  // Fetch live ATD Cricket matches
+  const { data: atdData } = useQuery({
     queryKey: ['atd-cricket-home'],
     queryFn: async () => {
       try {
         const result = await fetchAtdCricketHome({});
         return (result && typeof result === 'object' && Array.isArray(result.matches)) ? result : { matches: [] };
       } catch (err) {
-        console.debug("Failed to fetch atd cricket:", err);
         return { matches: [] };
       }
     },
     refetchInterval: 30000,
-    retry: 1
+    retry: false
   });
 
-  // Real-time API Health status for banner notifications
-  const healthStatus = getHealthStatusMap();
+  const healthStatus = getHealthStatusMap ? getHealthStatusMap() : {};
 
   const safeMatches = Array.isArray(matches) ? matches : [];
   const safeBetfair = Array.isArray(betfairEvents) ? betfairEvents : [];
   const safeAtdMatches = Array.isArray(atdData?.matches) ? atdData.matches : [];
 
-  // Auto-sync Betfair odds for matches
-  const matchesWithBetfair = safeMatches.filter((m: any) => 
-    m && m.betfair_event_id && 
-    !String(m.id).startsWith('atd-') && 
-    m.betfair_event_id !== 'undefined' && 
-    m.betfair_event_id !== ''
-  );
-
-  useQuery({
-    queryKey: ['betfair-bulk-sync', matchesWithBetfair.map((m: any) => m.id).join(',')],
-    queryFn: async () => {
-      if (matchesWithBetfair.length === 0) return { success: true, skipped: true };
-      try {
-        const syncMatches = matchesWithBetfair.slice(0, 10).map((m: any) => ({
-          matchId: m.id,
-          betfairEventId: m.betfair_event_id
-        }));
-
-        await oddsEngine({
-          action: 'syncAllFromBetfair',
-          matches: syncMatches
-        });
-        return { success: true };
-      } catch (err) {
-        return { success: false, error: "Failed to fetch" };
-      }
-    },
-    enabled: matchesWithBetfair.length > 0 && !!betfairEvents,
-    refetchInterval: 15000,
-    retry: false,
-    staleTime: 5000,
-    gcTime: 0,
-  });
-
-  // Fetch real-time client data for balance and credits
   const { data: clients } = useQuery({
     queryKey: ['client-data', session?.username],
-    queryFn: () => (session?.username ? Client.filter({ username: session.username }) : Promise.resolve([])),
+    queryFn: async () => {
+      if (!session?.username) return [];
+      try {
+        const res = await Client.filter({ username: session.username });
+        return Array.isArray(res) ? res : [];
+      } catch (e) {
+        return [];
+      }
+    },
     enabled: !!session?.username,
   });
 
@@ -212,29 +187,17 @@ export default function UserDashboard() {
   const clientCash = typeof clientData?.cash === "number" ? clientData.cash : (parseFloat(String(clientData?.cash || 0)) || 0);
   const clientBalance = clientCash;
 
-  // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
-      if (!activeBet) {
-        throw new Error("No active bet selected. Please select odds first.");
-      }
-      if (!session || !session.username) {
-        throw new Error("User session not found. Please log in again.");
-      }
-      if (!clientData) {
-        throw new Error("Client account data is not loaded. Please wait or refresh the page.");
-      }
+      if (!activeBet) throw new Error("No active bet selected.");
+      if (!session || !session.username) throw new Error("Session expired.");
+      if (!clientData) throw new Error("Client account error.");
 
-      const numericStake = typeof stake === "number" ? stake : parseFloat(String(stake));
-      if (isNaN(numericStake) || numericStake <= 0) {
-        throw new Error("Please enter a valid positive stake amount.");
-      }
+      const numericStake = parseFloat(String(stake));
+      if (isNaN(numericStake) || numericStake <= 0) throw new Error("Invalid stake.");
+      if (numericStake > clientBalance) throw new Error("Insufficient balance.");
 
-      if (numericStake > clientBalance) {
-        throw new Error(`Insufficient balance. Current balance is ${clientBalance.toLocaleString('en-IN')}`);
-      }
-
-      const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
+      const oddsVal = parseFloat(String(activeBet.odds || 1));
       const potentialWin = (numericStake * oddsVal) - numericStake;
 
       await Bet.create({
@@ -250,9 +213,7 @@ export default function UserDashboard() {
       });
 
       const updatedCash = Math.max(0, clientBalance - numericStake);
-      await Client.update(clientData.id, {
-        cash: updatedCash
-      });
+      await Client.update(clientData.id, { cash: updatedCash });
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -263,7 +224,7 @@ export default function UserDashboard() {
       toast({
         variant: "destructive",
         title: "Bet Failed",
-        description: error?.message || "Could not place bet. Please try again.",
+        description: error?.message || "Could not place bet.",
       });
     }
   });
@@ -275,13 +236,13 @@ export default function UserDashboard() {
     
     let sport = m.sport || '';
     if (!sport) {
-      const title = (m.title || '').toLowerCase();
+      const title = String(m.title || '').toLowerCase();
       if (title.includes('cricket')) sport = 'Cricket';
       else if (title.includes('soccer') || title.includes('football')) sport = 'Soccer';
       else if (title.includes('tennis')) sport = 'Tennis';
     }
 
-    if (sport.toLowerCase() === 'football') sport = 'Soccer';
+    if (String(sport).toLowerCase() === 'football') sport = 'Soccer';
 
     return {
       ...m,
@@ -296,59 +257,35 @@ export default function UserDashboard() {
       if (!atd) return false;
       return !safeBetfair.some((bf: any) => {
         if (!bf) return false;
-        const t1 = atd.team1?.toLowerCase() || '';
-        const t2 = atd.team2?.toLowerCase() || '';
+        const t1 = String(atd.team1 || '').toLowerCase();
+        const t2 = String(atd.team2 || '').toLowerCase();
         if (!t1 || !t2) return false;
-        return bf.title?.toLowerCase().includes(t1) && bf.title?.toLowerCase().includes(t2);
+        return String(bf.title || '').toLowerCase().includes(t1) && String(bf.title || '').toLowerCase().includes(t2);
       });
     }),
     ...safeMatches.map(normalizeMatch).filter((m: any) => {
       if (!m) return false;
-      const isExternal = String(m.id).startsWith('bf-') || String(m.id).startsWith('atd-') || String(m.id).startsWith('cb-') || String(m.id).startsWith('sportapi-');
+      const isExternal = String(m.id || '').startsWith('bf-') || String(m.id || '').startsWith('atd-') || String(m.id || '').startsWith('cb-');
       if (isExternal) return false;
-
-      if (!m.betfair_event_id || m.betfair_event_id === 'undefined' || m.betfair_event_id === '') return false;
+      if (!m.betfair_event_id || m.betfair_event_id === 'undefined') return false;
       if (m.status === 'completed' || m.status === 'finished') return false;
 
-      const isDuplicate = safeBetfair.some((bf: any) => 
-        bf && (bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id)
-      );
-      if (isDuplicate) return false;
-
-      return true;
+      return !safeBetfair.some((bf: any) => bf && (bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id));
     })
   ].filter((m: any) => {
     if (!m) return false;
-    const sport = m.sport?.toLowerCase();
+    const sport = String(m.sport || '').toLowerCase();
     return sport === 'cricket' || sport === 'soccer' || sport === 'tennis';
   }).sort((a: any, b: any) => {
-    if (a.status === 'live' && b.status !== 'live') return -1;
-    if (b.status === 'live' && a.status !== 'live') return 1;
-    
-    const timeA = a.match_time ? new Date(a.match_time).getTime() : 0;
-    const timeB = b.match_time ? new Date(b.match_time).getTime() : 0;
-    return timeA - timeB;
+    if (a?.status === 'live' && b?.status !== 'live') return -1;
+    if (b?.status === 'live' && a?.status !== 'live') return 1;
+    return 0;
   });
-  
-  const inplayCount = matchesList.filter((m: any) => m.status === 'live').length;
-  const cricketCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'cricket').length;
-  const tennisCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'tennis').length;
-  const soccerCount = matchesList.filter((m: any) => m.sport?.toLowerCase() === 'football' || m.sport?.toLowerCase() === 'soccer').length;
 
-  if (!session) return null;
-
-  const isInitialLoading = matchesLoading || betfairLoading || atdLoading;
-
-  if (isInitialLoading && matchesList.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-[#254465] animate-spin" />
-          <p className="text-xs font-bold text-[#254465]/60 uppercase tracking-widest animate-pulse">Loading Live Markets...</p>
-        </div>
-      </div>
-    );
-  }
+  const inplayCount = matchesList.filter((m: any) => m?.status === 'live').length;
+  const cricketCount = matchesList.filter((m: any) => String(m?.sport || '').toLowerCase() === 'cricket').length;
+  const tennisCount = matchesList.filter((m: any) => String(m?.sport || '').toLowerCase() === 'tennis').length;
+  const soccerCount = matchesList.filter((m: any) => String(m?.sport || '').toLowerCase() === 'soccer').length;
 
   const categories = [
     { id: "Inplay", label: "Inplay", count: inplayCount },
@@ -358,13 +295,14 @@ export default function UserDashboard() {
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
+    if (!m) return false;
     const status = String(m.status || '').toLowerCase();
     const isLive = status === 'live' || status === 'inplay';
 
     if (activeFilter === "Inplay") return isLive;
     
-    const sport = m.sport?.toLowerCase();
-    const filter = activeFilter.toLowerCase();
+    const sport = String(m.sport || '').toLowerCase();
+    const filter = String(activeFilter || '').toLowerCase();
     if (filter === 'soccer') return sport === 'football' || sport === 'soccer';
     return sport === filter;
   });
@@ -372,33 +310,6 @@ export default function UserDashboard() {
   const handleSelectBet = (match: any, selection: string, betType: 'back' | 'lay', odds: number) => {
     setActiveBet({ match, selection, betType, odds });
   };
-
-  const getActiveTabApiStatusNotice = () => {
-    if (activeFilter === "Cricket" && (healthStatus.cricket?.statusType === "quota_exceeded" || healthStatus.cricket?.statusCode === 429)) {
-      return "Cricket feed unavailable - API quota exceeded";
-    }
-    if (activeFilter === "Soccer" && (healthStatus.football?.statusType === "subscription_required" || healthStatus.football?.statusCode === 403)) {
-      return "Football feed unavailable - API subscription required";
-    }
-    if (activeFilter === "Tennis" && (healthStatus.tennis?.statusType === "subscription_required" || healthStatus.tennis?.statusCode === 403)) {
-      return "Tennis feed unavailable - API subscription required";
-    }
-    if (activeFilter === "Inplay") {
-      const issues = [];
-      if (healthStatus.cricket?.statusType === "quota_exceeded" || healthStatus.cricket?.statusCode === 429) {
-        issues.push("Cricket feed unavailable - API quota exceeded");
-      }
-      if (healthStatus.football?.statusType === "subscription_required" || healthStatus.football?.statusCode === 403 || healthStatus.tennis?.statusType === "subscription_required" || healthStatus.tennis?.statusCode === 403) {
-        issues.push("Football/Tennis feed unavailable - API subscription required");
-      }
-      if (issues.length > 0) {
-        return issues.join(" • ");
-      }
-    }
-    return null;
-  };
-
-  const currentApiNotice = getActiveTabApiStatusNotice();
 
   return (
     <div className="min-h-screen text-[#212529]" style={{ 
@@ -410,19 +321,16 @@ export default function UserDashboard() {
         onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      {/* Account Info Bar */}
-      <div
-        style={{
-          backgroundColor: "#254465",
-          padding: "7px 14px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-around",
-          fontSize: 13,
-          color: "white",
-          borderBottom: "1px solid rgba(255,255,255,0.15)",
-        }}
-      >
+      <div style={{
+        backgroundColor: "#254465",
+        padding: "7px 14px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-around",
+        fontSize: 13,
+        color: "white",
+        borderBottom: "1px solid rgba(255,255,255,0.15)",
+      }}>
         <div>
           <span style={{ color: "rgba(255,255,255,0.7)", marginRight: 5 }}>Pts:</span>
           <span style={{ fontWeight: 800, color: "#ffffff" }}>
@@ -432,9 +340,7 @@ export default function UserDashboard() {
         <div style={{ color: "rgba(255,255,255,0.3)" }}>|</div>
         <div>
           <span style={{ color: "rgba(255,255,255,0.7)", marginRight: 5 }}>Exp:</span>
-          <span style={{ fontWeight: 800, color: "#ff6b6b" }}>
-            0
-          </span>
+          <span style={{ fontWeight: 800, color: "#ff6b6b" }}>0</span>
         </div>
       </div>
 
@@ -450,45 +356,16 @@ export default function UserDashboard() {
 
       <main className="max-w-4xl mx-auto pb-20">
         <GameBanners />
+        <RaceSection onSelectRace={(race) => console.log(race)} />
 
-        <RaceSection 
-          onSelectRace={(race) => {
-            console.log("Selected race:", race);
-          }}
-        />
-
-        {currentApiNotice && (
-          <div 
-            style={{ 
-              backgroundColor: "#fff3cd", 
-              border: "1px solid #ffeeba", 
-              color: "#856404", 
-              padding: "6px 12px", 
-              fontSize: "12px", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "space-between",
-              fontWeight: 600,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <AlertTriangle size={14} color="#856404" />
-              <span>{currentApiNotice}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation Categories */}
-        <div 
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            backgroundColor: "#254465",
-            borderBottom: "2px solid #1a334d",
-            overflow: "hidden",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.12)",
-          }}
-        >
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          backgroundColor: "#254465",
+          borderBottom: "2px solid #1a334d",
+          overflow: "hidden",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.12)",
+        }}>
           {categories.map((cat) => {
             const isActive = activeFilter === cat.id;
             return (
@@ -505,32 +382,16 @@ export default function UserDashboard() {
                   border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.12)",
                   cursor: "pointer",
-                  transition: "background-color 0.2s",
                   minHeight: 62,
-                  position: "relative",
                 }}
               >
-                <span style={{ 
-                  color: 'white', 
-                  fontSize: 14, 
-                  fontWeight: 900, 
-                  lineHeight: 1, 
-                  marginBottom: 3,
-                  fontStyle: 'italic'
-                }}>
+                <span style={{ color: 'white', fontSize: 14, fontWeight: 900, marginBottom: 3, fontStyle: 'italic' }}>
                   {cat.count}
                 </span>
-                
                 <div style={{ marginBottom: 3 }}>
                    <SportIcon sport={cat.id} color="white" size={20} />
                 </div>
-
-                <span style={{
-                  color: "white",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  textTransform: "uppercase"
-                }}>
+                <span style={{ color: "white", fontSize: 11, fontWeight: 800, textTransform: "uppercase" }}>
                   {cat.label}
                 </span>
               </button>
@@ -538,7 +399,6 @@ export default function UserDashboard() {
           })}
         </div>
 
-        {/* Matches / Casino Section Content */}
         {activeFilter === "Casino" ? (
           <CasinoSection />
         ) : (
@@ -546,20 +406,19 @@ export default function UserDashboard() {
             {filteredMatches.length > 0 ? (
               filteredMatches.map((match: any, idx: number) => (
                 <BettingMatchCard 
-                  key={match.id || idx} 
+                  key={match?.id || idx} 
                   match={match} 
                   onSelectBet={handleSelectBet} 
                 />
               ))
             ) : (
-              <div className="bg-white p-8 text-center text-gray-500 rounded border border-gray-200 mt-2">
-                No active matches available for {activeFilter}.
+              <div className="bg-white p-8 text-center text-gray-500 rounded border border-gray-200 mt-2 font-bold text-sm">
+                No active events available right now.
               </div>
             )}
           </div>
         )}
 
-        {/* Active Bet Slip */}
         {activeBet && (
           <BetSlip 
             activeBet={activeBet}
