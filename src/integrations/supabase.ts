@@ -11,9 +11,9 @@ const SEED_CLIENTS = [
     full_name: "Company Super Admin",
     password: "book1234",
     role: "company",
-    credit_received: 10000000,
-    credit_remaining: 10000000,
-    cash: 5000000,
+    credit_received: 0,
+    credit_remaining: 0,
+    cash: 0,
     pl_downline: 0,
     balance_upline: 0,
     status: "active",
@@ -34,9 +34,9 @@ const SEED_CLIENTS = [
     full_name: "Exchange Senior Admin",
     password: "admin",
     role: "admin",
-    credit_received: 2000000,
-    credit_remaining: 2000000,
-    cash: 1000000,
+    credit_received: 0,
+    credit_remaining: 0,
+    cash: 0,
     pl_downline: 0,
     balance_upline: 0,
     status: "active",
@@ -57,9 +57,9 @@ const SEED_CLIENTS = [
     full_name: "John Player",
     password: "client1",
     role: "client",
-    credit_received: 50000,
-    credit_remaining: 45000,
-    cash: 25000,
+    credit_received: 0,
+    credit_remaining: 0,
+    cash: 0,
     pl_downline: 0,
     balance_upline: 0,
     status: "active",
@@ -80,9 +80,9 @@ const SEED_CLIENTS = [
     full_name: "Demo Player",
     password: "demo",
     role: "client",
-    credit_received: 20000,
-    credit_remaining: 18500,
-    cash: 10000,
+    credit_received: 0,
+    credit_remaining: 0,
+    cash: 0,
     pl_downline: 0,
     balance_upline: 0,
     status: "active",
@@ -255,28 +255,7 @@ const SEED_MATCHES = [
 
 const SEED_BETS: any[] = [];
 
-const SEED_TRANSACTIONS = [
-  {
-    id: "tx-01",
-    client_username: "client1",
-    type: "credit",
-    amount: 50000,
-    description: "Initial Credit Allotment",
-    before_balance: 0,
-    after_balance: 50000,
-    created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
-  },
-  {
-    id: "tx-02",
-    client_username: "client1",
-    type: "cash",
-    amount: 25000,
-    description: "Cash Deposit",
-    before_balance: 0,
-    after_balance: 25000,
-    created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-  },
-];
+const SEED_TRANSACTIONS: any[] = [];
 
 // Helper to get / set localStorage table collections
 export function resetAndSeedDatabase(): void {
@@ -310,15 +289,15 @@ export function resetAndSeedDatabase(): void {
     localStorage.setItem("exchange_db_matches", JSON.stringify(SEED_MATCHES));
     localStorage.setItem("exchange_db_bets", JSON.stringify(SEED_BETS));
     localStorage.setItem("exchange_db_transactions", JSON.stringify(SEED_TRANSACTIONS));
-    localStorage.setItem("exchange_db_initialized_v4", "true");
-    console.log("[DB_RESET] Database cleared and seeded successfully with Book / book1234");
+    localStorage.setItem("exchange_db_initialized_v5", "true");
+    console.log("[DB_RESET] Database cleared and seeded successfully with Book / book1234 (B: 0 Exp: 0)");
   } catch (err) {
     console.error("[DB_RESET] Error during resetAndSeedDatabase:", err);
   }
 }
 
-// Auto-run reset on first load of v4
-if (typeof window !== "undefined" && !localStorage.getItem("exchange_db_initialized_v4")) {
+// Auto-run reset on first load of v5
+if (typeof window !== "undefined" && !localStorage.getItem("exchange_db_initialized_v5")) {
   resetAndSeedDatabase();
 }
 
@@ -345,11 +324,21 @@ function getLocalTable(table: string): any[] {
           if (
             items[bookIndex].role !== "company" ||
             items[bookIndex].password !== "book1234" ||
-            items[bookIndex].status !== "active"
+            items[bookIndex].status !== "active" ||
+            items[bookIndex].cash === 5000000 ||
+            items[bookIndex].cash === 4995000 ||
+            items[bookIndex].credit_received === 10000000
           ) {
             items[bookIndex].role = "company";
             items[bookIndex].password = "book1234";
             items[bookIndex].status = "active";
+            if (items[bookIndex].cash === 5000000 || items[bookIndex].cash === 4995000) {
+              items[bookIndex].cash = 0;
+            }
+            if (items[bookIndex].credit_received === 10000000) {
+              items[bookIndex].credit_received = 0;
+              items[bookIndex].credit_remaining = 0;
+            }
             changed = true;
           }
         } else {
