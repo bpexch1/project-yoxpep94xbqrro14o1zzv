@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Shield, Zap, TrendingUp, Trophy } from "lucide-react";
 
 export default function Landing() {
-  // Purani dead lines hata kar direct local paths set kar diye
   const loginUrl = "/login";
-  const signupUrl = "/login"; // Betting exchange me admin khud account bana kar deta hai
+  const signupUrl = "/login"; // Betting exchange me admin account create karta hai
 
   const features = [
     {
@@ -51,7 +50,7 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
+      {/* Hero Section */}
       <main className="relative z-10 container mx-auto px-6 pt-20 pb-32">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -74,7 +73,7 @@ export default function Landing() {
               <Button asChild size="lg" className="h-14 px-10 text-lg bg-amber-500 hover:bg-amber-400 text-black font-black shadow-[0_0_20px_rgba(245,158,11,0.2)]">
                 <a href={loginUrl}>START BETTING NOW</a>
               </Button>
-              <Button asChild variant="outline" size="lg" className="h-14 px-10 text-lg border-gray-700 text-white hover:bg-white/5">
+              <Button asChild variant="outline" size="lg" className="h-14 px-10 text-lg border-gray-700 bg-transparent text-white hover:bg-white/10 hover:text-white">
                 <a href={signupUrl}>CREATE ACCOUNT</a>
               </Button>
             </div>
@@ -108,7 +107,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-gray-800 py-12">
         <div className="container mx-auto px-6 text-center text-gray-500 text-sm">
-          <p>© 2024 BetPro Exchange. Play responsibly. 18+ only.</p>
+          <p>© {new Date().getFullYear()} BetPro Exchange. Play responsibly. 18+ only.</p>
         </div>
       </footer>
     </div>
