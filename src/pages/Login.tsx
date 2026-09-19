@@ -37,13 +37,8 @@ export default function Login() {
     try {
       let client: any = null;
 
-      // 1. Log localStorage raw state
-      console.log("[RUNTIME_TEST] 1. localStorage.getItem('exchange_db_clients'):", typeof window !== "undefined" ? localStorage.getItem("exchange_db_clients") : "N/A");
-
-      // 2. Query and log Client.filter({ username: cleanUser })
-      console.log("[RUNTIME_TEST] Entered username:", cleanUser);
+      // 1. Primary DB Search
       const results = await Client.filter({ username: cleanUser }, "-created_at", 10);
-      console.log("[RUNTIME_TEST] 2. The result of Client.filter({ username: '" + cleanUser + "' }):", results);
 
       if (Array.isArray(results) && results.length > 0) {
         client = results.find(
@@ -51,23 +46,16 @@ export default function Login() {
         );
       }
 
-      // Case-insensitive secondary search if not found
+      // 2. Case-insensitive Fallback Search
       if (!client) {
         const allClients = await Client.list("-created_at", 500);
-        console.log("[RUNTIME_TEST] Secondary search Client.list() results:", allClients);
         client = (Array.isArray(allClients) ? allClients : []).find(
           (c: any) => (c.username || "").trim().toLowerCase() === cleanUser.toLowerCase()
         );
       }
 
-      // Immediately before password validation print:
-      console.log("CLIENT FOUND:", client);
-      console.log("DB PASSWORD:", client?.password);
-      console.log("ENTERED PASSWORD:", cleanPw);
-      console.log("MATCH RESULT:", client?.password === cleanPw);
-
-      // Validate password strictly against database record
-      if (!client) {
+      // 3. User & Password Validation
+      if (!client || client.password !== cleanPw) {
         toast({
           variant: "destructive",
           title: "Login Failed",
@@ -76,18 +64,8 @@ export default function Login() {
         return;
       }
 
-      if (client.password !== cleanPw) {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid username or password.",
-        });
-        return;
-      }
-
-      // 3. Check account status
-      if (client.status === "inactive" || client.status === "locked" || client.status === "suspended") {
-        console.error("[LOGIN_DEBUG] 6. Login failed reason: Account disabled or inactive. Status:", client.status);
+      // 4. Account Status Validation
+      if (["inactive", "locked", "suspended"].includes(client.status)) {
         toast({
           variant: "destructive",
           title: "Account Disabled",
@@ -96,9 +74,14 @@ export default function Login() {
         return;
       }
 
-      console.log("[LOGIN_DEBUG] Login verified successfully. Creating session for:", client.username, "Role:", client.role);
+      // 5. Forced Password Change Check
+      if (client.must_change_pw) {
+        setPendingClient(client);
+        setForcedModal(true);
+        return;
+      }
 
-      // 4. Create authenticated session
+      // 6. Set Authenticated Session
       setClientSession({
         id: client.id,
         username: client.username,
@@ -112,14 +95,13 @@ export default function Login() {
         status: client.status || "active",
       });
 
-      // 5. Redirect by role
+      // 7. Route Redirection
       if (client.role === "client") {
         navigate("/play");
       } else {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      console.error("Login error:", err);
       toast({
         variant: "destructive",
         title: "Login Error",
@@ -141,7 +123,10 @@ export default function Login() {
     }
     setChangingPw(true);
     try {
-      await Client.update(pendingClient.id, { password: newPw });
+      await Client.update(pendingClient.id, { 
+        password: newPw, 
+        must_change_pw: false 
+      });
       setForcedModal(false);
       setSuccessModal(true);
       setTimeout(() => {
@@ -181,7 +166,6 @@ export default function Login() {
         .login-input:focus { outline: none; }
       `}</style>
 
-      {/* Login Card Container */}
       <div
         style={{
           width: "100%",
@@ -200,13 +184,11 @@ export default function Login() {
             position: "relative",
           }}
         >
-          {/* BP Logo Circle */}
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 38, marginTop: 4 }}>
             <BPLogo size={132} />
           </div>
 
           <form onSubmit={handleLogin}>
-            {/* Username field */}
             <div style={{ marginBottom: 30 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
                 <User size={18} color="#ffffff" fill="#ffffff" strokeWidth={1} />
@@ -231,7 +213,6 @@ export default function Login() {
               <div style={{ height: 1, background: "rgba(255,255,255,0.45)", width: "100%" }} />
             </div>
 
-            {/* Password field */}
             <div style={{ marginBottom: 38 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
                 <Lock size={18} color="#ffffff" fill="#ffffff" strokeWidth={1} />
@@ -256,7 +237,6 @@ export default function Login() {
               <div style={{ height: 1, background: "rgba(255,255,255,0.45)", width: "100%" }} />
             </div>
 
-            {/* Login Button — centered rounded pill with 3D gradient & shadow */}
             <div style={{ display: "flex", justifyContent: "center" }}>
               <button
                 type="submit"
@@ -280,8 +260,6 @@ export default function Login() {
                   gap: 8,
                   transition: "transform 0.1s, opacity 0.2s, box-shadow 0.2s",
                 }}
-                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
-                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
               >
                 {loading ? <Loader2 size={18} className="animate-spin" /> : "Login"}
               </button>
@@ -290,7 +268,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Blue bar at bottom of screen */}
       <div
         style={{
           position: "fixed",
@@ -302,14 +279,12 @@ export default function Login() {
         }}
       />
 
-      {/* Forced Password Change Modal */}
       {forcedModal && (
         <div 
           className="fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4"
           style={{ backdropFilter: 'blur(4px)' }}
         >
-          <div className="w-full max-w-[500px] bg-white rounded-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-            {/* Header */}
+          <div className="w-full max-w-[500px] bg-white rounded-lg shadow-2xl overflow-hidden">
             <div className="bg-[#1a4a6e] px-6 py-4 border-b border-white/10">
               <h2 className="text-white text-lg font-bold flex items-center gap-2">
                 <Lock className="w-5 h-5" />
@@ -317,9 +292,8 @@ export default function Login() {
               </h2>
             </div>
             
-            {/* Body */}
             <div className="p-8 text-center border-b border-gray-100">
-              <h3 className="text-2xl font-bold text-red-600 mb-4 blink_me">
+              <h3 className="text-2xl font-bold text-red-600 mb-4">
                 Change Your Password ⚠️
               </h3>
               <p className="text-gray-700 font-semibold text-lg mb-2">
@@ -330,7 +304,6 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Form section */}
             <div className="p-8 bg-gray-50">
               <div className="flex items-center gap-2 mb-4 text-[#1a4a6e] font-bold">
                 <Key className="w-5 h-5" />
@@ -348,13 +321,12 @@ export default function Login() {
                 autoFocus
               />
               {pwError && (
-                <div className="mt-2 text-red-500 text-sm font-semibold animate-bounce">
+                <div className="mt-2 text-red-500 text-sm font-semibold">
                   {pwError}
                 </div>
               )}
             </div>
 
-            {/* Footer */}
             <div className="p-6 flex justify-center bg-white">
               <button
                 onClick={handleChangePassword}
@@ -368,10 +340,9 @@ export default function Login() {
         </div>
       )}
 
-      {/* Success Modal */}
       {successModal && (
         <div className="fixed inset-0 z-[1001] bg-black/80 flex items-center justify-center p-4">
-          <div className="w-full max-w-[400px] bg-white rounded-xl shadow-2xl p-8 text-center animate-in fade-in zoom-in duration-300">
+          <div className="w-full max-w-[400px] bg-white rounded-xl shadow-2xl p-8 text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
