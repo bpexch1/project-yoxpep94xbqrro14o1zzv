@@ -30,115 +30,134 @@ export interface ApiHealthStatus {
 const STORAGE_KEY = "bpexch_api_config";
 const STATUS_STORAGE_KEY = "bpexch_api_health_status";
 
-export const DEFAULT_CONFIG: ApiConfig = {
-  rapidApiKey: (import.meta.env.VITE_RAPIDAPI_KEY || import.meta.env.RAPIDAPI_KEY || "3f6e56db9amsh8bb661e1e33739bp1041cdjsn7f5a3f41abfa") as string,
-  cricbuzzHost: (import.meta.env.VITE_CRICBUZZ_HOST || "cricbuzz-cricket.p.rapidapi.com") as string,
-  sportApi7Host: (import.meta.env.VITE_RAPIDAPI_HOST || "sportapi7.p.rapidapi.com") as string,
-  betfairHost: "betfair-exchange-api2.p.rapidapi.com",
-  apiBaseUrl: (import.meta.env.VITE_API_BASE_URL || "") as string,
-  atdApiKey: (import.meta.env.VITE_ATD_API_KEY || import.meta.env.ATD_API_KEY || "") as string,
+// Safe helper to prevent window/localStorage crash during initialization
+const getSafeEnv = (key: string, fallback: string = ""): string => {
+  try {
+    if (typeof import.meta !== "undefined" && import.meta.env) {
+      return (import.meta.env[key] || fallback) as string;
+    }
+  } catch (e) {
+    console.debug("Env read error:", e);
+  }
+  return fallback;
 };
 
-export const INITIAL_HEALTH_STATUS: Record<string, ApiHealthStatus> = {
-  cricket: {
-    key: "cricket",
-    name: "Cricbuzz Cricket API",
-    sport: "Cricket",
-    endpointUrl: `https://${DEFAULT_CONFIG.cricbuzzHost}/matches/v1/live`,
-    statusCode: 429,
-    statusText: "Too Many Requests",
-    statusType: "quota_exceeded",
-    displayMessage: "Sports data temporarily unavailable.",
-    matchesReturned: 0,
-    lastChecked: new Date().toISOString(),
-    responseTimeMs: 120,
-    requestHeaders: {
-      "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "...",
-      "x-rapidapi-host": DEFAULT_CONFIG.cricbuzzHost,
-      "Content-Type": "application/json",
-    },
-    rawResponseJson: {
-      message: "You have exceeded the MONTHLY quota for Requests on your current plan, BASIC. Upgrade your plan at https://rapidapi.com/cricketapilive/api/cricbuzz-cricket",
-    },
-    exactError: "Request failed with status code 429",
-    isUsingFallback: true,
-  },
-  football: {
-    key: "football",
-    name: "SportAPI7 Football API",
-    sport: "Football",
-    endpointUrl: `https://${DEFAULT_CONFIG.sportApi7Host}/api/v1/sport/football/events/live`,
-    statusCode: 403,
-    statusText: "Forbidden",
-    statusType: "subscription_required",
-    displayMessage: "Sports data temporarily unavailable.",
-    matchesReturned: 0,
-    lastChecked: new Date().toISOString(),
-    responseTimeMs: 95,
-    requestHeaders: {
-      "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "...",
-      "x-rapidapi-host": DEFAULT_CONFIG.sportApi7Host,
-      "Content-Type": "application/json",
-    },
-    rawResponseJson: {
-      message: "You are not subscribed to this API.",
-    },
-    exactError: "Request failed with status code 403",
-    isUsingFallback: true,
-  },
-  tennis: {
-    key: "tennis",
-    name: "SportAPI7 Tennis API",
-    sport: "Tennis",
-    endpointUrl: `https://${DEFAULT_CONFIG.sportApi7Host}/api/v1/sport/tennis/events/live`,
-    statusCode: 403,
-    statusText: "Forbidden",
-    statusType: "subscription_required",
-    displayMessage: "Sports data temporarily unavailable.",
-    matchesReturned: 0,
-    lastChecked: new Date().toISOString(),
-    responseTimeMs: 88,
-    requestHeaders: {
-      "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "...",
-      "x-rapidapi-host": DEFAULT_CONFIG.sportApi7Host,
-      "Content-Type": "application/json",
-    },
-    rawResponseJson: {
-      message: "You are not subscribed to this API.",
-    },
-    exactError: "Request failed with status code 403",
-    isUsingFallback: true,
-  },
-  betfair: {
-    key: "betfair",
-    name: "Betfair Exchange API",
-    sport: "Multi-Sport",
-    endpointUrl: `https://${DEFAULT_CONFIG.betfairHost}/getBetfairMatches`,
-    statusCode: 403,
-    statusText: "Forbidden",
-    statusType: "subscription_required",
-    displayMessage: "Sports data temporarily unavailable.",
-    matchesReturned: 0,
-    lastChecked: new Date().toISOString(),
-    responseTimeMs: 110,
-    requestHeaders: {
-      "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "...",
-      "x-rapidapi-host": DEFAULT_CONFIG.betfairHost,
-      "Content-Type": "application/json",
-    },
-    rawResponseJson: {
-      message: "You are not subscribed to this API.",
-    },
-    exactError: "Request failed with status code 403",
-    isUsingFallback: true,
-  },
+export const DEFAULT_CONFIG: ApiConfig = {
+  rapidApiKey: getSafeEnv("VITE_RAPIDAPI_KEY", getSafeEnv("RAPIDAPI_KEY", "3f6e56db9amsh8bb661e1e33739bp1041cdjsn7f5a3f41abfa")),
+  cricbuzzHost: getSafeEnv("VITE_CRICBUZZ_HOST", "cricbuzz-cricket.p.rapidapi.com"),
+  sportApi7Host: getSafeEnv("VITE_RAPIDAPI_HOST", "sportapi7.p.rapidapi.com"),
+  betfairHost: "betfair-exchange-api2.p.rapidapi.com",
+  apiBaseUrl: getSafeEnv("VITE_API_BASE_URL", ""),
+  atdApiKey: getSafeEnv("VITE_ATD_API_KEY", getSafeEnv("ATD_API_KEY", "")),
 };
+
+export const getInitialHealthStatus = (): Record<string, ApiHealthStatus> => {
+  const now = new Date().toISOString();
+  return {
+    cricket: {
+      key: "cricket",
+      name: "Cricbuzz Cricket API",
+      sport: "Cricket",
+      endpointUrl: `https://${DEFAULT_CONFIG.cricbuzzHost}/matches/v1/live`,
+      statusCode: 429,
+      statusText: "Too Many Requests",
+      statusType: "quota_exceeded",
+      displayMessage: "Sports data temporarily unavailable.",
+      matchesReturned: 0,
+      lastChecked: now,
+      responseTimeMs: 120,
+      requestHeaders: {
+        "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey ? DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "..." : "",
+        "x-rapidapi-host": DEFAULT_CONFIG.cricbuzzHost,
+        "Content-Type": "application/json",
+      },
+      rawResponseJson: {
+        message: "You have exceeded the MONTHLY quota for Requests on your current plan, BASIC.",
+      },
+      exactError: "Request failed with status code 429",
+      isUsingFallback: true,
+    },
+    football: {
+      key: "football",
+      name: "SportAPI7 Football API",
+      sport: "Football",
+      endpointUrl: `https://${DEFAULT_CONFIG.sportApi7Host}/api/v1/sport/football/events/live`,
+      statusCode: 403,
+      statusText: "Forbidden",
+      statusType: "subscription_required",
+      displayMessage: "Sports data temporarily unavailable.",
+      matchesReturned: 0,
+      lastChecked: now,
+      responseTimeMs: 95,
+      requestHeaders: {
+        "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey ? DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "..." : "",
+        "x-rapidapi-host": DEFAULT_CONFIG.sportApi7Host,
+        "Content-Type": "application/json",
+      },
+      rawResponseJson: {
+        message: "You are not subscribed to this API.",
+      },
+      exactError: "Request failed with status code 403",
+      isUsingFallback: true,
+    },
+    tennis: {
+      key: "tennis",
+      name: "SportAPI7 Tennis API",
+      sport: "Tennis",
+      endpointUrl: `https://${DEFAULT_CONFIG.sportApi7Host}/api/v1/sport/tennis/events/live`,
+      statusCode: 403,
+      statusText: "Forbidden",
+      statusType: "subscription_required",
+      displayMessage: "Sports data temporarily unavailable.",
+      matchesReturned: 0,
+      lastChecked: now,
+      responseTimeMs: 88,
+      requestHeaders: {
+        "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey ? DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "..." : "",
+        "x-rapidapi-host": DEFAULT_CONFIG.sportApi7Host,
+        "Content-Type": "application/json",
+      },
+      rawResponseJson: {
+        message: "You are not subscribed to this API.",
+      },
+      exactError: "Request failed with status code 403",
+      isUsingFallback: true,
+    },
+    betfair: {
+      key: "betfair",
+      name: "Betfair Exchange API",
+      sport: "Multi-Sport",
+      endpointUrl: `https://${DEFAULT_CONFIG.betfairHost}/getBetfairMatches`,
+      statusCode: 403,
+      statusText: "Forbidden",
+      statusType: "subscription_required",
+      displayMessage: "Sports data temporarily unavailable.",
+      matchesReturned: 0,
+      lastChecked: now,
+      responseTimeMs: 110,
+      requestHeaders: {
+        "x-rapidapi-key": DEFAULT_CONFIG.rapidApiKey ? DEFAULT_CONFIG.rapidApiKey.slice(0, 8) + "..." : "",
+        "x-rapidapi-host": DEFAULT_CONFIG.betfairHost,
+        "Content-Type": "application/json",
+      },
+      rawResponseJson: {
+        message: "You are not subscribed to this API.",
+      },
+      exactError: "Request failed with status code 403",
+      isUsingFallback: true,
+    },
+  };
+};
+
+export const INITIAL_HEALTH_STATUS = getInitialHealthStatus();
 
 export function getStoredApiConfig(): ApiConfig {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+    if (typeof window !== "undefined" && window.localStorage) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+      }
     }
   } catch (err) {
     console.debug("Failed to read stored API config:", err);
@@ -149,7 +168,9 @@ export function getStoredApiConfig(): ApiConfig {
 export function saveStoredApiConfig(config: Partial<ApiConfig>): ApiConfig {
   const updated = { ...getStoredApiConfig(), ...config };
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }
   } catch (err) {
     console.error("Failed to save API config:", err);
   }
@@ -157,22 +178,28 @@ export function saveStoredApiConfig(config: Partial<ApiConfig>): ApiConfig {
 }
 
 export function getHealthStatusMap(): Record<string, ApiHealthStatus> {
+  const defaults = getInitialHealthStatus();
   try {
-    const raw = localStorage.getItem(STATUS_STORAGE_KEY);
-    if (raw) {
-      return { ...INITIAL_HEALTH_STATUS, ...JSON.parse(raw) };
+    if (typeof window !== "undefined" && window.localStorage) {
+      const raw = localStorage.getItem(STATUS_STORAGE_KEY);
+      if (raw) {
+        return { ...defaults, ...JSON.parse(raw) };
+      }
     }
   } catch (err) {
     console.debug("Failed to read stored API health status:", err);
   }
-  return { ...INITIAL_HEALTH_STATUS };
+  return defaults;
 }
 
 export function updateHealthStatus(key: string, status: Partial<ApiHealthStatus>) {
   const current = getHealthStatusMap();
-  current[key] = { ...(current[key] || INITIAL_HEALTH_STATUS[key]), ...status };
+  const defaults = getInitialHealthStatus();
+  current[key] = { ...(current[key] || defaults[key]), ...status };
   try {
-    localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(current));
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(current));
+    }
   } catch (err) {
     console.debug("Failed to save API health status:", err);
   }
@@ -230,7 +257,6 @@ export async function testApiEndpoint(
   }
 
   const startTime = Date.now();
-  console.log(`[API Request] URL: ${url}`);
   try {
     const res = await axios.get(url, { headers, timeout: 8000 });
     const duration = Date.now() - startTime;
@@ -250,9 +276,6 @@ export async function testApiEndpoint(
       const rawEvents = Array.isArray(res.data?.events) ? res.data.events : Array.isArray(res.data) ? res.data : [];
       count = rawEvents.length;
     }
-
-    console.log(`[API Response] URL: ${url} | Status: ${res.status} | Body:`, res.data);
-    console.log(`[API Result] Match Count: ${count}`);
 
     const result: ApiHealthStatus = {
       key: apiType,
@@ -282,9 +305,6 @@ export async function testApiEndpoint(
     const statusCode = err.response?.status || null;
     const statusText = err.response?.statusText || "Error";
     const rawData = err.response?.data || null;
-
-    console.warn(`[API Response] URL: ${url} | Status: ${statusCode || 'Network Error'} | Body:`, rawData || err.message);
-    console.log(`[API Result] Match Count: 0`);
 
     let statusType: ApiHealthStatus["statusType"] = "error";
     let displayMessage = `${sport} feed unavailable`;
