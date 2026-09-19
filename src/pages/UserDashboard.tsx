@@ -15,11 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { getHealthStatusMap } from "@/lib/apiManager";
 import { 
   Loader2, 
-  Trophy, 
   AlertTriangle,
-  Info,
 } from "lucide-react";
-import { Plus18Badge, BLogoIcon } from "@/components/icons/CustomIcons";
 
 const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string, color?: string, size?: number }) => {
   const s = sport.toLowerCase();
@@ -112,6 +109,7 @@ export default function UserDashboard() {
       setActiveFilter(location.state.activeFilter);
     }
   }, [location.pathname, location.state]);
+
   const [activeBet, setActiveBet] = useState<{ match: any; selection: string; betType: 'back' | 'lay'; odds: number } | null>(null);
 
   const session = getClientSession();
@@ -152,7 +150,7 @@ export default function UserDashboard() {
     queryFn: async () => {
       try {
         const result = await fetchAtdCricketHome({});
-        return (result && typeof result === 'object') ? result : { matches: [] };
+        return (result && typeof result === 'object' && Array.isArray(result.matches)) ? result : { matches: [] };
       } catch (err) {
         console.debug("Failed to fetch atd cricket:", err);
         return { matches: [] };
@@ -171,7 +169,7 @@ export default function UserDashboard() {
 
   // Auto-sync Betfair odds for matches
   const matchesWithBetfair = safeMatches.filter((m: any) => 
-    m.betfair_event_id && 
+    m && m.betfair_event_id && 
     !String(m.id).startsWith('atd-') && 
     m.betfair_event_id !== 'undefined' && 
     m.betfair_event_id !== ''
@@ -204,7 +202,7 @@ export default function UserDashboard() {
   });
 
   // Fetch real-time client data for balance and credits
-  const { data: clients, isLoading: clientLoading } = useQuery({
+  const { data: clients } = useQuery({
     queryKey: ['client-data', session?.username],
     queryFn: () => (session?.username ? Client.filter({ username: session.username }) : Promise.resolve([])),
     enabled: !!session?.username,
@@ -212,7 +210,6 @@ export default function UserDashboard() {
 
   const clientData = Array.isArray(clients) && clients.length > 0 ? clients[0] : null;
   const clientCash = typeof clientData?.cash === "number" ? clientData.cash : (parseFloat(String(clientData?.cash || 0)) || 0);
-  const clientCredit = typeof clientData?.credit_received === "number" ? clientData.credit_received : (parseFloat(String(clientData?.credit_received || 0)) || 0);
   const clientBalance = clientCash;
 
   // Place bet mutation
@@ -272,6 +269,7 @@ export default function UserDashboard() {
   });
 
   const normalizeMatch = (m: any) => {
+    if (!m) return null;
     const status = String(m.status || m.api_status || '').toLowerCase();
     const isLive = status === 'live' || status === 'inplay' || status === 'started' || status === '1' || status === '2';
     
@@ -292,11 +290,12 @@ export default function UserDashboard() {
     };
   };
 
-  const now = new Date();
   const matchesList = [
     ...safeBetfair.map(normalizeMatch),
     ...safeAtdMatches.map(normalizeMatch).filter((atd: any) => {
+      if (!atd) return false;
       return !safeBetfair.some((bf: any) => {
+        if (!bf) return false;
         const t1 = atd.team1?.toLowerCase() || '';
         const t2 = atd.team2?.toLowerCase() || '';
         if (!t1 || !t2) return false;
@@ -304,6 +303,7 @@ export default function UserDashboard() {
       });
     }),
     ...safeMatches.map(normalizeMatch).filter((m: any) => {
+      if (!m) return false;
       const isExternal = String(m.id).startsWith('bf-') || String(m.id).startsWith('atd-') || String(m.id).startsWith('cb-') || String(m.id).startsWith('sportapi-');
       if (isExternal) return false;
 
@@ -311,13 +311,14 @@ export default function UserDashboard() {
       if (m.status === 'completed' || m.status === 'finished') return false;
 
       const isDuplicate = safeBetfair.some((bf: any) => 
-        bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id
+        bf && (bf.betfair_event_id === m.betfair_event_id || bf.id === m.betfair_event_id)
       );
       if (isDuplicate) return false;
 
       return true;
     })
   ].filter((m: any) => {
+    if (!m) return false;
     const sport = m.sport?.toLowerCase();
     return sport === 'cricket' || sport === 'soccer' || sport === 'tennis';
   }).sort((a: any, b: any) => {
@@ -368,29 +369,19 @@ export default function UserDashboard() {
     return sport === filter;
   });
 
-  const displayMatches = filteredMatches;
-
-  const groupedMatches = displayMatches.reduce((acc: any, match: any) => {
-    const sport = match.sport || 'Others';
-    if (!acc[sport]) acc[sport] = [];
-    acc[sport].push(match);
-    return acc;
-  }, {});
-
   const handleSelectBet = (match: any, selection: string, betType: 'back' | 'lay', odds: number) => {
     setActiveBet({ match, selection, betType, odds });
   };
 
-  // Determine active API status notification based on current active tab
   const getActiveTabApiStatusNotice = () => {
     if (activeFilter === "Cricket" && (healthStatus.cricket?.statusType === "quota_exceeded" || healthStatus.cricket?.statusCode === 429)) {
       return "Cricket feed unavailable - API quota exceeded";
     }
     if (activeFilter === "Soccer" && (healthStatus.football?.statusType === "subscription_required" || healthStatus.football?.statusCode === 403)) {
-      return "Football/Tennis feed unavailable - API subscription required";
+      return "Football feed unavailable - API subscription required";
     }
     if (activeFilter === "Tennis" && (healthStatus.tennis?.statusType === "subscription_required" || healthStatus.tennis?.statusCode === 403)) {
-      return "Football/Tennis feed unavailable - API subscription required";
+      return "Tennis feed unavailable - API subscription required";
     }
     if (activeFilter === "Inplay") {
       const issues = [];
@@ -458,17 +449,14 @@ export default function UserDashboard() {
       />
 
       <main className="max-w-4xl mx-auto pb-20">
-        {/* Game Banners Slider */}
         <GameBanners />
 
-        {/* Racing Quick Access Section */}
         <RaceSection 
           onSelectRace={(race) => {
             console.log("Selected race:", race);
           }}
         />
 
-        {/* API Status Notice Strip when APIs hit quota or subscription limits */}
         {currentApiNotice && (
           <div 
             style={{ 
@@ -541,122 +529,47 @@ export default function UserDashboard() {
                   color: "white",
                   fontSize: 11,
                   fontWeight: 800,
-                  letterSpacing: 0.3,
-                  opacity: isActive ? 1 : 0.9,
-                  textTransform: 'capitalize'
-                }}>{cat.label}</span>
+                  textTransform: "uppercase"
+                }}>
+                  {cat.label}
+                </span>
               </button>
             );
           })}
         </div>
 
-        {/* Content Area */}
-        {activeFilter === "Casino" || activeFilter === "Horse Race" || activeFilter === "Greyhound" ? (
-          <CasinoSection title={activeFilter === "Casino" ? "Premium Casino" : `${activeFilter} Feed`} />
+        {/* Matches / Casino Section Content */}
+        {activeFilter === "Casino" ? (
+          <CasinoSection />
         ) : (
-          <div className="flex flex-col">
-            {Object.entries(groupedMatches).map(([sport, sportMatches]: [string, any]) => {
-              const matchesArray = Array.isArray(sportMatches) ? sportMatches : [];
-              const liveMatches = matchesArray.filter((m: any) => m.status === 'live');
-              const upcomingMatches = matchesArray.filter((m: any) => m.status !== 'live');
-
-              return (
-                <div key={sport} className="flex flex-col">
-                  {/* Sport section header */}
-                  <div
-                    style={{
-                      backgroundColor: "#e2e8f0",
-                      borderBottom: "1px solid #cbd5e1",
-                      padding: "6px 12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ display:'inline-block', verticalAlign:'middle' }}>
-                        <SportIcon sport={sport} color="#1e3a5f" size={16} />
-                      </div>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: "#1e3a5f" }}>
-                        {sport === 'Soccer' ? 'Football' : sport}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#334155" }}>
-                      Matched
-                    </span>
-                  </div>
-
-                  {/* Live matches */}
-                  {liveMatches.map((m: any) => (
-                    <BettingMatchCard 
-                      key={m.id} 
-                      match={m} 
-                      onSelectBet={handleSelectBet}
-                      onSelectOdds={handleSelectBet}
-                      setActiveBet={setActiveBet}
-                    />
-                  ))}
-
-                  {/* Upcoming matches */}
-                  {upcomingMatches.map((m: any) => (
-                    <BettingMatchCard 
-                      key={m.id} 
-                      match={m} 
-                      onSelectBet={handleSelectBet}
-                      onSelectOdds={handleSelectBet}
-                      setActiveBet={setActiveBet}
-                    />
-                  ))}
-                </div>
-              );
-            })}
-
-            {displayMatches.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center px-4 bg-white m-3 rounded border border-gray-200">
-                <Trophy className="w-12 h-12 text-[#254465]/30 mb-3" />
-                <p className="text-sm font-bold text-[#254465] uppercase tracking-wide">
-                  {activeFilter} Matches
-                </p>
-                <p className="text-xs text-gray-600 mt-1 font-semibold">
-                  {currentApiNotice ? currentApiNotice : `No ${activeFilter} matches scheduled right now.`}
-                </p>
+          <div className="space-y-2 p-2">
+            {filteredMatches.length > 0 ? (
+              filteredMatches.map((match: any, idx: number) => (
+                <BettingMatchCard 
+                  key={match.id || idx} 
+                  match={match} 
+                  onSelectBet={handleSelectBet} 
+                />
+              ))
+            ) : (
+              <div className="bg-white p-8 text-center text-gray-500 rounded border border-gray-200 mt-2">
+                No active matches available for {activeFilter}.
               </div>
             )}
           </div>
         )}
 
-        {/* BPEXCH Platform Footer */}
-        <footer className="mt-8 bg-[#1e3a5f] text-white/80 py-6 px-4 border-t border-white/10 text-center">
-          <div className="max-w-md mx-auto flex flex-col items-center gap-3">
-            <div className="flex items-center gap-2">
-              <BLogoIcon className="w-6 h-6 text-[#00e676]" color="#00e676" />
-              <span className="font-extrabold text-base tracking-wider text-white">BPEXCH</span>
-            </div>
-            <div className="flex items-center justify-center gap-4 text-xs font-semibold text-white/70">
-              <span>Terms & Conditions</span>
-              <span>•</span>
-              <span>Privacy Policy</span>
-              <span>•</span>
-              <span>Rules & Regulations</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <Plus18Badge className="w-7 h-7" />
-              <span className="text-[11px] text-white/60">
-                18+ Only. Please trade and gamble responsibly.
-              </span>
-            </div>
-          </div>
-        </footer>
+        {/* Active Bet Slip */}
+        {activeBet && (
+          <BetSlip 
+            activeBet={activeBet}
+            onClose={() => setActiveBet(null)}
+            onSubmit={(stake) => placeBet(stake)}
+            isSubmitting={isSubmitting}
+            userBalance={clientBalance}
+          />
+        )}
       </main>
-
-      {activeBet && (
-        <BetSlip 
-          bet={activeBet} 
-          onClose={() => setActiveBet(null)}
-          onSubmit={(stake: number) => placeBet(stake)}
-          isSubmitting={isSubmitting}
-        />
-      )}
     </div>
   );
 }
