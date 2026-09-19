@@ -615,3 +615,5 @@ export const supabase: any = new Proxy(
     },
   }
 );
+
+export default supabase;
