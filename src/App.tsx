@@ -34,6 +34,7 @@ import ApiSettings from "@/pages/ApiSettings";
 import NotFound from "@/pages/NotFound";
 import { BrandingBadge } from "@/components/BrandingBadge";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { GlobalRouteLoader } from "@/components/ui/GlobalRouteLoader";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <GlobalRouteLoader />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -66,6 +68,9 @@ const App = () => (
             <Route path="/reports/commission" element={<AppLayout><Accounts /></AppLayout>} />
             <Route path="/current-position" element={<AppLayout><CurrentPosition /></AppLayout>} />
             <Route path="/play/current-position" element={<CurrentPosition />} />
+            <Route path="/Customer/LiveMatch" element={<CurrentPosition />} />
+            <Route path="/customer/livematch" element={<CurrentPosition />} />
+            <Route path="/Customer/CurrentPosition" element={<CurrentPosition />} />
             <Route path="/accounts/view/:username" element={<AppLayout><AccountView /></AppLayout>} />
             <Route path="/accounts/edit/:username" element={<AppLayout><EditClientPage /></AppLayout>} />
             <Route path="/accounts/cash-credit/:username" element={<AppLayout><CashCreditPage /></AppLayout>} />
@@ -80,11 +85,29 @@ const App = () => (
             <Route path="/play" element={<UserDashboard />} />
             <Route path="/casino" element={<UserDashboard />} />
             <Route path="/play/profile" element={<UserProfile />} />
+            <Route path="/Customer/Profile" element={<UserProfile />} />
+            <Route path="/customer/profile" element={<UserProfile />} />
             <Route path="/play/statement" element={<UserStatement />} />
+            <Route path="/play/ledger" element={<UserStatement />} />
+            <Route path="/Customer/Statement" element={<UserStatement />} />
+            <Route path="/Customer/Ledger" element={<UserStatement />} />
+            <Route path="/customer/ledger" element={<UserStatement />} />
+            <Route path="/Customer/LiveMarket" element={<UserDashboard />} />
+            <Route path="/customer/livemarket" element={<UserDashboard />} />
+            <Route path="/Common/Dashboard" element={<UserDashboard />} />
+            <Route path="/common/dashboard" element={<UserDashboard />} />
             <Route path="/play/result" element={<UserResult />} />
+            <Route path="/Customer/Result" element={<UserResult />} />
+            <Route path="/customer/result" element={<UserResult />} />
             <Route path="/play/profit-loss" element={<UserProfitLoss />} />
+            <Route path="/Customer/ProfitLoss" element={<UserProfitLoss />} />
+            <Route path="/customer/profitloss" element={<UserProfitLoss />} />
             <Route path="/play/bets" element={<UserBetHistory />} />
+            <Route path="/Customer/BetHistory" element={<UserBetHistory />} />
+            <Route path="/customer/bethistory" element={<UserBetHistory />} />
             <Route path="/play/match/:matchId" element={<MatchDetail />} />
+            <Route path="/Customer/EventDetail" element={<MatchDetail />} />
+            <Route path="/Common/EventDetail" element={<MatchDetail />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

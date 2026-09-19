@@ -9,9 +9,49 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+      @keyframes initialSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .preloader-bg {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        inset: 0;
+        background-color: #f8fafc;
+        z-index: 99999;
+      }
+      .pre-arc-outer {
+        transform-origin: 50px 50px;
+        animation: initialSpin 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      .pre-arc-mid-outer {
+        transform-origin: 50px 50px;
+        animation: initialSpin 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      .pre-arc-mid-inner {
+        transform-origin: 50px 50px;
+        animation: initialSpin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      .pre-arc-innermost {
+        transform-origin: 50px 50px;
+        animation: initialSpin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="preloader-bg">
+        <svg viewBox="0 0 100 100" width="100" height="100" style="overflow: visible;">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#b23bc7" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="180 264" class="pre-arc-outer" />
+          <circle cx="50" cy="50" r="32" fill="none" stroke="#b84366" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="130 201" class="pre-arc-mid-outer" />
+          <circle cx="50" cy="50" r="22" fill="none" stroke="#38b29d" stroke-width="4" stroke-linecap="round" stroke-dasharray="80 138" class="pre-arc-mid-inner" />
+          <circle cx="50" cy="50" r="13" fill="none" stroke="#5c6bc0" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="45 82" class="pre-arc-innermost" />
+        </svg>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

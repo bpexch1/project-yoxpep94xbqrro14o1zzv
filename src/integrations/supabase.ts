@@ -99,7 +99,159 @@ const SEED_CLIENTS = [
   },
 ];
 
-const SEED_MATCHES: any[] = [];
+const nowMs = Date.now();
+
+const SEED_MATCHES = [
+  // Cricket Matches
+  {
+    id: "match-ck-01",
+    sport: "Cricket",
+    team1: "India",
+    team2: "Australia",
+    title: "India v Australia",
+    status: "live",
+    match_time: new Date(nowMs - 3600000).toISOString(),
+    odds: 1.85,
+    back_odds: 1.85,
+    lay_odds: 1.88,
+    back_odds2: 2.14,
+    lay_odds2: 2.18,
+    category: "ICC Champions Trophy",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+  {
+    id: "match-ck-02",
+    sport: "Cricket",
+    team1: "Chennai Super Kings",
+    team2: "Mumbai Indians",
+    title: "Chennai Super Kings v Mumbai Indians",
+    status: "live",
+    match_time: new Date(nowMs - 1800000).toISOString(),
+    odds: 1.92,
+    back_odds: 1.92,
+    lay_odds: 1.96,
+    back_odds2: 2.05,
+    lay_odds2: 2.09,
+    category: "Indian Premier League",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+  {
+    id: "match-ck-03",
+    sport: "Cricket",
+    team1: "England",
+    team2: "South Africa",
+    title: "England v South Africa",
+    status: "upcoming",
+    match_time: new Date(nowMs + 7200000).toISOString(),
+    odds: 1.90,
+    back_odds: 1.90,
+    lay_odds: 1.94,
+    back_odds2: 2.08,
+    lay_odds2: 2.12,
+    category: "T20 International Series",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+  {
+    id: "match-ck-04",
+    sport: "Cricket",
+    team1: "Pakistan",
+    team2: "New Zealand",
+    title: "Pakistan v New Zealand",
+    status: "upcoming",
+    match_time: new Date(nowMs + 18000000).toISOString(),
+    odds: 1.95,
+    back_odds: 1.95,
+    lay_odds: 1.99,
+    back_odds2: 2.02,
+    lay_odds2: 2.06,
+    category: "ODI Tri-Series",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+
+  // Soccer Matches
+  {
+    id: "match-sc-01",
+    sport: "Soccer",
+    team1: "Arsenal",
+    team2: "Chelsea",
+    title: "Arsenal v Chelsea",
+    status: "live",
+    match_time: new Date(nowMs - 2700000).toISOString(),
+    odds: 1.78,
+    back_odds: 1.78,
+    lay_odds: 1.82,
+    back_odds2: 4.80,
+    lay_odds2: 4.90,
+    category: "Premier League",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+  {
+    id: "match-sc-02",
+    sport: "Soccer",
+    team1: "Real Madrid",
+    team2: "Barcelona",
+    title: "Real Madrid v Barcelona",
+    status: "live",
+    match_time: new Date(nowMs - 1200000).toISOString(),
+    odds: 2.10,
+    back_odds: 2.10,
+    lay_odds: 2.16,
+    back_odds2: 3.40,
+    lay_odds2: 3.50,
+    category: "La Liga",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+  {
+    id: "match-sc-03",
+    sport: "Soccer",
+    team1: "Liverpool",
+    team2: "Manchester City",
+    title: "Liverpool v Manchester City",
+    status: "upcoming",
+    match_time: new Date(nowMs + 14400000).toISOString(),
+    odds: 2.30,
+    back_odds: 2.30,
+    lay_odds: 2.36,
+    back_odds2: 3.10,
+    lay_odds2: 3.18,
+    category: "Premier League",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+
+  // Tennis Matches
+  {
+    id: "match-tn-01",
+    sport: "Tennis",
+    team1: "Carlos Alcaraz",
+    team2: "Novak Djokovic",
+    title: "Carlos Alcaraz v Novak Djokovic",
+    status: "live",
+    match_time: new Date(nowMs - 3000000).toISOString(),
+    odds: 1.82,
+    back_odds: 1.82,
+    lay_odds: 1.86,
+    back_odds2: 2.18,
+    lay_odds2: 2.24,
+    category: "ATP Masters 1000",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+  {
+    id: "match-tn-02",
+    sport: "Tennis",
+    team1: "Jannik Sinner",
+    team2: "Daniil Medvedev",
+    title: "Jannik Sinner v Daniil Medvedev",
+    status: "upcoming",
+    match_time: new Date(nowMs + 10800000).toISOString(),
+    odds: 1.65,
+    back_odds: 1.65,
+    lay_odds: 1.69,
+    back_odds2: 2.45,
+    lay_odds2: 2.52,
+    category: "ATP Grand Slam",
+    created_at: new Date(nowMs - 86400000).toISOString(),
+  },
+];
 
 const SEED_BETS: any[] = [];
 
@@ -176,19 +328,11 @@ function getLocalTable(table: string): any[] {
     const raw = localStorage.getItem(key);
     if (raw) {
       let items = JSON.parse(raw);
-      if (table === "matches" && Array.isArray(items)) {
-        // Filter out any legacy dummy seed matches
-        items = items.filter(
-          (m: any) =>
-            m &&
-            !["match-01", "match-02", "match-03", "match-04", "match-05"].includes(m.id) &&
-            m.title !== "India vs Australia" &&
-            m.title !== "Chennai Super Kings vs Mumbai Indians" &&
-            m.title !== "Real Madrid vs Barcelona" &&
-            m.title !== "England vs South Africa" &&
-            m.title !== "Novak Djokovic vs Carlos Alcaraz"
-        );
-        localStorage.setItem(key, JSON.stringify(items));
+      if ((table === "matches" || table === "sports_matches") && Array.isArray(items)) {
+        if (items.length === 0) {
+          items = [...SEED_MATCHES];
+          localStorage.setItem(key, JSON.stringify(items));
+        }
       }
 
       if (table === "clients" && Array.isArray(items)) {
@@ -232,7 +376,7 @@ function getLocalTable(table: string): any[] {
 
     let seed: any[] = [];
     if (table === "clients") seed = SEED_CLIENTS;
-    else if (table === "matches") seed = SEED_MATCHES;
+    else if (table === "matches" || table === "sports_matches") seed = SEED_MATCHES;
     else if (table === "bets") seed = SEED_BETS;
     else if (table === "transactions") seed = SEED_TRANSACTIONS;
 

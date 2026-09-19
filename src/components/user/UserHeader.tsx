@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession } from "@/hooks/useClientAuth";
 import { Client } from "@/entities";
-import { useQuery } from "@tanstack/react-query";
-import { BLogoIcon } from "@/components/icons/CustomIcons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface UserHeaderProps {
   sidebarOpen?: boolean;
@@ -22,8 +21,16 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
 
   useEffect(() => {
     const s = getClientSession();
-    if (!s) navigate("/login");
-    else setSession(s);
+    if (!s) {
+      navigate("/login");
+      return;
+    }
+    const r = s.role?.toLowerCase()?.trim();
+    if (r && r !== "client" && r !== "user" && r !== "bettor") {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+    setSession(s);
   }, [navigate]);
 
   useEffect(() => {
@@ -36,11 +43,14 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const queryClient = useQueryClient();
+
   const handleDashboardClick = () => {
-    if (location.pathname === "/play") {
-      navigate(0);
+    if (location.pathname === "/play" || location.pathname === "/play/") {
+      window.dispatchEvent(new CustomEvent("refresh-dashboard"));
+      queryClient.invalidateQueries();
     } else {
-      navigate("/play");
+      navigate("/play", { state: { refresh: true } });
     }
   };
 
@@ -81,77 +91,110 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
   return (
     <header
       style={{
-        backgroundColor: "#254465",
+        backgroundColor: "#173456",
         position: "sticky",
         top: 0,
         zIndex: 50,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.25)",
       }}
     >
+      {/* Top Header Row */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          padding: "8px 12px",
-          minHeight: 56,
+          justifyContent: "space-between",
+          padding: "6px 10px",
+          minHeight: 46,
         }}
       >
-        {/* Left: hamburger + BLogo + Dashboard label */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        {/* Left: Hamburger button in square box + Dashboard */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <button
             onClick={onMenuToggle}
             style={{
-              background: "none",
-              border: "none",
+              width: 34,
+              height: 30,
+              backgroundColor: "transparent",
+              border: "1px solid rgba(255,255,255,0.4)",
+              borderRadius: 3,
               cursor: "pointer",
-              padding: 4,
+              padding: "2px 4px",
               display: "flex",
               flexDirection: "column",
-              gap: 4,
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 3,
             }}
           >
-            <span style={{ display: "block", width: 20, height: 2, backgroundColor: "white" }} />
-            <span style={{ display: "block", width: 20, height: 2, backgroundColor: "white" }} />
-            <span style={{ display: "block", width: 20, height: 2, backgroundColor: "white" }} />
+            <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
+            <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
+            <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
           </button>
-          <div
+          <button
             onClick={handleDashboardClick}
-            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}
+            type="button"
+            className="hover:opacity-85 active:scale-95 transition-all text-left"
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              background: "transparent",
+              border: "none",
+              padding: "4px 2px",
+              outline: "none",
+            }}
+            title={location.pathname === "/play" || location.pathname === "/play/" ? "Refresh Dashboard" : "Go to Dashboard"}
           >
-            <BLogoIcon className="w-4 h-4 text-[#00e676]" color="#00e676" />
             <span
-              style={{ color: "white", fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.5px' }}
+              style={{
+                color: "white",
+                fontWeight: 700,
+                fontSize: 13,
+                letterSpacing: "0.2px",
+              }}
             >
               Dashboard
             </span>
-          </div>
+          </button>
         </div>
 
         {/* Center: Marquee Ticker */}
-        <div style={{ flex: 1, overflow: "hidden", margin: "0 10px", display: "flex", alignItems: "center" }}>
-          <div style={{
-            whiteSpace: "nowrap",
-            animation: "marquee 15s linear infinite",
-            color: "rgba(255,255,255,0.85)",
-            fontSize: 12,
-            fontWeight: 600,
-          }}>
-            Welcome to BPEXCH Sports Trading Platform.
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            margin: "0 8px",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              animation: "marquee 14s linear infinite",
+              color: "#ffffff",
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+          >
+            Welcome to Exchange. - null
           </div>
         </div>
 
-        {/* Right: Dropdown with Balance and User */}
-        <div 
+        {/* Right: Balance & Username with dropdown */}
+        <div
           ref={dropdownRef}
-          style={{ 
-            marginLeft: "auto", 
+          style={{
+            marginLeft: "auto",
             textAlign: "right",
-            position: "relative"
+            position: "relative",
+            flexShrink: 0,
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-            <div style={{ color: "white", fontSize: 13 }}>
-              <span style={{ fontWeight: 700 }}>B: Rs. {balance.toLocaleString('en-IN')}</span>
+            <div style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
+              <span>B: {balance.toLocaleString("en-IN")}</span>
               <span style={{ opacity: 0.9 }}> | L: 0</span>
             </div>
             <button
@@ -164,10 +207,10 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                 fontWeight: 700,
                 display: "flex",
                 alignItems: "center",
-                gap: 4,
-                marginTop: 2,
+                gap: 2,
                 cursor: "pointer",
-                padding: 0
+                padding: 0,
+                marginTop: 1,
               }}
             >
               {session.username}
@@ -181,14 +224,14 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                 position: "absolute",
                 top: "100%",
                 right: 0,
-                marginTop: 8,
+                marginTop: 6,
                 backgroundColor: "white",
                 minWidth: 130,
                 borderRadius: 4,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
                 border: "1px solid rgba(0,0,0,0.1)",
                 zIndex: 100,
-                overflow: "hidden"
+                overflow: "hidden",
               }}
             >
               {menuItems.map((item) => (
@@ -203,7 +246,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                     textAlign: "left",
                     cursor: "pointer",
                     borderBottom: "1px solid #f1f1f1",
-                    transition: "background-color 0.2s"
+                    transition: "background-color 0.2s",
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f8f9fa")}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -217,11 +260,11 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
                   display: "block",
                   padding: "7px 12px",
                   fontSize: 12,
-                  color: "#212529",
+                  color: "#dc3545",
                   textAlign: "left",
                   cursor: "pointer",
-                  fontWeight: 600,
-                  transition: "background-color 0.2s"
+                  fontWeight: 700,
+                  transition: "background-color 0.2s",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f8f9fa")}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -231,6 +274,26 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
             </div>
           )}
         </div>
+      </div>
+
+      {/* Sub-bar: Credit, Balance, Liable, Active Bets */}
+      <div
+        style={{
+          backgroundColor: "#1a395e",
+          padding: "5px 12px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          fontSize: 13,
+          fontWeight: 700,
+          color: "white",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <div>Credit: 0</div>
+        <div>Balance: {balance.toLocaleString("en-IN")}</div>
+        <div>Liable: 0</div>
+        <div>Active Bets: *</div>
       </div>
     </header>
   );

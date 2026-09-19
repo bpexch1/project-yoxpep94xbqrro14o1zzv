@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase";
 const TABLE_MAP: Record<string, string> = {
   Client: "clients",
   Match: "matches",
+  SportsMatch: "matches",
   Bet: "bets",
   Transaction: "transactions",
 };
@@ -256,5 +257,6 @@ export const User = {
 
 export const Client = createEntity("Client");
 export const Match = createEntity("Match");
+export const SportsMatch = createEntity("SportsMatch");
 export const Bet = createEntity("Bet");
 export const Transaction = createEntity("Transaction");

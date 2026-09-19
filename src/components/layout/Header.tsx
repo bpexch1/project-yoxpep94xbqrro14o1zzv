@@ -6,6 +6,7 @@ import { Bet, Client } from "@/entities";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
+import { AdminProfileModal } from "./AdminProfileModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,16 +24,23 @@ function formatRole(role: string): string {
   const roleMap: Record<string, string> = {
     superadmin: "SuperAdmin",
     admin: "Admin",
+    dealer: "Dealer",
     agent: "Agent",
+    superagent: "SuperAgent",
+    subdealer: "SubDealer",
+    subagent: "SubAgent",
     client: "Client",
     company: "Company",
     supermaster: "SuperMaster",
+    master: "Master",
+    distributor: "Distributor",
   };
-  return roleMap[role?.toLowerCase()] ?? role;
+  return roleMap[role?.toLowerCase()] ?? (role ? role.charAt(0).toUpperCase() + role.slice(1) : "");
 }
 
 export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const location = useLocation();
@@ -155,7 +163,7 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
                   Logged in as <span className="font-semibold text-[#333]">{session.username}</span>
                 </div>
                 <DropdownMenuItem
-                  onClick={() => navigate("/play/profile")}
+                  onClick={() => setIsProfileModalOpen(true)}
                   className="text-[#333] hover:bg-gray-50 hover:text-[#00b181] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00b181]"
                 >
                   <User className="w-3.5 h-3.5 mr-2 opacity-70" />
@@ -190,6 +198,14 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
           </button>
         )}
       </div>
+
+      {/* Admin Profile Modal */}
+      <AdminProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        session={session}
+        roleLabel={session?.role ? formatRole(session.role) : "Admin"}
+      />
     </header>
   );
 }

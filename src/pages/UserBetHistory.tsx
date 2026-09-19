@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
@@ -14,6 +14,18 @@ export default function UserBetHistory() {
   const session = getClientSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  useEffect(() => {
+    if (!session) {
+      navigate("/login", { replace: true });
+      return;
+    }
+    const r = session.role?.toLowerCase()?.trim();
+    if (r && r !== "client" && r !== "user" && r !== "bettor") {
+      navigate("/current-position", { replace: true });
+      return;
+    }
+  }, [session, navigate]);
 
   const { data: bets, isLoading: betsLoading } = useQuery({
     queryKey: ["user-bets", session?.username],

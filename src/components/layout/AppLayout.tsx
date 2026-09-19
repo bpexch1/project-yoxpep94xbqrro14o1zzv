@@ -5,7 +5,26 @@ import { Header } from "./Header";
 import { cn } from "@/lib/utils";
 import { getClientSession } from "@/hooks/useClientAuth";
 
-const ADMIN_ROLES = ["company", "superadmin", "admin", "supermaster", "master"];
+export const ADMIN_ROLES = [
+  "company",
+  "superadmin",
+  "admin",
+  "supermaster",
+  "master",
+  "dealer",
+  "agent",
+  "superagent",
+  "subdealer",
+  "subagent",
+  "distributor",
+  "minidistributor",
+];
+
+export const isStaffOrAdmin = (role?: string) => {
+  if (!role) return false;
+  const r = role.toLowerCase().trim();
+  return ADMIN_ROLES.includes(r) || (r !== "client" && r !== "user" && r !== "bettor");
+};
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -19,16 +38,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const userRole = session.role?.toLowerCase();
-    if (!ADMIN_ROLES.includes(userRole)) {
+    if (!isStaffOrAdmin(session.role)) {
       navigate("/play", { replace: true });
     }
   }, [session, navigate]);
 
-  // If session is missing or role is not admin, don't render anything while redirecting
-  if (!session || !ADMIN_ROLES.includes(session.role?.toLowerCase())) {
+  // If session is missing or role is client, don't render admin panel while redirecting
+  if (!session || !isStaffOrAdmin(session.role)) {
     return (
-      <div className="min-h-screen bg-[#0F1419] flex items-center justify-center">
+      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
       </div>
     );

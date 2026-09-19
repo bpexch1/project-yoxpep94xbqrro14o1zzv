@@ -289,3 +289,78 @@ table.dataTable tbody td {
 table.dataTable tbody tr:hover {
   background-color: #eaf3fa;
 }
+
+/* ===== ANIMATED SIDEBAR CASINO BUTTONS (TeenPatti & Galaxy) ===== */
+@keyframes teenPattiRedSlowBreathing {
+  0% {
+    background-color: #bd141b; /* Dark deep red */
+  }
+  50% {
+    background-color: #ff3b30; /* Light vibrant red */
+  }
+  100% {
+    background-color: #bd141b; /* Dark deep red */
+  }
+}
+
+@keyframes galaxyPurpleSlowBreathing {
+  0% {
+    background-color: #6317b3; /* Dark deep purple */
+  }
+  50% {
+    background-color: #9f4bf6; /* Light vibrant violet */
+  }
+  100% {
+    background-color: #6317b3; /* Dark deep purple */
+  }
+}
+
+.animate-teen-patti {
+  animation: teenPattiRedSlowBreathing 3.5s ease-in-out infinite;
+  position: relative;
+  transition: background-color 0.5s ease;
+}
+
+.animate-galaxy-casino {
+  animation: galaxyPurpleSlowBreathing 3.5s ease-in-out infinite;
+  position: relative;
+  transition: background-color 0.5s ease;
+}
+
+/* ===== CIRCULAR ARCS LOADER (BPEXCH / MULTI-RING SPINNER) ===== */
+@keyframes arcRotateClockwise {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.circular-arcs-spinner {
+  transform-origin: center center;
+}
+
+.arc-outer {
+  transform-origin: 50px 50px;
+  animation: arcRotateClockwise 2.2s linear infinite;
+}
+
+.arc-mid-outer {
+  transform-origin: 50px 50px;
+  animation: arcRotateClockwise 1.7s linear infinite;
+}
+
+.arc-mid-inner {
+  transform-origin: 50px 50px;
+  animation: arcRotateClockwise 1.3s linear infinite;
+}
+
+.arc-innermost {
+  transform-origin: 50px 50px;
+  animation: arcRotateClockwise 0.95s linear infinite;
+}
+
+
+
+

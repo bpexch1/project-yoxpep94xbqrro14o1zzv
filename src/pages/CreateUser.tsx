@@ -11,8 +11,10 @@ function getCreatableRole(sessionRole: string): { label: string; role: string } 
   if (r === 'company') return { label: 'SuperAdmin', role: 'superadmin' };
   if (r === 'superadmin') return { label: 'Admin', role: 'admin' };
   if (r === 'admin') return { label: 'SuperMaster', role: 'supermaster' };
-  if (r === 'supermaster') return { label: 'Agent', role: 'agent' };
-  return { label: 'SuperAdmin', role: 'superadmin' }; 
+  if (r === 'supermaster') return { label: 'Master', role: 'master' };
+  if (r === 'master') return { label: 'Dealer', role: 'dealer' };
+  if (r === 'dealer' || r === 'agent') return { label: 'Client', role: 'client' };
+  return { label: 'Client', role: 'client' }; 
 }
 
 export default function CreateUser() {

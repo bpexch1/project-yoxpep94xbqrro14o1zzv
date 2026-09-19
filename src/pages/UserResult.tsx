@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
@@ -13,6 +13,18 @@ export default function UserResult() {
   const navigate = useNavigate();
   const session = getClientSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (!session) {
+      navigate("/login", { replace: true });
+      return;
+    }
+    const r = session.role?.toLowerCase()?.trim();
+    if (r && r !== "client" && r !== "user" && r !== "bettor") {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+  }, [session, navigate]);
 
   const { data: bets, isLoading: betsLoading } = useQuery({
     queryKey: ["user-results", session?.username],

@@ -89,7 +89,7 @@ export default function CurrentPosition() {
   const totalPotentialWin = filteredBets?.reduce((acc, b) => acc + (b.potential_win || 0), 0) || 0;
 
   return (
-    <div className={cn("min-h-screen pb-16", isClient ? "bg-[#d6e4f0] text-[#1e3a5c]" : "bg-[#e8e8e8]")}>
+    <div className={cn("min-h-screen pb-16", isClient ? "bg-[#e8eff5] text-[#212529]" : "bg-[#e8e8e8]")} style={{ fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif' }}>
       {isClient && (
         <>
           <UserHeader 
@@ -100,83 +100,78 @@ export default function CurrentPosition() {
         </>
       )}
 
-      <main className={cn("px-0 pt-0 pb-8 mx-auto font-sans", isClient ? "max-w-4xl px-3 py-4" : "max-w-6xl")}>
-        {isClient && (
+      <main className={cn("px-0 pt-0 pb-8 mx-auto", isClient ? "max-w-4xl p-2 sm:p-4" : "max-w-6xl")}>
+        {/* Top Header Bar */}
+        <div className="flex items-center gap-3 mb-3 bg-white p-3 border border-[#c8d4e2]">
+          <h1 className="text-base font-bold text-[#142a45]">
+            Market Position
+          </h1>
           <button
-            onClick={() => navigate("/play")}
-            className="flex items-center gap-1 text-[#1e3a5c] mb-4 hover:opacity-70 transition-opacity"
+            onClick={handleRefresh}
+            className="bg-[#00a676] hover:bg-[#008f64] text-white text-xs font-bold px-3 py-1.5 flex items-center gap-1.5 transition-colors rounded-none"
           >
-            <ChevronLeft className="w-5 h-5" />
-            <span className="text-sm font-semibold">Back to Dashboard</span>
+            <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
+            Refresh
           </button>
-        )}
-
-        <div className={cn("mb-4 flex items-end justify-between", !isClient && "mx-[5px]")}>
-          <div>
-            <h1 className={cn("text-2xl font-bold", isClient ? "text-[#1e3a5c]" : "text-[#254465]")}>Current Position</h1>
-            <p className="text-sm text-gray-500">View all active exposures and pending bets</p>
-          </div>
-          <div className="text-right">
-            <div className="text-[10px] text-gray-500 uppercase font-bold">Total Exposure</div>
-            <div className="text-xl font-bold text-[#e74c3c]">Rs. {totalStake.toLocaleString()}</div>
-          </div>
         </div>
 
-        {/* Filters Card */}
-        <div className={cn("mb-4", !isClient && "mx-[5px]")}>
-          <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#dee2e6] bg-[#f8f9fa]">
-              <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
-              <span className="font-bold text-[#212529] text-sm">Filter Pending Bets</span>
-            </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-              <div>
-                <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Match Name</label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search match..."
-                    value={matchFilter}
-                    onChange={(e) => setMatchFilter(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
-                  />
-                </div>
+        {!isClient && (
+          /* Filters Card */
+          <div className="mb-4 mx-[5px]">
+            <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-[#dee2e6] bg-[#f8f9fa]">
+                <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
+                <span className="font-bold text-[#212529] text-sm">Filter Pending Bets</span>
               </div>
-              <div>
-                <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Username</label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search user..."
-                    value={usernameFilter}
-                    onChange={(e) => setUsernameFilter(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
-                  />
+              <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Match Name</label>
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search match..."
+                      value={matchFilter}
+                      onChange={(e) => setMatchFilter(e.target.value)}
+                      className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                    />
+                  </div>
                 </div>
-              </div>
-              <button 
-                onClick={handleRefresh}
-                className="bg-[#00b181] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4dbd74] transition-colors"
-              >
-                <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
-                Refresh Data
-              </button>
-
-              {(session?.role === 'company' || session?.role === 'superadmin') && (
-                <button
-                  onClick={handleClearAllBets}
-                  disabled={isClearingAll}
-                  className="bg-[#e74c3c] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-red-700 transition-colors disabled:opacity-60"
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Username</label>
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search user..."
+                      value={usernameFilter}
+                      onChange={(e) => setUsernameFilter(e.target.value)}
+                      className="w-full border border-[#d5d8dc] rounded pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                    />
+                  </div>
+                </div>
+                <button 
+                  onClick={handleRefresh}
+                  className="bg-[#00b181] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4dbd74] transition-colors"
                 >
-                  {isClearingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  Clear All Bets
+                  <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+                  Refresh Data
                 </button>
-              )}
-            </div>
-          </section>
-        </div>
+
+                {(session?.role === 'company' || session?.role === 'superadmin') && (
+                  <button
+                    onClick={handleClearAllBets}
+                    disabled={isClearingAll}
+                    className="bg-[#e74c3c] text-white py-2 px-4 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-red-700 transition-colors disabled:opacity-60"
+                  >
+                    {isClearingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    Clear All Bets
+                  </button>
+                )}
+              </div>
+            </section>
+          </div>
+        )}
 
         {/* Summary Stats */}
         <div className={cn("mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2", !isClient && "mx-[5px]")}>

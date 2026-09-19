@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Volume2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { getLiveOdds, getCricketScore, oddsEngine, fetchBetfairEvents } from "@/functions";
+import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -24,14 +25,28 @@ export default function MatchDetail() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [keepDisplayOn, setKeepDisplayOn] = useState(true);
   const [activeMediaTab, setActiveMediaTab] = useState<'tv'|'scorecard'>('tv');
+  const [isEntering, setIsEntering] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsEntering(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [matchId]);
 
   const session = getClientSession();
   const location = useLocation();
   const stateMatch = location.state?.match || null;
 
   useEffect(() => {
-    if (!session || session.role !== 'client') {
+    if (!session) {
       navigate("/login", { replace: true });
+      return;
+    }
+    const r = session.role?.toLowerCase()?.trim();
+    if (r && r !== "client" && r !== "user" && r !== "bettor") {
+      navigate("/dashboard", { replace: true });
+      return;
     }
   }, [session, navigate]);
 
@@ -290,8 +305,9 @@ export default function MatchDetail() {
   if (!session) return null;
   if (matchLoading || clientLoading) {
     return (
-      <div className="min-h-screen bg-[#ecf0f1] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#254465] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#e8eff5] relative">
+        <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <CircularArcsLoader fullScreen size={110} />
       </div>
     );
   }
@@ -307,10 +323,20 @@ export default function MatchDetail() {
   // Detect sport and render correct page
   const sport = match?.sport?.toLowerCase() || '';
   if (sport === 'football' || sport === 'soccer') {
-    return <FootballMatchDetail match={match} clientData={clientData} session={session} liveOddsData={liveOddsData} />;
+    return (
+      <>
+        {isEntering && <CircularArcsLoader fullScreen size={110} />}
+        <FootballMatchDetail match={match} clientData={clientData} session={session} liveOddsData={liveOddsData} />
+      </>
+    );
   }
   if (sport === 'tennis') {
-    return <TennisMatchDetail match={match} clientData={clientData} session={session} liveOddsData={liveOddsData} />;
+    return (
+      <>
+        {isEntering && <CircularArcsLoader fullScreen size={110} />}
+        <TennisMatchDetail match={match} clientData={clientData} session={session} liveOddsData={liveOddsData} />
+      </>
+    );
   }
 
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
@@ -335,7 +361,8 @@ export default function MatchDetail() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column", position: "relative" }}>
+      {isEntering && <CircularArcsLoader fullScreen size={110} />}
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
