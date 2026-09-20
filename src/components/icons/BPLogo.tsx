@@ -14,13 +14,14 @@ export function BPLogo({ className = "", size = 120, style = {} }: BPLogoProps) 
         width: size,
         height: size,
         borderRadius: "50%",
-        backgroundColor: "#63e6d6",
+        backgroundColor: "#61e0d8",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
         position: "relative",
         userSelect: "none",
+        flexShrink: 0,
         ...style,
       }}
     >
@@ -32,20 +33,20 @@ export function BPLogo({ className = "", size = 120, style = {} }: BPLogoProps) 
         xmlns="http://www.w3.org/2000/svg"
         style={{ width: "100%", height: "100%", display: "block" }}
       >
-        <circle cx="100" cy="100" r="100" fill="#63e6d6" />
+        <circle cx="100" cy="100" r="100" fill="#61e0d8" />
         
-        {/* Italic stylized 'BP' matching the screenshot */}
-        <g transform="translate(100, 100) scale(1.05) translate(-100, -100)">
+        {/* Stylized Italic Calligraphic BP matching the reference video */}
+        <g fill="#141a29">
           <text
-            x="100"
-            y="134"
+            x="96"
+            y="138"
             textAnchor="middle"
-            fill="#151922"
-            fontSize="108"
+            fill="#141a29"
+            fontSize="116"
             fontWeight="900"
             fontStyle="italic"
-            fontFamily="'Playfair Display', 'Baskerville', 'Georgia', 'Bodoni MT', 'Times New Roman', serif"
-            letterSpacing="-3px"
+            fontFamily="'Playfair Display', 'Bodoni MT', 'Didot', 'Baskerville', 'Georgia', serif"
+            letterSpacing="-5px"
           >
             BP
           </text>
@@ -56,4 +57,3 @@ export function BPLogo({ className = "", size = 120, style = {} }: BPLogoProps) 
 }
 
 export default BPLogo;
-

@@ -9,6 +9,7 @@ import { BPLogo } from "@/components/icons/BPLogo";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
   const [loading, setLoading] = useState(false);
   const [forcedModal, setForcedModal] = useState(false);
   const [pendingClient, setPendingClient] = useState<any>(null);
@@ -21,15 +22,12 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError("");
+
     const cleanUser = username.trim();
     const cleanPw = password;
 
     if (!cleanUser || !cleanPw) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter username and password.",
-      });
       return;
     }
     setLoading(true);
@@ -56,21 +54,13 @@ export default function Login() {
 
       // 3. User & Password Validation
       if (!client || client.password !== cleanPw) {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid username or password.",
-        });
+        setLoginError("Username/Password Incorrect.");
         return;
       }
 
       // 4. Account Status Validation
       if (["inactive", "locked", "suspended"].includes(client.status)) {
-        toast({
-          variant: "destructive",
-          title: "Account Disabled",
-          description: "Your account is currently inactive. Please contact your upline.",
-        });
+        setLoginError("Account Inactive or Suspended. Contact Upline.");
         return;
       }
 
@@ -102,11 +92,7 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      toast({
-        variant: "destructive",
-        title: "Login Error",
-        description: err?.message || "Failed to process login. Please try again.",
-      });
+      setLoginError("Username/Password Incorrect.");
     } finally {
       setLoading(false);
     }
@@ -162,41 +148,52 @@ export default function Login() {
       }}
     >
       <style>{`
-        .login-input::placeholder { color: #ffffff; opacity: 0.9; font-weight: 400; font-size: 16px; }
+        .login-input::placeholder { color: #ffffff; opacity: 0.9; font-weight: 400; font-size: 15.5px; }
         .login-input:focus { outline: none; }
+        .login-btn:active { transform: scale(0.97); }
+        @keyframes errorFadeIn {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .error-msg {
+          animation: errorFadeIn 0.25s ease-out forwards;
+        }
       `}</style>
 
       <div
         style={{
           width: "100%",
-          maxWidth: 440,
-          margin: "16px auto 0",
-          padding: "0 12px",
+          maxWidth: 390,
+          margin: "18px auto 0",
+          padding: "0 16px",
         }}
       >
         <div
           style={{
-            borderRadius: 14,
-            background: "linear-gradient(180deg, #2e567a 0%, #204261 48%, #132b40 100%)",
-            boxShadow: "0 14px 36px rgba(0,0,0,0.55)",
-            padding: "36px 24px 36px",
+            borderRadius: 16,
+            background: "linear-gradient(180deg, #3f6d94 0%, #21476a 45%, #0a2346 100%)",
+            boxShadow: "0 18px 45px rgba(0, 0, 0, 0.75)",
+            padding: "44px 26px 36px",
             overflow: "hidden",
             position: "relative",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 38, marginTop: 4 }}>
-            <BPLogo size={132} />
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 38 }}>
+            <BPLogo size={120} />
           </div>
 
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: 30 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
+            <div style={{ marginBottom: 32 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
                 <User size={18} color="#ffffff" fill="#ffffff" strokeWidth={1} />
                 <input
                   type="text"
                   placeholder="Username"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    if (loginError) setLoginError("");
+                  }}
                   required
                   className="login-input"
                   style={{
@@ -205,22 +202,25 @@ export default function Login() {
                     border: "none",
                     outline: "none",
                     color: "#ffffff",
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: 400,
                   }}
                 />
               </div>
-              <div style={{ height: 1, background: "rgba(255,255,255,0.45)", width: "100%" }} />
+              <div style={{ height: 1, background: "rgba(255,255,255,0.4)", width: "100%" }} />
             </div>
 
-            <div style={{ marginBottom: 38 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 8 }}>
+            <div style={{ marginBottom: 40 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 10 }}>
                 <Lock size={18} color="#ffffff" fill="#ffffff" strokeWidth={1} />
                 <input
                   type="password"
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (loginError) setLoginError("");
+                  }}
                   required
                   className="login-input"
                   style={{
@@ -229,31 +229,32 @@ export default function Login() {
                     border: "none",
                     outline: "none",
                     color: "#ffffff",
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: 400,
                   }}
                 />
               </div>
-              <div style={{ height: 1, background: "rgba(255,255,255,0.45)", width: "100%" }} />
+              <div style={{ height: 1, background: "rgba(255,255,255,0.4)", width: "100%" }} />
             </div>
 
             <div style={{ display: "flex", justifyContent: "center" }}>
               <button
                 type="submit"
                 disabled={loading}
+                className="login-btn"
                 style={{
-                  minWidth: 146,
+                  minWidth: 140,
                   height: 44,
                   borderRadius: 9999,
-                  background: "linear-gradient(180deg, #4f82ac 0%, #35628b 50%, #224b70 100%)",
-                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: "linear-gradient(180deg, #5380a2 0%, #3a6589 45%, #234a6c 55%, #153651 100%)",
+                  border: "1px solid rgba(255,255,255,0.25)",
                   color: "#ffffff",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  padding: "0 38px",
+                  fontSize: 15.5,
+                  fontWeight: 700,
+                  padding: "0 36px",
                   cursor: loading ? "not-allowed" : "pointer",
                   opacity: loading ? 0.75 : 1,
-                  boxShadow: "0 10px 22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.45)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -264,6 +265,22 @@ export default function Login() {
                 {loading ? <Loader2 size={18} className="animate-spin" /> : "Login"}
               </button>
             </div>
+
+            {loginError && (
+              <div
+                className="error-msg"
+                style={{
+                  color: "#e53935",
+                  textAlign: "center",
+                  marginTop: "16px",
+                  fontSize: "14.5px",
+                  fontWeight: 400,
+                  letterSpacing: "0.2px",
+                }}
+              >
+                {loginError}
+              </div>
+            )}
           </form>
         </div>
       </div>
