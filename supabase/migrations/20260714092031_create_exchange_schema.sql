@@ -1,86 +1,3 @@
-
-/*
-# Exchange Admin Panel - Full Database Schema
-
-## Overview
-Creates all four core tables for a sports betting exchange admin panel.
-This is a single-tenant app (no per-user auth required for the frontend),
-so RLS policies allow anon + authenticated access.
-
-## New Tables
-
-### 1. clients
-Stores all users in the exchange hierarchy (company, superadmin, admin, agent, client roles).
-- id (uuid, PK)
-- username (text, unique) — login identifier
-- full_name (text)
-- password (text) — plaintext as used by existing login logic
-- role (text) — company | superadmin | admin | supermaster | agent | client
-- credit_received (numeric) — total credit assigned
-- credit_remaining (numeric) — current credit balance
-- cash (numeric) — cash balance
-- pl_downline (numeric) — profit/loss from downline
-- balance_upline (numeric) — balance owed to upline
-- status (text) — active | inactive
-- parent_username (text) — references the parent in hierarchy
-- phone (text)
-- downline_share (numeric) — downline share percentage 0-100
-- reference (text)
-- betting_allowed (boolean)
-- can_settle_pl (boolean)
-- commission (numeric) — commission percentage
-- notes (text)
-- created_at, updated_at timestamps
-
-### 2. matches
-Sports matches available for betting.
-- id (uuid, PK)
-- title (text) — e.g. "India vs Pakistan"
-- sport (text) — cricket | football | tennis
-- team1, team2 (text)
-- match_time (timestamptz)
-- status (text) — live | upcoming | completed
-- back_odds, lay_odds (numeric) — odds for team1
-- back_odds2, lay_odds2 (numeric) — odds for team2
-- category (text) — IPL, World Cup, etc.
-- betfair_event_id (text) — for live odds sync
-- cricbuzz_match_id (text) — for live scores
-- created_at, updated_at timestamps
-
-### 3. bets
-Bets placed by clients on matches.
-- id (uuid, PK)
-- user_email (text) — client's username
-- match_id (text) — references match
-- match_title (text) — denormalized for display
-- selection (text) — which team/outcome was bet on
-- bet_type (text) — back | lay
-- stake (numeric)
-- odds (numeric)
-- potential_win (numeric)
-- status (text) — pending | won | lost | cancelled
-- created_at, updated_at timestamps
-
-### 4. transactions
-Cash and credit transaction records for the ledger.
-- id (uuid, PK)
-- client_username (text)
-- type (text) — cash | credit
-- amount (numeric) — positive = deposit, negative = withdrawal
-- description (text)
-- before_balance (numeric)
-- after_balance (numeric)
-- created_at timestamps
-
-## Security
-- RLS enabled on all 4 tables.
-- All policies use `TO anon, authenticated` — this is a single-tenant app with
-  its own username/password auth (not Supabase Auth), so the anon key is used
-  for all frontend operations.
-- USING (true) / WITH CHECK (true) is intentional here because access control
-  is handled by the app's own session logic, not row-level ownership.
-*/
-
 -- ============================================================
 -- 1. CLIENTS TABLE
 -- ============================================================
@@ -88,7 +5,7 @@ CREATE TABLE IF NOT EXISTS clients (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   username text UNIQUE NOT NULL,
   full_name text,
-  password text,
+  password text NOT NULL, -- BCrypt hashed password store karne ke liye
   role text NOT NULL DEFAULT 'client',
   credit_received numeric NOT NULL DEFAULT 0,
   credit_remaining numeric NOT NULL DEFAULT 0,
@@ -115,21 +32,24 @@ CREATE INDEX IF NOT EXISTS clients_status_idx ON clients (status);
 
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 
+-- OLD DANGEROUS POLICIES DROP KAREIN
 DROP POLICY IF EXISTS "anon_select_clients" ON clients;
-CREATE POLICY "anon_select_clients" ON clients FOR SELECT
-  TO anon, authenticated USING (true);
-
 DROP POLICY IF EXISTS "anon_insert_clients" ON clients;
-CREATE POLICY "anon_insert_clients" ON clients FOR INSERT
-  TO anon, authenticated WITH CHECK (true);
-
 DROP POLICY IF EXISTS "anon_update_clients" ON clients;
-CREATE POLICY "anon_update_clients" ON clients FOR UPDATE
-  TO anon, authenticated USING (true) WITH CHECK (true);
-
 DROP POLICY IF EXISTS "anon_delete_clients" ON clients;
-CREATE POLICY "anon_delete_clients" ON clients FOR DELETE
-  TO anon, authenticated USING (true);
+
+-- SECURE VIEW: Public API se password hide karne ke liye Secure View
+CREATE OR REPLACE VIEW public_clients AS
+SELECT 
+  id, username, full_name, role, credit_received, credit_remaining, 
+  cash, pl_downline, balance_upline, status, parent_username, phone, 
+  downline_share, reference, betting_allowed, can_settle_pl, commission, 
+  notes, created_at, updated_at
+FROM clients;
+
+-- Service Role Policy (Only Edge Functions & Backend can bypass RLS)
+CREATE POLICY "service_role_all_clients" ON clients 
+  TO service_role USING (true) WITH CHECK (true);
 
 -- ============================================================
 -- 2. MATCHES TABLE
@@ -164,18 +84,6 @@ DROP POLICY IF EXISTS "anon_select_matches" ON matches;
 CREATE POLICY "anon_select_matches" ON matches FOR SELECT
   TO anon, authenticated USING (true);
 
-DROP POLICY IF EXISTS "anon_insert_matches" ON matches;
-CREATE POLICY "anon_insert_matches" ON matches FOR INSERT
-  TO anon, authenticated WITH CHECK (true);
-
-DROP POLICY IF EXISTS "anon_update_matches" ON matches;
-CREATE POLICY "anon_update_matches" ON matches FOR UPDATE
-  TO anon, authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "anon_delete_matches" ON matches;
-CREATE POLICY "anon_delete_matches" ON matches FOR DELETE
-  TO anon, authenticated USING (true);
-
 -- ============================================================
 -- 3. BETS TABLE
 -- ============================================================
@@ -205,18 +113,6 @@ DROP POLICY IF EXISTS "anon_select_bets" ON bets;
 CREATE POLICY "anon_select_bets" ON bets FOR SELECT
   TO anon, authenticated USING (true);
 
-DROP POLICY IF EXISTS "anon_insert_bets" ON bets;
-CREATE POLICY "anon_insert_bets" ON bets FOR INSERT
-  TO anon, authenticated WITH CHECK (true);
-
-DROP POLICY IF EXISTS "anon_update_bets" ON bets;
-CREATE POLICY "anon_update_bets" ON bets FOR UPDATE
-  TO anon, authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "anon_delete_bets" ON bets;
-CREATE POLICY "anon_delete_bets" ON bets FOR DELETE
-  TO anon, authenticated USING (true);
-
 -- ============================================================
 -- 4. TRANSACTIONS TABLE
 -- ============================================================
@@ -241,20 +137,8 @@ DROP POLICY IF EXISTS "anon_select_transactions" ON transactions;
 CREATE POLICY "anon_select_transactions" ON transactions FOR SELECT
   TO anon, authenticated USING (true);
 
-DROP POLICY IF EXISTS "anon_insert_transactions" ON transactions;
-CREATE POLICY "anon_insert_transactions" ON transactions FOR INSERT
-  TO anon, authenticated WITH CHECK (true);
-
-DROP POLICY IF EXISTS "anon_update_transactions" ON transactions;
-CREATE POLICY "anon_update_transactions" ON transactions FOR UPDATE
-  TO anon, authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "anon_delete_transactions" ON transactions;
-CREATE POLICY "anon_delete_transactions" ON transactions FOR DELETE
-  TO anon, authenticated USING (true);
-
 -- ============================================================
--- 5. AUTO-UPDATE updated_at TRIGGER
+-- 5. AUTO-UPDATE TRIGGER
 -- ============================================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -267,14 +151,4 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS set_clients_updated_at ON clients;
 CREATE TRIGGER set_clients_updated_at
   BEFORE UPDATE ON clients
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-DROP TRIGGER IF EXISTS set_matches_updated_at ON matches;
-CREATE TRIGGER set_matches_updated_at
-  BEFORE UPDATE ON matches
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-DROP TRIGGER IF EXISTS set_bets_updated_at ON bets;
-CREATE TRIGGER set_bets_updated_at
-  BEFORE UPDATE ON bets
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
