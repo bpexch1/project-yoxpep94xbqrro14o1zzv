@@ -16,68 +16,137 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const {
-      clientId,
-      clientUsername,
-      tabType,
-      transactionType,
-      amount,
+      clientId,                // Downline User ID
+      clientUsername,          // Downline Username
+      tabType,                 // 'cash' | 'credit'
+      transactionType,         // 'deposit' | 'withdraw'
+      amount,                  // Amount
       description,
-      beforeCash,
-      beforeCreditReceived,
-      beforeCreditRemaining,
-      beforeBalanceUpline,
+      beforeCash = 0,
+      beforeCreditRemaining = 0,
+      beforeBalanceUpline = 0,
+      dealerId,                // Upline/Admin ID
+      dealerCash = 0,          // Upline ka current Cash balance
+      dealerCreditRemaining = 0, // Upline ka current Credit Remaining balance
     } = body;
 
     if (!clientId || !clientUsername || !tabType || !transactionType || !amount || amount <= 0) {
-      return new Response(JSON.stringify({ error: 'Invalid input' }), {
+      return new Response(JSON.stringify({ error: 'Invalid input parameters' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     const txAmount = transactionType === 'deposit' ? amount : -amount;
-    let beforeBalance: number;
-    let afterBalance: number;
-    let clientUpdateData: Record<string, number> = {};
+    let beforeBalance: number = 0;
+    let afterBalance: number = 0;
+    
+    let clientUpdateData: Record<string, any> = {};
+    let dealerUpdateData: Record<string, any> = {};
 
-    // Balance check
-    if (transactionType === 'withdraw') {
-      if (tabType === 'cash' && amount > (beforeCash ?? 0)) {
-        return new Response(JSON.stringify({ error: 'Insufficient Balance', available: beforeCash ?? 0 }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (tabType === 'credit' && amount > (beforeCreditRemaining ?? 0)) {
-        return new Response(JSON.stringify({ error: 'Insufficient Balance', available: beforeCreditRemaining ?? 0 }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-    }
-
-    if (tabType === 'cash') {
-      beforeBalance = beforeCash ?? 0;
-      afterBalance = transactionType === 'deposit' ? beforeBalance + amount : beforeBalance - amount;
-      afterBalance = Math.max(0, afterBalance);
-      const newBalanceUpline = transactionType === 'deposit'
-        ? (beforeBalanceUpline ?? 0) + amount
-        : Math.max(0, (beforeBalanceUpline ?? 0) - amount);
-      clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline };
-    } else {
+    // =============================================================
+    // 1. CREDIT TRANSACTIONS LOGIC (BPEXCH Rules)
+    // =============================================================
+    if (tabType === 'credit') {
       if (transactionType === 'deposit') {
-        beforeBalance = beforeCreditRemaining ?? 0;
+        // Validation: Upline ke pass kafi Credit Remaining hona chahiye
+        if (amount > dealerCreditRemaining) {
+          return new Response(
+            JSON.stringify({
+              error: `Max available credit is ${dealerCreditRemaining}`,
+              available: dealerCreditRemaining,
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        beforeBalance = beforeCreditRemaining;
         afterBalance = beforeBalance + amount;
+
+        // NOTE: credit_received box NOT updated (fixed rehta hai)
         clientUpdateData = {
-          credit_received: (beforeCreditReceived ?? 0) + amount,
           credit_remaining: afterBalance,
         };
+
+        // Upline ka credit deduct hoga
+        dealerUpdateData = {
+          credit_remaining: dealerCreditRemaining - amount,
+        };
       } else {
-        beforeBalance = beforeCreditRemaining ?? 0;
-        afterBalance = beforeBalance - amount;
-        afterBalance = Math.max(0, afterBalance);
-        clientUpdateData = { credit_remaining: afterBalance };
+        // Credit Withdrawal
+        if (amount > beforeCreditRemaining) {
+          return new Response(
+            JSON.stringify({
+              error: 'Insufficient credit balance to withdraw',
+              available: beforeCreditRemaining,
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        beforeBalance = beforeCreditRemaining;
+        afterBalance = Math.max(0, beforeBalance - amount);
+
+        clientUpdateData = {
+          credit_remaining: afterBalance,
+        };
+
+        // Upline ka credit restore hoga
+        dealerUpdateData = {
+          credit_remaining: dealerCreditRemaining + amount,
+        };
       }
     }
 
+    // =============================================================
+    // 2. CASH TRANSACTIONS LOGIC (BPEXCH Rules)
+    // =============================================================
+    if (tabType === 'cash') {
+      if (transactionType === 'deposit') {
+        beforeBalance = beforeCash;
+        afterBalance = beforeBalance + amount;
+        const newBalanceUpline = beforeBalanceUpline + amount;
+
+        clientUpdateData = {
+          cash: afterBalance,
+          balance_upline: newBalanceUpline,
+        };
+
+        // Downline ko Cash deposit karne par Upline ka Cash deduct/minus ho jata hai
+        dealerUpdateData = {
+          cash: dealerCash - amount,
+        };
+      } else {
+        // Cash Withdrawal
+        if (amount > beforeCash) {
+          return new Response(
+            JSON.stringify({
+              error: 'Insufficient cash balance to withdraw',
+              available: beforeCash,
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        beforeBalance = beforeCash;
+        afterBalance = Math.max(0, beforeBalance - amount);
+        const newBalanceUpline = Math.max(0, beforeBalanceUpline - amount);
+
+        clientUpdateData = {
+          cash: afterBalance,
+          balance_upline: newBalanceUpline,
+        };
+
+        // Upline ka Cash balance recover hota hai
+        dealerUpdateData = {
+          cash: dealerCash + amount,
+        };
+      }
+    }
+
+    // =============================================================
+    // 3. EXECUTE DATABASE UPDATES
+    // =============================================================
     const txData = {
       client_username: clientUsername,
       type: tabType,
@@ -87,23 +156,18 @@ Deno.serve(async (req) => {
       after_balance: afterBalance,
     };
 
-    // Collect all possible auth tokens to try in order
     const tokensToTry: string[] = [];
-    
-    // 1. Service keys (auto-injected by Buildy if available)
-    const serviceKey = Deno.env.get('SUPERDEV_SERVICE_KEY') 
-      || Deno.env.get('SUPERDEV_API_KEY')
-      || Deno.env.get('SUPERDEV_SECRET_KEY')
-      || Deno.env.get('SUPERDEV_ADMIN_KEY')
-      || '';
+    const serviceKey =
+      Deno.env.get('SUPERDEV_SERVICE_KEY') ||
+      Deno.env.get('SUPERDEV_API_KEY') ||
+      Deno.env.get('SUPERDEV_SECRET_KEY') ||
+      Deno.env.get('SUPERDEV_ADMIN_KEY') ||
+      '';
     if (serviceKey) tokensToTry.push(serviceKey);
-    
-    // 2. User token from Authorization header (if Buildy user is logged in)
+
     const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
     const userToken = authHeader.replace('Bearer ', '').trim();
     if (userToken) tokensToTry.push(userToken);
-    
-    // 3. Empty string = try without auth (backend functions on Buildy may have implicit permissions)
     tokensToTry.push('');
 
     let lastError: string = '';
@@ -113,17 +177,26 @@ Deno.serve(async (req) => {
       try {
         const superdev = createSuperdevClient({ appId });
         if (token) superdev.auth.setToken(token);
-        
+
         const TxEntity = superdev.entity('Transaction');
         const ClientEntity = superdev.entity('Client');
+
+        // Transaction history record create karna
         await TxEntity.create(txData);
+
+        // Downline Client update karna
         await ClientEntity.update(clientId, clientUpdateData);
+
+        // Upline Dealer update karna (agar dealerId di ho)
+        if (dealerId && Object.keys(dealerUpdateData).length > 0) {
+          await ClientEntity.update(dealerId, dealerUpdateData);
+        }
+
         succeeded = true;
         break;
       } catch (e: any) {
         lastError = e?.message ?? 'Unknown error';
-        console.error(`Token attempt failed (token length: ${token.length}):`, lastError);
-        // Continue to next token strategy
+        console.error(`Token attempt failed:`, lastError);
       }
     }
 
@@ -134,15 +207,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      afterBalance, 
-      balanceUpline: clientUpdateData.balance_upline ?? beforeBalanceUpline ?? 0,
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        afterBalance,
+        balanceUpline: clientUpdateData.balance_upline ?? beforeBalanceUpline,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (err: any) {
     console.error('handle-transaction error:', err?.message);
     return new Response(JSON.stringify({ error: err?.message ?? 'Unknown error' }), {
