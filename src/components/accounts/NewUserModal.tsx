@@ -128,6 +128,7 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     try {
       await Client.create({
         username: formData.username.trim(),
+        password: formData.password.trim(),
         full_name: formData.fullName,
         role: formData.role,
         credit_received: Number(formData.creditLimit),
@@ -143,7 +144,6 @@ export function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
       resetForm();
       onClose();
     } catch (error: any) {
-      console.error("Error creating user:", error);
       const msg = error?.message || "An error occurred while creating the user.";
       if (msg.includes("Username already exists")) {
         setErrors((prev) => ({

@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase";
+import bcrypt from "bcryptjs";
 
 const SESSION_KEY = "clientSession";
 
@@ -42,29 +43,76 @@ export async function loginClient(username: string, password: string): Promise<C
   const cleanPassword = password;
 
   try {
-    const { data, error } = await supabase
-      .from("clients")
-      .select("*")
-      .ilike("username", cleanUsername)
-      .eq("password", cleanPassword)
-      .maybeSingle();
+    let clientData: any = null;
 
-    if (!error && data) {
-      if (data.status === "inactive" || data.status === "locked" || data.status === "suspended") {
+    // 1. Primary ilike query from clients table
+    const res1 = await supabase
+      .from("clients")
+      .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
+      .ilike("username", cleanUsername);
+
+    if (res1.data && Array.isArray(res1.data) && res1.data.length > 0) {
+      clientData = res1.data.find(
+        (c: any) => (c.username || "").trim().toLowerCase() === cleanUsername.toLowerCase()
+      ) || res1.data[0];
+    } else if (res1.data && !Array.isArray(res1.data)) {
+      clientData = res1.data;
+    }
+
+    // 2. Fallback eq query if ilike returned nothing
+    if (!clientData) {
+      const res2 = await supabase
+        .from("clients")
+        .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
+        .eq("username", cleanUsername);
+
+      if (res2.data && Array.isArray(res2.data) && res2.data.length > 0) {
+        clientData = res2.data[0];
+      } else if (res2.data && !Array.isArray(res2.data)) {
+        clientData = res2.data;
+      }
+    }
+
+    if (clientData) {
+      const storedPw = String(clientData.password ?? "");
+      const isBcrypt =
+        storedPw.startsWith("$2a$") ||
+        storedPw.startsWith("$2b$") ||
+        storedPw.startsWith("$2y$");
+
+      let isMatch = false;
+      if (isBcrypt) {
+        try {
+          isMatch = bcrypt.compareSync(cleanPassword, storedPw);
+        } catch {
+          isMatch = false;
+        }
+      }
+
+      // Plain text fallback if not matched or not bcrypt
+      if (!isMatch) {
+        isMatch = storedPw === cleanPassword || storedPw.trim() === cleanPassword.trim();
+      }
+
+      if (!isMatch) {
+        throw new Error("Invalid username or password");
+      }
+
+      if (clientData.status === "inactive" || clientData.status === "locked" || clientData.status === "suspended") {
         throw new Error("Account is inactive or disabled");
       }
 
       const session: ClientSession = {
-        id: data.id,
-        username: data.username,
-        full_name: data.full_name || data.username,
-        role: data.role || "client",
-        credit_received: data.credit_received || 0,
-        credit_remaining: data.credit_remaining || 0,
-        cash: data.cash || 0,
-        pl_downline: data.pl_downline || 0,
-        balance_upline: data.balance_upline || 0,
-        status: data.status || "active",
+        id: clientData.id,
+        username: clientData.username,
+        full_name: clientData.full_name || clientData.username,
+        role: clientData.role || "client",
+        credit_received: clientData.credit_received || 0,
+        credit_remaining: clientData.credit_remaining || 0,
+        cash: clientData.cash || 0,
+        pl_downline: clientData.pl_downline || 0,
+        balance_upline: clientData.balance_upline || 0,
+        status: clientData.status || "active",
       };
       setClientSession(session);
       return session;
@@ -73,7 +121,7 @@ export async function loginClient(username: string, password: string): Promise<C
     if (err?.message === "Account is inactive or disabled") {
       throw err;
     }
-    console.error("Backend auth query error:", err);
+    // Never log raw passwords
   }
 
   throw new Error("Invalid username or password");

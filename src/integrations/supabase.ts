@@ -303,6 +303,15 @@ if (typeof window !== "undefined" && !localStorage.getItem("exchange_db_initiali
 
 function getLocalTable(table: string): any[] {
   try {
+    if (table === "public_clients") {
+      const clients = getLocalTable("clients");
+      return clients.map((c: any) => {
+        const copy = { ...c };
+        delete copy.password;
+        return copy;
+      });
+    }
+
     const key = `exchange_db_${table}`;
     const raw = localStorage.getItem(key);
     if (raw) {

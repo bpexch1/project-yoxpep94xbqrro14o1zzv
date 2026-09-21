@@ -1,7 +1,16 @@
 import { supabase } from "@/integrations/supabase";
+import bcrypt from "bcryptjs";
 
-// Map entity names to Supabase table names
-const TABLE_MAP: Record<string, string> = {
+// Map entity names to Supabase table/view names for reads and writes
+const READ_TABLE_MAP: Record<string, string> = {
+  Client: "public_clients",
+  Match: "matches",
+  SportsMatch: "matches",
+  Bet: "bets",
+  Transaction: "transactions",
+};
+
+const WRITE_TABLE_MAP: Record<string, string> = {
   Client: "clients",
   Match: "matches",
   SportsMatch: "matches",
@@ -9,15 +18,37 @@ const TABLE_MAP: Record<string, string> = {
   Transaction: "transactions",
 };
 
-function getTable(entityName: string): string {
-  const table = TABLE_MAP[entityName];
+function getReadTable(entityName: string): string {
+  const table = READ_TABLE_MAP[entityName];
+  if (!table) throw new Error(`Unknown entity: ${entityName}`);
+  return table;
+}
+
+function getWriteTable(entityName: string): string {
+  const table = WRITE_TABLE_MAP[entityName];
   if (!table) throw new Error(`Unknown entity: ${entityName}`);
   return table;
 }
 
 function transformRow(row: any): any {
   if (!row) return null;
-  return { ...row };
+  const copy = { ...row };
+  // Security guard: never leak password field if somehow present in row
+  if ("password" in copy) {
+    delete copy.password;
+  }
+  return copy;
+}
+
+// Helper to hash password if plain text
+export function hashPasswordIfPlain(password: string): string {
+  if (!password) return "";
+  const isBcrypt =
+    password.startsWith("$2a$") ||
+    password.startsWith("$2b$") ||
+    password.startsWith("$2y$");
+  if (isBcrypt) return password;
+  return bcrypt.hashSync(password, 10);
 }
 
 // Generic query builder that mimics the old SuperdevClient chaining API
@@ -71,7 +102,11 @@ class QueryBuilder {
   }
 
   async exec(): Promise<any[]> {
-    let query = supabase.from(this._table).select("*");
+    const isClientTable = this._table === "clients" || this._table === "public_clients";
+    const targetTable = isClientTable ? "public_clients" : this._table;
+    const selectCols = isClientTable ? CLIENT_SAFE_COLUMNS : "*";
+
+    let query = supabase.from(targetTable).select(selectCols);
 
     for (const f of this._filters) {
       if (f.method === "eq") query = (query as any).eq(f.column, f.value);
@@ -91,7 +126,7 @@ class QueryBuilder {
 
     const { data, error } = await query;
     if (error) {
-      console.error(`[${this._table}] query error:`, error.message);
+      console.error(`[${targetTable}] query error:`, error.message);
       return [];
     }
     return (data || []).map(transformRow);
@@ -114,16 +149,16 @@ class BatchBuilder {
 }
 
 /**
- * Checks if a username already exists in the system (case-insensitive).
+ * Checks if a username already exists in the system (case-insensitive) using public_clients view.
  */
 export async function checkUsernameExists(username: string): Promise<boolean> {
   if (!username || !username.trim()) return false;
   const clean = username.trim().toLowerCase();
 
-  // Check Supabase clients table case-insensitively using ilike
+  // Check Supabase public_clients view case-insensitively using ilike
   try {
     const { data, error } = await supabase
-      .from("clients")
+      .from("public_clients")
       .select("id, username")
       .ilike("username", clean);
 
@@ -136,7 +171,7 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
 
     // Secondary fallback in case ilike is not indexed or exact matching
     const { data: allData, error: allErr } = await supabase
-      .from("clients")
+      .from("public_clients")
       .select("username")
       .limit(1000);
 
@@ -147,19 +182,24 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
       if (exists) return true;
     }
   } catch (err) {
-    console.debug("checkUsernameExists check error:", err);
+    // Silent check
   }
 
   return false;
 }
 
+const CLIENT_SAFE_COLUMNS =
+  "id, username, full_name, role, credit_received, credit_remaining, cash, pl_downline, balance_upline, status, parent_username, phone, downline_share, reference, betting_allowed, can_settle_pl, commission, notes, created_at, updated_at";
+
 // Core entity factory
 function createEntity(entityName: string) {
-  const table = getTable(entityName);
+  const readTable = getReadTable(entityName);
+  const writeTable = getWriteTable(entityName);
 
   return {
     list: async (sort?: string, limitN?: number): Promise<any[]> => {
-      let q = supabase.from(table).select("*");
+      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
+      let q = supabase.from(readTable).select(selectCols);
       if (sort) {
         const asc = !sort.startsWith("-");
         const col = sort.startsWith("-") ? sort.slice(1) : sort;
@@ -172,14 +212,15 @@ function createEntity(entityName: string) {
 
       const { data, error } = await q;
       if (error) {
-        console.error(`[${table}] list error:`, error.message);
+        console.error(`[${readTable}] list error:`, error.message);
         return [];
       }
       return (data || []).map(transformRow);
     },
 
     filter: async (filters: Record<string, any>, sort?: string, limitN?: number): Promise<any[]> => {
-      let q = supabase.from(table).select("*");
+      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
+      let q = supabase.from(readTable).select(selectCols);
 
       for (const [key, val] of Object.entries(filters)) {
         if (val !== undefined && val !== null) {
@@ -199,48 +240,63 @@ function createEntity(entityName: string) {
 
       const { data, error } = await q;
       if (error) {
-        console.error(`[${table}] filter error:`, error.message);
+        console.error(`[${readTable}] filter error:`, error.message);
         return [];
       }
       return (data || []).map(transformRow);
     },
 
     create: async (payload: Record<string, any>): Promise<any> => {
-      if (entityName === "Client" && payload.username) {
-        const isDuplicate = await checkUsernameExists(payload.username);
-        if (isDuplicate) {
-          throw new Error("Username already exists. Please choose a different username");
+      const dataToInsert = { ...payload };
+
+      if (entityName === "Client") {
+        if (dataToInsert.username) {
+          const isDuplicate = await checkUsernameExists(dataToInsert.username);
+          if (isDuplicate) {
+            throw new Error("Username already exists. Please choose a different username");
+          }
+        }
+        if (dataToInsert.password) {
+          dataToInsert.password = hashPasswordIfPlain(dataToInsert.password);
         }
       }
 
+      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
       const { data, error } = await supabase
-        .from(table)
-        .insert(payload)
-        .select()
+        .from(writeTable)
+        .insert(dataToInsert)
+        .select(selectCols)
         .maybeSingle();
       if (error) throw new Error(error.message);
       return transformRow(data);
     },
 
     update: async (id: string, payload: Record<string, any>): Promise<any> => {
+      const dataToUpdate = { ...payload };
+
+      if (entityName === "Client" && dataToUpdate.password) {
+        dataToUpdate.password = hashPasswordIfPlain(dataToUpdate.password);
+      }
+
+      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
       const { data, error } = await supabase
-        .from(table)
-        .update(payload)
+        .from(writeTable)
+        .update(dataToUpdate)
         .eq("id", id)
-        .select()
+        .select(selectCols)
         .maybeSingle();
       if (error) throw new Error(error.message);
       return transformRow(data);
     },
 
     delete: async (id: string): Promise<void> => {
-      const { error } = await supabase.from(table).delete().eq("id", id);
+      const { error } = await supabase.from(writeTable).delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
 
-    query: (): QueryBuilder => new QueryBuilder(table),
+    query: (): QueryBuilder => new QueryBuilder(readTable),
 
-    batch: (): BatchBuilder => new BatchBuilder(table),
+    batch: (): BatchBuilder => new BatchBuilder(writeTable),
   };
 }
 

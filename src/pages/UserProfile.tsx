@@ -4,6 +4,7 @@ import { getClientSession } from "@/hooks/useClientAuth";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
+import { Client } from "@/entities";
 
 export default function UserProfile() {
   const navigate = useNavigate();
@@ -52,19 +53,26 @@ export default function UserProfile() {
     });
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPassword) {
-      toast({ variant: "destructive", title: "Error", description: "Please enter new password." });
+    if (!newPassword || newPassword.length < 4) {
+      toast({ variant: "destructive", title: "Error", description: "Password must be at least 4 characters." });
       return;
     }
     if (newPassword !== confirmPassword) {
       toast({ variant: "destructive", title: "Error", description: "Passwords do not match." });
       return;
     }
-    toast({ title: "Success", description: "Password changed successfully." });
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      if (session?.id) {
+        await Client.update(session.id, { password: newPassword });
+      }
+      toast({ title: "Success", description: "Password changed successfully." });
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error", description: err?.message || "Failed to change password." });
+    }
   };
 
   return (
