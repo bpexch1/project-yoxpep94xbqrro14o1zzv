@@ -3,6 +3,7 @@ import { Pencil, User, Book, Loader2, ChevronDown, ChevronUp } from "lucide-reac
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { Client } from "@/entities";
 import { DataTablePagination } from "./DataTablePagination";
 
@@ -114,12 +115,34 @@ export function ClientSummaryCard({
     [filteredClients]
   );
 
-  const summaryData = adminRecord ? {
-    credit_received: adminRecord.credit_received || 0,
-    credit_remaining: adminRecord.credit_remaining || 0,
-    cash: adminRecord.cash || 0,
-    pl_downline: adminRecord.pl_downline || 0,
-    balance_upline: adminRecord.balance_upline || 0,
+  // If adminRecord is not passed as prop, automatically query it for `username`
+  const { data: autoUserData } = useQuery({
+    queryKey: ["summary-card-user-record", username],
+    queryFn: () => {
+      if (!username || username === "Admin" || username === "User" || username === "Book") return [];
+      return Client.filter({ username });
+    },
+    enabled: !adminRecord && !!username && username !== "Admin" && username !== "User",
+    staleTime: 0,
+    refetchInterval: 5000,
+  });
+
+  const effectiveAdminRecord = adminRecord || autoUserData?.[0];
+
+  const creditReceivedVal = effectiveAdminRecord 
+    ? (Number(effectiveAdminRecord.credit_received || 0) || Number(effectiveAdminRecord.credit_remaining || 0) || 0)
+    : totals.credit_received;
+
+  const creditRemainingVal = effectiveAdminRecord 
+    ? Number(effectiveAdminRecord.credit_remaining || 0)
+    : totals.credit_remaining;
+
+  const summaryData = effectiveAdminRecord ? {
+    credit_received: creditReceivedVal,
+    credit_remaining: creditRemainingVal,
+    cash: Number(effectiveAdminRecord.cash || 0),
+    pl_downline: Number(effectiveAdminRecord.pl_downline || 0),
+    balance_upline: Number(effectiveAdminRecord.balance_upline || 0),
   } : totals;
 
   // DataTable Logic
@@ -222,12 +245,20 @@ export function ClientSummaryCard({
     const fresh = refreshedData[client.id] || client;
     const isLoaded = balancesLoaded || rowLoadedMap[client.id];
     
+    const credit = Number(fresh.credit_remaining ?? 0);
+    const cash = Number(fresh.cash ?? 0);
+    const pl = Number(fresh.pl_downline ?? 0);
+    const totalBalance = credit + cash + pl;
+    const clientPL = cash + pl;
+    const exposure = 0;
+    const available = totalBalance - exposure;
+
     return {
-      credit: isLoaded ? (fresh.credit_received || 0) : null,
-      balance: isLoaded ? (fresh.cash || 0) : null,
-      plDownline: isLoaded ? (fresh.pl_downline || 0) : null,
-      share: isLoaded ? (fresh.downline_share || 0) : null,
-      available: isLoaded ? (fresh.credit_remaining || 0) : null,
+      credit: isLoaded ? credit : null,
+      balance: isLoaded ? totalBalance : null,
+      plDownline: isLoaded ? clientPL : null,
+      share: isLoaded ? (fresh.downline_share ?? 0) : null,
+      available: isLoaded ? available : null,
       isLoaded
     };
   };
@@ -470,15 +501,15 @@ export function ClientSummaryCard({
                         <tr className="bg-white">
                           <td colSpan={3} className="px-4 py-3 border-b border-[#d5d8dc]">
                             <ul className="text-[15px] text-[#212529] space-y-2 mb-2">
-                              <li>• Balance <span className="font-bold" style={{ color: display.isLoaded ? "#212529" : "#212529" }}>
+                              <li>• Balance <span className="font-bold" style={{ color: "#212529" }}>
                                 {display.isLoaded ? display.balance?.toLocaleString() : '-'}
                               </span></li>
-                              <li>• Client (P/L) <span className="font-bold" style={{ color: display.isLoaded ? getAmountColor(display.plDownline ?? 0) : "#212529" }}>
+                              <li>• Client (P/L) <span className="font-bold" style={{ color: "#212529" }}>
                                 {display.isLoaded ? display.plDownline?.toLocaleString() : '-'}
                               </span></li>
                               <li>• Share <span className="font-bold" style={{ color: "#212529" }}>{display.isLoaded ? display.share : '-'}</span></li>
                               <li>• Exposure <span className="font-bold" style={{ color: "#212529" }}>0</span></li>
-                              <li>• Available Balance <span className="font-bold" style={{ color: display.isLoaded ? "#212529" : "#212529" }}>
+                              <li>• Available Balance <span className="font-bold" style={{ color: "#212529" }}>
                                 {display.isLoaded ? display.available?.toLocaleString() : '-'}
                               </span></li>
                             </ul>

@@ -53,7 +53,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   return (
-    <div className="min-h-screen bg-[#ecf0f1]">
+    <div className="min-h-screen bg-[#ececed]">
       {/* Sidebar handles both desktop and mobile modes */}
       <Sidebar 
         isMobileOpen={isMobileSidebarOpen} 

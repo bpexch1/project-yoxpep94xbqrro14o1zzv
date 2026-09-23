@@ -139,7 +139,7 @@ export default function Accounts() {
   const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
 
   return (
-    <div style={{ minHeight: "100vh", background: "#e8e8e8", fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529" }}>
       <main style={{ width: "100%", padding: "8px 5px 12px" }}>
 
         {/* 1. Report Type Card */}
@@ -148,8 +148,8 @@ export default function Accounts() {
         {/* 2. Search-Users Card */}
         <div style={{
           background: "#fff",
-          borderRadius: 10,
-          border: "1px solid #d0d0d0",
+          borderRadius: 4,
+          border: "1px solid #dee2e6",
           boxShadow: "0 1px 3px rgba(0,0,0,.08)",
           marginBottom: 16,
           overflow: "visible", // Changed to visible for dropdown
@@ -159,11 +159,11 @@ export default function Accounts() {
             alignItems: "center",
             gap: 8,
             padding: "6px 12px",
-            backgroundColor: "#f8f9fa",
-            borderBottom: "1px solid #dee2e6",
+            backgroundColor: "#254465",
+            borderBottom: "1px solid #1e3650",
           }}>
-            <Filter style={{ width: "16px", height: "16px", color: "#212529", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529", fontFamily: "Roboto, system-ui, sans-serif" }}>Search-Users</span>
+            <Filter style={{ width: "16px", height: "16px", color: "#fff", flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: "13px", color: "#fff", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif' }}>Search-Users</span>
           </div>
           <div style={{ padding: "20px 16px 40px 16px" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -194,7 +194,7 @@ export default function Accounts() {
                         padding: "0 28px 0 8px",
                         fontSize: "12px",
                         color: "#374151",
-                        fontFamily: "Roboto, system-ui, sans-serif",
+                        fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif',
                         outline: "none",
                         boxSizing: "border-box",
                         background: "#fff",

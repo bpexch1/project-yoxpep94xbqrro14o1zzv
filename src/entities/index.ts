@@ -102,34 +102,41 @@ class QueryBuilder {
   }
 
   async exec(): Promise<any[]> {
-    const isClientTable = this._table === "clients" || this._table === "public_clients";
-    const targetTable = isClientTable ? "public_clients" : this._table;
-    const selectCols = isClientTable ? CLIENT_SAFE_COLUMNS : "*";
+    try {
+      const isClientTable = this._table === "clients" || this._table === "public_clients";
+      const targetTable = isClientTable ? "public_clients" : this._table;
+      const selectCols = isClientTable ? CLIENT_SAFE_COLUMNS : "*";
 
-    let query = supabase.from(targetTable).select(selectCols);
+      let query = supabase.from(targetTable).select(selectCols);
 
-    for (const f of this._filters) {
-      if (f.method === "eq") query = (query as any).eq(f.column, f.value);
-      else if (f.method === "neq") query = (query as any).neq(f.column, f.value);
-      else if (f.method === "gt") query = (query as any).gt(f.column, f.value);
-      else if (f.method === "gte") query = (query as any).gte(f.column, f.value);
-      else if (f.method === "lt") query = (query as any).lt(f.column, f.value);
-      else if (f.method === "lte") query = (query as any).lte(f.column, f.value);
-    }
+      for (const f of this._filters) {
+        if (f.method === "eq") query = (query as any).eq(f.column, f.value);
+        else if (f.method === "neq") query = (query as any).neq(f.column, f.value);
+        else if (f.method === "gt") query = (query as any).gt(f.column, f.value);
+        else if (f.method === "gte") query = (query as any).gte(f.column, f.value);
+        else if (f.method === "lt") query = (query as any).lt(f.column, f.value);
+        else if (f.method === "lte") query = (query as any).lte(f.column, f.value);
+      }
 
-    for (const f of this._inFilters) {
-      query = (query as any).in(f.column, f.values);
-    }
+      for (const f of this._inFilters) {
+        query = (query as any).in(f.column, f.values);
+      }
 
-    query = (query as any).order(this._sortColumn, { ascending: this._sortAsc });
-    query = (query as any).limit(this._limitVal);
+      query = (query as any).order(this._sortColumn, { ascending: this._sortAsc });
+      query = (query as any).limit(this._limitVal);
 
-    const { data, error } = await query;
-    if (error) {
-      console.error(`[${targetTable}] query error:`, error.message);
+      const { data, error } = await query;
+      if (error) {
+        const msg = String(error?.message || "");
+        if (!msg.includes("fetch")) {
+          console.warn(`[${targetTable}] query notice:`, msg);
+        }
+        return [];
+      }
+      return (data || []).map(transformRow);
+    } catch (err: any) {
       return [];
     }
-    return (data || []).map(transformRow);
   }
 }
 
@@ -198,77 +205,98 @@ function createEntity(entityName: string) {
 
   return {
     list: async (sort?: string, limitN?: number): Promise<any[]> => {
-      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-      let q = supabase.from(readTable).select(selectCols);
-      if (sort) {
-        const asc = !sort.startsWith("-");
-        const col = sort.startsWith("-") ? sort.slice(1) : sort;
-        q = (q as any).order(col, { ascending: asc });
-      } else {
-        q = (q as any).order("created_at", { ascending: false });
-      }
-      if (limitN) q = (q as any).limit(limitN);
-      else q = (q as any).limit(500);
+      try {
+        const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
+        let q = supabase.from(readTable).select(selectCols);
+        if (sort) {
+          const asc = !sort.startsWith("-");
+          const col = sort.startsWith("-") ? sort.slice(1) : sort;
+          q = (q as any).order(col, { ascending: asc });
+        } else {
+          q = (q as any).order("created_at", { ascending: false });
+        }
+        if (limitN) q = (q as any).limit(limitN);
+        else q = (q as any).limit(500);
 
-      const { data, error } = await q;
-      if (error) {
-        console.error(`[${readTable}] list error:`, error.message);
+        const { data, error } = await q;
+        if (error) {
+          const msg = String(error?.message || "");
+          if (!msg.includes("fetch")) {
+            console.warn(`[${readTable}] list notice:`, msg);
+          }
+          return [];
+        }
+        return (data || []).map(transformRow);
+      } catch {
         return [];
       }
-      return (data || []).map(transformRow);
     },
 
     filter: async (filters: Record<string, any>, sort?: string, limitN?: number): Promise<any[]> => {
-      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-      let q = supabase.from(readTable).select(selectCols);
+      try {
+        const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
+        let q = supabase.from(readTable).select(selectCols);
 
-      for (const [key, val] of Object.entries(filters)) {
-        if (val !== undefined && val !== null) {
-          q = (q as any).eq(key, val);
+        for (const [key, val] of Object.entries(filters)) {
+          if (val !== undefined && val !== null) {
+            q = (q as any).eq(key, val);
+          }
         }
-      }
 
-      if (sort) {
-        const asc = !sort.startsWith("-");
-        const col = sort.startsWith("-") ? sort.slice(1) : sort;
-        q = (q as any).order(col, { ascending: asc });
-      } else {
-        q = (q as any).order("created_at", { ascending: false });
-      }
+        if (sort) {
+          const asc = !sort.startsWith("-");
+          const col = sort.startsWith("-") ? sort.slice(1) : sort;
+          q = (q as any).order(col, { ascending: asc });
+        } else {
+          q = (q as any).order("created_at", { ascending: false });
+        }
 
-      q = (q as any).limit(limitN ?? 500);
+        q = (q as any).limit(limitN ?? 500);
 
-      const { data, error } = await q;
-      if (error) {
-        console.error(`[${readTable}] filter error:`, error.message);
+        const { data, error } = await q;
+        if (error) {
+          const msg = String(error?.message || "");
+          if (!msg.includes("fetch")) {
+            console.warn(`[${readTable}] filter notice:`, msg);
+          }
+          return [];
+        }
+        return (data || []).map(transformRow);
+      } catch {
         return [];
       }
-      return (data || []).map(transformRow);
     },
 
     create: async (payload: Record<string, any>): Promise<any> => {
-      const dataToInsert = { ...payload };
+      try {
+        const dataToInsert = { ...payload };
 
-      if (entityName === "Client") {
-        if (dataToInsert.username) {
-          const isDuplicate = await checkUsernameExists(dataToInsert.username);
-          if (isDuplicate) {
-            throw new Error("Username already exists. Please choose a different username");
+        if (entityName === "Client") {
+          if (dataToInsert.username) {
+            const isDuplicate = await checkUsernameExists(dataToInsert.username);
+            if (isDuplicate) {
+              throw new Error("Username already exists. Please choose a different username");
+            }
+          }
+          if (dataToInsert.password) {
+            dataToInsert.password = hashPasswordIfPlain(dataToInsert.password);
           }
         }
-        if (dataToInsert.password) {
-          dataToInsert.password = hashPasswordIfPlain(dataToInsert.password);
-        }
-      }
 
-      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-      const { data, error } = await supabase
-        .from(writeTable)
-        .insert(dataToInsert)
-        .select(selectCols)
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      return transformRow(data);
+        const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
+        const { data, error } = await supabase
+          .from(writeTable)
+          .insert(dataToInsert)
+          .select(selectCols)
+          .maybeSingle();
+        if (error) throw new Error(error.message);
+        return transformRow(data);
+      } catch (err: any) {
+        if (err.message && err.message.includes("already exists")) {
+          throw err;
+        }
+        throw err;
+      }
     },
 
     update: async (id: string, payload: Record<string, any>): Promise<any> => {

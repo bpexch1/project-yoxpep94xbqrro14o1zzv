@@ -3,11 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client } from "@/entities";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ChevronLeft, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 
@@ -17,7 +13,9 @@ export default function EditClientPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingMaxBets, setIsSubmittingMaxBets] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -33,7 +31,7 @@ export default function EditClientPage() {
         return;
       }
 
-      const authorized = await verifyInHierarchy(username, session.username, session.role);
+      const authorized = await verifyInHierarchy(username, session!.username, session!.role);
       if (!authorized) {
         setIsAuthorized(false);
         navigate("/accounts", { replace: true });
@@ -59,9 +57,20 @@ export default function EditClientPage() {
     bettingAllowed: true,
     canSettlePL: false,
     phone: "",
-    reference: "",
     notes: "",
     commission: "2.00",
+  });
+
+  const [maxBets, setMaxBets] = useState({
+    soccer: "1000000.00",
+    tennis: "250000.00",
+    cricket: "5000000.00",
+    fancy: "200000.00",
+    races: "200000.00",
+    casino: "50000.00",
+    greyhound: "50000.00",
+    bookmaker: "2000000.00",
+    tPin: "",
   });
 
   useEffect(() => {
@@ -72,10 +81,15 @@ export default function EditClientPage() {
         bettingAllowed: client.betting_allowed !== false,
         canSettlePL: client.can_settle_pl === true,
         phone: client.phone || "",
-        reference: client.reference || "",
         notes: client.notes || "",
         commission: (client.commission ?? 2.00).toString(),
       });
+      if (client.max_bets) {
+        setMaxBets((prev) => ({
+          ...prev,
+          ...client.max_bets,
+        }));
+      }
     }
   }, [client]);
 
@@ -91,11 +105,9 @@ export default function EditClientPage() {
         status: formData.isActive ? "active" : "inactive",
         betting_allowed: formData.bettingAllowed,
         can_settle_pl: formData.canSettlePL,
+        phone: formData.phone || "",
+        notes: formData.notes || "",
       };
-
-      if (formData.phone !== undefined) updateData.phone = formData.phone || "";
-      if (formData.reference !== undefined) updateData.reference = formData.reference || "";
-      if (formData.notes !== undefined) updateData.notes = formData.notes || "";
 
       if (!isNaN(commission) && commission >= 0) {
         updateData.commission = commission;
@@ -110,7 +122,7 @@ export default function EditClientPage() {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });
       
-      navigate(-1);
+      toast({ title: "Updated", description: "User details updated successfully." });
     } catch (error: any) {
       console.error("Error updating client:", error);
       toast({
@@ -123,10 +135,36 @@ export default function EditClientPage() {
     }
   };
 
+  const handleMaxBetsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!client) return;
+
+    setIsSubmittingMaxBets(true);
+    try {
+      await Client.update(client.id, {
+        max_bets: maxBets,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({ queryKey: ["client", username] });
+
+      toast({ title: "Success", description: "Max bet sizes saved successfully." });
+    } catch (error: any) {
+      console.error("Error saving max bets:", error);
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: error?.message || "Could not update max bet sizes.",
+      });
+    } finally {
+      setIsSubmittingMaxBets(false);
+    }
+  };
+
   if (isAuthorized === null || isFetching) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
+      <div style={{ minHeight: "100vh", background: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Loader2 style={{ width: 32, height: 32, animation: "spin 1s linear infinite", color: "#00a65a" }} />
       </div>
     );
   }
@@ -135,284 +173,472 @@ export default function EditClientPage() {
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center p-4">
-        <h1 className="text-xl font-bold text-gray-800 mb-4">Client not found</h1>
-        <Button onClick={() => navigate(-1)} variant="outline">
-          <ChevronLeft className="w-4 h-4 mr-2" /> Go Back
-        </Button>
+      <div style={{ minHeight: "100vh", background: "#f0f0f0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <h1 style={{ fontSize: 18, fontWeight: 700, color: "#212529", marginBottom: 12 }}>Client not found</h1>
+        <button onClick={() => navigate("/accounts")} style={{ background: "#fff", border: "1px solid #ccc", padding: "6px 16px", borderRadius: 3, fontWeight: 600, cursor: "pointer" }}>
+          Go Back
+        </button>
       </div>
     );
   }
 
+  const roleLabel = client.role === "client" || !client.role ? "Bettor" : (client.role.charAt(0).toUpperCase() + client.role.slice(1));
+  const numericId = client.id?.replace?.(/\D/g, "")?.slice?.(0, 7) || "8703594";
+
   return (
-    <div className="bg-[#eef2f5] font-sans text-[#333333] pb-16">
-      <div className="max-w-[760px] mx-auto px-2 sm:px-4 pt-3">
-        {/* Top White Nav Box with 5 Green Buttons & Large Username */}
-        <div className="bg-white border border-[#dee2e6] rounded-[2px] p-3 mb-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-          <div className="flex flex-wrap items-center gap-1.5 mb-2">
+    <div style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529", paddingBottom: 40 }}>
+      <div style={{ maxWidth: 500, margin: "0 auto", padding: "8px 8px" }}>
+        
+        {/* Top Tab Bar & Large Username on Right */}
+        <div style={{ background: "#ffffff", border: "1px solid #dee2e6", borderRadius: 4, padding: "10px 12px", marginBottom: 12, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
             <button
               type="button"
-              className="bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm border border-[#007a57]"
+              style={{
+                background: "#00b181",
+                color: "#ffffff",
+                border: "1px solid #00b181",
+                borderRadius: 3,
+                padding: "5px 12px",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
             >
               Edit User
             </button>
             <button
               type="button"
               onClick={() => navigate(`/accounts/ledger/${username}`)}
-              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+              style={{
+                background: "#ffffff",
+                color: "#00b181",
+                border: "1px solid #00b181",
+                borderRadius: 3,
+                padding: "5px 12px",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
             >
               Ledger
             </button>
             <button
               type="button"
               onClick={() => navigate(`/reports/book-detail`)}
-              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+              style={{
+                background: "#ffffff",
+                color: "#00b181",
+                border: "1px solid #00b181",
+                borderRadius: 3,
+                padding: "5px 12px",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
             >
               Bets
             </button>
             <button
               type="button"
               onClick={() => navigate(`/reports/daily-pl`)}
-              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+              style={{
+                background: "#ffffff",
+                color: "#00b181",
+                border: "1px solid #00b181",
+                borderRadius: 3,
+                padding: "5px 12px",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
             >
               Profit Loss
             </button>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <button
               type="button"
               onClick={() => navigate(`/current-position`)}
-              className="bg-[#00a676] hover:bg-[#008f66] text-white text-[13px] font-semibold px-3 py-1.5 rounded-[3px] shadow-sm transition-colors"
+              style={{
+                background: "#ffffff",
+                color: "#00b181",
+                border: "1px solid #00b181",
+                borderRadius: 3,
+                padding: "5px 12px",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
             >
               Current Position
             </button>
 
-            <span className="text-xl sm:text-2xl font-black text-[#111] tracking-tight">
+            <span style={{ fontSize: 20, fontWeight: 800, color: "#212529" }}>
               {client.username}
             </span>
           </div>
         </div>
 
-        {/* Main Edit Client Table/Card */}
-        <div className="bg-white border border-[#dee2e6] rounded-[2px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-          {/* Header Row */}
-          <div className="bg-[#f1f4f8] px-3 py-2 border-b border-[#dee2e6]">
-            <h1 className="text-[15px] font-normal text-[#333]">
-              Edit Client - <strong className="font-bold text-[#111]">{client.username}</strong>
-            </h1>
+        {/* 1. EDIT CLIENT FORM CARD */}
+        <div style={{ background: "#ffffff", border: "1px solid #dee2e6", borderRadius: 4, overflow: "hidden", marginBottom: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+          <div style={{ background: "#254465", borderBottom: "1px solid #1e3650", padding: "8px 14px", fontSize: 13.5, color: "#ffffff", fontWeight: 700 }}>
+            Edit Client - <strong style={{ color: "#ffffff" }}>{client.username}</strong>
           </div>
 
-          {/* Form Content */}
-          <form onSubmit={handleSubmit} className="p-4 sm:p-5">
-            <div className="flex flex-col space-y-4 text-[15px]">
+          <form onSubmit={handleSubmit} style={{ padding: "14px 16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 13.5 }}>
+              
               {/* ID */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  ID
-                </div>
-                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
-                  {client.id?.replace?.(/\D/g, "")?.slice?.(0, 7) || "8501292"}
-                </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>ID</div>
+                <div style={{ color: "#111827", fontWeight: 600 }}>{numericId}</div>
               </div>
 
               {/* Username */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Username
-                </div>
-                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
-                  {client.username}
-                </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>Username</div>
+                <div style={{ color: "#111827", fontWeight: 600 }}>{client.username}</div>
               </div>
 
               {/* Type */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Type
-                </div>
-                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
-                  {client.role === "client" || !client.role ? "Bettor" : (client.role.charAt(0).toUpperCase() + client.role.slice(1))}
-                </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>Type</div>
+                <div style={{ color: "#111827", fontWeight: 600 }}>{roleLabel}</div>
               </div>
 
               {/* Currency */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Currency
-                </div>
-                <div className="col-span-8 sm:col-span-9 text-[#212529] font-normal text-[15px]">
-                  Rs.
-                </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>Currency</div>
+                <div style={{ color: "#111827", fontWeight: 600 }}>Rs.</div>
               </div>
 
               {/* Password */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Password
-                </div>
-                <div className="col-span-8 sm:col-span-9">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>Password</div>
+                <div style={{ flex: 1 }}>
                   <input
-                    type="text"
+                    type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Abc12345"
-                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border-2 border-[#9ed4f4] rounded-[4px] outline-none text-[#333] shadow-inner focus:border-[#4299e1]"
+                    style={{
+                      width: "100%",
+                      maxWidth: 240,
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 3,
+                      padding: "5px 8px",
+                      fontSize: 13,
+                      outline: "none"
+                    }}
                   />
                 </div>
               </div>
 
               {/* IsActive */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  IsActive
-                </div>
-                <div className="col-span-8 sm:col-span-9 flex items-center">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>IsActive</div>
+                <div>
                   <input
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="w-[18px] h-[18px] text-[#0d6efd] rounded-[3px] border-[#adb5bd] cursor-pointer"
+                    style={{ width: 16, height: 16, accentColor: "#0088cc", cursor: "pointer" }}
                   />
                 </div>
               </div>
 
               {/* Betting Allowed */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal leading-tight">
-                  Betting<br />Allowed
-                </div>
-                <div className="col-span-8 sm:col-span-9 flex items-center">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, lineHeight: 1.2 }}>Betting<br />Allowed</div>
+                <div>
                   <input
                     type="checkbox"
                     checked={formData.bettingAllowed}
                     onChange={(e) => setFormData({ ...formData, bettingAllowed: e.target.checked })}
-                    className="w-[18px] h-[18px] text-[#0d6efd] rounded-[3px] border-[#adb5bd] cursor-pointer"
+                    style={{ width: 16, height: 16, accentColor: "#0088cc", cursor: "pointer" }}
                   />
                 </div>
               </div>
 
               {/* Can Settle PL */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal leading-tight">
-                  Can Settle<br />PL
-                </div>
-                <div className="col-span-8 sm:col-span-9 flex items-center gap-2">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, lineHeight: 1.2 }}>Can Settle<br />PL</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <input
                     type="checkbox"
-                    id="enableSBtn"
+                    id="enableS"
                     checked={formData.canSettlePL}
                     onChange={(e) => setFormData({ ...formData, canSettlePL: e.target.checked })}
-                    className="w-[18px] h-[18px] text-[#0d6efd] rounded-[3px] border-[#adb5bd] cursor-pointer"
+                    style={{ width: 16, height: 16, accentColor: "#0088cc", cursor: "pointer" }}
                   />
-                  <label htmlFor="enableSBtn" className="text-[15px] text-[#212529] cursor-pointer select-none">
+                  <label htmlFor="enableS" style={{ fontSize: 13, color: "#374151", cursor: "pointer" }}>
                     Enable S button
                   </label>
                 </div>
               </div>
 
               {/* Phone */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Phone
-                </div>
-                <div className="col-span-8 sm:col-span-9">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>Phone</div>
+                <div style={{ flex: 1 }}>
                   <input
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] focus:border-[#86b7fe]"
-                  />
-                </div>
-              </div>
-
-              {/* Reference */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Reference
-                </div>
-                <div className="col-span-8 sm:col-span-9">
-                  <input
-                    type="text"
-                    value={formData.reference}
-                    onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] focus:border-[#86b7fe]"
+                    style={{
+                      width: "100%",
+                      maxWidth: 240,
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 3,
+                      padding: "5px 8px",
+                      fontSize: 13,
+                      outline: "none"
+                    }}
                   />
                 </div>
               </div>
 
               {/* Notes */}
-              <div className="grid grid-cols-12 items-start gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal pt-1">
-                  Notes
-                </div>
-                <div className="col-span-8 sm:col-span-9">
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Notes</div>
+                <div style={{ flex: 1 }}>
                   <textarea
                     rows={2}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full max-w-[340px] p-2 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] resize-none focus:border-[#86b7fe]"
+                    style={{
+                      width: "100%",
+                      maxWidth: 240,
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 3,
+                      padding: "5px 8px",
+                      fontSize: 13,
+                      outline: "none",
+                      resize: "none"
+                    }}
                   />
                 </div>
               </div>
 
               {/* Commission */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  Commission (%)
-                </div>
-                <div className="col-span-8 sm:col-span-9">
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4, lineHeight: 1.2 }}>Commissio<br />n</div>
+                <div style={{ flex: 1 }}>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.commission}
                     onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
-                    className="w-full max-w-[240px] h-[34px] px-2.5 text-[15px] bg-white border border-[#ced4da] rounded-[4px] outline-none text-[#333] focus:border-[#86b7fe]"
+                    style={{
+                      width: "100%",
+                      maxWidth: 240,
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 3,
+                      padding: "5px 8px",
+                      fontSize: 13,
+                      outline: "none"
+                    }}
                   />
-                  <div className="text-[12px] text-[#6c757d] italic mt-0.5">
-                    Minimum commission is 2.00 %
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 3 }}>
+                    Min commission is 2.00 %
                   </div>
                 </div>
               </div>
 
               {/* UserDomain */}
-              <div className="grid grid-cols-12 items-center gap-2">
-                <div className="col-span-4 sm:col-span-3 text-[#212529] font-normal">
-                  UserDomain
-                </div>
-                <div className="col-span-8 sm:col-span-9 text-[#495057] text-[15px]">
-                  1 ( betproexch.com )
-                </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, lineHeight: 1.2 }}>UserDomai<br />n</div>
+                <div style={{ color: "#374151", fontSize: 13 }}>1 ( betproexch.com )</div>
               </div>
+
             </div>
 
-            {/* Submit / Action Buttons */}
-            <div className="mt-8 pt-4 border-t border-[#dee2e6] flex items-center gap-2">
+            {/* Submit Button */}
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#00a676] hover:bg-[#008f66] text-white font-semibold text-[14px] px-5 py-2 rounded-[3px] transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                style={{
+                  background: "#00a65a",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 3,
+                  padding: "7px 22px",
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Update Client"
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="bg-[#6c757d] hover:bg-[#5a6268] text-white font-semibold text-[14px] px-4 py-2 rounded-[3px] transition-colors shadow-sm"
-              >
-                Cancel
+                {isSubmitting ? "Submitting..." : "Submit"}
               </button>
             </div>
           </form>
         </div>
+
+        {/* 2. MAX BET SIZES CARD */}
+        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+          <div style={{ background: "#f8f9fa", borderBottom: "1px solid #e5e7eb", padding: "8px 14px", fontSize: 13.5, fontWeight: 700, color: "#374151" }}>
+            Max Bet Sizes
+          </div>
+
+          <form onSubmit={handleMaxBetsSubmit} style={{ padding: "14px 16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 13.5 }}>
+              
+              {/* Soccer */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Soccer</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.soccer}
+                    onChange={(e) => setMaxBets({ ...maxBets, soccer: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 1,000,000</div>
+                </div>
+              </div>
+
+              {/* Tennis */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Tennis</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.tennis}
+                    onChange={(e) => setMaxBets({ ...maxBets, tennis: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 250,000</div>
+                </div>
+              </div>
+
+              {/* Cricket */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Cricket</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.cricket}
+                    onChange={(e) => setMaxBets({ ...maxBets, cricket: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 5,000,000</div>
+                </div>
+              </div>
+
+              {/* Fancy */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Fancy</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.fancy}
+                    onChange={(e) => setMaxBets({ ...maxBets, fancy: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 200,000</div>
+                </div>
+              </div>
+
+              {/* Races */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Races</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.races}
+                    onChange={(e) => setMaxBets({ ...maxBets, races: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 200,000</div>
+                </div>
+              </div>
+
+              {/* Casino */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Casino</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.casino}
+                    onChange={(e) => setMaxBets({ ...maxBets, casino: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 50,000</div>
+                </div>
+              </div>
+
+              {/* Greyhound */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Greyhound</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.greyhound}
+                    onChange={(e) => setMaxBets({ ...maxBets, greyhound: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 50,000</div>
+                </div>
+              </div>
+
+              {/* BookMaker */}
+              <div style={{ display: "flex", alignItems: "flex-start" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>BookMaker</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.bookmaker}
+                    onChange={(e) => setMaxBets({ ...maxBets, bookmaker: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 2 }}>Max: 2,000,000</div>
+                </div>
+              </div>
+
+              {/* T-PIN */}
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>T-PIN</div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={maxBets.tPin}
+                    onChange={(e) => setMaxBets({ ...maxBets, tPin: e.target.value })}
+                    style={{ width: "100%", maxWidth: 240, border: "1px solid #cbd5e1", borderRadius: 3, padding: "5px 8px", fontSize: 13, outline: "none" }}
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            {/* Submit Button */}
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
+              <button
+                type="submit"
+                disabled={isSubmittingMaxBets}
+                style={{
+                  background: "#00a65a",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 3,
+                  padding: "7px 22px",
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {isSubmittingMaxBets ? "Submitting..." : "Submit"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Bottom marquee ticker */}
+        <div style={{ marginTop: 20, textAlign: "center", fontSize: 11, fontWeight: 700, color: "#6b7280" }}>
+          Welcome to Exchange.
+        </div>
+
       </div>
     </div>
   );

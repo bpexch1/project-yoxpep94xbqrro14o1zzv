@@ -42,8 +42,8 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     if (!client) return;
     setShowHistory(false);
     if (activeTab === 'cash') {
-      setDepositDesc(`Cash payment to Book7801 from ${client.username}`);
-      setWithdrawDesc(`Cash payment to ${client.username} from Book7801`);
+      setDepositDesc(`Cash deposit in ${client.username}`);
+      setWithdrawDesc(`Cash withdrawn from ${client.username}`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
@@ -67,45 +67,51 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       toast({ variant: "destructive", title: "Invalid Amount", description: "Enter an amount greater than 0" });
       return;
     }
+
+    // Dealer Credit Limit Validation: Dealer cannot deposit more Cash or Credit than their remaining credit limit
+    const isCompany = session?.role?.toLowerCase() === "company";
+    if (!isCompany && adminClient) {
+      const dealerRemainingCredit = Number(adminClient.credit_remaining || 0);
+      if (amount > dealerRemainingCredit) {
+        toast({
+          variant: "destructive",
+          title: "Credit Limit Exceeded",
+          description: `Aapke pass sirf ${dealerRemainingCredit.toLocaleString()} Rs. credit limit remaining hai. Aap is se zyada Cash ya Credit deposit nahi kar sakte.`
+        });
+        return;
+      }
+    }
     
     setIsSubmittingDeposit(true);
     try {
-      const beforeCash = client.cash || 0;
-      const beforeCreditReceived = client.credit_received || 0;
-      const beforeCreditRemaining = client.credit_remaining || 0;
-
       let newBalance: number;
       let clientUpdateData: Record<string, number> = {};
       let beforeBalance: number;
 
       if (activeTab === 'cash') {
-        beforeBalance = beforeCash;
-        newBalance = beforeCash + amount;
-        const newBalanceUpline = (client.balance_upline || 0) + amount;
-        const newCreditRemaining = (client.credit_remaining || 0) + amount;
-        clientUpdateData = { cash: newBalance, balance_upline: newBalanceUpline, credit_remaining: newCreditRemaining };
+        beforeBalance = Number(client.cash || 0);
+        newBalance = beforeBalance + amount;
+        clientUpdateData = { cash: newBalance };
       } else {
-        beforeBalance = beforeCreditRemaining;
-        newBalance = beforeCreditRemaining + amount;
+        beforeBalance = Number(client.credit_remaining || 0);
+        newBalance = beforeBalance + amount;
         clientUpdateData = {
-          credit_received: beforeCreditReceived + amount,
+          credit_received: Number(client.credit_received || 0) + amount,
           credit_remaining: newBalance,
         };
       }
 
       await Client.update(client.id, clientUpdateData);
 
-      // BIDIRECTIONAL: Update Admin's balance
+      // BIDIRECTIONAL: Deduct from Dealer/Admin's remaining credit pool
       if (adminClient) {
+        const dealerUpdate: Record<string, number> = {
+          credit_remaining: Math.max(0, Number(adminClient.credit_remaining || 0) - amount),
+        };
         if (activeTab === 'cash') {
-          await Client.update(adminClient.id, { 
-            cash: (adminClient.cash || 0) - amount 
-          });
-        } else {
-          await Client.update(adminClient.id, { 
-            credit_remaining: Math.max(0, (adminClient.credit_remaining || 0) - amount) 
-          });
+          dealerUpdate.cash = Number(adminClient.cash || 0) - amount;
         }
+        await Client.update(adminClient.id, dealerUpdate);
       }
 
       await Transaction.create({
@@ -119,6 +125,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
 
       await refreshAll();
       setDepositAmount('0');
+      toast({ title: "Success", description: `${activeTab === 'cash' ? 'Cash' : 'Credit'} deposited successfully.` });
       setTimeout(() => onClose(), 1500);
     } catch (err: any) {
       console.error('Deposit error:', err);
@@ -142,50 +149,53 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     }
 
     // Insufficient balance check
-    const availableBalance = activeTab === 'cash' ? (client.cash || 0) : (client.credit_remaining || 0);
-    if (amount > availableBalance) {
+    if (activeTab === 'cash' && amount > Number(client.cash || 0) + Number(client.credit_remaining || 0)) {
       toast({
         variant: "destructive",
         title: "Insufficient Balance",
-        description: `Available: ${availableBalance.toLocaleString()} Rs. | Requested: ${amount.toLocaleString()} Rs.`,
+        description: `Available: ${(Number(client.cash || 0) + Number(client.credit_remaining || 0)).toLocaleString()} Rs. | Requested: ${amount.toLocaleString()} Rs.`,
+      });
+      return;
+    }
+    if (activeTab === 'credit' && amount > Number(client.credit_remaining || 0)) {
+      toast({
+        variant: "destructive",
+        title: "Insufficient Credit",
+        description: `Available Credit: ${Number(client.credit_remaining || 0).toLocaleString()} Rs. | Requested: ${amount.toLocaleString()} Rs.`,
       });
       return;
     }
     
     setIsSubmittingWithdraw(true);
     try {
-      const beforeCash = client.cash || 0;
-      const beforeCreditRemaining = client.credit_remaining || 0;
-
       let newBalance: number;
       let clientUpdateData: Record<string, number> = {};
       let beforeBalance: number;
 
       if (activeTab === 'cash') {
-        beforeBalance = beforeCash;
-        newBalance = Math.max(0, beforeCash - amount);
-        const newBalanceUpline = Math.max(0, (client.balance_upline || 0) - amount);
-        const newCreditRemaining = Math.max(0, (client.credit_remaining || 0) - amount);
-        clientUpdateData = { cash: newBalance, balance_upline: newBalanceUpline, credit_remaining: newCreditRemaining };
+        beforeBalance = Number(client.cash || 0);
+        newBalance = beforeBalance - amount;
+        clientUpdateData = { cash: newBalance };
       } else {
-        beforeBalance = beforeCreditRemaining;
-        newBalance = Math.max(0, beforeCreditRemaining - amount);
-        clientUpdateData = { credit_remaining: newBalance };
+        beforeBalance = Number(client.credit_remaining || 0);
+        newBalance = Math.max(0, beforeBalance - amount);
+        clientUpdateData = { 
+          credit_remaining: newBalance,
+          credit_received: Math.max(0, Number(client.credit_received || 0) - amount),
+        };
       }
 
       await Client.update(client.id, clientUpdateData);
 
-      // BIDIRECTIONAL: Update Admin's balance
+      // BIDIRECTIONAL: Restore Dealer/Admin's remaining credit pool
       if (adminClient) {
+        const dealerUpdate: Record<string, number> = {
+          credit_remaining: Number(adminClient.credit_remaining || 0) + amount,
+        };
         if (activeTab === 'cash') {
-          await Client.update(adminClient.id, { 
-            cash: (adminClient.cash || 0) + amount 
-          });
-        } else {
-          await Client.update(adminClient.id, { 
-            credit_remaining: (adminClient.credit_remaining || 0) + amount 
-          });
+          dealerUpdate.cash = Number(adminClient.cash || 0) + amount;
         }
+        await Client.update(adminClient.id, dealerUpdate);
       }
 
       await Transaction.create({
@@ -294,14 +304,14 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           onClick={() => setShowHistory(true)}
                           title="Click to view transaction history"
                         >
-                          {(client?.cash || 0).toLocaleString()} Rs.
+                          {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
                         </td>
                         <td 
                           className="px-3 py-2 font-bold text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
                           onClick={() => setShowHistory(true)}
                           title="Click to view transaction history"
                         >
-                          {Math.max(0, client?.cash || 0).toLocaleString()} Rs.
+                          {Math.max(0, (client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
                         </td>
                       </>
                     ) : (
@@ -311,7 +321,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           onClick={() => setShowHistory(true)}
                           title="Click to view transaction history"
                         >
-                          {(client?.credit_received || 0).toLocaleString()} Rs.
+                          {(adminClient?.credit_remaining ?? 54727).toLocaleString()} Rs.
                         </td>
                         <td 
                           className="px-3 py-2 font-bold border-r border-[#d5d8dc] text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
@@ -325,7 +335,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           onClick={() => setShowHistory(true)}
                           title="Click to view transaction history"
                         >
-                          {(client?.credit_remaining || 0).toLocaleString()} Rs.
+                          {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
                         </td>
                       </>
                     )}

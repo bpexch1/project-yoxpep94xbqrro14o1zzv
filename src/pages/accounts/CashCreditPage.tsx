@@ -3,12 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client, Transaction } from "@/entities";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  ChevronLeft, 
-  Loader2
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { getClientSession } from "@/hooks/useClientAuth";
+import { Loader2 } from "lucide-react";
+import { getClientSession, updateClientSessionBalance } from "@/hooks/useClientAuth";
 import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 
 export default function CashCreditPage() {
@@ -61,7 +57,7 @@ export default function CashCreditPage() {
 
   const client = clients?.[0];
 
-  // Admin's own record to update balance bidirectional
+  // Admin's own record to update balance bidirectional & show credit limit
   const { data: adminClients, refetch: refetchAdmin } = useQuery({
     queryKey: ["admin-own-record", session?.username],
     queryFn: () => Client.filter({ username: session?.username }),
@@ -69,17 +65,11 @@ export default function CashCreditPage() {
   });
   const adminClient = adminClients?.[0];
 
-  const { data: transactions, isLoading: isFetchingTx, refetch: refetchTx } = useQuery({
-    queryKey: ["transactions", username, activeTab],
-    queryFn: () => Transaction.filter({ client_username: username, type: activeTab }, "-created_at", 50),
-    enabled: !!username && isAuthorized === true,
-  });
-
   useEffect(() => {
     if (!client) return;
     if (activeTab === 'cash') {
-      setDepositDesc(`Cash payment to Book from ${client.username}`);
-      setWithdrawDesc(`Cash payment to ${client.username} from Book`);
+      setDepositDesc(`Cash deposit in ${client.username}`);
+      setWithdrawDesc(`Cash withdrawn from ${client.username}`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
@@ -88,14 +78,21 @@ export default function CashCreditPage() {
     setWithdrawAmount('0');
   }, [client?.username, activeTab]);
 
-  const refreshAll = async () => {
-    await refetchClient();
-    await refetchTx();
-    await refetchAdmin();
-    queryClient.invalidateQueries({ queryKey: ["clients"] });
-    queryClient.invalidateQueries({ queryKey: ["client", username] });
-    queryClient.invalidateQueries({ queryKey: ["transactions", username] });
-    queryClient.invalidateQueries({ queryKey: ["admin-own-record"] });
+  const refreshAll = async (updatedClientCash?: number) => {
+    if (updatedClientCash !== undefined && client && session?.username === client.username) {
+      updateClientSessionBalance(updatedClientCash);
+    }
+    window.dispatchEvent(new CustomEvent("balance-updated"));
+    await Promise.all([
+      refetchClient(),
+      refetchAdmin(),
+      queryClient.invalidateQueries({ queryKey: ["clients"] }),
+      queryClient.invalidateQueries({ queryKey: ["client", username] }),
+      queryClient.invalidateQueries({ queryKey: ["transactions", username] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-own-record"] }),
+      queryClient.invalidateQueries({ queryKey: ["user-header-balance"] }),
+      queryClient.invalidateQueries({ queryKey: ["header-balance"] }),
+    ]);
   };
 
   const handleDeposit = async () => {
@@ -106,6 +103,20 @@ export default function CashCreditPage() {
       return;
     }
 
+    // Dealer Credit Limit Validation: Dealer cannot deposit more Cash or Credit than their remaining credit limit
+    const isCompany = session?.role?.toLowerCase() === "company";
+    if (!isCompany && adminClient) {
+      const dealerRemainingCredit = Number(adminClient.credit_remaining || 0);
+      if (amount > dealerRemainingCredit) {
+        toast({
+          variant: "destructive",
+          title: "Credit Limit Exceeded",
+          description: `Aapke pass sirf ${dealerRemainingCredit.toLocaleString()} Rs. credit limit remaining hai. Aap is se zyada Cash ya Credit deposit nahi kar sakte.`
+        });
+        return;
+      }
+    }
+
     setIsSubmittingDeposit(true);
     try {
       let clientUpdateData: Record<string, number> = {};
@@ -113,46 +124,49 @@ export default function CashCreditPage() {
       let beforeBalance: number;
 
       if (activeTab === 'cash') {
-        beforeBalance = client.cash || 0;
+        beforeBalance = Number(client.cash || 0);
         afterBalance = beforeBalance + amount;
-        const newBalanceUpline = (client.balance_upline || 0) + amount;
-        const newCreditRemaining = (client.credit_remaining || 0) + amount;
-        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline, credit_remaining: newCreditRemaining };
+        clientUpdateData = { 
+          cash: afterBalance,
+        };
       } else {
-        beforeBalance = client.credit_remaining || 0;
+        beforeBalance = Number(client.credit_remaining || 0);
         afterBalance = beforeBalance + amount;
         clientUpdateData = {
-          credit_received: (client.credit_received || 0) + amount,
           credit_remaining: afterBalance,
+          credit_received: Number(client.credit_received || 0) + amount,
         };
       }
 
       await Client.update(client.id, clientUpdateData);
 
-      // BIDIRECTIONAL: Update Admin's balance
+      // BIDIRECTIONAL: Deduct from Dealer/Admin's remaining credit pool
       if (adminClient) {
+        const dealerUpdate: Record<string, number> = {
+          credit_remaining: Math.max(0, Number(adminClient.credit_remaining || 0) - amount),
+        };
         if (activeTab === 'cash') {
-          await Client.update(adminClient.id, { 
-            cash: (adminClient.cash || 0) - amount 
-          });
-        } else {
-          await Client.update(adminClient.id, { 
-            credit_remaining: Math.max(0, (adminClient.credit_remaining || 0) - amount) 
-          });
+          dealerUpdate.cash = Number(adminClient.cash || 0) - amount;
         }
+        await Client.update(adminClient.id, dealerUpdate);
       }
 
+      // Record transaction with clean format
       await Transaction.create({
         client_username: client.username,
         type: activeTab,
         amount: amount,
-        description: depositDesc,
+        description: activeTab === 'cash' 
+          ? (depositDesc.includes('(Cash)') ? depositDesc : `${depositDesc} (Cash)`) 
+          : (depositDesc.includes('(Credit)') ? depositDesc : `${depositDesc} (Credit)`),
         before_balance: beforeBalance,
         after_balance: afterBalance,
       });
 
-      await refreshAll();
+      const newCash = activeTab === 'cash' ? afterBalance : Number(client.cash || 0);
+      await refreshAll(newCash);
       setDepositAmount('0');
+      toast({ title: "Success", description: `${activeTab === 'cash' ? 'Cash' : 'Credit'} deposited successfully.` });
     } catch (err: any) {
       console.error('Deposit error:', err);
       toast({ variant: "destructive", title: "Deposit Failed", description: err?.message || "Please try again" });
@@ -170,12 +184,12 @@ export default function CashCreditPage() {
     }
 
     // Insufficient balance check
-    if (activeTab === 'cash' && amount > (client.cash || 0)) {
-      toast({ variant: "destructive", title: "Insufficient Balance", description: `Available: ${(client.cash || 0).toLocaleString()} Rs.` });
+    if (activeTab === 'cash' && amount > Number(client.cash || 0) + Number(client.credit_remaining || 0)) {
+      toast({ variant: "destructive", title: "Insufficient Balance", description: `Available: ${(Number(client.cash || 0) + Number(client.credit_remaining || 0)).toLocaleString()} Rs.` });
       return;
     }
-    if (activeTab === 'credit' && amount > (client.credit_remaining || 0)) {
-      toast({ variant: "destructive", title: "Insufficient Balance", description: `Available: ${(client.credit_remaining || 0).toLocaleString()} Rs.` });
+    if (activeTab === 'credit' && amount > Number(client.credit_remaining || 0)) {
+      toast({ variant: "destructive", title: "Insufficient Credit", description: `Available Credit: ${Number(client.credit_remaining || 0).toLocaleString()} Rs.` });
       return;
     }
 
@@ -186,43 +200,49 @@ export default function CashCreditPage() {
       let beforeBalance: number;
 
       if (activeTab === 'cash') {
-        beforeBalance = client.cash || 0;
-        afterBalance = Math.max(0, beforeBalance - amount);
-        const newBalanceUpline = Math.max(0, (client.balance_upline || 0) - amount);
-        const newCreditRemaining = Math.max(0, (client.credit_remaining || 0) - amount);
-        clientUpdateData = { cash: afterBalance, balance_upline: newBalanceUpline, credit_remaining: newCreditRemaining };
+        beforeBalance = Number(client.cash || 0);
+        afterBalance = beforeBalance - amount;
+        clientUpdateData = { 
+          cash: afterBalance,
+        };
       } else {
-        beforeBalance = client.credit_remaining || 0;
+        beforeBalance = Number(client.credit_remaining || 0);
         afterBalance = Math.max(0, beforeBalance - amount);
-        clientUpdateData = { credit_remaining: afterBalance };
+        clientUpdateData = { 
+          credit_remaining: afterBalance,
+          credit_received: Math.max(0, Number(client.credit_received || 0) - amount),
+        };
       }
 
       await Client.update(client.id, clientUpdateData);
 
-      // BIDIRECTIONAL: Update Admin's balance
+      // BIDIRECTIONAL: Restore Dealer/Admin's remaining credit pool
       if (adminClient) {
+        const dealerUpdate: Record<string, number> = {
+          credit_remaining: Number(adminClient.credit_remaining || 0) + amount,
+        };
         if (activeTab === 'cash') {
-          await Client.update(adminClient.id, { 
-            cash: (adminClient.cash || 0) + amount 
-          });
-        } else {
-          await Client.update(adminClient.id, { 
-            credit_remaining: (adminClient.credit_remaining || 0) + amount 
-          });
+          dealerUpdate.cash = Number(adminClient.cash || 0) + amount;
         }
+        await Client.update(adminClient.id, dealerUpdate);
       }
 
+      // Record transaction with clean format
       await Transaction.create({
         client_username: client.username,
         type: activeTab,
         amount: -amount,
-        description: withdrawDesc,
+        description: activeTab === 'cash'
+          ? (withdrawDesc.includes('(Cash)') ? withdrawDesc : `${withdrawDesc} (Cash)`)
+          : (withdrawDesc.includes('(Credit)') ? withdrawDesc : `${withdrawDesc} (Credit)`),
         before_balance: beforeBalance,
         after_balance: afterBalance,
       });
 
-      await refreshAll();
+      const newCash = activeTab === 'cash' ? afterBalance : Number(client.cash || 0);
+      await refreshAll(newCash);
       setWithdrawAmount('0');
+      toast({ title: "Success", description: `${activeTab === 'cash' ? 'Cash' : 'Credit'} withdrawn successfully.` });
     } catch (err: any) {
       console.error('Withdraw error:', err);
       toast({ variant: "destructive", title: "Withdraw Failed", description: err?.message || "Please try again" });
@@ -233,8 +253,8 @@ export default function CashCreditPage() {
 
   if (isAuthorized === null || isFetchingClient) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#16a085]" />
+      <div style={{ minHeight: "100vh", background: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Loader2 style={{ width: 32, height: 32, animation: "spin 1s linear infinite", color: "#00a65a" }} />
       </div>
     );
   }
@@ -243,183 +263,295 @@ export default function CashCreditPage() {
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center p-4">
-        <h1 className="text-xl font-bold text-gray-800 mb-4">Client not found</h1>
-        <button onClick={() => navigate(-1)} className="bg-white border border-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 font-medium">
-          <ChevronLeft className="w-4 h-4" /> Go Back
+      <div style={{ minHeight: "100vh", background: "#f0f0f0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <h1 style={{ fontSize: 18, fontWeight: 700, color: "#212529", marginBottom: 12 }}>Client not found</h1>
+        <button onClick={() => navigate("/accounts")} style={{ background: "#fff", border: "1px solid #ccc", padding: "6px 16px", borderRadius: 3, fontWeight: 600, cursor: "pointer" }}>
+          Go Back
         </button>
       </div>
     );
   }
 
+  const clientCredit = Number(client.credit_remaining ?? 0);
+  const clientCash = Number(client.cash ?? 0);
+  const clientPL = Number(client.pl_downline ?? 0);
+  const clientTotalBalance = clientCredit + clientCash + clientPL;
+  const maxWithdraw = clientTotalBalance;
+  const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 54727;
+
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f0f0", fontFamily: "Roboto, sans-serif" }}>
-      <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 5px" }}>
+    <div style={{ minHeight: "100vh", background: "#e8eff5", fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', paddingBottom: 40 }}>
+      <div style={{ maxWidth: 440, margin: "0 auto", padding: "8px 8px" }}>
         
-        {/* 1. TAB SWITCHER - full width flat buttons, no border-radius */}
-        <div style={{ display: "flex", background: "#fff", marginBottom: "0" }}>
+        {/* Top 2 Flat Action Buttons: Cash & Credit */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
           <button 
+            type="button"
             onClick={() => setActiveTab('cash')}
             style={{
-              flex: 1, padding: "12px", fontSize: "14px", fontWeight: 700,
-              background: activeTab === 'cash' ? "#3498db" : "#fff",
-              color: activeTab === 'cash' ? "#fff" : "#16a085",
-              border: "none", cursor: "pointer"
+              flex: 1,
+              padding: "9px 0",
+              fontSize: 14,
+              fontWeight: 700,
+              backgroundColor: activeTab === 'cash' ? "#0088cc" : "#ffffff",
+              color: activeTab === 'cash' ? "#ffffff" : "#27ae60",
+              border: activeTab === 'cash' ? "1px solid #0088cc" : "1px solid #27ae60",
+              borderRadius: 4,
+              cursor: "pointer",
+              textAlign: "center",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
             }}
           >
             Cash
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('credit')}
             style={{
-              flex: 1, padding: "12px", fontSize: "14px", fontWeight: 700,
-              background: activeTab === 'credit' ? "#3498db" : "#fff",
-              color: activeTab === 'credit' ? "#fff" : "#16a085",
-              border: "none", cursor: "pointer"
+              flex: 1,
+              padding: "9px 0",
+              fontSize: 14,
+              fontWeight: 700,
+              backgroundColor: activeTab === 'credit' ? "#0088cc" : "#ffffff",
+              color: activeTab === 'credit' ? "#ffffff" : "#27ae60",
+              border: activeTab === 'credit' ? "1px solid #0088cc" : "1px solid #27ae60",
+              borderRadius: 4,
+              cursor: "pointer",
+              textAlign: "center",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
             }}
           >
             Credit
           </button>
         </div>
         
-        {/* 2. CLIENT NAME */}
-        <div style={{ background: "#fff", padding: "16px 16px 8px", fontWeight: 700, fontSize: "15px", color: "#212529" }}>
-          {client.username}
-        </div>
-        
-        {/* 3. INFO TABLE: Credit | Balance | Max Withdraw */}
-        <div style={{ background: "#fff", padding: "0 16px 16px" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #dee2e6", fontSize: "13px" }}>
-            <thead>
-              <tr>
-                <th style={{ border: "1px solid #dee2e6", padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "#212529" }}>Credit</th>
-                <th style={{ border: "1px solid #dee2e6", padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "#212529" }}>Balance</th>
-                <th style={{ border: "1px solid #dee2e6", padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "#212529" }}>Max Withdraw</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ border: "1px solid #dee2e6", padding: "8px 12px", color: "#212529" }}>
-                  {(client.credit_remaining || 0).toLocaleString()} Rs.
-                </td>
-                <td style={{ border: "1px solid #dee2e6", padding: "8px 12px", color: "#212529" }}>
-                  {(client.cash || 0).toLocaleString()} Rs.
-                </td>
-                <td style={{ border: "1px solid #dee2e6", padding: "8px 12px", color: "#212529" }}>
-                  {Math.max(0, client.cash || 0).toLocaleString()} Rs.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        {/* 4. DEPOSIT SECTION */}
-        <div style={{ background: "#fff", marginTop: "16px", border: "1px solid #dee2e6" }}>
-          {/* Green header */}
-          <div style={{ background: "#00b181", padding: "10px 16px", fontSize: "13px", color: "#fff", fontWeight: 700 }}>
-            Deposit {activeTab === 'cash' ? 'Cash' : 'Credit'} in <strong>{client.username}</strong> account
+        {/* Username Header & 3-Column Info Table Box */}
+        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, padding: "12px 14px 14px 14px", marginBottom: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontWeight: 800, fontSize: 17, color: "#111827", marginBottom: 10 }}>
+            {client.username}
           </div>
-          {/* Form body */}
-          <div style={{ padding: "16px" }}>
-            {/* Description row */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Description</div>
+          
+          {activeTab === 'cash' ? (
+            /* Cash Tab Header Table: Credit | Balance | Max Withdraw */
+            <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #e5e7eb", fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: "#f9fafb" }}>
+                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "33%" }}>Credit</th>
+                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "33%" }}>Balance</th>
+                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "34%" }}>Max Withdraw</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                    {clientCredit.toLocaleString()} Rs.
+                  </td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                    {clientTotalBalance.toLocaleString()} Rs.
+                  </td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                    {maxWithdraw.toLocaleString()} Rs.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          ) : (
+            /* Credit Tab Header Table: Credit limit | [Username] Credit | [Username] Available Balance */
+            <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #e5e7eb", fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: "#f9fafb" }}>
+                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "30%", lineHeight: 1.2 }}>Credit limit</th>
+                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "35%", lineHeight: 1.2 }}>{client.username} Credit</th>
+                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "35%", lineHeight: 1.2 }}>{client.username} Available Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                    {adminCreditLimit.toLocaleString()} Rs.
+                  </td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                    {clientCredit.toLocaleString()} Rs.
+                  </td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                    {clientTotalBalance.toLocaleString()} Rs.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
+        </div>
+        
+        {/* DEPOSIT FORM BOX (Green Header) */}
+        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, overflow: "hidden", marginBottom: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+          <div style={{ background: "#00a65a", padding: "9px 14px", fontSize: 13.5, color: "#ffffff", fontWeight: 700 }}>
+            {activeTab === 'cash' 
+              ? `Deposit Cash in ${client.username} account` 
+              : `Deposit Credit in ${client.username} Account`}
+          </div>
+          
+          <div style={{ padding: "14px" }}>
+            {/* Description */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+                Description
+              </label>
               <input
                 type="text"
                 value={depositDesc}
                 onChange={(e) => setDepositDesc(e.target.value)}
-                style={{ flex: 1, border: "1px solid #ccc", borderRadius: "3px", padding: "5px 8px", fontSize: "13px", outline: "none" }}
+                style={{
+                  width: "100%",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: 3,
+                  padding: "7px 10px",
+                  fontSize: 13.5,
+                  outline: "none",
+                  color: "#1f2937",
+                  boxSizing: "border-box"
+                }}
               />
             </div>
-            {/* Amount row */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
-              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Amount</div>
-              <div style={{ display: "flex", alignItems: "center", flex: 1, border: "1px solid #ccc", borderRadius: "3px" }}>
-                <span style={{ padding: "5px 8px", fontSize: "13px", color: "#555", background: "#f9f9f9", borderRight: "1px solid #ccc" }}>Rs.</span>
+            
+            {/* Amount */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+                Amount
+              </label>
+              <div style={{ display: "flex", alignItems: "stretch", width: "100%", border: "1px solid #cbd5e1", borderRadius: 3, overflow: "hidden" }}>
+                <span style={{ padding: "7px 12px", fontSize: 13, color: "#4b5563", background: "#f3f4f6", borderRight: "1px solid #cbd5e1", display: "flex", alignItems: "center" }}>
+                  Rs.
+                </span>
                 <input
                   type="number"
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   min="0"
-                  style={{ flex: 1, border: "none", padding: "5px 8px", fontSize: "13px", outline: "none" }}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    padding: "7px 10px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    outline: "none",
+                    color: "#111827",
+                    boxSizing: "border-box"
+                  }}
                 />
               </div>
             </div>
+            
             {/* Submit */}
-            <button
-              onClick={handleDeposit}
-              disabled={isSubmittingDeposit}
-              style={{
-                background: "#00b181", color: "#fff", border: "none", borderRadius: "3px",
-                padding: "6px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer"
-              }}
-            >
-              {isSubmittingDeposit ? "Submitting..." : "Submit"}
-            </button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={handleDeposit}
+                disabled={isSubmittingDeposit}
+                style={{
+                  background: "#00a65a",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 3,
+                  padding: "7px 22px",
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
+              >
+                {isSubmittingDeposit ? "Submitting..." : "Submit"}
+              </button>
+            </div>
           </div>
         </div>
-        
-        {/* 5. WITHDRAW SECTION */}
-        <div style={{ background: "#fff", marginTop: "16px", border: "1px solid #dee2e6" }}>
-          {/* Red header */}
-          <div style={{ background: "#dd4b39", padding: "10px 16px", fontSize: "13px", color: "#fff", fontWeight: 700 }}>
-            Withdraw {activeTab === 'cash' ? 'cash' : 'credit'} from <strong>{client.username}</strong> account
+
+        {/* WITHDRAW FORM BOX (Red Header) */}
+        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+          <div style={{ background: "#dd4b39", padding: "9px 14px", fontSize: 13.5, color: "#ffffff", fontWeight: 700 }}>
+            {activeTab === 'cash' 
+              ? `Withdraw cash from ${client.username} account` 
+              : `Withdraw Credit from ${client.username}`}
           </div>
-          {/* Form body */}
-          <div style={{ padding: "16px" }}>
-            {/* Description row */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Description</div>
+          
+          <div style={{ padding: "14px" }}>
+            {/* Description */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+                Description
+              </label>
               <input
                 type="text"
                 value={withdrawDesc}
                 onChange={(e) => setWithdrawDesc(e.target.value)}
-                style={{ flex: 1, border: "1px solid #ccc", borderRadius: "3px", padding: "5px 8px", fontSize: "13px", outline: "none" }}
+                style={{
+                  width: "100%",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: 3,
+                  padding: "7px 10px",
+                  fontSize: 13.5,
+                  outline: "none",
+                  color: "#1f2937",
+                  boxSizing: "border-box"
+                }}
               />
             </div>
-            {/* Amount row */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
-              <div style={{ width: "100px", fontSize: "13px", color: "#212529" }}>Amount</div>
-              <div style={{ display: "flex", alignItems: "center", flex: 1, border: "1px solid #ccc", borderRadius: "3px" }}>
-                <span style={{ padding: "5px 8px", fontSize: "13px", color: "#555", background: "#f9f9f9", borderRight: "1px solid #ccc" }}>Rs.</span>
+            
+            {/* Amount */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+                Amount
+              </label>
+              <div style={{ display: "flex", alignItems: "stretch", width: "100%", border: "1px solid #cbd5e1", borderRadius: 3, overflow: "hidden" }}>
+                <span style={{ padding: "7px 12px", fontSize: 13, color: "#4b5563", background: "#f3f4f6", borderRight: "1px solid #cbd5e1", display: "flex", alignItems: "center" }}>
+                  Rs.
+                </span>
                 <input
                   type="number"
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                   min="0"
-                  style={{ flex: 1, border: "none", padding: "5px 8px", fontSize: "13px", outline: "none" }}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    padding: "7px 10px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    outline: "none",
+                    color: "#111827",
+                    boxSizing: "border-box"
+                  }}
                 />
               </div>
             </div>
+            
             {/* Submit */}
-            <button
-              onClick={handleWithdraw}
-              disabled={isSubmittingWithdraw}
-              style={{
-                background: "#dd4b39", color: "#fff", border: "none", borderRadius: "3px",
-                padding: "6px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer"
-              }}
-            >
-              {isSubmittingWithdraw ? "Submitting..." : "Submit"}
-            </button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={handleWithdraw}
+                disabled={isSubmittingWithdraw}
+                style={{
+                  background: "#dd4b39",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 3,
+                  padding: "7px 22px",
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
+              >
+                {isSubmittingWithdraw ? "Submitting..." : "Submit"}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* BACK BUTTON */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "24px", paddingBottom: "40px" }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: "#fff", color: "#2c3e50", border: "1px solid #dee2e6",
-              padding: "8px 24px", fontSize: "13px", fontWeight: 700, borderRadius: "4px",
-              cursor: "pointer", display: "flex", alignItems: "center", gap: "8px"
-            }}
-          >
-            <ChevronLeft style={{ width: "16px", height: "16px" }} />
-            Back to Accounts
-          </button>
-        </div>
-        
       </div>
     </div>
   );

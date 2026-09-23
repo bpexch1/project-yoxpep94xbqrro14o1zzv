@@ -38,6 +38,59 @@ export const clearClientSession = () => {
   localStorage.removeItem(SESSION_KEY);
 };
 
+export const updateClientSessionBalance = (cash: number) => {
+  try {
+    const data = localStorage.getItem(SESSION_KEY);
+    if (data) {
+      const session = JSON.parse(data);
+      session.cash = Number(cash || 0);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      window.dispatchEvent(new CustomEvent("balance-updated"));
+    }
+  } catch (e) {
+    console.error("Failed to update session cash balance:", e);
+  }
+};
+
+export async function refreshClientSession(targetUsername?: string): Promise<ClientSession | null> {
+  try {
+    const current = getClientSession();
+    const uname = targetUsername || current?.username;
+    if (!uname) return null;
+
+    const { data, error } = await supabase
+      .from("public_clients")
+      .select("id, username, full_name, role, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
+      .ilike("username", uname.trim())
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    const sanitized: ClientSession = {
+      id: data.id,
+      username: data.username,
+      full_name: data.full_name || data.username,
+      role: data.role || "client",
+      credit_received: Number(data.credit_received || 0),
+      credit_remaining: Number(data.credit_remaining || 0),
+      cash: Number(data.cash || 0),
+      pl_downline: Number(data.pl_downline || 0),
+      balance_upline: Number(data.balance_upline || 0),
+      status: data.status || "active",
+    };
+
+    if (current && current.username.toLowerCase() === data.username.toLowerCase()) {
+      setClientSession(sanitized);
+      window.dispatchEvent(new CustomEvent("balance-updated"));
+    }
+
+    return sanitized;
+  } catch (e) {
+    console.error("Failed to refresh client session:", e);
+    return null;
+  }
+}
+
 export async function loginClient(username: string, password: string): Promise<ClientSession> {
   const cleanUsername = username.trim();
   const cleanPassword = password;

@@ -9,7 +9,6 @@ const SEED_CLIENTS = [
     id: "client-book-01",
     username: "Book",
     full_name: "Company Super Admin",
-    password: "book1234",
     role: "company",
     credit_received: 0,
     credit_remaining: 0,
@@ -32,7 +31,6 @@ const SEED_CLIENTS = [
     id: "client-admin-01",
     username: "admin",
     full_name: "Exchange Senior Admin",
-    password: "admin",
     role: "admin",
     credit_received: 0,
     credit_remaining: 0,
@@ -55,7 +53,6 @@ const SEED_CLIENTS = [
     id: "client-user-01",
     username: "client1",
     full_name: "John Player",
-    password: "client1",
     role: "client",
     credit_received: 0,
     credit_remaining: 0,
@@ -78,7 +75,6 @@ const SEED_CLIENTS = [
     id: "client-user-02",
     username: "demo_user",
     full_name: "Demo Player",
-    password: "demo",
     role: "client",
     credit_received: 0,
     credit_remaining: 0,
@@ -290,7 +286,6 @@ export function resetAndSeedDatabase(): void {
     localStorage.setItem("exchange_db_bets", JSON.stringify(SEED_BETS));
     localStorage.setItem("exchange_db_transactions", JSON.stringify(SEED_TRANSACTIONS));
     localStorage.setItem("exchange_db_initialized_v5", "true");
-    console.log("[DB_RESET] Database cleared and seeded successfully with Book / book1234 (B: 0 Exp: 0)");
   } catch (err) {
     console.error("[DB_RESET] Error during resetAndSeedDatabase:", err);
   }
@@ -325,21 +320,19 @@ function getLocalTable(table: string): any[] {
 
       if (table === "clients" && Array.isArray(items)) {
         let changed = false;
-        // Ensure Book exists with company role and book1234 password
+        // Ensure Book exists with company role
         const bookIndex = items.findIndex(
           (c: any) => c && String(c.username || "").toLowerCase() === "book"
         );
         if (bookIndex >= 0) {
           if (
             items[bookIndex].role !== "company" ||
-            items[bookIndex].password !== "book1234" ||
             items[bookIndex].status !== "active" ||
             items[bookIndex].cash === 5000000 ||
             items[bookIndex].cash === 4995000 ||
             items[bookIndex].credit_received === 10000000
           ) {
             items[bookIndex].role = "company";
-            items[bookIndex].password = "book1234";
             items[bookIndex].status = "active";
             if (items[bookIndex].cash === 5000000 || items[bookIndex].cash === 4995000) {
               items[bookIndex].cash = 0;
@@ -355,7 +348,7 @@ function getLocalTable(table: string): any[] {
           changed = true;
         }
 
-        // Ensure client1 exists with client1 password
+        // Ensure client1 exists
         const client1Index = items.findIndex(
           (c: any) => c && String(c.username || "").toLowerCase() === "client1"
         );
@@ -387,14 +380,15 @@ function getLocalTable(table: string): any[] {
 
 function saveLocalTable(table: string, data: any[]): void {
   try {
-    localStorage.setItem(`exchange_db_${table}`, JSON.stringify(data));
+    const targetKey = table === "public_clients" ? "exchange_db_clients" : `exchange_db_${table}`;
+    localStorage.setItem(targetKey, JSON.stringify(data));
   } catch (e) {
     console.warn("Failed to persist to localStorage:", e);
   }
 }
 
 // In-memory query builder mock that mirrors the Supabase fluent API
-class MockQueryBuilder {
+export class MockQueryBuilder {
   private _table: string;
   private _operation: "select" | "insert" | "update" | "delete" = "select";
   private _insertPayload: any = null;
@@ -445,7 +439,11 @@ class MockQueryBuilder {
     this._filters.push((item) => {
       const itemVal = String(item[col] ?? "").toLowerCase();
       const cleanPattern = String(val ?? "").toLowerCase().replace(/%/g, ".*");
-      return new RegExp(`^${cleanPattern}$`, "i").test(itemVal);
+      try {
+        return new RegExp(`^${cleanPattern}$`, "i").test(itemVal);
+      } catch {
+        return itemVal.includes(String(val).toLowerCase());
+      }
     });
     return this;
   }
@@ -454,7 +452,11 @@ class MockQueryBuilder {
     this._filters.push((item) => {
       const itemVal = String(item[col] ?? "");
       const cleanPattern = String(val ?? "").replace(/%/g, ".*");
-      return new RegExp(`^${cleanPattern}$`).test(itemVal);
+      try {
+        return new RegExp(`^${cleanPattern}$`).test(itemVal);
+      } catch {
+        return itemVal.includes(String(val));
+      }
     });
     return this;
   }
@@ -500,7 +502,7 @@ class MockQueryBuilder {
   }
 
   in(col: string, vals: any[]) {
-    this._filters.push((item) => vals.includes(item[col]));
+    this._filters.push((item) => Array.isArray(vals) && vals.includes(item[col]));
     return this;
   }
 
@@ -595,6 +597,294 @@ class MockQueryBuilder {
   }
 }
 
+// Resilient query wrapper that transparently falls back to MockQueryBuilder if Supabase network call fails
+class ResilientQueryBuilder {
+  private _table: string;
+  private _mock: MockQueryBuilder;
+  private _realQuery: any;
+
+  constructor(table: string, realQuery: any) {
+    this._table = table;
+    this._mock = new MockQueryBuilder(table);
+    this._realQuery = realQuery;
+  }
+
+  select(cols?: string) {
+    this._mock.select(cols);
+    if (this._realQuery && typeof this._realQuery.select === "function") {
+      try {
+        this._realQuery = this._realQuery.select(cols);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  insert(data: any) {
+    this._mock.insert(data);
+    if (this._realQuery && typeof this._realQuery.insert === "function") {
+      try {
+        this._realQuery = this._realQuery.insert(data);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  update(data: any) {
+    this._mock.update(data);
+    if (this._realQuery && typeof this._realQuery.update === "function") {
+      try {
+        this._realQuery = this._realQuery.update(data);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  delete() {
+    this._mock.delete();
+    if (this._realQuery && typeof this._realQuery.delete === "function") {
+      try {
+        this._realQuery = this._realQuery.delete();
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  eq(col: string, val: any) {
+    this._mock.eq(col, val);
+    if (this._realQuery && typeof this._realQuery.eq === "function") {
+      try {
+        this._realQuery = this._realQuery.eq(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  neq(col: string, val: any) {
+    this._mock.neq(col, val);
+    if (this._realQuery && typeof this._realQuery.neq === "function") {
+      try {
+        this._realQuery = this._realQuery.neq(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  gt(col: string, val: any) {
+    this._mock.gt(col, val);
+    if (this._realQuery && typeof this._realQuery.gt === "function") {
+      try {
+        this._realQuery = this._realQuery.gt(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  gte(col: string, val: any) {
+    this._mock.gte(col, val);
+    if (this._realQuery && typeof this._realQuery.gte === "function") {
+      try {
+        this._realQuery = this._realQuery.gte(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  lt(col: string, val: any) {
+    this._mock.lt(col, val);
+    if (this._realQuery && typeof this._realQuery.lt === "function") {
+      try {
+        this._realQuery = this._realQuery.lt(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  lte(col: string, val: any) {
+    this._mock.lte(col, val);
+    if (this._realQuery && typeof this._realQuery.lte === "function") {
+      try {
+        this._realQuery = this._realQuery.lte(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  ilike(col: string, val: string) {
+    this._mock.ilike(col, val);
+    if (this._realQuery && typeof this._realQuery.ilike === "function") {
+      try {
+        this._realQuery = this._realQuery.ilike(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  like(col: string, val: string) {
+    this._mock.like(col, val);
+    if (this._realQuery && typeof this._realQuery.like === "function") {
+      try {
+        this._realQuery = this._realQuery.like(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  in(col: string, vals: any[]) {
+    this._mock.in(col, vals);
+    if (this._realQuery && typeof this._realQuery.in === "function") {
+      try {
+        this._realQuery = this._realQuery.in(col, vals);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  is(col: string, val: any) {
+    this._mock.is(col, val);
+    if (this._realQuery && typeof this._realQuery.is === "function") {
+      try {
+        this._realQuery = this._realQuery.is(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  contains(col: string, val: any) {
+    this._mock.contains(col, val);
+    if (this._realQuery && typeof this._realQuery.contains === "function") {
+      try {
+        this._realQuery = this._realQuery.contains(col, val);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  order(col: string, opts?: { ascending?: boolean }) {
+    this._mock.order(col, opts);
+    if (this._realQuery && typeof this._realQuery.order === "function") {
+      try {
+        this._realQuery = this._realQuery.order(col, opts);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  limit(n: number) {
+    this._mock.limit(n);
+    if (this._realQuery && typeof this._realQuery.limit === "function") {
+      try {
+        this._realQuery = this._realQuery.limit(n);
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  single() {
+    this._mock.single();
+    if (this._realQuery && typeof this._realQuery.single === "function") {
+      try {
+        this._realQuery = this._realQuery.single();
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  maybeSingle() {
+    this._mock.maybeSingle();
+    if (this._realQuery && typeof this._realQuery.maybeSingle === "function") {
+      try {
+        this._realQuery = this._realQuery.maybeSingle();
+      } catch {
+        this._realQuery = null;
+      }
+    }
+    return this;
+  }
+
+  async then<TResult1 = any, TResult2 = never>(
+    onfulfilled?: ((value: { data: any; error: any }) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+  ): Promise<TResult1 | TResult2> {
+    if (this._realQuery && typeof this._realQuery.then === "function") {
+      try {
+        // Run with a 3500ms safety timeout to prevent stalling on unreachable network
+        const queryPromise = Promise.resolve(this._realQuery);
+        const timeoutPromise = new Promise<{ data: any; error: any }>((_, reject) =>
+          setTimeout(() => reject(new Error("Supabase request timeout")), 3500)
+        );
+        const res = (await Promise.race([queryPromise, timeoutPromise])) as any;
+
+        if (res && res.error) {
+          const errMsg = String(res.error?.message || "");
+          if (
+            errMsg.includes("fetch") ||
+            errMsg.includes("Failed to fetch") ||
+            errMsg.includes("NetworkError") ||
+            errMsg.includes("timeout") ||
+            errMsg.includes("schema cache") ||
+            errMsg.includes("relation") ||
+            errMsg.includes("does not exist") ||
+            errMsg.includes("404") ||
+            errMsg.includes("500") ||
+            errMsg.includes("502") ||
+            errMsg.includes("503")
+          ) {
+            const mockRes = await this._mock;
+            return Promise.resolve(mockRes).then(onfulfilled, onrejected);
+          }
+        }
+
+        if (res && !res.error && res.data !== null && res.data !== undefined) {
+          return Promise.resolve(res).then(onfulfilled, onrejected);
+        }
+      } catch {
+        // Fallback gracefully on network error / failed fetch
+        const mockRes = await this._mock;
+        return Promise.resolve(mockRes).then(onfulfilled, onrejected);
+      }
+    }
+
+    const mockRes = await this._mock;
+    return Promise.resolve(mockRes).then(onfulfilled, onrejected);
+  }
+}
+
 // Create real client if valid URL and Key are present
 let realClient: any = null;
 if (supabaseUrl && supabaseAnonKey && typeof supabaseUrl === "string" && supabaseUrl.startsWith("http")) {
@@ -611,8 +901,13 @@ export const supabase: any = new Proxy(
     get(_target, prop) {
       if (prop === "from") {
         return (table: string) => {
-          if (realClient) {
-            return realClient.from(table);
+          if (realClient && typeof realClient.from === "function") {
+            try {
+              const rQuery = realClient.from(table);
+              return new ResilientQueryBuilder(table, rQuery);
+            } catch {
+              return new MockQueryBuilder(table);
+            }
           }
           return new MockQueryBuilder(table);
         };

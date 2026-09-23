@@ -32,19 +32,19 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     }}>
       {/* Header Bar */}
       <div style={{
-        backgroundColor: "#f8f9fa",
-        borderBottom: "1px solid #dee2e6",
+        backgroundColor: "#254465",
+        borderBottom: "1px solid #1e3650",
         padding: "6px 12px",
         display: "flex",
         alignItems: "center",
         gap: "8px",
       }}>
-        <Filter style={{ width: "16px", height: "16px", color: "#212529", flexShrink: 0 }} />
+        <Filter style={{ width: "16px", height: "16px", color: "#ffffff", flexShrink: 0 }} />
         <strong style={{
           fontSize: "13px",
           fontWeight: 700,
-          color: "#212529",
-          fontFamily: "inherit",
+          color: "#ffffff",
+          fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif',
           lineHeight: "1",
         }}>
           Report Type

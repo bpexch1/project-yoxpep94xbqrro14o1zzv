@@ -213,7 +213,7 @@ function SidebarNavItems({ onNavigate, isCollapsed = false, isMobile = false }: 
   };
 
   return (
-    <nav className="flex flex-col bg-[#273444] min-h-full">
+    <nav className="flex flex-col bg-[#254465] min-h-full" style={{ fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif' }}>
       {/* Main menu items */}
       <div className="flex flex-col">
         {mainMenuItems.map((item) => renderItem(item))}
@@ -242,7 +242,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
     <>
       {/* DESKTOP SIDEBAR */}
       <aside className={cn(
-        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#273444] flex-col overflow-y-auto border-r border-[#354354] transition-all duration-200",
+        "hidden lg:flex fixed left-0 top-0 h-full z-30 bg-[#254465] flex-col overflow-y-auto border-r border-[#1e3650] transition-all duration-200",
         isCollapsed ? "w-[60px]" : "w-[220px]"
       )}>
         <SidebarNavItems onNavigate={() => {}} isCollapsed={isCollapsed} />
@@ -267,7 +267,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed = false, onTo
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "tween", duration: 0.2 }}
-              className="fixed left-0 top-0 h-full w-[260px] max-w-[80vw] z-50 bg-[#273444] flex flex-col overflow-y-auto shadow-2xl lg:hidden"
+              className="fixed left-0 top-0 h-full w-[260px] max-w-[80vw] z-50 bg-[#254465] flex flex-col overflow-y-auto shadow-2xl lg:hidden"
             >
               <SidebarNavItems onNavigate={onMobileClose} isCollapsed={false} isMobile={true} />
             </motion.div>

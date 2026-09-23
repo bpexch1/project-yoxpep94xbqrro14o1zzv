@@ -53,6 +53,23 @@ export default function AccountView() {
     select: (data: any) => Array.isArray(data) ? data.map((c: any) => ({ ...c })) : [],
   });
 
+  // Fetch target account's own record (e.g. Book22) to display in the top summary card
+  const { data: userOwnData, refetch: refetchUser } = useQuery({
+    queryKey: ["account-view-user-record", username],
+    queryFn: () => {
+      if (!username) return [];
+      return ClientEntity.filter({ username });
+    },
+    enabled: !!username && !!session && isAuthorized === true,
+    staleTime: 0,
+    refetchInterval: 5000,
+  });
+  const userRecord = userOwnData?.[0];
+
+  const handleRefresh = async () => {
+    await Promise.all([refetch(), refetchUser()]);
+  };
+
   if (isAuthorized === null) {
     return (
       <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
@@ -93,12 +110,13 @@ export default function AccountView() {
         {/* Client List card */}
         <div className="mx-[5px]">
           <ClientSummaryCard 
-            key={clientsKey}
+            key={`${clientsKey}-${userRecord?.id || 'none'}-${userRecord?.credit_remaining || 0}`}
             clients={clients || []} 
             isLoading={isLoading} 
             username={username || 'User'}
             hideCreateButton={true}
-            onRefresh={refetch}
+            onRefresh={handleRefresh}
+            adminRecord={userRecord}
           />
         </div>
       </main>

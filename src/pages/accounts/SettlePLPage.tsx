@@ -117,94 +117,94 @@ export default function SettlePLPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] font-roboto">
+    <div style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529" }}>
       <main className="max-w-[720px] mx-auto px-[5px] py-4 lg:py-6">
         
         {/* Header Bar */}
-        <div className="flex items-center gap-3 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex items-center gap-3 mb-6 bg-[#254465] p-4 rounded shadow-sm border border-[#1e3650]">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-white/10 rounded transition-colors text-white"
           >
-            <ChevronLeft className="w-5 h-5 text-[#2c3e50]" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-[#2c3e50]">Settle P/L Account</h1>
-            <p className="text-sm text-[#7f8c8d] font-bold uppercase tracking-wider">
+            <h1 className="text-xl font-bold text-white">Settle P/L Account</h1>
+            <p className="text-sm text-gray-200 font-bold uppercase tracking-wider">
               @{client.username}
             </p>
           </div>
         </div>
 
         {/* Settlement Form Card */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded shadow-sm border border-[#dee2e6] overflow-hidden">
+          <div className="p-6 space-y-6">
             
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-700">
+            <div className="bg-[#e6f2fc] border border-[#b8daff] rounded p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-[#254465] mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-[#254465] font-semibold">
                 Settling P/L will deduct the specified amount from the downline P/L balance and add it to the client's cash balance.
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">Available P/L</p>
-                <p className="text-xl font-bold text-[#1a9e71]">
+              <div className="bg-[#f8f9fa] p-4 rounded border border-[#dee2e6]">
+                <p className="text-[11px] font-bold text-[#6c757d] uppercase mb-1">Available P/L</p>
+                <p className="text-xl font-bold text-[#00b181]">
                   {(client?.pl_downline || 0).toLocaleString()} Rs.
                 </p>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-[10px] font-bold text-[#7f8c8d] uppercase mb-1">Current Cash</p>
-                <p className="text-xl font-bold text-[#3498db]">
+              <div className="bg-[#f8f9fa] p-4 rounded border border-[#dee2e6]">
+                <p className="text-[11px] font-bold text-[#6c757d] uppercase mb-1">Current Cash</p>
+                <p className="text-xl font-bold text-[#254465]">
                   {(client?.cash || 0).toLocaleString()} Rs.
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#2c3e50] uppercase mb-2 tracking-wide">Settlement Amount (Rs.)</label>
+              <label className="block text-xs font-bold text-[#212529] uppercase mb-2 tracking-wide">Settlement Amount (Rs.)</label>
               <div className="relative">
                 <input
                   type="number"
                   step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-4 pl-12 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#1a9e71]/10 focus:border-[#1a9e71] transition-all bg-gray-50"
+                  className="w-full border border-gray-300 rounded px-4 py-3 pl-12 text-lg font-bold focus:outline-none focus:ring-1 focus:ring-[#00b181] focus:border-[#00b181] transition-all bg-white text-[#212529]"
                   placeholder="0.00"
                 />
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rs.</span>
               </div>
-              <p className="text-[11px] text-gray-400 mt-2 italic">
+              <p className="text-[11px] text-gray-500 mt-2 italic">
                 * Maximum allowed transfer is {(client?.pl_downline || 0).toLocaleString()} Rs.
               </p>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#2c3e50] uppercase mb-2 tracking-wide">Description</label>
+              <label className="block text-xs font-bold text-[#212529] uppercase mb-2 tracking-wide">Description</label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9e71]/10 focus:border-[#1a9e71] transition-all bg-gray-50"
+                className="w-full border border-gray-300 rounded px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#00b181] focus:border-[#00b181] transition-all bg-white text-[#212529]"
               />
             </div>
           </div>
 
-          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <div className="px-6 py-4 bg-[#f8f9fa] border-t border-[#dee2e6] flex justify-end">
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#1a9e71] hover:bg-[#158c61] text-white font-bold px-12 py-3 h-auto rounded-lg shadow-lg flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+              className="bg-[#00b181] hover:bg-[#4dbd74] text-white font-bold px-8 py-2.5 h-auto rounded shadow flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Processing...
                 </>
               ) : (
                 <>
-                  <ArrowRightLeft className="w-5 h-5" />
+                  <ArrowRightLeft className="w-4 h-4" />
                   Settle Now
                 </>
               )}
@@ -212,10 +212,10 @@ export default function SettlePLPage() {
           </div>
         </form>
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-4 flex justify-center">
           <button 
             onClick={() => navigate(-1)}
-            className="text-sm font-bold text-[#7f8c8d] hover:text-[#2c3e50] transition-colors"
+            className="text-sm font-bold text-[#6c757d] hover:text-[#212529] transition-colors"
           >
             Cancel and Return
           </button>

@@ -3,8 +3,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Menu } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession } from "@/hooks/useClientAuth";
-import { Client } from "@/entities";
+import { Client, Bet } from "@/entities";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { calculateTotalLiability } from "@/utils/bettingPositions";
 
 interface UserHeaderProps {
   sidebarOpen?: boolean;
@@ -54,7 +55,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
     }
   };
 
-  const { data: clientData } = useQuery({
+  const { data: clientData, refetch: refetchClientData } = useQuery({
     queryKey: ["user-header-balance", session?.username],
     queryFn: async () => {
       if (!session?.username) return null;
@@ -62,10 +63,31 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
       return (clients as any)?.[0] ?? null;
     },
     enabled: !!session?.username,
-    refetchInterval: 15000,
+    refetchInterval: 3000,
+    staleTime: 0,
   });
 
-  const balance = clientData?.cash ?? 0;
+  useEffect(() => {
+    const handleBalanceUpdate = () => {
+      refetchClientData();
+    };
+    window.addEventListener("balance-updated", handleBalanceUpdate);
+    return () => window.removeEventListener("balance-updated", handleBalanceUpdate);
+  }, [refetchClientData]);
+
+  const { data: userPendingBets = [] } = useQuery({
+    queryKey: ["user-header-bets", session?.username],
+    queryFn: async () => {
+      if (!session?.username) return [];
+      return Bet.filter({ user_email: session.username, status: "pending" });
+    },
+    enabled: !!session?.username,
+    refetchInterval: 3000,
+  });
+
+  const balance = Number(clientData?.cash ?? 0);
+  const totalLiability = calculateTotalLiability(userPendingBets as any);
+  const activeBetsCount = (userPendingBets as any[])?.length || 0;
 
   const handleLogout = () => {
     clearClientSession();
@@ -81,6 +103,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
   if (!session) return null;
 
   const menuItems = [
+    { label: "Current Position", path: "/play/current-position" },
     { label: "Statement", path: "/play/statement" },
     { label: "Result", path: "/play/result" },
     { label: "Profit Loss", path: "/play/profit-loss" },
@@ -194,8 +217,10 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <div style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
-              <span>B: {balance.toLocaleString("en-IN")}</span>
-              <span style={{ opacity: 0.9 }}> | L: 0</span>
+              <span>B: 0</span>
+              <span style={{ opacity: 0.95, color: totalLiability > 0 ? "#ff8a80" : "white" }}>
+                {" "}| L: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
+              </span>
             </div>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -292,8 +317,10 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
       >
         <div>Credit: 0</div>
         <div>Balance: {balance.toLocaleString("en-IN")}</div>
-        <div>Liable: 0</div>
-        <div>Active Bets: *</div>
+        <div style={{ color: totalLiability > 0 ? "#ff8a80" : "white" }}>
+          Liable: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
+        </div>
+        <div>Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
       </div>
     </header>
   );

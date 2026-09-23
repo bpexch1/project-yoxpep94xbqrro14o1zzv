@@ -199,8 +199,13 @@ export default function UserDashboard() {
   const location = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isCasinoPath = (path: string) => {
+    const p = path.toLowerCase();
+    return p.includes("casino") || p.includes("betfair-game") || p.includes("betfairgame");
+  };
+
   const [activeFilter, setActiveFilter] = useState(() => {
-    if (location.pathname === "/casino") return "Casino";
+    if (isCasinoPath(location.pathname)) return "Casino";
     return location.state?.activeFilter || "Inplay";
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -229,7 +234,7 @@ export default function UserDashboard() {
   }, [location.state]);
 
   useEffect(() => {
-    if (location.pathname === "/casino") {
+    if (isCasinoPath(location.pathname)) {
       setActiveFilter("Casino");
     } else if (location.state?.activeFilter) {
       setActiveFilter(location.state.activeFilter);

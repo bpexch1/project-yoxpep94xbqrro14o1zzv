@@ -6,6 +6,7 @@ import { Match, Bet, Client } from "@/entities";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
+import { MatchedAndOpenBets } from "@/components/user/MatchedAndOpenBets";
 import FootballMatchDetail from "./FootballMatchDetail";
 import TennisMatchDetail from "./TennisMatchDetail";
 import { getClientSession } from "@/hooks/useClientAuth";
@@ -14,6 +15,8 @@ import { Volume2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { getLiveOdds, getCricketScore, oddsEngine, fetchBetfairEvents } from "@/functions";
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
+import { calculateMarketPositions } from "@/utils/bettingPositions";
+import { findMatchByIdOrTitle } from "@/utils/matchCatalog";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -54,11 +57,15 @@ export default function MatchDetail() {
   const { data: matchFromDB, isLoading: matchLoading_raw } = useQuery({
     queryKey: ['match', matchId],
     queryFn: async () => {
-      const results = await Match.list();
-      const found = (Array.isArray(results) ? results : []).find(
-        (m: any) => m.id === matchId || m.betfair_event_id === matchId
-      );
-      if (found) return found;
+      try {
+        const results = await Match.list();
+        const found = (Array.isArray(results) ? results : []).find(
+          (m: any) => m.id === matchId || m.betfair_event_id === matchId || String(m.id).toLowerCase() === String(matchId).toLowerCase()
+        );
+        if (found) return found;
+      } catch (err) {
+        console.debug("Match.list error:", err);
+      }
 
       // Fallback lookup in live API events
       try {
@@ -70,15 +77,17 @@ export default function MatchDetail() {
       } catch (err) {
         console.debug("Live events lookup fallback error:", err);
       }
-      return null;
+
+      // Catalog & synthesized fallback
+      return findMatchByIdOrTitle(matchId || "");
     },
     enabled: !!matchId && !stateMatch,
     refetchInterval: stateMatch ? false : 8000
   });
 
-  // Use state match (Betfair event) OR DB match
-  const match = stateMatch || matchFromDB;
-  const matchLoading = stateMatch ? false : matchLoading_raw;
+  // Use state match (Betfair event) OR DB match OR Catalog fallback
+  const match = stateMatch || matchFromDB || (matchId ? findMatchByIdOrTitle(matchId) : null);
+  const matchLoading = stateMatch ? false : (matchLoading_raw && !match);
 
   // Fetch real-time client data
   const { data: clients, isLoading: clientLoading } = useQuery({
@@ -88,14 +97,24 @@ export default function MatchDetail() {
   });
 
   const { data: openBets = [] } = useQuery({
-    queryKey: ['open-bets', matchId, session?.username],
-    queryFn: () => Bet.filter({ 
-      user_email: session?.username,
-      match_id: matchId,
-      status: 'pending'
-    }),
-    enabled: !!session?.username && !!matchId,
-    refetchInterval: 5000
+    queryKey: ['open-bets', match?.id, match?.title, matchId, session?.username],
+    queryFn: async () => {
+      if (!session?.username) return [];
+      const userBets = await Bet.filter({ 
+        user_email: session.username,
+        status: 'pending'
+      });
+      const currentMatchId = match?.id || matchId;
+      const currentTitle = match?.title?.toLowerCase()?.trim();
+      return (userBets || []).filter((b: any) => {
+        if (b.match_id === currentMatchId || b.match_id === matchId) return true;
+        if (match?.betfair_event_id && b.match_id === match.betfair_event_id) return true;
+        if (currentTitle && b.match_title && b.match_title.toLowerCase().trim() === currentTitle) return true;
+        return false;
+      });
+    },
+    enabled: !!session?.username && (!!matchId || !!match?.id),
+    refetchInterval: 3000
   });
 
   const clientData = clients?.[0];
@@ -295,7 +314,13 @@ export default function MatchDetail() {
     onSuccess: () => {
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data'] });
-      queryClient.invalidateQueries({ queryKey: ['open-bets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-header-balance'] });
+      queryClient.invalidateQueries({ queryKey: ['user-header-bets'] });
+      queryClient.invalidateQueries({ queryKey: ['open-bets', matchId] });
+      toast({
+        title: "Bet Placed Successfully",
+        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+      });
     },
     onError: (error: any) => {
       toast({ variant: "destructive", title: "Bet Failed", description: error.message });
@@ -359,6 +384,11 @@ export default function MatchDetail() {
     { title: `Mohammad Nabi Boundaries`, back: 4, lay: 3, backSize: '100', laySize: '100' },
     { title: `Mohammad Nabi Runs`, back: 21, lay: 21, backSize: '90', laySize: '110' },
   ];
+
+  // Calculate runner positions across cricket markets
+  const matchOddsRunners = [match.team1, match.team2].filter(Boolean);
+  const matchOddsPositions = calculateMarketPositions(matchOddsRunners, openBets as any);
+  const fancyPositions = calculateMarketPositions(fancy2Items.map(f => f.title), openBets as any);
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column", position: "relative" }}>
@@ -486,6 +516,7 @@ export default function MatchDetail() {
             <>
               <TeamRow2
                 name={match.team1}
+                position={matchOddsPositions[match.team1]}
                 odds={t1_back}
                 layOdds={t1_lay}
                 backSize={hasLiveOdds ? formatSize(runner1?.backSize) : "22.6M"}
@@ -496,6 +527,7 @@ export default function MatchDetail() {
               />
               <TeamRow2
                 name={match.team2}
+                position={matchOddsPositions[match.team2]}
                 odds={t2_back}
                 layOdds={t2_lay}
                 backSize={hasLiveOdds ? formatSize(runner2?.backSize) : "1.5M"}
@@ -511,6 +543,7 @@ export default function MatchDetail() {
               <CombinedSectionHeader title="BOOKMAKER (MaxBet: 1M)" />
               <TeamRow2
                 name={match.team1}
+                position={matchOddsPositions[match.team1]}
                 odds={t1_back ? Number((t1_back * 0.99).toFixed(2)) : 1.18}
                 layOdds={t1_lay ? Number((t1_lay * 0.99).toFixed(2)) : 1.19}
                 backSize="100"
@@ -521,6 +554,7 @@ export default function MatchDetail() {
               />
               <TeamRow2
                 name={match.team2}
+                position={matchOddsPositions[match.team2]}
                 odds={t2_back ? Number((t2_back * 0.99).toFixed(2)) : 6.26}
                 layOdds={t2_lay ? Number((t2_lay * 0.99).toFixed(2)) : 6.56}
                 backSize="100"
@@ -557,6 +591,7 @@ export default function MatchDetail() {
               <TeamRow2
                 key={idx}
                 name={item.title}
+                position={fancyPositions[item.title]}
                 odds={item.back}
                 layOdds={item.lay}
                 backSize={item.backSize}
@@ -723,49 +758,8 @@ export default function MatchDetail() {
           </div>
         </div>
 
-        {/* === OPEN BETS TABLE === */}
-        <div style={{ marginTop: 14 }}>
-          <div style={{ backgroundColor: "#1e3a5f", padding: "6px 12px" }}>
-            <span style={{ color: "white", fontWeight: 800, fontSize: 12, textTransform: "uppercase" }}>
-              Open Bets ({openBets.length})
-            </span>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", backgroundColor: "#e2e8f0", padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#334155" }}>
-            <span>Runner</span>
-            <span style={{ textAlign: "center" }}>Price</span>
-            <span style={{ textAlign: "right" }}>Size</span>
-          </div>
-          {openBets.length > 0 ? (
-            openBets.map((b: any) => (
-              <div key={b.id} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", backgroundColor: "#fff", padding: "8px 12px", borderBottom: "1px solid #dbe3ec", fontSize: 12 }}>
-                <span style={{ fontWeight: 700, color: "#1e293b" }}>{b.selection}</span>
-                <span style={{ textAlign: "center", fontWeight: 700 }}>{b.odds}</span>
-                <span style={{ textAlign: "right", fontWeight: 700 }}>{b.stake}</span>
-              </div>
-            ))
-          ) : (
-            <div style={{ backgroundColor: "#fff", padding: "10px 12px", borderBottom: "1px solid #dbe3ec", fontSize: 12, color: "#64748b", textAlign: "center" }}>
-              No open bets for this match.
-            </div>
-          )}
-        </div>
-
-        {/* === MATCHED BETS TABLE === */}
-        <div style={{ marginTop: 10 }}>
-          <div style={{ backgroundColor: "#1e3a5f", padding: "6px 12px" }}>
-            <span style={{ color: "white", fontWeight: 800, fontSize: 12, textTransform: "uppercase" }}>
-              Matched Bets (0)
-            </span>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", backgroundColor: "#e2e8f0", padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#334155" }}>
-            <span>Runner</span>
-            <span style={{ textAlign: "center" }}>Price</span>
-            <span style={{ textAlign: "right" }}>Size</span>
-          </div>
-          <div style={{ backgroundColor: "#fff", padding: "10px 12px", borderBottom: "1px solid #dbe3ec", fontSize: 12, color: "#64748b", textAlign: "center" }}>
-            No matched bets.
-          </div>
-        </div>
+        {/* === OPEN & MATCHED BETS COMPONENT === */}
+        <MatchedAndOpenBets openBets={[]} matchedBets={openBets} />
 
         {/* === RELATED EVENTS === */}
         <div style={{ marginTop: 14 }}>
@@ -830,19 +824,46 @@ function CombinedSectionHeader({ title }: { title: string }) {
   );
 }
 
-function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, showBook, onBet }: any) {
+function TeamRow2({ 
+  name, 
+  odds, 
+  layOdds, 
+  backSize, 
+  laySize, 
+  loading, 
+  suspended, 
+  showBook, 
+  position,
+  onBet 
+}: any) {
   const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
   const defaultBack = `${((hash % 30) / 10 + 0.5).toFixed(1)}M`;
   const defaultLay = `${((hash % 20) / 10 + 0.2).toFixed(1)}M`;
   const displayBackSize = backSize !== undefined ? backSize : defaultBack;
   const displayLaySize = laySize !== undefined ? laySize : defaultLay;
+  const hasPos = position !== undefined && position !== 0;
 
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 42 }}>
+    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 46 }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "4px 10px" }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: "#1e293b", lineHeight: 1.2 }}>{name}</span>
-        {showBook && (
-          <span style={{ color: "#00b894", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Book</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontWeight: 700, fontSize: 13.5, color: "#1e293b", lineHeight: 1.2 }}>{name}</span>
+          {showBook && (
+            <span style={{ color: "#00b894", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Book</span>
+          )}
+        </div>
+        {hasPos && (
+          <span 
+            style={{ 
+              fontWeight: 800, 
+              fontSize: 12, 
+              marginTop: 1.5,
+              color: position > 0 ? "#00b181" : "#e53935",
+              letterSpacing: "0.2px"
+            }}
+          >
+            {position > 0 ? position.toLocaleString("en-IN") : position.toLocaleString("en-IN")}
+          </span>
         )}
       </div>
       {suspended ? (
@@ -863,11 +884,13 @@ function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, 
               cursor: odds ? "pointer" : "default",
               borderLeft: "1px solid #c4d9ea",
               padding: "2px 0",
-              transition: "opacity 0.1s"
+              transition: "background-color 0.1s"
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5bb5f5")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#7ec8f8")}
           >
-            <span style={{ fontWeight: 800, fontSize: 13, color: "#000" }}>{odds ? odds : '-'}</span>
-            <span style={{ fontSize: 9, color: "#333", fontWeight: 600 }}>{displayBackSize}</span>
+            <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000" }}>{odds ? odds : '-'}</span>
+            <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600 }}>{displayBackSize}</span>
           </div>
           <div
             onClick={() => layOdds && onBet('lay', layOdds)}
@@ -881,11 +904,13 @@ function TeamRow2({ name, odds, layOdds, backSize, laySize, loading, suspended, 
               cursor: layOdds ? "pointer" : "default",
               borderLeft: "1px solid #c4d9ea",
               padding: "2px 0",
-              transition: "opacity 0.1s"
+              transition: "background-color 0.1s"
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f87171")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fca5a5")}
           >
-            <span style={{ fontWeight: 800, fontSize: 13, color: "#000" }}>{layOdds ? layOdds : '-'}</span>
-            <span style={{ fontSize: 9, color: "#333", fontWeight: 600 }}>{displayLaySize}</span>
+            <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000" }}>{layOdds ? layOdds : '-'}</span>
+            <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600 }}>{displayLaySize}</span>
           </div>
         </>
       )}

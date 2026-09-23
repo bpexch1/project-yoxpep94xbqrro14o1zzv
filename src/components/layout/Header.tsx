@@ -77,17 +77,25 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
     enabled: !!session && downlineUsernames !== undefined,
   });
 
-  const { data: liveBalance = 0 } = useQuery({
-    queryKey: ["header-balance", session?.id],
+  const { data: liveBalance = 0, refetch: refetchHeaderBalance } = useQuery({
+    queryKey: ["header-balance", session?.username],
     queryFn: async () => {
-      if (!session?.id) return 0;
+      if (!session?.username) return 0;
       const clients = await Client.filter({ username: session.username }, "-created_at", 1);
-      return (clients as any)?.[0]?.cash ?? 0;
+      return Number((clients as any)?.[0]?.cash ?? 0);
     },
-    enabled: !!session?.id,
-    refetchInterval: 30000,
-    staleTime: 10000,
+    enabled: !!session?.username,
+    refetchInterval: 3000,
+    staleTime: 0,
   });
+
+  useEffect(() => {
+    const handleBalanceUpdate = () => {
+      refetchHeaderBalance();
+    };
+    window.addEventListener("balance-updated", handleBalanceUpdate);
+    return () => window.removeEventListener("balance-updated", handleBalanceUpdate);
+  }, [refetchHeaderBalance]);
 
   const handleLogout = () => {
     clearClientSession();
@@ -181,11 +189,11 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
             </DropdownMenu>
 
             <div className="flex items-center gap-1.5 text-sm">
-              <span className="text-[#212529] whitespace-nowrap font-bold">
-                B: <span className="font-normal text-[#212529]">{Math.max(0, liveBalance).toLocaleString('en-IN')}</span>
+              <span className="text-[#6c757d] whitespace-nowrap font-normal">
+                B: <span className="font-normal text-[#6c757d]">0</span>
               </span>
-              <span className="text-[#212529] whitespace-nowrap font-bold">
-                Exp: <span className="font-normal text-[#212529]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
+              <span className="text-[#6c757d] whitespace-nowrap font-normal">
+                Exp: <span className="font-normal text-[#6c757d]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
               </span>
             </div>
           </div>

@@ -5,8 +5,9 @@ import { Bet, Client } from "@/entities";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { BetSlip } from "@/components/user/BetSlip";
+import { MatchedAndOpenBets } from "@/components/user/MatchedAndOpenBets";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { calculateMarketPositions } from "@/utils/bettingPositions";
 
 // Sub-components
 import { TennisMatchInfo } from "@/components/user/TennisMatchInfo";
@@ -33,14 +34,24 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
 
   // Fetch open bets for this match
   const { data: openBets = [] } = useQuery({
-    queryKey: ['open-bets', match?.id, session?.username],
-    queryFn: () => Bet.filter({ 
-      user_email: session?.username,
-      match_id: match?.id,
-      status: 'pending'
-    }),
-    enabled: !!session?.username && !!match?.id,
-    refetchInterval: 5000
+    queryKey: ['open-bets', match?.id, match?.title, session?.username],
+    queryFn: async () => {
+      if (!session?.username) return [];
+      const userBets = await Bet.filter({ 
+        user_email: session.username,
+        status: 'pending'
+      });
+      const currentId = match?.id;
+      const currentTitle = (match?.title || `${match?.team1 || ""} v ${match?.team2 || ""}`).toLowerCase().trim();
+      return (userBets || []).filter((b: any) => {
+        if (currentId && b.match_id === currentId) return true;
+        if (match?.betfair_event_id && b.match_id === match.betfair_event_id) return true;
+        if (currentTitle && b.match_title && b.match_title.toLowerCase().trim() === currentTitle) return true;
+        return false;
+      });
+    },
+    enabled: !!session?.username && (!!match?.id || !!match?.title),
+    refetchInterval: 3000
   });
 
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
@@ -67,12 +78,22 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
     onSuccess: () => {
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ['client-data'] });
-      queryClient.invalidateQueries({ queryKey: ['open-bets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-header-balance'] });
+      queryClient.invalidateQueries({ queryKey: ['user-header-bets'] });
+      queryClient.invalidateQueries({ queryKey: ['open-bets', match?.id, session?.username] });
+      toast({
+        title: "Bet Placed Successfully",
+        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+      });
     },
     onError: (error: any) => {
       toast({ variant: "destructive", title: "Bet Failed", description: error.message });
     }
   });
+
+  // Calculate market positions for Tennis match odds
+  const tennisRunners = [match.team1, match.team2].filter(Boolean);
+  const tennisPositions = calculateMarketPositions(tennisRunners, openBets as any);
 
   // Extract Match Odds market
   const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
@@ -140,6 +161,7 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
             <>
               <TennisOddsRow 
                 name={match.team1} 
+                position={tennisPositions[match.team1]}
                 odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? 1.72) : (match.back_odds ?? 1.72)} 
                 layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? 1.74) : (match.lay_odds ?? 1.74)} 
                 backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
@@ -148,6 +170,7 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
               />
               <TennisOddsRow 
                 name={match.team2} 
+                position={tennisPositions[match.team2]}
                 odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? 2.36) : (match.back_odds2 ?? 2.36)} 
                 layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? 2.4) : (match.lay_odds2 ?? 2.4)} 
                 backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
@@ -165,67 +188,8 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
           match={match} 
         />
 
-        {/* 7. OPEN BETS SECTION */}
-        <div style={{ marginTop: 0, backgroundColor: "white" }}>
-          <div style={{ backgroundColor: "#254465", padding: "7px 12px" }}>
-            <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>Open Bets ({openBets.length})</span>
-          </div>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-            <thead>
-              <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "5px 10px", textAlign: "left", fontWeight: 700, color: "#254465", borderBottom: "1px solid #e0e0e0" }}>Runner</th>
-                <th style={{ padding: "5px 10px", textAlign: "center", fontWeight: 700, color: "#254465", borderBottom: "1px solid #e0e0e0" }}>Price</th>
-                <th style={{ padding: "5px 10px", textAlign: "right", fontWeight: 700, color: "#254465", borderBottom: "1px solid #e0e0e0" }}>Size</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {openBets.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="px-4 py-10 text-center text-[13px] font-bold text-gray-400 uppercase tracking-widest">
-                    No open bets found
-                  </td>
-                </tr>
-              ) : (
-                openBets.map((bet: any) => (
-                  <tr key={bet.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-3">
-                        <span className={cn(
-                          "px-2 py-0.5 rounded-sm text-[10px] font-black uppercase tracking-tighter",
-                          bet.bet_type === 'back' ? "bg-[#72bbef] text-black" : "bg-[#faa9ba] text-black"
-                        )}>
-                          {bet.bet_type}
-                        </span>
-                        <span className="font-black text-[14px] text-[#1e293b]">{bet.selection}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-center font-black text-[15px] text-[#1e293b]">{bet.odds}</td>
-                    <td className="px-3 py-2 text-right font-black text-[15px] text-[#1e293b]">Rs. {bet.stake?.toLocaleString()}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* MATCHED BETS */}
-        <div style={{ marginTop: 0, backgroundColor: "white", marginBottom: 16 }}>
-          <div style={{ backgroundColor: "#254465", padding: "7px 12px" }}>
-            <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>Matched Bets (0)</span>
-          </div>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-            <thead>
-              <tr style={{ backgroundColor: "#f5f5f5" }}>
-                <th style={{ padding: "5px 10px", textAlign: "left", fontWeight: 700, color: "#254465", borderBottom: "1px solid #e0e0e0" }}>Runner</th>
-                <th style={{ padding: "5px 10px", textAlign: "center", fontWeight: 700, color: "#254465", borderBottom: "1px solid #e0e0e0" }}>Price</th>
-                <th style={{ padding: "5px 10px", textAlign: "right", fontWeight: 700, color: "#254465", borderBottom: "1px solid #e0e0e0" }}>Size</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td colSpan={3} style={{ padding: "16px", textAlign: "center", color: "#999" }}>No matched bets</td></tr>
-            </tbody>
-          </table>
-        </div>
+        {/* 7. OPEN & MATCHED BETS SECTION */}
+        <MatchedAndOpenBets openBets={[]} matchedBets={openBets} />
       </main>
 
       <BetSlip 
