@@ -146,9 +146,9 @@ export default function Accounts() {
 
   return (
     <div
-      className="min-h-screen bg-[#ececed] text-[#212529]"
+      className="min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]"
       style={{
-        fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
       <main className="w-full max-w-full px-2 sm:px-3 py-2 sm:py-3">
@@ -156,23 +156,23 @@ export default function Accounts() {
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
-        <div className="bg-white rounded-[4px] border border-[#dee2e6] shadow-[0_1px_3px_rgba(0,0,0,0.05)] mb-3 overflow-visible">
+        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] shadow-[0_1px_1px_rgba(0,0,0,0.05)] mb-3 overflow-visible">
           {/* Light Header matching original website */}
-          <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
+          <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center gap-2">
             <svg
               viewBox="0 0 24 24"
-              className="w-4 h-4 fill-black text-black shrink-0"
+              className="w-4 h-4 fill-[rgb(35,40,44)] text-[rgb(35,40,44)] shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .71 1.71L14 11.42V19a1 1 0 0 1-.55.89l-4 2A1 1 0 0 1 8 21v-9.58L3.29 5.71A1 1 0 0 1 3 4z" />
             </svg>
-            <span className="font-bold text-[14px] text-[#212529] tracking-tight">
+            <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)] tracking-tight">
               Search-Users
             </span>
           </div>
 
           {/* Search-Users Body */}
-          <div className="p-3.5 sm:p-4">
+          <div className="p-3">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <div ref={dropdownRef} className="relative flex-1 max-w-md flex">
                 <div className="relative flex-1">
@@ -189,7 +189,7 @@ export default function Accounts() {
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
-                    className="w-full h-[36px] border border-[#ced4da] rounded-l-[4px] px-3 text-[13px] text-[#374151] bg-white outline-none focus:border-[#00a676] focus:ring-1 focus:ring-[#00a676] transition-all"
+                    className="w-full h-[34px] border border-[rgb(200,206,211)] border-r-0 rounded-l-[0.2rem] px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00b98a] transition-all"
                   />
                   {searchQuery && (
                     <button
@@ -209,22 +209,22 @@ export default function Accounts() {
 
                 <button
                   onClick={handleSearchClick}
-                  className="h-[36px] px-4 bg-[#00a676] hover:bg-[#008f65] text-white font-medium text-[13px] rounded-r-[4px] flex items-center gap-1.5 transition-colors shrink-0 shadow-sm"
+                  className="h-[34px] px-3.5 bg-[#00b98a] hover:bg-[#138a72] text-white font-medium text-[0.875rem] rounded-r-[0.2rem] flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#00b98a]"
                 >
-                  <Search className="w-4 h-4 stroke-[2.5]" />
+                  <Search className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Search</span>
                 </button>
 
                 {/* Suggestions dropdown */}
                 {showSuggestions && suggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#ced4da] rounded-[4px] shadow-lg z-50 max-h-[260px] overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] shadow-lg z-50 max-h-[260px] overflow-y-auto">
                     {suggestions.map((client, index) => (
                       <div
                         key={client.id}
                         onClick={() => selectSuggestion(client)}
                         onMouseEnter={() => setHighlightedIndex(index)}
-                        className={`px-3 py-2 cursor-pointer flex items-center justify-between text-[13px] border-b border-gray-100 last:border-0 ${
-                          highlightedIndex === index ? "bg-[#f0fdf4] text-[#00a676]" : "text-[#212529] hover:bg-gray-50"
+                        className={`px-3 py-2 cursor-pointer flex items-center justify-between text-[0.875rem] border-b border-gray-100 last:border-0 ${
+                          highlightedIndex === index ? "bg-[#f0fdf4] text-[#00b98a]" : "text-[rgb(35,40,44)] hover:bg-gray-50"
                         }`}
                       >
                         <span className="font-bold">{client.username}</span>
@@ -237,7 +237,7 @@ export default function Accounts() {
 
               {/* Breadcrumbs if user navigated */}
               {breadcrumb.length > 0 && (
-                <div className="flex items-center gap-1.5 text-[13px] overflow-x-auto py-1">
+                <div className="flex items-center gap-1.5 text-[0.875rem] overflow-x-auto py-1">
                   {breadcrumb.map((item, index) => {
                     const isLast = index === breadcrumb.length - 1;
                     const path = isLast ? `/accounts/cash-credit/${item}` : `/accounts/view/${item}`;
@@ -246,7 +246,7 @@ export default function Accounts() {
                         <button
                           onClick={() => navigate(path)}
                           className={`font-semibold transition-colors ${
-                            isLast ? "text-[#00a676] font-bold" : "text-[#212529] hover:text-[#00a676]"
+                            isLast ? "text-[#00b98a] font-bold" : "text-[rgb(35,40,44)] hover:text-[#00b98a]"
                           }`}
                         >
                           {item}
@@ -273,8 +273,8 @@ export default function Accounts() {
         />
 
         {/* Footer Text */}
-        <div className="text-center py-5">
-          <p className="font-bold text-[13px] text-[#212529]">
+        <div className="text-center py-4">
+          <p className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">
             Welcome to Exchange.
           </p>
         </div>

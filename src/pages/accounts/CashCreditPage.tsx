@@ -282,76 +282,62 @@ export default function CashCreditPage() {
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 54727;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#e8eff5", fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', paddingBottom: 40 }}>
-      <div style={{ maxWidth: 440, margin: "0 auto", padding: "8px 8px" }}>
+    <div className="min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <div className="max-w-md mx-auto px-2 py-3">
         
         {/* Top 2 Flat Action Buttons: Cash & Credit */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+        <div className="flex gap-2.5 mb-3">
           <button 
             type="button"
             onClick={() => setActiveTab('cash')}
-            style={{
-              flex: 1,
-              padding: "9px 0",
-              fontSize: 14,
-              fontWeight: 700,
-              backgroundColor: activeTab === 'cash' ? "#0088cc" : "#ffffff",
-              color: activeTab === 'cash' ? "#ffffff" : "#27ae60",
-              border: activeTab === 'cash' ? "1px solid #0088cc" : "1px solid #27ae60",
-              borderRadius: 4,
-              cursor: "pointer",
-              textAlign: "center",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
-            }}
+            className={cn(
+              "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
+              activeTab === 'cash' 
+                ? "bg-[#0088cc] text-white border-[#0088cc]" 
+                : "bg-white text-[#00b98a] border-[#00b98a] hover:bg-gray-50"
+            )}
           >
             Cash
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('credit')}
-            style={{
-              flex: 1,
-              padding: "9px 0",
-              fontSize: 14,
-              fontWeight: 700,
-              backgroundColor: activeTab === 'credit' ? "#0088cc" : "#ffffff",
-              color: activeTab === 'credit' ? "#ffffff" : "#27ae60",
-              border: activeTab === 'credit' ? "1px solid #0088cc" : "1px solid #27ae60",
-              borderRadius: 4,
-              cursor: "pointer",
-              textAlign: "center",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
-            }}
+            className={cn(
+              "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
+              activeTab === 'credit' 
+                ? "bg-[#0088cc] text-white border-[#0088cc]" 
+                : "bg-white text-[#00b98a] border-[#00b98a] hover:bg-gray-50"
+            )}
           >
             Credit
           </button>
         </div>
         
         {/* Username Header & 3-Column Info Table Box */}
-        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, padding: "12px 14px 14px 14px", marginBottom: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontWeight: 800, fontSize: 17, color: "#111827", marginBottom: 10 }}>
+        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-3 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="font-bold text-[1rem] text-[rgb(35,40,44)] mb-2.5">
             {client.username}
           </div>
           
           {activeTab === 'cash' ? (
             /* Cash Tab Header Table: Credit | Balance | Max Withdraw */
-            <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #e5e7eb", fontSize: 13 }}>
+            <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
-                <tr style={{ background: "#f9fafb" }}>
-                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "33%" }}>Credit</th>
-                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "33%" }}>Balance</th>
-                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "34%" }}>Max Withdraw</th>
+                <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Credit</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Balance</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Max Withdraw</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                <tr className="bg-white font-bold text-[rgb(35,40,44)]">
+                  <td className="border border-[rgb(200,206,211)] p-2">
                     {clientCredit.toLocaleString()} Rs.
                   </td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                  <td className="border border-[rgb(200,206,211)] p-2">
                     {clientTotalBalance.toLocaleString()} Rs.
                   </td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                  <td className="border border-[rgb(200,206,211)] p-2">
                     {maxWithdraw.toLocaleString()} Rs.
                   </td>
                 </tr>
@@ -359,23 +345,23 @@ export default function CashCreditPage() {
             </table>
           ) : (
             /* Credit Tab Header Table: Credit limit | [Username] Credit | [Username] Available Balance */
-            <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #e5e7eb", fontSize: 13 }}>
+            <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
-                <tr style={{ background: "#f9fafb" }}>
-                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "30%", lineHeight: 1.2 }}>Credit limit</th>
-                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "35%", lineHeight: 1.2 }}>{client.username} Credit</th>
-                  <th style={{ border: "1px solid #e5e7eb", padding: "6px 8px", textAlign: "left", fontWeight: 600, color: "#374151", width: "35%", lineHeight: 1.2 }}>{client.username} Available Balance</th>
+                <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[30%] leading-tight">Credit limit</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[35%] leading-tight">{client.username} Credit</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[35%] leading-tight">{client.username} Available Balance</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                <tr className="bg-white font-bold text-[rgb(35,40,44)]">
+                  <td className="border border-[rgb(200,206,211)] p-2">
                     {adminCreditLimit.toLocaleString()} Rs.
                   </td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                  <td className="border border-[rgb(200,206,211)] p-2">
                     {clientCredit.toLocaleString()} Rs.
                   </td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 8px", fontWeight: 700, color: "#111827" }}>
+                  <td className="border border-[rgb(200,206,211)] p-2">
                     {clientTotalBalance.toLocaleString()} Rs.
                   </td>
                 </tr>
@@ -385,43 +371,34 @@ export default function CashCreditPage() {
         </div>
         
         {/* DEPOSIT FORM BOX (Green Header) */}
-        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, overflow: "hidden", marginBottom: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ background: "#00a65a", padding: "9px 14px", fontSize: 13.5, color: "#ffffff", fontWeight: 700 }}>
+        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="bg-[#00b98a] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash' 
               ? `Deposit Cash in ${client.username} account` 
               : `Deposit Credit in ${client.username} Account`}
           </div>
           
-          <div style={{ padding: "14px" }}>
+          <div className="p-3.5">
             {/* Description */}
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+            <div className="mb-3">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
                 Description
               </label>
               <input
                 type="text"
                 value={depositDesc}
                 onChange={(e) => setDepositDesc(e.target.value)}
-                style={{
-                  width: "100%",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 3,
-                  padding: "7px 10px",
-                  fontSize: 13.5,
-                  outline: "none",
-                  color: "#1f2937",
-                  boxSizing: "border-box"
-                }}
+                className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] text-[rgb(35,40,44)] outline-none focus:border-[#00b98a]"
               />
             </div>
             
             {/* Amount */}
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+            <div className="mb-3.5">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
                 Amount
               </label>
-              <div style={{ display: "flex", alignItems: "stretch", width: "100%", border: "1px solid #cbd5e1", borderRadius: 3, overflow: "hidden" }}>
-                <span style={{ padding: "7px 12px", fontSize: 13, color: "#4b5563", background: "#f3f4f6", borderRight: "1px solid #cbd5e1", display: "flex", alignItems: "center" }}>
+              <div className="flex items-stretch w-full border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden">
+                <span className="px-3 py-1.5 text-[0.875rem] text-[#6c757d] bg-[#f0f3f5] border-r border-[rgb(200,206,211)] flex items-center">
                   Rs.
                 </span>
                 <input
@@ -429,39 +406,18 @@ export default function CashCreditPage() {
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   min="0"
-                  style={{
-                    flex: 1,
-                    border: "none",
-                    padding: "7px 10px",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    outline: "none",
-                    color: "#111827",
-                    boxSizing: "border-box"
-                  }}
+                  className="flex-1 border-0 px-2.5 py-1.5 text-[0.875rem] font-bold text-[rgb(35,40,44)] outline-none"
                 />
               </div>
             </div>
             
             {/* Submit */}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={handleDeposit}
                 disabled={isSubmittingDeposit}
-                style={{
-                  background: "#00a65a",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: 3,
-                  padding: "7px 22px",
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6
-                }}
+                className="bg-[#00b98a] hover:bg-[#138a72] text-white border border-[#00b98a] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingDeposit ? "Submitting..." : "Submit"}
               </button>
@@ -470,43 +426,34 @@ export default function CashCreditPage() {
         </div>
 
         {/* WITHDRAW FORM BOX (Red Header) */}
-        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ background: "#dd4b39", padding: "9px 14px", fontSize: 13.5, color: "#ffffff", fontWeight: 700 }}>
+        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="bg-[#dc3545] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash' 
               ? `Withdraw cash from ${client.username} account` 
               : `Withdraw Credit from ${client.username}`}
           </div>
           
-          <div style={{ padding: "14px" }}>
+          <div className="p-3.5">
             {/* Description */}
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+            <div className="mb-3">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
                 Description
               </label>
               <input
                 type="text"
                 value={withdrawDesc}
                 onChange={(e) => setWithdrawDesc(e.target.value)}
-                style={{
-                  width: "100%",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 3,
-                  padding: "7px 10px",
-                  fontSize: 13.5,
-                  outline: "none",
-                  color: "#1f2937",
-                  boxSizing: "border-box"
-                }}
+                className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] text-[rgb(35,40,44)] outline-none focus:border-[#00b98a]"
               />
             </div>
             
             {/* Amount */}
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 13, color: "#374151", fontWeight: 500, marginBottom: 5 }}>
+            <div className="mb-3.5">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
                 Amount
               </label>
-              <div style={{ display: "flex", alignItems: "stretch", width: "100%", border: "1px solid #cbd5e1", borderRadius: 3, overflow: "hidden" }}>
-                <span style={{ padding: "7px 12px", fontSize: 13, color: "#4b5563", background: "#f3f4f6", borderRight: "1px solid #cbd5e1", display: "flex", alignItems: "center" }}>
+              <div className="flex items-stretch w-full border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden">
+                <span className="px-3 py-1.5 text-[0.875rem] text-[#6c757d] bg-[#f0f3f5] border-r border-[rgb(200,206,211)] flex items-center">
                   Rs.
                 </span>
                 <input
@@ -514,39 +461,18 @@ export default function CashCreditPage() {
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                   min="0"
-                  style={{
-                    flex: 1,
-                    border: "none",
-                    padding: "7px 10px",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    outline: "none",
-                    color: "#111827",
-                    boxSizing: "border-box"
-                  }}
+                  className="flex-1 border-0 px-2.5 py-1.5 text-[0.875rem] font-bold text-[rgb(35,40,44)] outline-none"
                 />
               </div>
             </div>
             
             {/* Submit */}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={handleWithdraw}
                 disabled={isSubmittingWithdraw}
-                style={{
-                  background: "#dd4b39",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: 3,
-                  padding: "7px 22px",
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6
-                }}
+                className="bg-[#dc3545] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingWithdraw ? "Submitting..." : "Submit"}
               </button>

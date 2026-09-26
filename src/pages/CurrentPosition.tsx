@@ -264,17 +264,22 @@ export default function CurrentPosition() {
 
   // Company & Admin Management Portal View
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f2f4f8", fontFamily: 'Roboto, system-ui, -apple-system, sans-serif' }}>
-      <div style={{ width: "100%", padding: "10px 10px 40px" }}>
+    <div
+      className="min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]"
+      style={{
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      }}
+    >
+      <div className="w-full px-2.5 pt-2.5 pb-10">
 
         {/* 1. Report Type Quick Navigation Header */}
-        <div style={{ backgroundColor: "#ffffff", borderRadius: "3px", border: "1px solid #dcdcdc", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 12px", backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-            <Filter size={14} color="#212529" strokeWidth={2.5} />
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#212529" }}>Report Type</span>
+        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
+            <Filter size={14} className="text-[rgb(35,40,44)]" strokeWidth={2.5} />
+            <span className="font-bold text-[14px] text-[rgb(35,40,44)]">Report Type</span>
           </div>
 
-          <div style={{ padding: "12px 14px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          <div className="p-3 flex flex-wrap gap-2">
             {[
               { label: "Book Detail", path: "/reports/book-detail" },
               { label: "Book Detail 2", path: "/reports/book-detail-2" },
@@ -288,17 +293,11 @@ export default function CurrentPosition() {
                 key={btn.label}
                 type="button"
                 onClick={() => navigate(btn.path)}
-                style={{
-                  backgroundColor: btn.active ? "#00a65a" : "#ffffff",
-                  color: btn.active ? "#ffffff" : "#00a65a",
-                  border: "1px solid #00a65a",
-                  borderRadius: "3px",
-                  padding: "5px 12px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                }}
+                className={`rounded-[0.25rem] px-3 py-1.5 text-[12px] font-bold transition-all border ${
+                  btn.active
+                    ? "bg-[#00b98a] text-white border-[#00b98a]"
+                    : "bg-white text-[#138a72] border-[#138a72] hover:bg-[#138a72] hover:text-white"
+                }`}
               >
                 {btn.label}
               </button>
@@ -307,44 +306,24 @@ export default function CurrentPosition() {
         </div>
 
         {/* 2. Search-Users Filter Box */}
-        <div style={{ backgroundColor: "#ffffff", borderRadius: "3px", border: "1px solid #dcdcdc", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 12px", backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-            <Filter size={14} color="#212529" strokeWidth={2.5} />
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#212529" }}>Search-Users</span>
+        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
+            <Filter size={14} className="text-[rgb(35,40,44)]" strokeWidth={2.5} />
+            <span className="font-bold text-[14px] text-[rgb(35,40,44)]">Search-Users</span>
           </div>
 
-          <div style={{ padding: "12px 14px" }}>
-            <form onSubmit={handleSearchSubmit} style={{ display: "flex", gap: "8px", maxWidth: "420px" }}>
+          <div className="p-3">
+            <form onSubmit={handleSearchSubmit} className="flex gap-2 max-w-[420px]">
               <input
                 type="text"
                 placeholder="Username (optional)"
                 value={searchUsername}
                 onChange={(e) => setSearchUsername(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: "6px 10px",
-                  fontSize: "13px",
-                  border: "1px solid #ced4da",
-                  borderRadius: "3px",
-                  outline: "none",
-                  backgroundColor: "#ffffff",
-                }}
+                className="flex-1 px-2.5 py-1.5 text-[13px] border border-[rgb(200,206,211)] rounded-[0.25rem] bg-white outline-none focus:border-[#00b98a]"
               />
               <button
                 type="submit"
-                style={{
-                  backgroundColor: "#00b181",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "3px",
-                  padding: "6px 16px",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
+                className="bg-[#00b98a] hover:bg-[#138a72] text-white rounded-[0.25rem] px-4 py-1.5 text-[13px] font-bold flex items-center gap-1.5 transition-colors"
               >
                 <Search size={14} /> Search
               </button>
@@ -355,23 +334,14 @@ export default function CurrentPosition() {
                     setSelectedUserFilter("");
                     setSearchUsername("");
                   }}
-                  style={{
-                    backgroundColor: "#e2e8f0",
-                    color: "#475569",
-                    border: "none",
-                    borderRadius: "3px",
-                    padding: "6px 10px",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
+                  className="bg-[#e4e5e6] hover:bg-[#c8ced3] text-[#23282c] rounded-[0.25rem] px-3 py-1.5 text-[12px] font-bold transition-colors"
                 >
                   Clear
                 </button>
               )}
             </form>
             {selectedUserFilter && (
-              <div style={{ marginTop: 8, fontSize: 12, color: "#00a65a", fontWeight: 700 }}>
+              <div className="mt-2 text-[12px] text-[#00b98a] font-bold">
                 Showing active positions for user: <u>{selectedUserFilter}</u>
               </div>
             )}
@@ -379,27 +349,15 @@ export default function CurrentPosition() {
         </div>
 
         {/* 3. Sport Highlights / Current Position Tables */}
-        <div style={{ backgroundColor: "#ffffff", borderRadius: "3px", border: "1px solid #dcdcdc", marginBottom: "16px", overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-4 overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           {/* Header Bar with Refresh */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#212529" }}>
+          <div className="flex justify-between items-center px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
+            <span className="font-bold text-[14px] text-[rgb(35,40,44)]">
               Sport Highlights / Current Position
             </span>
             <button
               onClick={handleRefreshAll}
-              style={{
-                backgroundColor: "#00b181",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "3px",
-                padding: "3px 12px",
-                fontSize: "12px",
-                fontWeight: 700,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
+              className="bg-[#00b98a] hover:bg-[#138a72] text-white rounded-[0.25rem] px-3 py-1 text-[12px] font-bold flex items-center gap-1.5 transition-colors"
             >
               <RefreshCw size={12} className={cn(isFetching && "animate-spin")} /> Refresh
             </button>
@@ -407,24 +365,24 @@ export default function CurrentPosition() {
 
           {/* Tables Grouped by Sport */}
           {isLoading ? (
-            <div style={{ padding: "30px", textAlign: "center", color: "#6c757d", fontSize: "13px" }}>
+            <div className="p-8 text-center text-[#73818f] text-[13px]">
               Loading active market positions...
             </div>
           ) : totalActiveMarkets === 0 ? (
-            <div style={{ padding: "30px 16px", textAlign: "center", color: "#6c757d" }}>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#212529", marginBottom: "6px" }}>
+            <div className="p-8 text-center text-[#73818f]">
+              <div className="text-[14px] font-semibold text-[rgb(35,40,44)] mb-1.5">
                 No active betting positions found
               </div>
-              <div style={{ fontSize: "12px", color: "#6c757d" }}>
+              <div className="text-[12px] text-[#73818f]">
                 {selectedUserFilter ? `No pending bets found for ${selectedUserFilter}.` : "There are currently no active pending bets in any sport market."}
               </div>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className="flex flex-col">
               {Object.entries(marketsBySport).map(([sport, markets]) => (
-                <div key={sport} style={{ borderBottom: "1px solid #dee2e6" }}>
+                <div key={sport} className="border-b border-[rgb(200,206,211)]">
                   {/* Sport Header Table Row */}
-                  <div style={{ display: "flex", justifyContent: "space-between", padding: "7px 12px", backgroundColor: "#e9ecef", borderBottom: "1px solid #dee2e6", fontWeight: 700, fontSize: "13px", color: "#212529" }}>
+                  <div className="flex justify-between px-3 py-1.5 bg-[#e4e5e6] border-b border-[rgb(200,206,211)] font-bold text-[13px] text-[rgb(35,40,44)]">
                     <span>{sport}</span>
                     <span>Amount</span>
                   </div>
@@ -441,33 +399,22 @@ export default function CurrentPosition() {
                       <div
                         key={m.key || idx}
                         onClick={() => setSelectedMarketModal(m)}
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          padding: "9px 12px",
-                          borderBottom: idx < markets.length - 1 ? "1px solid #f1f3f5" : "none",
-                          backgroundColor: "#ffffff",
-                          cursor: "pointer",
-                          transition: "background-color 0.1s",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f8f9fa")}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ffffff")}
+                        className={`flex justify-between items-center px-3 py-2 bg-white hover:bg-[#f0f3f5] cursor-pointer transition-colors ${
+                          idx < markets.length - 1 ? "border-b border-[rgb(200,206,211)]" : ""
+                        }`}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-                          <span style={{ color: "#00b181", fontWeight: 700, fontSize: "13px" }}>
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-[#00b98a] font-bold text-[13px]">
                             {m.displayTitle}
                           </span>
-                          <span style={{ backgroundColor: "#e8f5e9", color: "#2e7d32", fontSize: "10px", fontWeight: 800, padding: "1px 6px", borderRadius: "2px" }}>
+                          <span className="bg-[#e8f5e9] text-[#2e7d32] text-[10px] font-extrabold px-1.5 py-0.5 rounded-[2px]">
                             {m.bets?.length} {m.bets?.length === 1 ? "Bet" : "Bets"}
                           </span>
                         </div>
                         <span
-                          style={{
-                            fontWeight: 700,
-                            fontSize: "13px",
-                            color: isNegative ? "#dc3545" : isPositive ? "#00b181" : "#212529",
-                          }}
+                          className={`font-bold text-[13px] ${
+                            isNegative ? "text-[#f86c6b]" : isPositive ? "text-[#00b98a]" : "text-[rgb(35,40,44)]"
+                          }`}
                         >
                           {formattedAmount}
                         </span>
@@ -482,45 +429,47 @@ export default function CurrentPosition() {
 
         {/* 4. Interactive Market Book & Bets Modal */}
         {selectedMarketModal && (
-          <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "12px" }}>
-            <div style={{ backgroundColor: "#ffffff", borderRadius: "4px", width: "100%", maxWidth: "700px", maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}>
+          <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-3">
+            <div className="bg-white rounded-[0.25rem] w-full max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col shadow-[0_10px_25px_rgba(0,0,0,0.2)]">
               {/* Modal Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#00a65a", padding: "10px 16px", color: "#ffffff" }}>
+              <div className="flex justify-between items-center bg-[#00b98a] px-4 py-2.5 text-white">
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: "14.5px" }}>{selectedMarketModal.displayTitle}</div>
-                  <div style={{ fontSize: "11.5px", opacity: 0.9 }}>Sport: {selectedMarketModal.sport} | Pending Bets: {selectedMarketModal.bets.length}</div>
+                  <div className="font-bold text-[14.5px]">{selectedMarketModal.displayTitle}</div>
+                  <div className="text-[11.5px] opacity-90">Sport: {selectedMarketModal.sport} | Pending Bets: {selectedMarketModal.bets.length}</div>
                 </div>
                 <button
                   onClick={() => setSelectedMarketModal(null)}
-                  style={{ background: "transparent", border: "none", color: "#ffffff", cursor: "pointer" }}
+                  className="bg-transparent border-none text-white hover:opacity-75 cursor-pointer"
                 >
                   <X size={20} />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div style={{ padding: "16px", overflowY: "auto", flex: 1 }}>
+              <div className="p-4 overflow-y-auto flex-1">
                 
                 {/* Book Positions Breakdown */}
-                <div style={{ marginBottom: "16px" }}>
-                  <div style={{ fontWeight: 700, fontSize: "13px", color: "#212529", marginBottom: "6px" }}>
+                <div className="mb-4">
+                  <div className="font-bold text-[13px] text-[rgb(35,40,44)] mb-1.5">
                     Runner Book Position (Company P/L):
                   </div>
-                  <div style={{ border: "1px solid #dee2e6", borderRadius: "3px", overflow: "hidden" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
+                  <div className="border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden">
+                    <table className="w-full border-collapse text-[12.5px]">
                       <thead>
-                        <tr style={{ backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6", color: "#495057", fontWeight: 700 }}>
-                          <th style={{ padding: "6px 10px", textAlign: "left" }}>Selection / Runner</th>
-                          <th style={{ padding: "6px 10px", textAlign: "right" }}>Company Position</th>
+                        <tr className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] text-[#73818f] font-bold">
+                          <th className="px-2.5 py-1.5 text-left">Selection / Runner</th>
+                          <th className="px-2.5 py-1.5 text-right">Company Position</th>
                         </tr>
                       </thead>
                       <tbody>
                         {Object.entries(selectedMarketModal.positions || {}).map(([sel, posVal]) => {
                           const val = Number(posVal) || 0;
                           return (
-                            <tr key={sel} style={{ borderBottom: "1px solid #dee2e6" }}>
-                              <td style={{ padding: "6px 10px", fontWeight: 600, color: "#212529" }}>{sel}</td>
-                              <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 700, color: val > 0 ? "#00b181" : val < 0 ? "#dc3545" : "#212529" }}>
+                            <tr key={sel} className="border-b border-[rgb(200,206,211)] last:border-b-0">
+                              <td className="px-2.5 py-1.5 font-semibold text-[rgb(35,40,44)]">{sel}</td>
+                              <td className={`px-2.5 py-1.5 text-right font-bold ${
+                                val > 0 ? "text-[#00b98a]" : val < 0 ? "text-[#f86c6b]" : "text-[rgb(35,40,44)]"
+                              }`}>
                                 {val > 0 ? `+${val.toLocaleString()}` : val.toLocaleString()}
                               </td>
                             </tr>
@@ -533,52 +482,46 @@ export default function CurrentPosition() {
 
                 {/* Downline Bets Table */}
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: "13px", color: "#212529", marginBottom: "6px" }}>
+                  <div className="font-bold text-[13px] text-[rgb(35,40,44)] mb-1.5">
                     Active Client Bets ({selectedMarketModal.bets.length}):
                   </div>
-                  <div style={{ border: "1px solid #dee2e6", borderRadius: "3px", overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", minWidth: "520px" }}>
+                  <div className="border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-x-auto">
+                    <table className="w-full border-collapse text-[12px] min-w-[520px]">
                       <thead>
-                        <tr style={{ backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6", color: "#495057", fontWeight: 700 }}>
-                          <th style={{ padding: "6px 8px", textAlign: "left" }}>User</th>
-                          <th style={{ padding: "6px 8px", textAlign: "left" }}>Selection</th>
-                          <th style={{ padding: "6px 8px", textAlign: "center" }}>Type</th>
-                          <th style={{ padding: "6px 8px", textAlign: "right" }}>Odds</th>
-                          <th style={{ padding: "6px 8px", textAlign: "right" }}>Stake</th>
-                          <th style={{ padding: "6px 8px", textAlign: "right" }}>Exposure</th>
+                        <tr className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] text-[#73818f] font-bold">
+                          <th className="px-2 py-1.5 text-left">User</th>
+                          <th className="px-2 py-1.5 text-left">Selection</th>
+                          <th className="px-2 py-1.5 text-center">Type</th>
+                          <th className="px-2 py-1.5 text-right">Odds</th>
+                          <th className="px-2 py-1.5 text-right">Stake</th>
+                          <th className="px-2 py-1.5 text-right">Exposure</th>
                         </tr>
                       </thead>
                       <tbody>
                         {selectedMarketModal.bets.map((b: any, bIdx: number) => {
                           const isBack = b.type?.toLowerCase() === "back";
                           return (
-                            <tr key={b.id || bIdx} style={{ borderBottom: "1px solid #dee2e6" }}>
-                              <td style={{ padding: "6px 8px", fontWeight: 700, color: "#00b181" }}>
+                            <tr key={b.id || bIdx} className="border-b border-[rgb(200,206,211)] last:border-b-0">
+                              <td className="px-2 py-1.5 font-bold text-[#00b98a]">
                                 {b.user_email || b.client_username || "client"}
                               </td>
-                              <td style={{ padding: "6px 8px", color: "#212529", fontWeight: 600 }}>
+                              <td className="px-2 py-1.5 text-[rgb(35,40,44)] font-semibold">
                                 {b.selection}
                               </td>
-                              <td style={{ padding: "6px 8px", textAlign: "center" }}>
-                                <span style={{
-                                  backgroundColor: isBack ? "#a5d8ff" : "#ffc9c9",
-                                  color: isBack ? "#004085" : "#721c24",
-                                  padding: "1px 6px",
-                                  borderRadius: "2px",
-                                  fontWeight: 800,
-                                  fontSize: "11px",
-                                }}
-                                >
+                              <td className="px-2 py-1.5 text-center">
+                                <span className={`px-1.5 py-0.5 rounded-[2px] font-extrabold text-[11px] ${
+                                  isBack ? "bg-[#a5d8ff] text-[#004085]" : "bg-[#ffc9c9] text-[#721c24]"
+                                }`}>
                                   {b.type ? b.type.toUpperCase() : "BACK"}
                                 </span>
                               </td>
-                              <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 700, color: "#212529" }}>
+                              <td className="px-2 py-1.5 text-right font-bold text-[rgb(35,40,44)]">
                                 {Number(b.odds || 0).toFixed(2)}
                               </td>
-                              <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 700, color: "#212529" }}>
+                              <td className="px-2 py-1.5 text-right font-bold text-[rgb(35,40,44)]">
                                 {Number(b.stake || 0).toLocaleString()}
                               </td>
-                              <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 700, color: "#dc3545" }}>
+                              <td className="px-2 py-1.5 text-right font-bold text-[#f86c6b]">
                                 {Number(b.potential_profit || b.stake || 0).toLocaleString()}
                               </td>
                             </tr>
@@ -592,10 +535,10 @@ export default function CurrentPosition() {
               </div>
 
               {/* Modal Footer */}
-              <div style={{ backgroundColor: "#f8f9fa", borderTop: "1px solid #dee2e6", padding: "8px 16px", display: "flex", justifyContent: "flex-end" }}>
+              <div className="bg-[#f0f3f5] border-t border-[rgb(200,206,211)] px-4 py-2 flex justify-end">
                 <button
                   onClick={() => setSelectedMarketModal(null)}
-                  style={{ backgroundColor: "#6c757d", color: "#ffffff", border: "none", borderRadius: "3px", padding: "5px 14px", fontSize: "12.5px", fontWeight: 700, cursor: "pointer" }}
+                  className="bg-[#73818f] hover:bg-[#5c6873] text-white rounded-[0.25rem] px-3.5 py-1 text-[12.5px] font-bold cursor-pointer transition-colors"
                 >
                   Close
                 </button>

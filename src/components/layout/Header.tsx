@@ -111,18 +111,18 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center px-3 h-[50px] border-b border-[#d2d6de]" style={{ backgroundColor: "#ffffff" }}>
+    <header className="sticky top-0 z-40 flex items-center px-3 h-[50px] border-b border-[rgb(200,206,211)] bg-white">
       {/* LEFT: Logo + Hamburger */}
       <div className="flex items-center shrink-0">
         <button
           onClick={handleHamburgerClick}
-          className="flex flex-col justify-center items-center w-[36px] h-[34px] border border-gray-400/80 rounded-[4px] bg-white hover:bg-gray-100 transition-colors gap-[4px] p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          className="navbar-toggler sidebar-toggler d-lg-none flex flex-col justify-center items-center w-[36px] h-[32px] border border-[rgb(200,206,211)] rounded-[2px] bg-white hover:bg-gray-50 transition-colors gap-[3px] p-1 focus:outline-none"
           aria-label="Toggle navigation menu"
           title="Toggle navigation"
         >
-          <span className="w-[18px] h-[2px] bg-[#333] rounded-full block"></span>
-          <span className="w-[18px] h-[2px] bg-[#333] rounded-full block"></span>
-          <span className="w-[18px] h-[2px] bg-[#333] rounded-full block"></span>
+          <span className="w-[18px] h-[2px] bg-[#23282c] rounded-full block"></span>
+          <span className="w-[18px] h-[2px] bg-[#23282c] rounded-full block"></span>
+          <span className="w-[18px] h-[2px] bg-[#23282c] rounded-full block"></span>
         </button>
       </div>
 
@@ -131,8 +131,8 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         <Link 
           to="/dashboard" 
           className={cn(
-            "text-sm transition-all hover:text-[#00b181]",
-            location.pathname === "/dashboard" ? "text-[#00b181] font-bold" : "text-[#333]"
+            "text-sm transition-all hover:text-[#00b98a]",
+            location.pathname === "/dashboard" ? "text-[#00b98a] font-bold" : "text-[#23282c]"
           )}
         >
           Dashboard
@@ -140,8 +140,8 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         <Link 
           to="/accounts" 
           className={cn(
-            "text-sm transition-all hover:text-[#00b181]",
-            location.pathname.startsWith("/accounts") ? "text-[#00b181] font-bold" : "text-[#333]"
+            "text-sm transition-all hover:text-[#00b98a]",
+            location.pathname.startsWith("/accounts") ? "text-[#00b98a] font-bold" : "text-[#23282c]"
           )}
         >
           Users
@@ -149,8 +149,8 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
         <Link 
           to="/reports/daily-pl" 
           className={cn(
-            "text-sm transition-all hover:text-[#00b181]",
-            location.pathname.startsWith("/reports") ? "text-[#00b181] font-bold" : "text-[#333]"
+            "text-sm transition-all hover:text-[#00b98a]",
+            location.pathname.startsWith("/reports") ? "text-[#00b98a] font-bold" : "text-[#23282c]"
           )}
         >
           Reports
@@ -160,23 +160,23 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
       {/* RIGHT: User + Stats */}
       <div className="flex items-center justify-end ml-auto gap-2 sm:gap-3">
         {session ? (
-          <div className="flex items-center gap-2 sm:gap-3 text-[#495057]">
+          <div className="flex items-center gap-2 sm:gap-3 text-[#23282c]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-1 cursor-pointer hover:text-[#00b181] transition-colors group">
-                  <span className="text-[#6c757d] text-sm font-normal">
+                <div className="flex items-center gap-1 cursor-pointer hover:text-[#00b98a] transition-colors group">
+                  <span className="text-[#23282c] text-sm font-normal">
                     {session.username} ({session.role ? formatRole(session.role) : 'Admin'})
                   </span>
                   <span className="text-[10px] text-[#6c757d]">▼</span>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border border-[#d2d6de] shadow-lg rounded w-48 mt-1">
+              <DropdownMenuContent align="end" className="bg-white border border-[rgb(200,206,211)] shadow-lg rounded-[2px] w-48 mt-1">
                 <div className="px-2 py-1.5 text-[11px] text-gray-500 border-b border-gray-100 mb-1">
-                  Logged in as <span className="font-semibold text-[#333]">{session.username}</span>
+                  Logged in as <span className="font-semibold text-[#23282c]">{session.username}</span>
                 </div>
                 <DropdownMenuItem
                   onClick={() => setIsProfileModalOpen(true)}
-                  className="text-[#333] hover:bg-gray-50 hover:text-[#00b181] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00b181]"
+                  className="text-[#23282c] hover:bg-gray-50 hover:text-[#00b98a] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00b98a]"
                 >
                   <User className="w-3.5 h-3.5 mr-2 opacity-70" />
                   Profile
@@ -193,18 +193,18 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
             </DropdownMenu>
 
             <div className="flex items-center gap-1.5 text-sm">
-              <span className="text-[#6c757d] whitespace-nowrap font-normal">
-                B: <span className="font-normal text-[#6c757d]">0</span>
+              <span className="text-[#23282c] whitespace-nowrap font-normal">
+                B: <span className="font-normal text-[#23282c]">0</span>
               </span>
-              <span className="text-[#6c757d] whitespace-nowrap font-normal">
-                Exp: <span className="font-normal text-[#6c757d]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
+              <span className="text-[#23282c] whitespace-nowrap font-normal">
+                Exp: <span className="font-normal text-[#23282c]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
               </span>
             </div>
           </div>
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="text-sm font-bold text-[#333] hover:text-[#00b181] uppercase transition-colors"
+            className="text-sm font-bold text-[#23282c] hover:text-[#00b98a] uppercase transition-colors"
           >
             Login
           </button>

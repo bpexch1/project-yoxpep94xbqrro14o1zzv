@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Filter, AlertTriangle, RefreshCw } from "lucide-react";
+import { Search, Filter, AlertTriangle } from "lucide-react";
 import { Match } from "@/entities";
 
 interface DisplayMatchItem {
@@ -50,11 +50,16 @@ export default function Dashboard() {
     refetch();
   };
 
-  const formatAmount = (n: number) => n.toLocaleString('en-IN');
+  const formatAmount = (n: number) => n.toLocaleString("en-IN");
   const getAmountForMatch = (m: any, idx: number): string => {
-    const seed = String(m.id || m.title || idx).split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-    const amounts = [1255214, 2982530, 79187, 3070274, 328942, 1590250, 74459, 109282, 68805, 744726, 36622, 50155, 135773, 1441515, 219418937, 30555, 4709, 1311];
-    return formatAmount(amounts[seed % amounts.length] + ((idx % 7) * 113));
+    const seed = String(m.id || m.title || idx)
+      .split("")
+      .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+    const amounts = [
+      1255214, 2982530, 79187, 3070274, 328942, 1590250, 74459, 109282, 68805, 744726,
+      36622, 50155, 135773, 1441515, 219418937, 30555, 4709, 1311,
+    ];
+    return formatAmount(amounts[seed % amounts.length] + (idx % 7) * 113);
   };
 
   // Build Soccer Matches
@@ -63,21 +68,21 @@ export default function Dashboard() {
     const addedTitles = new Set<string>();
 
     const dbSoccer = (Array.isArray(dbMatches) ? dbMatches : []).filter(
-      (m: any) => m && (m.sport?.toLowerCase() === 'soccer' || m.sport?.toLowerCase() === 'football')
+      (m: any) => m && (m.sport?.toLowerCase() === "soccer" || m.sport?.toLowerCase() === "football")
     );
 
     if (dbSoccer.length === 0) {
-      return DEFAULT_DASHBOARD_MATCHES.filter(m => m.sport === "Soccer");
+      return DEFAULT_DASHBOARD_MATCHES.filter((m) => m.sport === "Soccer");
     }
 
     dbSoccer.forEach((m: any, idx: number) => {
-      const titleBase = m.title || `${m.team1 || 'Team A'} v ${m.team2 || 'Team B'}`;
-      const title = titleBase.includes('/ Match Odds') ? titleBase : `${titleBase} / Match Odds`;
+      const titleBase = m.title || `${m.team1 || "Team A"} v ${m.team2 || "Team B"}`;
+      const title = titleBase.includes("/ Match Odds") ? titleBase : `${titleBase} / Match Odds`;
       const key = title.toLowerCase().trim();
       if (!addedTitles.has(key)) {
         addedTitles.add(key);
-        const status = String(m.status || m.api_status || '').toLowerCase();
-        const isLive = status === 'live' || status === 'inplay' || status === 'started';
+        const status = String(m.status || m.api_status || "").toLowerCase();
+        const isLive = status === "live" || status === "inplay" || status === "started";
         list.push({
           id: m.id || `live-fb-${idx}`,
           title,
@@ -97,21 +102,21 @@ export default function Dashboard() {
     const addedTitles = new Set<string>();
 
     const dbCricket = (Array.isArray(dbMatches) ? dbMatches : []).filter(
-      (m: any) => m && m.sport?.toLowerCase() === 'cricket'
+      (m: any) => m && m.sport?.toLowerCase() === "cricket"
     );
 
     if (dbCricket.length === 0) {
-      return DEFAULT_DASHBOARD_MATCHES.filter(m => m.sport === "Cricket");
+      return DEFAULT_DASHBOARD_MATCHES.filter((m) => m.sport === "Cricket");
     }
 
     dbCricket.forEach((m: any, idx: number) => {
-      const titleBase = m.title || `${m.team1 || 'Team A'} v ${m.team2 || 'Team B'}`;
-      const title = titleBase.includes('/ Match Odds') ? titleBase : `${titleBase} / Match Odds`;
+      const titleBase = m.title || `${m.team1 || "Team A"} v ${m.team2 || "Team B"}`;
+      const title = titleBase.includes("/ Match Odds") ? titleBase : `${titleBase} / Match Odds`;
       const key = title.toLowerCase().trim();
       if (!addedTitles.has(key)) {
         addedTitles.add(key);
-        const status = String(m.status || m.api_status || '').toLowerCase();
-        const isLive = status === 'live' || status === 'inplay' || status === 'started';
+        const status = String(m.status || m.api_status || "").toLowerCase();
+        const isLive = status === "live" || status === "inplay" || status === "started";
         list.push({
           id: m.id || `live-ck-${idx}`,
           title,
@@ -131,21 +136,21 @@ export default function Dashboard() {
     const addedTitles = new Set<string>();
 
     const dbTennis = (Array.isArray(dbMatches) ? dbMatches : []).filter(
-      (m: any) => m && m.sport?.toLowerCase() === 'tennis'
+      (m: any) => m && m.sport?.toLowerCase() === "tennis"
     );
 
     if (dbTennis.length === 0) {
-      return DEFAULT_DASHBOARD_MATCHES.filter(m => m.sport === "Tennis");
+      return DEFAULT_DASHBOARD_MATCHES.filter((m) => m.sport === "Tennis");
     }
 
     dbTennis.forEach((m: any, idx: number) => {
-      const titleBase = m.title || `${m.team1 || 'Player 1'} v ${m.team2 || 'Player 2'}`;
-      const title = titleBase.includes('/ Match Odds') ? titleBase : `${titleBase} / Match Odds`;
+      const titleBase = m.title || `${m.team1 || "Player 1"} v ${m.team2 || "Player 2"}`;
+      const title = titleBase.includes("/ Match Odds") ? titleBase : `${titleBase} / Match Odds`;
       const key = title.toLowerCase().trim();
       if (!addedTitles.has(key)) {
         addedTitles.add(key);
-        const status = String(m.status || m.api_status || '').toLowerCase();
-        const isLive = status === 'live' || status === 'inplay' || status === 'started';
+        const status = String(m.status || m.api_status || "").toLowerCase();
+        const isLive = status === "live" || status === "inplay" || status === "started";
         list.push({
           id: m.id || `live-tn-${idx}`,
           title,
@@ -166,244 +171,188 @@ export default function Dashboard() {
   const totalHighlightsCount = soccerMatches.length + cricketMatches.length + tennisMatches.length;
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f2f4f8", fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif' }}>
-      <div style={{ width: "100%", padding: "10px 10px 40px" }}>
-
-        {/* 1. Search-Users Card */}
-        <div style={{ backgroundColor: "#ffffff", borderRadius: "3px", border: "1px solid #dcdcdc", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          {/* Card Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 12px", backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-            <Filter size={14} color="#212529" strokeWidth={2.5} />
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#212529" }}>Search-Users</span>
-          </div>
-
-          {/* Card Body */}
-          <div style={{ padding: "14px 14px" }}>
-            <form onSubmit={handleSearch} style={{ display: "flex", alignItems: "center", maxWidth: "420px" }}>
-              <input
-                type="text"
-                placeholder="Username"
-                value={searchUsername}
-                onChange={(e) => setSearchUsername(e.target.value)}
-                style={{
-                  flex: 1,
-                  height: "36px",
-                  border: "1px solid #ced4da",
-                  borderRight: "none",
-                  borderRadius: "4px 0 0 4px",
-                  padding: "6px 12px",
-                  fontSize: "14px",
-                  outline: "none",
-                  color: "#495057",
-                  backgroundColor: "#ffffff",
-                }}
-              />
-              <button
-                type="submit"
-                style={{
-                  height: "36px",
-                  backgroundColor: "#00b181",
-                  color: "#ffffff",
-                  border: "1px solid #00b181",
-                  borderRadius: "0 4px 4px 0",
-                  padding: "0 14px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <Search size={14} strokeWidth={2.5} />
-                Search
-              </button>
-            </form>
-          </div>
+    <div
+      className="w-full"
+      style={{
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        fontSize: "0.875rem",
+        color: "rgb(35, 40, 44)",
+      }}
+    >
+      {/* 1. Search-Users Card */}
+      <div
+        className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]"
+      >
+        {/* Card Header */}
+        <div
+          className="flex items-center gap-2 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]"
+        >
+          <Filter size={14} className="text-[rgb(35,40,44)] shrink-0" strokeWidth={2.5} />
+          <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">Search-Users</span>
         </div>
 
-        {/* 2. Sport Highlights Card */}
-        <div style={{ backgroundColor: "#ffffff", borderRadius: "3px", border: "1px solid #dcdcdc", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          {/* Card Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 12px", backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-            <span style={{ fontWeight: 700, fontSize: "14px", color: "#212529" }}>Sport Highlights</span>
+        {/* Card Body */}
+        <div className="p-3">
+          <form onSubmit={handleSearch} className="flex items-center max-w-md">
+            <input
+              type="text"
+              placeholder="Username"
+              value={searchUsername}
+              onChange={(e) => setSearchUsername(e.target.value)}
+              className="flex-1 h-[34px] border border-[rgb(200,206,211)] border-r-0 rounded-l-[0.2rem] px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00b98a]"
+            />
             <button
-              onClick={handleRefresh}
-              disabled={isFetching}
-              style={{
-                backgroundColor: "#00b181",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "3px",
-                padding: "2px 8px",
-                fontSize: "12px",
-                fontWeight: 700,
-                cursor: "pointer",
-                lineHeight: "1.5",
-              }}
+              type="submit"
+              className="h-[34px] bg-[#00b98a] hover:bg-[#138a72] text-white border border-[#00b98a] rounded-r-[0.2rem] px-3.5 text-[0.875rem] font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors"
             >
-              {isFetching ? "Refreshing" : "Refresh"}
+              <Search size={14} strokeWidth={2.5} />
+              Search
             </button>
-          </div>
+          </form>
+        </div>
+      </div>
 
-          {/* Tables Container */}
-          <div>
-            {/* Soccer Table */}
-            {soccerMatches.length > 0 ? (
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px" }}>
-                <thead>
-                  <tr style={{ backgroundColor: "#ffffff" }}>
-                    <th style={{ textAlign: "left", padding: "7px 12px", fontWeight: 700, fontSize: "14px", color: "#212529", borderBottom: "1px solid #dee2e6", borderRight: "1px solid #dee2e6" }}>
-                      Soccer
-                    </th>
-                    <th style={{ textAlign: "left", padding: "7px 12px", fontWeight: 700, fontSize: "14px", color: "#212529", borderBottom: "1px solid #dee2e6", width: "120px" }}>
-                      Amount
-                    </th>
+      {/* 2. Sport Highlights Card */}
+      <div
+        className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-4 shadow-[0_1px_1px_rgba(0,0,0,0.05)]"
+      >
+        {/* Card Header */}
+        <div
+          className="flex items-center gap-2.5 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]"
+        >
+          <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">Sport Highlights</span>
+          <button
+            onClick={handleRefresh}
+            disabled={isFetching}
+            className="bg-[#00b98a] hover:bg-[#138a72] text-white rounded-[0.2rem] px-2 py-0.5 text-[12px] font-bold transition-colors disabled:opacity-75"
+          >
+            {isFetching ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
+
+        {/* Tables Container */}
+        <div>
+          {/* Soccer Table */}
+          {soccerMatches.length > 0 && (
+            <table className="table table-bordered table-striped table-sm mb-0">
+              <thead>
+                <tr className="bg-[#f0f3f5]">
+                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
+                    Soccer
+                  </th>
+                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {soccerMatches.map((m) => (
+                  <tr
+                    key={m.id}
+                    onClick={() => handleMatchClick(m)}
+                    className="hover:bg-gray-50 cursor-pointer bg-white"
+                  >
+                    <td className="border-[rgb(200,206,211)] font-bold text-[0.875rem] text-[#009e74] leading-tight py-1.5 px-2">
+                      <span>{m.title}</span>
+                      {m.isLive && (
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle animate-pulse" />
+                      )}
+                    </td>
+                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[0.875rem] py-1.5 px-2">
+                      {m.amount}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {soccerMatches.map((m) => (
-                    <tr
-                      key={m.id}
-                      onClick={() => handleMatchClick(m)}
-                      style={{ borderBottom: "1px solid #e9ecef", cursor: "pointer", backgroundColor: "#ffffff" }}
-                    >
-                      <td style={{ padding: "8px 12px", borderRight: "1px solid #dee2e6", color: "#009e74", fontWeight: 700, fontSize: "13.5px", lineHeight: 1.35 }}>
-                        <span>{m.title}</span>
-                        {m.isLive && (
-                          <span
-                            style={{
-                              display: "inline-block",
-                              width: "12px",
-                              height: "12px",
-                              borderRadius: "50%",
-                              backgroundColor: "#1b5e20",
-                              marginLeft: "6px",
-                              verticalAlign: "middle",
-                            }}
-                          />
-                        )}
-                      </td>
-                      <td style={{ padding: "8px 12px", color: "#212529", fontSize: "13.5px", fontWeight: 400 }}>
-                        {m.amount}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : null}
+                ))}
+              </tbody>
+            </table>
+          )}
 
-            {/* Cricket Table */}
-            {cricketMatches.length > 0 ? (
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px" }}>
-                <thead>
-                  <tr style={{ backgroundColor: "#ffffff" }}>
-                    <th style={{ textAlign: "left", padding: "7px 12px", fontWeight: 700, fontSize: "14px", color: "#212529", borderTop: soccerMatches.length > 0 ? "1px solid #dee2e6" : "none", borderBottom: "1px solid #dee2e6", borderRight: "1px solid #dee2e6" }}>
-                      Cricket
-                    </th>
-                    <th style={{ textAlign: "left", padding: "7px 12px", fontWeight: 700, fontSize: "14px", color: "#212529", borderTop: soccerMatches.length > 0 ? "1px solid #dee2e6" : "none", borderBottom: "1px solid #dee2e6", width: "120px" }}>
-                      Amount
-                    </th>
+          {/* Cricket Table */}
+          {cricketMatches.length > 0 && (
+            <table className="table table-bordered table-striped table-sm mb-0">
+              <thead>
+                <tr className="bg-[#f0f3f5]">
+                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
+                    Cricket
+                  </th>
+                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {cricketMatches.map((m) => (
+                  <tr
+                    key={m.id}
+                    onClick={() => handleMatchClick(m)}
+                    className="hover:bg-gray-50 cursor-pointer bg-white"
+                  >
+                    <td className="border-[rgb(200,206,211)] font-bold text-[0.875rem] text-[#009e74] leading-tight py-1.5 px-2">
+                      <span>{m.title}</span>
+                      {m.isLive && (
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle animate-pulse" />
+                      )}
+                    </td>
+                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[0.875rem] py-1.5 px-2">
+                      {m.amount}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {cricketMatches.map((m) => (
-                    <tr
-                      key={m.id}
-                      onClick={() => handleMatchClick(m)}
-                      style={{ borderBottom: "1px solid #e9ecef", cursor: "pointer", backgroundColor: "#ffffff" }}
-                    >
-                      <td style={{ padding: "8px 12px", borderRight: "1px solid #dee2e6", color: "#009e74", fontWeight: 700, fontSize: "13.5px", lineHeight: 1.35 }}>
-                        <span>{m.title}</span>
-                        {m.isLive && (
-                          <span
-                            style={{
-                              display: "inline-block",
-                              width: "12px",
-                              height: "12px",
-                              borderRadius: "50%",
-                              backgroundColor: "#1b5e20",
-                              marginLeft: "6px",
-                              verticalAlign: "middle",
-                            }}
-                          />
-                        )}
-                      </td>
-                      <td style={{ padding: "8px 12px", color: "#212529", fontSize: "13.5px", fontWeight: 400 }}>
-                        {m.amount}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : null}
+                ))}
+              </tbody>
+            </table>
+          )}
 
-            {/* Tennis Table */}
-            {tennisMatches.length > 0 ? (
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px" }}>
-                <thead>
-                  <tr style={{ backgroundColor: "#ffffff" }}>
-                    <th style={{ textAlign: "left", padding: "7px 12px", fontWeight: 700, fontSize: "14px", color: "#212529", borderTop: (soccerMatches.length > 0 || cricketMatches.length > 0) ? "1px solid #dee2e6" : "none", borderBottom: "1px solid #dee2e6", borderRight: "1px solid #dee2e6" }}>
-                      Tennis
-                    </th>
-                    <th style={{ textAlign: "left", padding: "7px 12px", fontWeight: 700, fontSize: "14px", color: "#212529", borderTop: (soccerMatches.length > 0 || cricketMatches.length > 0) ? "1px solid #dee2e6" : "none", borderBottom: "1px solid #dee2e6", width: "120px" }}>
-                      Amount
-                    </th>
+          {/* Tennis Table */}
+          {tennisMatches.length > 0 && (
+            <table className="table table-bordered table-striped table-sm mb-0">
+              <thead>
+                <tr className="bg-[#f0f3f5]">
+                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
+                    Tennis
+                  </th>
+                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tennisMatches.map((m) => (
+                  <tr
+                    key={m.id}
+                    onClick={() => handleMatchClick(m)}
+                    className="hover:bg-gray-50 cursor-pointer bg-white"
+                  >
+                    <td className="border-[rgb(200,206,211)] font-bold text-[0.875rem] text-[#009e74] leading-tight py-1.5 px-2">
+                      <span>{m.title}</span>
+                      {m.isLive && (
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle animate-pulse" />
+                      )}
+                    </td>
+                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[0.875rem] py-1.5 px-2">
+                      {m.amount}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {tennisMatches.map((m) => (
-                    <tr
-                      key={m.id}
-                      onClick={() => handleMatchClick(m)}
-                      style={{ borderBottom: "1px solid #e9ecef", cursor: "pointer", backgroundColor: "#ffffff" }}
-                    >
-                      <td style={{ padding: "8px 12px", borderRight: "1px solid #dee2e6", color: "#009e74", fontWeight: 700, fontSize: "13.5px", lineHeight: 1.35 }}>
-                        <span>{m.title}</span>
-                        {m.isLive && (
-                          <span
-                            style={{
-                              display: "inline-block",
-                              width: "12px",
-                              height: "12px",
-                              borderRadius: "50%",
-                              backgroundColor: "#1b5e20",
-                              marginLeft: "6px",
-                              verticalAlign: "middle",
-                            }}
-                          />
-                        )}
-                      </td>
-                      <td style={{ padding: "8px 12px", color: "#212529", fontSize: "13.5px", fontWeight: 400 }}>
-                        {m.amount}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : null}
+                ))}
+              </tbody>
+            </table>
+          )}
 
-            {/* Clean status message when no matches are available */}
-            {totalHighlightsCount === 0 && (
-              <div style={{ padding: "30px 20px", textAlign: "center", color: "#6c757d", fontSize: "13.5px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "8px", color: "#856404", fontWeight: 700 }}>
-                  <AlertTriangle size={18} color="#856404" />
-                  <span>No Active Matches Currently Available</span>
-                </div>
-                <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#6c757d" }}>
-                  Please click Refresh or check back shortly.
-                </p>
+          {/* Status when empty */}
+          {totalHighlightsCount === 0 && (
+            <div className="p-8 text-center text-gray-500 text-[0.875rem]">
+              <div className="flex items-center justify-center gap-2 text-amber-700 font-bold mb-2">
+                <AlertTriangle size={18} />
+                <span>No Active Matches Currently Available</span>
               </div>
-            )}
-          </div>
+              <p className="text-xs text-gray-500">Please click Refresh or check back shortly.</p>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Footer (matches Screenshot 1 exactly) */}
-        <div style={{ textAlign: "center", padding: "20px 10px 10px", fontSize: "13px", fontWeight: 700, color: "#212529" }}>
-          Welcome to Exchange.
-        </div>
-
+      {/* Footer */}
+      <div className="text-center py-4 font-bold text-[0.875rem] text-[rgb(35,40,44)]">
+        Welcome to Exchange.
       </div>
     </div>
   );

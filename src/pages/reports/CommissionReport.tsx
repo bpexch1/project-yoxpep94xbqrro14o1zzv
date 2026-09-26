@@ -48,55 +48,58 @@ export default function CommissionReport() {
   const toggleSort = () => setSortDir((d) => (d === "asc" ? "desc" : "asc"));
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f0f0f0", paddingBottom: "60px", fontFamily: '"Roboto", -apple-system, sans-serif' }}>
-      <main style={{ maxWidth: "1024px", margin: "0 auto", padding: "12px 8px" }}>
+    <div className="bg-[rgb(228,229,230)] pb-16 min-h-screen text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <main className="max-w-5xl mx-auto px-2 sm:px-3">
+        <div className="h-2" />
         
         {/* Report Type Tabs */}
-        <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="mb-2">
+          <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
 
         {/* Commission Report Card */}
-        <div style={{ backgroundColor: "#ffffff", border: "1px solid #dee2e6", borderRadius: "4px", overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}>
+        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           
           {/* Card Header */}
-          <div style={{ backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6", padding: "8px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
-            <AlignJustify style={{ width: "16px", height: "16px", color: "#212529" }} />
-            <span style={{ fontSize: "14px", fontWeight: 700, color: "#212529" }}>
+          <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center gap-2">
+            <AlignJustify className="w-4 h-4 text-[rgb(35,40,44)]" />
+            <span className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">
               {session?.username || "Admin"} - Commission Report
             </span>
           </div>
 
           {/* Subtext Banner */}
-          <div style={{ padding: "10px 14px", borderBottom: "1px solid #dee2e6", backgroundColor: "#ffffff" }}>
-            <span style={{ fontSize: "13px", fontWeight: 700, color: "#212529" }}>
+          <div className="p-3 border-b border-[rgb(200,206,211)] bg-white">
+            <span className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">
               All Commission goes to As per share (Auto Commission)
             </span>
           </div>
 
           {/* Table */}
           {isLoading ? (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px" }}>
-              <Loader2 className="w-6 h-6 animate-spin text-[#00b181]" />
+            <div className="flex items-center justify-center p-10">
+              <Loader2 className="w-6 h-6 animate-spin text-[#00b98a]" />
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+            <div className="overflow-x-auto">
+              <table className="table table-bordered table-striped table-sm mb-0 text-[0.875rem]">
                 <thead>
-                  <tr style={{ backgroundColor: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
+                  <tr className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
                     <th 
                       onClick={toggleSort}
-                      style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, color: "#212529", cursor: "pointer", userSelect: "none" }}
+                      className="border border-[rgb(200,206,211)] px-3 py-2 text-left font-bold text-[rgb(35,40,44)] cursor-pointer select-none"
                     >
-                      User Name <span style={{ color: "#00b181" }}>▲</span>
+                      User Name <span className="text-[#00b98a]">▲</span>
                     </th>
-                    <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, color: "#212529" }}>
-                      Amount <span style={{ color: "#00b181" }}>▲</span>
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-right font-bold text-[rgb(35,40,44)]">
+                      Amount <span className="text-[#00b98a]">▲</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedClients.length === 0 ? (
                     <tr>
-                      <td colSpan={2} style={{ padding: "20px", textAlign: "center", color: "#6c757d" }}>
+                      <td colSpan={2} className="px-3 py-5 text-center text-gray-500 italic">
                         No data available in table
                       </td>
                     </tr>
@@ -106,12 +109,15 @@ export default function CommissionReport() {
                       return (
                         <tr 
                           key={client.id || idx}
-                          style={{ borderBottom: "1px solid #f1f3f5", backgroundColor: idx % 2 === 0 ? "#ffffff" : "#fcfcfc" }}
+                          className={idx % 2 === 0 ? "bg-white" : "bg-[#f8f9fa]"}
                         >
-                          <td style={{ padding: "7px 12px", fontWeight: 700, color: "#00b181" }}>
+                          <td className="border border-[rgb(200,206,211)] px-3 py-1.5 font-bold text-[#00b98a]">
                             {client.username}
                           </td>
-                          <td style={{ padding: "7px 12px", textAlign: "right", fontWeight: 700, color: comm >= 0 ? "#00b181" : "#dc3545" }}>
+                          <td className={cn(
+                            "border border-[rgb(200,206,211)] px-3 py-1.5 text-right font-bold",
+                            comm >= 0 ? "text-[#00b98a]" : "text-[#dc3545]"
+                          )}>
                             {comm.toLocaleString()}
                           </td>
                         </tr>
@@ -120,9 +126,9 @@ export default function CommissionReport() {
                   )}
                 </tbody>
                 <tfoot>
-                  <tr style={{ backgroundColor: "#00b181", color: "#ffffff", fontWeight: 700, fontSize: "13.5px" }}>
-                    <td style={{ padding: "8px 12px" }}>Total</td>
-                    <td style={{ padding: "8px 12px", textAlign: "right" }}>{totalCommission.toLocaleString()}</td>
+                  <tr className="bg-[#00b98a] text-white font-bold text-[0.875rem]">
+                    <td className="border border-[rgb(200,206,211)] px-3 py-2">Total</td>
+                    <td className="border border-[rgb(200,206,211)] px-3 py-2 text-right">{totalCommission.toLocaleString()}</td>
                   </tr>
                 </tfoot>
               </table>

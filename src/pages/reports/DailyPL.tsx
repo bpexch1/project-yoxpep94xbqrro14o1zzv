@@ -126,8 +126,8 @@ export default function DailyPL() {
   }));
 
   return (
-    <div className="bg-[#e8e8e8] min-h-screen pb-16">
-      <main className="pt-0 pb-8 max-w-5xl mx-auto font-sans px-[5px]">
+    <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <main className="pt-0 pb-8 max-w-5xl mx-auto px-2 sm:px-3">
         <div className="h-2" />
         
         <div className="mb-2">
@@ -136,37 +136,37 @@ export default function DailyPL() {
 
         {/* Date Filter Card */}
         <div className="mb-2">
-          <section className="bg-white border border-[#c8c8c8] rounded-none shadow-none">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#dee2e6] bg-[#f8f9fa]">
-              <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
-              <span className="font-bold text-[#212529] text-sm">Filters</span>
+          <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] shadow-[0_1px_1px_rgba(0,0,0,0.05)] overflow-hidden">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-[rgb(200,206,211)] bg-[#f0f3f5]">
+              <Filter className="w-4 h-4 fill-[rgb(35,40,44)] text-[rgb(35,40,44)]" />
+              <span className="font-bold text-[rgb(35,40,44)] text-[0.875rem]">Filters</span>
             </div>
-            <div className="p-4 flex flex-col gap-3">
+            <div className="p-3 flex flex-col gap-3">
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">From Date</label>
+                  <label className="text-[11px] text-[#6c757d] uppercase font-bold mb-1 block">From Date</label>
                   <input
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded px-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                    className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a]"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">To Date</label>
+                  <label className="text-[11px] text-[#6c757d] uppercase font-bold mb-1 block">To Date</label>
                   <input
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded px-2 py-1.5 text-xs focus:outline-none focus:border-[#00b181]"
+                    className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a]"
                   />
                 </div>
               </div>
               <button 
                 onClick={handleSearch}
-                className="bg-[#00b181] text-white w-full py-2 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4dbd74] transition-colors"
+                className="bg-[#00b98a] hover:bg-[#138a72] text-white w-full py-1.5 rounded-[0.2rem] text-[0.875rem] font-medium flex items-center justify-center gap-2 transition-colors border border-[#00b98a]"
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-4 h-4 stroke-[2.5]" />
                 Get Report
               </button>
             </div>
@@ -175,9 +175,9 @@ export default function DailyPL() {
 
         {/* Report Table */}
         <div>
-          <section className="bg-white border border-[#c8c8c8] overflow-hidden">
-            <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
-              <strong className="text-sm font-bold text-[#212529]">Daily P&L</strong>
+          <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] shadow-[0_1px_1px_rgba(0,0,0,0.05)] overflow-hidden">
+            <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center justify-between gap-2">
+              <strong className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">Daily P&L</strong>
               <ExportButtons 
                 data={exportData} 
                 columns={exportColumns} 
@@ -186,40 +186,40 @@ export default function DailyPL() {
               />
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs border-collapse">
+              <table className="table table-bordered table-striped table-sm mb-0 text-[0.875rem]">
                 <thead>
-                  <tr className="bg-[#254465] text-white">
-                    <th className="border border-[#1a3550] px-2 py-2 text-left font-medium">Date</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-center font-medium">Bets</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Stake</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Won</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Lost</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Net P&L</th>
-                    <th className="border border-[#1a3550] px-2 py-2 text-right font-medium">Comm.</th>
+                  <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-left font-bold">Date</th>
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-center font-bold">Bets</th>
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold">Stake</th>
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold">Won</th>
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold">Lost</th>
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold">Net P&L</th>
+                    <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold">Comm.</th>
                   </tr>
                 </thead>
                 <tbody>
                   {isLoading ? (
                     <tr>
                       <td colSpan={7} className="py-8 text-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#00b181] mx-auto" />
+                        <Loader2 className="w-6 h-6 animate-spin text-[#00b98a] mx-auto" />
                       </td>
                     </tr>
                   ) : safeDailyData.length > 0 ? (
                     safeDailyData.map((day, i) => (
-                      <tr key={day?.date || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f4f6f7]")}>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-gray-700 font-medium">{day?.date || "—"}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-center text-gray-700">{day?.totalBets || 0}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-gray-700 font-medium">{(day?.totalStake || 0).toFixed(2)}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-[#00b181] font-medium">{(day?.totalWon || 0).toFixed(2)}</td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-[#e74c3c] font-medium">{(day?.totalLost || 0).toFixed(2)}</td>
+                      <tr key={day?.date || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa]")}>
+                        <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-[rgb(35,40,44)] font-medium">{day?.date || "—"}</td>
+                        <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-center text-[rgb(35,40,44)]">{day?.totalBets || 0}</td>
+                        <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[rgb(35,40,44)] font-medium">{(day?.totalStake || 0).toFixed(2)}</td>
+                        <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[#00b98a] font-medium">{(day?.totalWon || 0).toFixed(2)}</td>
+                        <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[#dc3545] font-medium">{(day?.totalLost || 0).toFixed(2)}</td>
                         <td className={cn(
-                          "border border-[#d5d8dc] px-2 py-1.5 text-right font-bold",
-                          (day?.netPL || 0) >= 0 ? "text-[#00b181]" : "text-[#e74c3c]"
+                          "border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold",
+                          (day?.netPL || 0) >= 0 ? "text-[#00b98a]" : "text-[#dc3545]"
                         )}>
                           {(day?.netPL || 0).toFixed(2)}
                         </td>
-                        <td className="border border-[#d5d8dc] px-2 py-1.5 text-right text-gray-500 italic">
+                        <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-gray-500 italic">
                           {(day?.commission || 0).toFixed(2)}
                         </td>
                       </tr>
@@ -234,19 +234,19 @@ export default function DailyPL() {
                 </tbody>
                 {safeDailyData.length > 0 && grandTotal && (
                   <tfoot>
-                    <tr className="bg-[#ecf0f1] font-bold">
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#2c3e50]">Total:</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-center text-[#2c3e50]">{grandTotal.totalBets}</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#2c3e50]">{grandTotal.totalStake.toFixed(2)}</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#00b181]">{grandTotal.totalWon.toFixed(2)}</td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-[#e74c3c]">{grandTotal.totalLost.toFixed(2)}</td>
+                    <tr className="bg-[#e4e5e6] font-bold">
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[rgb(35,40,44)]">Total:</td>
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-center text-[rgb(35,40,44)]">{grandTotal.totalBets}</td>
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[rgb(35,40,44)]">{grandTotal.totalStake.toFixed(2)}</td>
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[#00b98a]">{grandTotal.totalWon.toFixed(2)}</td>
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[#dc3545]">{grandTotal.totalLost.toFixed(2)}</td>
                       <td className={cn(
-                        "border border-[#d5d8dc] px-2 py-2 text-right",
-                        grandTotal.netPL >= 0 ? "text-[#00b181]" : "text-[#e74c3c]"
+                        "border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right",
+                        grandTotal.netPL >= 0 ? "text-[#00b98a]" : "text-[#dc3545]"
                       )}>
                         {grandTotal.netPL.toFixed(2)}
                       </td>
-                      <td className="border border-[#d5d8dc] px-2 py-2 text-right text-gray-600 font-normal">
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[rgb(35,40,44)] font-normal">
                         {grandTotal.commission.toFixed(2)}
                       </td>
                     </tr>

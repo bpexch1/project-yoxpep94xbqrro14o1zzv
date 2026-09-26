@@ -179,15 +179,15 @@ export function ClientSummaryCard({
 
   return (
     <section
-      className="bg-white border border-[#dee2e6] shadow-[0_1px_3px_rgba(0,0,0,0.05)] rounded-[4px] overflow-hidden mb-3"
+      className="bg-white border border-[rgb(200,206,211)] shadow-[0_1px_1px_rgba(0,0,0,0.05)] rounded-[0.25rem] overflow-hidden mb-3"
       style={{
-        fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
       {/* 1. Header Bar */}
       {!hideHeader && (
-        <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center justify-between">
-          <span className="font-bold text-[14px] text-[#212529]">
+        <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center justify-between">
+          <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">
             {username} - Clients List{!balancesLoaded ? " | Default" : ""}
           </span>
         </div>
@@ -197,82 +197,82 @@ export function ClientSummaryCard({
         {/* 2. Top Summary Stats Table */}
         <div className="mb-3.5 overflow-x-auto">
           {!balancesLoaded ? (
-            <table className="border-collapse border border-[#dee2e6] text-[13px] bg-white">
+            <table className="border-collapse border border-[rgb(200,206,211)] text-[0.875rem] bg-white">
               <thead>
                 <tr className="bg-white">
-                  <th className="border border-[#dee2e6] px-3.5 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Credit<br />Remaining
                   </th>
-                  <th className="border border-[#dee2e6] px-3.5 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Cash
                   </th>
-                  <th className="border border-[#dee2e6] px-3.5 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     P/L<br />Downline
                   </th>
-                  <th className="border border-[#dee2e6] px-3.5 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Users
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="border border-[#dee2e6] px-3.5 py-1.5 font-bold text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 font-bold text-[#00b98a]">
                     0
                   </td>
-                  <td className="border border-[#dee2e6] px-3.5 py-1.5 font-bold text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 font-bold text-[#00b98a]">
                     0
                   </td>
-                  <td className="border border-[#dee2e6] px-3.5 py-1.5 font-bold text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 font-bold text-[#00b98a]">
                     0
                   </td>
-                  <td className="border border-[#dee2e6] px-3.5 py-1.5 font-bold text-[#212529]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 font-bold text-[rgb(35,40,44)]">
                     {filteredClients.length || 2}
                   </td>
                 </tr>
               </tbody>
             </table>
           ) : (
-            <table className="border-collapse border border-[#dee2e6] text-[13px] bg-white">
+            <table className="border-collapse border border-[rgb(200,206,211)] text-[0.875rem] bg-white">
               <thead>
                 <tr className="bg-white">
-                  <th className="border border-[#dee2e6] px-3 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Credit<br />Received
                   </th>
-                  <th className="border border-[#dee2e6] px-3 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Credit<br />Remaining
                   </th>
-                  <th className="border border-[#dee2e6] px-3 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Cash
                   </th>
-                  <th className="border border-[#dee2e6] px-3 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     P/L<br />Downline
                   </th>
-                  <th className="border border-[#dee2e6] px-3 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Balance<br />UpLine
                   </th>
-                  <th className="border border-[#dee2e6] px-3 py-1.5 text-left font-bold text-[#212529] whitespace-nowrap leading-tight">
+                  <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Users
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="bg-white font-bold">
-                  <td className="border border-[#dee2e6] px-3 py-1.5 text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00b98a]">
                     {summaryData.credit_received.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-1.5 text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00b98a]">
                     {summaryData.credit_remaining.toLocaleString()}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-1.5 text-[#dc3545]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#dc3545]">
                     {summaryData.cash < 0 ? summaryData.cash.toLocaleString() : `-${Math.abs(summaryData.cash).toLocaleString()}`}
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-1.5 text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00b98a]">
                     0
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-1.5 text-[#00a676]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00b98a]">
                     0
                   </td>
-                  <td className="border border-[#dee2e6] px-3 py-1.5 text-[#212529]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
                     {filteredClients.length || 2}
                   </td>
                 </tr>
@@ -288,14 +288,14 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#00a676] hover:bg-[#008f65] text-white font-medium text-[12px] py-1 px-2.5 rounded-[3px] flex items-center gap-1 transition-colors shadow-sm"
+                className="bg-[#00b98a] hover:bg-[#138a72] text-white font-medium text-[0.75rem] py-1 px-2.5 rounded-[0.2rem] flex items-center gap-1 transition-colors shadow-sm"
               >
                 <span>New User</span>
               </button>
             )}
             <button
               onClick={() => navigate("/reports/daily")}
-              className="bg-[#00a676] hover:bg-[#008f65] text-white font-medium text-[12px] py-1 px-2.5 rounded-[3px] flex items-center gap-1 transition-colors shadow-sm"
+              className="bg-[#00b98a] hover:bg-[#138a72] text-white font-medium text-[0.75rem] py-1 px-2.5 rounded-[0.2rem] flex items-center gap-1 transition-colors shadow-sm"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Account Ledger</span>
@@ -303,7 +303,7 @@ export function ClientSummaryCard({
           </div>
 
           {/* Legend Badges Row */}
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12px] text-[#212529]">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[0.75rem] text-[rgb(35,40,44)]">
             <div className="flex items-center gap-1">
               <span className="w-[18px] h-[18px] bg-[#ffc107] text-black flex items-center justify-center rounded-[2px] text-[11px] font-bold">
                 C
@@ -312,7 +312,7 @@ export function ClientSummaryCard({
             </div>
 
             <div className="flex items-center gap-1">
-              <span className="w-[18px] h-[18px] bg-[#00a676] text-white flex items-center justify-center rounded-[2px]">
+              <span className="w-[18px] h-[18px] bg-[#00b98a] text-white flex items-center justify-center rounded-[2px]">
                 <Pencil className="w-2.5 h-2.5" />
               </span>
               <span className="font-normal">Edit</span>
@@ -343,7 +343,7 @@ export function ClientSummaryCard({
 
         {/* 4. Table Search Box - Centered like original website */}
         <div className="flex flex-col items-center justify-center my-3">
-          <label className="text-[13px] text-[#212529] font-normal mb-1">
+          <label className="text-[0.875rem] text-[rgb(35,40,44)] font-normal mb-1">
             Search:
           </label>
           <input
@@ -353,32 +353,32 @@ export function ClientSummaryCard({
               setTableSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full max-w-[240px] border border-[#ced4da] rounded-[4px] px-2 py-1 text-[13px] text-[#212529] bg-white outline-none focus:border-[#00a676] focus:ring-1 focus:ring-[#00a676]"
+            className="w-full max-w-[240px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1 text-[0.875rem] text-[rgb(35,40,44)] bg-white outline-none focus:border-[#00b98a]"
           />
         </div>
 
         {/* 5. Main Users Table */}
-        <div className="overflow-x-auto border border-[#dee2e6] rounded-[3px]">
-          <table className="w-full border-collapse text-[13px]">
+        <div className="overflow-x-auto border border-[rgb(200,206,211)] rounded-[0.2rem]">
+          <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
             <tbody>
               {/* TOP GREEN BAR / LOAD BALANCE */}
-              <tr className="bg-[#00a676] text-white font-bold">
+              <tr className="bg-[#00b98a] text-white font-bold">
                 {!balancesLoaded ? (
-                  <td colSpan={3} className="px-3 py-2 border-b border-[#008f65]">
+                  <td colSpan={3} className="px-3 py-2 border-b border-[#009e74]">
                     <button
                       onClick={handleLoadBalance}
-                      className="bg-[#ffc107] hover:bg-[#e0a800] text-black text-[12px] font-bold py-1 px-3 rounded-[3px] shadow-sm transition-colors"
+                      className="bg-[#ffc107] hover:bg-[#e0a800] text-black text-[12px] font-bold py-1 px-3 rounded-[2px] shadow-sm transition-colors"
                     >
                       {isLoadingBalances ? "Loading..." : "Load Balance"}
                     </button>
                   </td>
                 ) : (
                   <>
-                    <td className="px-3 py-2 border-r border-[#008f65] font-bold text-left text-[14px]">
+                    <td className="px-3 py-2 border-r border-[#009e74] font-bold text-left text-[0.875rem]">
                       Total
                     </td>
-                    <td className="px-3 py-2 border-r border-[#008f65]"></td>
-                    <td className="px-3 py-2 font-bold text-left text-[14px]">
+                    <td className="px-3 py-2 border-r border-[#009e74]"></td>
+                    <td className="px-3 py-2 font-bold text-left text-[0.875rem]">
                       {totalCreditSum.toLocaleString()}
                     </td>
                   </>
@@ -386,11 +386,11 @@ export function ClientSummaryCard({
               </tr>
 
               {/* TABLE HEADERS */}
-              <tr className="bg-white border-b border-[#dee2e6] font-bold text-[#212529]">
-                <th className="px-3 py-2 text-left border-r border-[#dee2e6] w-[40%] font-bold">
+              <tr className="bg-white border-b border-[rgb(200,206,211)] font-bold text-[rgb(35,40,44)]">
+                <th className="px-3 py-2 text-left border-r border-[rgb(200,206,211)] w-[40%] font-bold">
                   Username
                 </th>
-                <th className="px-3 py-2 text-left border-r border-[#dee2e6] w-[35%] font-bold">
+                <th className="px-3 py-2 text-left border-r border-[rgb(200,206,211)] w-[35%] font-bold">
                   Type
                 </th>
                 <th className="px-3 py-2 text-left w-[25%] font-bold">
@@ -402,7 +402,7 @@ export function ClientSummaryCard({
               {isLoading ? (
                 <tr>
                   <td colSpan={3} className="px-3 py-8 text-center text-gray-500">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#00a676]" />
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#00b98a]" />
                     <span>Loading clients...</span>
                   </td>
                 </tr>
@@ -422,16 +422,16 @@ export function ClientSummaryCard({
                       {/* Main user row */}
                       <tr
                         onClick={() => toggleExpand(client.id)}
-                        className="border-b border-[#dee2e6] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
+                        className="border-b border-[rgb(200,206,211)] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
                       >
-                        <td className="px-3 py-2.5 border-r border-[#dee2e6]">
+                        <td className="px-3 py-2.5 border-r border-[rgb(200,206,211)]">
                           <div className="flex items-center gap-1.5">
                             <span
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/accounts/view/${client.username}`);
                               }}
-                              className="text-[#00a676] hover:text-[#008f65] font-bold text-[13px] hover:underline cursor-pointer"
+                              className="text-[#00b98a] hover:text-[#138a72] font-bold text-[0.875rem] hover:underline cursor-pointer"
                             >
                               {client.username}
                             </span>
@@ -450,20 +450,20 @@ export function ClientSummaryCard({
                           </div>
                         </td>
 
-                        <td className="px-3 py-2.5 border-r border-[#dee2e6] text-[#212529]">
+                        <td className="px-3 py-2.5 border-r border-[rgb(200,206,211)] text-[rgb(35,40,44)]">
                           {getTypeLabel(client.role)}
                         </td>
 
-                        <td className="px-3 py-2.5 text-[#212529]">
+                        <td className="px-3 py-2.5 text-[rgb(35,40,44)]">
                           {balancesLoaded ? display.credit.toLocaleString() : "-"}
                         </td>
                       </tr>
 
                       {/* Expanded Sub-Details Row */}
                       {isExpanded && (
-                        <tr className="bg-white border-b border-[#dee2e6]">
+                        <tr className="bg-white border-b border-[rgb(200,206,211)]">
                           <td colSpan={3} className="px-4 py-3 bg-[#fafafa]/50">
-                            <ul className="space-y-1 text-[13px] text-[#212529] mb-3">
+                            <ul className="space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
                               <li>
                                 • Balance{" "}
                                 <span className="font-bold">
@@ -478,7 +478,7 @@ export function ClientSummaryCard({
                                     color:
                                       balancesLoaded && display.clientPL < 0
                                         ? "#dc3545"
-                                        : "#212529",
+                                        : "rgb(35,40,44)",
                                   }}
                                 >
                                   {balancesLoaded
@@ -512,7 +512,7 @@ export function ClientSummaryCard({
 
                             {/* Options Action Buttons */}
                             <div className="flex items-center gap-1.5 pt-1">
-                              <span className="font-bold text-[13px] text-[#212529] mr-1">
+                              <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)] mr-1">
                                 • Options
                               </span>
 
@@ -533,7 +533,7 @@ export function ClientSummaryCard({
                                   navigate(`/accounts/edit/${client.username}`);
                                 }}
                                 title="Edit"
-                                className="w-6 h-6 bg-[#00a676] text-white rounded-[2px] flex items-center justify-center hover:opacity-85 shadow-sm transition-opacity"
+                                className="w-6 h-6 bg-[#00b98a] text-white rounded-[2px] flex items-center justify-center hover:opacity-85 shadow-sm transition-opacity"
                               >
                                 <Pencil className="w-3 h-3" />
                               </button>
@@ -577,7 +577,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* 6. Footer Entries Counter */}
-        <div className="mt-3 text-center text-[13px] text-[#212529]">
+        <div className="mt-3 text-center text-[0.875rem] text-[rgb(35,40,44)]">
           Showing 1 to {paginatedClients.length} of {tableFilteredClients.length} entries
         </div>
 

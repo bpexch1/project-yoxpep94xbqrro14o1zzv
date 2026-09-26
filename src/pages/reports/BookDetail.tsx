@@ -128,8 +128,8 @@ export default function BookDetail() {
   const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
 
   return (
-    <div className="bg-[#e8e8e8] min-h-screen pb-16">
-      <main className="max-w-5xl mx-auto font-sans px-[5px]">
+    <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <main className="max-w-5xl mx-auto px-2 sm:px-3">
         <div className="h-2" />
         
         <div className="mt-2 mb-3">
@@ -138,22 +138,22 @@ export default function BookDetail() {
 
         {/* Filters Card */}
         <div className="mb-3">
-          <section className="bg-white border border-[#c8c8c8] rounded-[4px] overflow-hidden shadow-sm">
-            <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
-              <Filter className="w-4 h-4 fill-[#212529] text-[#212529]" />
-              <strong className="text-sm font-bold text-[#212529]">Filters</strong>
+          <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+            <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center gap-2">
+              <Filter className="w-4 h-4 fill-[rgb(35,40,44)] text-[rgb(35,40,44)]" />
+              <strong className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">Filters</strong>
             </div>
             <div className="p-3">
               {/* Row 1: Username */}
               <div className="mb-3">
-                <label className="text-[11px] font-bold text-[#555] uppercase mb-1 block">Client Username</label>
+                <label className="text-[11px] font-bold text-[#6c757d] uppercase mb-1 block">Client Username</label>
                 <input
                   type="text"
                   placeholder="Enter username or leave blank for all"
                   list="downline-users-list"
                   value={usernameFilter}
                   onChange={(e) => setUsernameFilter(e.target.value)}
-                  className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors"
+                  className="w-full h-[34px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a] transition-colors"
                 />
                 <datalist id="downline-users-list">
                   {safeDownlineUsernames.map((name: string) => (
@@ -166,21 +166,21 @@ export default function BookDetail() {
               {/* Row 2: From/To Dates */}
               <div className="flex gap-3 mb-3">
                 <div className="flex-1">
-                  <label className="text-[11px] font-bold text-[#555] uppercase mb-1 block">From Date</label>
+                  <label className="text-[11px] font-bold text-[#6c757d] uppercase mb-1 block">From Date</label>
                   <input 
                     type="date" 
                     value={fromDate} 
                     onChange={(e) => setFromDate(e.target.value)} 
-                    className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors" 
+                    className="w-full h-[34px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a] transition-colors" 
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-[11px] font-bold text-[#555] uppercase mb-1 block">To Date</label>
+                  <label className="text-[11px] font-bold text-[#6c757d] uppercase mb-1 block">To Date</label>
                   <input 
                     type="date" 
                     value={toDate} 
                     onChange={(e) => setToDate(e.target.value)} 
-                    className="w-full h-[32px] border border-[#ced4da] rounded px-2 text-[13px] focus:outline-none focus:border-[#1a9e71] transition-colors" 
+                    className="w-full h-[34px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a] transition-colors" 
                   />
                 </div>
               </div>
@@ -188,9 +188,9 @@ export default function BookDetail() {
               {/* Get Report button */}
               <button
                 onClick={handleSearch}
-                className="w-full h-[34px] bg-[#1a9e71] hover:bg-[#158a60] text-white text-[13px] font-bold rounded flex items-center justify-center gap-2 transition-colors"
+                className="w-full h-[34px] bg-[#00b98a] hover:bg-[#138a72] text-white text-[0.875rem] font-medium rounded-[0.2rem] flex items-center justify-center gap-2 transition-colors border border-[#00b98a]"
               >
-                <Search className="w-4 h-4" /> Get Report
+                <Search className="w-4 h-4 stroke-[2.5]" /> Get Report
               </button>
             </div>
           </section>
@@ -198,12 +198,14 @@ export default function BookDetail() {
 
         {/* Results Card */}
         <div>
-          <section className="bg-white border border-[#c8c8c8] rounded-[4px] overflow-hidden shadow-sm">
-            <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#212529]" />
-              <strong className="text-sm font-bold text-[#212529]">
-                {usernameFilter ? `${usernameFilter} — Book Detail` : "Book Detail"}
-              </strong>
+          <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+            <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-[rgb(35,40,44)]" />
+                <strong className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">
+                  {usernameFilter ? `${usernameFilter} — Book Detail` : "Book Detail"}
+                </strong>
+              </div>
               <ExportButtons 
                 data={exportData} 
                 columns={exportColumns} 
@@ -213,55 +215,55 @@ export default function BookDetail() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-[12px] border-collapse">
+              <table className="table table-bordered table-striped table-sm mb-0 text-[0.875rem]">
                 <thead>
-                  <tr className="bg-[#254465] text-white">
-                    <th className="border border-[#1a3550] px-3 py-2 text-left font-medium">S.No</th>
-                    <th className="border border-[#1a3550] px-3 py-2 text-left font-medium">Date/Time</th>
-                    <th className="border border-[#1a3550] px-3 py-2 text-left font-medium">Description</th>
-                    <th className="border border-[#1a3550] px-3 py-2 text-right font-medium">Dr</th>
-                    <th className="border border-[#1a3550] px-3 py-2 text-right font-medium">Cr</th>
-                    <th className="border border-[#1a3550] px-3 py-2 text-right font-medium">Balance</th>
+                  <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-left font-bold">S.No</th>
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-left font-bold">Date/Time</th>
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-left font-bold">Description</th>
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-right font-bold">Dr</th>
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-right font-bold">Cr</th>
+                    <th className="border border-[rgb(200,206,211)] px-3 py-2 text-right font-bold">Balance</th>
                   </tr>
                 </thead>
                 <tbody>
                   {searchTrigger === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-10 text-center text-[#888] text-[13px] italic">
+                      <td colSpan={6} className="py-10 text-center text-gray-500 text-[0.875rem] italic">
                         Use the filters above and click <strong>Get Report</strong> to load data.
                       </td>
                     </tr>
                   ) : isLoading ? (
                     <tr>
                       <td colSpan={6} className="py-10 text-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#1a9e71] mx-auto" />
+                        <Loader2 className="w-6 h-6 animate-spin text-[#00b98a] mx-auto" />
                       </td>
                     </tr>
                   ) : safeProcessedTransactions.length > 0 ? (
                     safeProcessedTransactions.map((t, i) => (
                       <tr key={t?.id || i} className={cn(i % 2 === 0 ? "bg-white" : "bg-[#f8f9fa]")}>
-                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057]">{i + 1}</td>
-                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057]">
+                        <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-gray-500">{i + 1}</td>
+                        <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
                           {t?.created_at ? new Date(t.created_at).toLocaleDateString() : "—"}<br/>
                           <span className="text-[10px] text-gray-400">
                             {t?.created_at ? new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
                           </span>
                         </td>
-                        <td className="border border-[#dee2e6] px-3 py-1.5 text-[#495057] min-w-[150px]">{t?.description || "—"}</td>
-                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", (t?.dr || 0) > 0 ? "text-[#e74c3c]" : "text-gray-400")}>
+                        <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)] min-w-[150px]">{t?.description || "—"}</td>
+                        <td className={cn("border border-[rgb(200,206,211)] px-3 py-1.5 text-right font-bold", (t?.dr || 0) > 0 ? "text-[#dc3545]" : "text-gray-400")}>
                           {(t?.dr || 0) > 0 ? (t?.dr || 0).toFixed(2) : "0.00"}
                         </td>
-                        <td className={cn("border border-[#dee2e6] px-3 py-1.5 text-right font-bold", (t?.cr || 0) > 0 ? "text-[#1a9e71]" : "text-gray-400")}>
+                        <td className={cn("border border-[rgb(200,206,211)] px-3 py-1.5 text-right font-bold", (t?.cr || 0) > 0 ? "text-[#00b98a]" : "text-gray-400")}>
                           {(t?.cr || 0) > 0 ? (t?.cr || 0).toFixed(2) : "0.00"}
                         </td>
-                        <td className="border border-[#dee2e6] px-3 py-1.5 text-right font-bold text-[#254465]">
+                        <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-right font-bold text-[rgb(35,40,44)]">
                           {(t?.balance || 0).toFixed(2)}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-10 text-center text-[#888] text-[13px] italic">
+                      <td colSpan={6} className="py-10 text-center text-gray-500 text-[0.875rem] italic">
                         No records found for selected period.
                       </td>
                     </tr>
@@ -269,11 +271,11 @@ export default function BookDetail() {
                 </tbody>
                 {safeProcessedTransactions.length > 0 && (
                   <tfoot>
-                    <tr className="bg-[#ecf0f1] font-bold">
-                      <td colSpan={3} className="border border-[#dee2e6] px-3 py-2 text-right text-[#2c3e50]">Total:</td>
-                      <td className="border border-[#dee2e6] px-3 py-2 text-right text-[#e74c3c]">{totalDr.toFixed(2)}</td>
-                      <td className="border border-[#dee2e6] px-3 py-2 text-right text-[#1a9e71]">{totalCr.toFixed(2)}</td>
-                      <td className="border border-[#dee2e6] px-3 py-2 text-right text-[#254465]">
+                    <tr className="bg-[#e4e5e6] font-bold">
+                      <td colSpan={3} className="border border-[rgb(200,206,211)] px-3 py-2 text-right text-[rgb(35,40,44)]">Total:</td>
+                      <td className="border border-[rgb(200,206,211)] px-3 py-2 text-right text-[#dc3545]">{totalDr.toFixed(2)}</td>
+                      <td className="border border-[rgb(200,206,211)] px-3 py-2 text-right text-[#00b98a]">{totalCr.toFixed(2)}</td>
+                      <td className="border border-[rgb(200,206,211)] px-3 py-2 text-right text-[rgb(35,40,44)]">
                         {(totalCr - totalDr).toFixed(2)}
                       </td>
                     </tr>
@@ -283,7 +285,7 @@ export default function BookDetail() {
             </div>
 
             {searchTrigger > 0 && !isLoading && (
-              <div className="px-3 py-2 text-[11px] text-[#555] bg-[#f8f9fa] border-t border-[#d0d0d0]">
+              <div className="px-3 py-2 text-[11px] text-gray-500 bg-[#f8f9fa] border-t border-[rgb(200,206,211)]">
                 Showing {safeProcessedTransactions.length} entries
               </div>
             )}

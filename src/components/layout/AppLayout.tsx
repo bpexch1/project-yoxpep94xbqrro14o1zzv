@@ -53,7 +53,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   return (
-    <div className="min-h-screen bg-[#ececed]">
+    <div className="app app-dashboard app-root min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       {/* Sidebar handles both desktop and mobile modes */}
       <Sidebar 
         isMobileOpen={isMobileSidebarOpen} 
@@ -71,7 +71,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} 
           onToggleDesktopSidebar={() => setSidebarCollapsed(prev => !prev)}
         />
-        <main className="flex-1 overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden p-2 sm:p-3">
           {children}
         </main>
       </div>

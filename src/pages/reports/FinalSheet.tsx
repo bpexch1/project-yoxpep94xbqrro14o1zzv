@@ -99,8 +99,8 @@ export default function FinalSheet() {
   const toggleSort = () => setSortDir((d) => d === "asc" ? "desc" : "asc");
 
   return (
-    <div className="bg-[#f4f6f7] pb-16 min-h-screen">
-      <main className="pt-0 pb-8 max-w-5xl mx-auto px-[5px]" style={{ fontFamily: "Roboto, system-ui, sans-serif" }}>
+    <div className="bg-[rgb(228,229,230)] pb-16 min-h-screen text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <main className="pt-0 pb-8 max-w-5xl mx-auto px-2 sm:px-3">
         <div className="h-2" />
 
         {/* Report Type Tabs */}
@@ -110,11 +110,11 @@ export default function FinalSheet() {
 
         {/* Title Card */}
         <div className="mb-3">
-          <div className="bg-white border border-[#d5d8dc] rounded-[4px] px-3 py-3">
+          <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] px-3 py-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
             {/* Title Row */}
             <div className="flex items-center gap-2 mb-2">
-              <AlignJustify className="w-5 h-5 text-[#212529]" />
-              <span className="font-bold text-[15px] text-[#212529]">
+              <AlignJustify className="w-5 h-5 text-[rgb(35,40,44)]" />
+              <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">
                 {session?.username || "Admin"} - Final Sheet
               </span>
             </div>
@@ -124,9 +124,9 @@ export default function FinalSheet() {
                 type="checkbox"
                 checked={hideZero}
                 onChange={(e) => setHideZero(e.target.checked)}
-                className="w-4 h-4 accent-[#00b181]"
+                className="w-4 h-4 accent-[#00b98a]"
               />
-              <span className="text-[13px] text-[#212529] font-medium">Hide Zero Amounts</span>
+              <span className="text-[0.875rem] text-[rgb(35,40,44)] font-medium">Hide Zero Amounts</span>
             </label>
           </div>
         </div>
@@ -135,22 +135,22 @@ export default function FinalSheet() {
         <div>
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-7 h-7 animate-spin text-[#00b181]" />
+              <Loader2 className="w-7 h-7 animate-spin text-[#00b98a]" />
             </div>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               {/* LEFT TABLE — Positive Amounts */}
-              <div className="flex-1 min-w-0">
-                <table className="w-full border-collapse text-[12px]" style={{ borderTop: "2px solid #212529" }}>
+              <div className="flex-1 min-w-0 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+                <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
                   <thead>
-                    <tr className="bg-white">
+                    <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
                       <th
-                        className="border border-[#dee2e6] px-2 py-2 text-left font-bold text-[#212529] cursor-pointer select-none"
+                        className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-left font-bold text-[rgb(35,40,44)] cursor-pointer select-none"
                         onClick={toggleSort}
                       >
                         Name {sortDir === "asc" ? "▲" : "▼"}
                       </th>
-                      <th className="border border-[#dee2e6] px-2 py-2 text-right font-bold text-[#212529]">
+                      <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold text-[rgb(35,40,44)]">
                         Amount
                       </th>
                     </tr>
@@ -158,7 +158,7 @@ export default function FinalSheet() {
                   <tbody>
                     {positiveClients.length === 0 ? (
                       <tr>
-                        <td colSpan={2} className="px-2 py-6 text-center text-gray-400 italic text-[11px]">
+                        <td colSpan={2} className="px-2.5 py-6 text-center text-gray-400 italic text-[0.75rem]">
                           No entries
                         </td>
                       </tr>
@@ -168,12 +168,12 @@ export default function FinalSheet() {
                         return (
                           <tr
                             key={c.id}
-                            className={isCurrentUser ? "bg-[#c8c8c8]" : "bg-white hover:bg-[#f8f9fa]"}
+                            className={isCurrentUser ? "bg-[#c8ced3]" : "bg-white hover:bg-[#f8f9fa]"}
                           >
-                            <td className="border border-[#dee2e6] px-2 py-1.5 text-[#00b181] font-medium">
+                            <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-[#00b98a] font-medium">
                               {c.username}
                             </td>
-                            <td className="border border-[#dee2e6] px-2 py-1.5 text-right text-[#212529] font-medium">
+                            <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[rgb(35,40,44)] font-medium">
                               {(c.balance_upline || 0).toLocaleString()}
                             </td>
                           </tr>
@@ -182,9 +182,9 @@ export default function FinalSheet() {
                     )}
                   </tbody>
                   <tfoot>
-                    <tr style={{ background: "#00b181" }}>
-                      <td className="px-2 py-2 font-bold text-white text-[13px]">Total</td>
-                      <td className="px-2 py-2 text-right font-bold text-white text-[13px]">
+                    <tr className="bg-[#00b98a] text-white">
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 font-bold text-[0.875rem]">Total</td>
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold text-[0.875rem]">
                         {positiveTotal.toLocaleString()}
                       </td>
                     </tr>
@@ -193,17 +193,17 @@ export default function FinalSheet() {
               </div>
 
               {/* RIGHT TABLE — Negative Amounts */}
-              <div className="flex-1 min-w-0">
-                <table className="w-full border-collapse text-[12px]" style={{ borderTop: "2px solid #212529" }}>
+              <div className="flex-1 min-w-0 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+                <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
                   <thead>
-                    <tr className="bg-white">
+                    <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
                       <th
-                        className="border border-[#dee2e6] px-2 py-2 text-left font-bold text-[#212529] cursor-pointer select-none"
+                        className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-left font-bold text-[rgb(35,40,44)] cursor-pointer select-none"
                         onClick={toggleSort}
                       >
                         Name {sortDir === "asc" ? "▲" : "▼"}
                       </th>
-                      <th className="border border-[#dee2e6] px-2 py-2 text-right font-bold text-[#212529]">
+                      <th className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold text-[rgb(35,40,44)]">
                         Amount
                       </th>
                     </tr>
@@ -211,7 +211,7 @@ export default function FinalSheet() {
                   <tbody>
                     {negativeClients.length === 0 ? (
                       <tr>
-                        <td colSpan={2} className="px-2 py-6 text-center text-gray-400 italic text-[11px]">
+                        <td colSpan={2} className="px-2.5 py-6 text-center text-gray-400 italic text-[0.75rem]">
                           No entries
                         </td>
                       </tr>
@@ -221,12 +221,12 @@ export default function FinalSheet() {
                         return (
                           <tr
                             key={c.id}
-                            className={isCurrentUser ? "bg-[#c8c8c8]" : "bg-white hover:bg-[#f8f9fa]"}
+                            className={isCurrentUser ? "bg-[#c8ced3]" : "bg-white hover:bg-[#f8f9fa]"}
                           >
-                            <td className="border border-[#dee2e6] px-2 py-1.5 text-[#00b181] font-medium">
+                            <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-[#00b98a] font-medium">
                               {c.username}
                             </td>
-                            <td className="border border-[#dee2e6] px-2 py-1.5 text-right text-[#dc3545] font-medium">
+                            <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right text-[#dc3545] font-medium">
                               {(c.balance_upline || 0).toLocaleString()}
                             </td>
                           </tr>
@@ -235,9 +235,9 @@ export default function FinalSheet() {
                     )}
                   </tbody>
                   <tfoot>
-                    <tr style={{ background: "#e74c3c" }}>
-                      <td className="px-2 py-2 font-bold text-white text-[13px]">Total</td>
-                      <td className="px-2 py-2 text-right font-bold text-white text-[13px]">
+                    <tr className="bg-[#dc3545] text-white">
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 font-bold text-[0.875rem]">Total</td>
+                      <td className="border border-[rgb(200,206,211)] px-2.5 py-1.5 text-right font-bold text-[0.875rem]">
                         {negativeTotal.toLocaleString()}
                       </td>
                     </tr>
