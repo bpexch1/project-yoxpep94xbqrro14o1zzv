@@ -133,6 +133,8 @@ const App = () => (
             <Route path="/play/profile" element={<UserProfile />} />
             <Route path="/Customer/Profile" element={<UserProfile />} />
             <Route path="/customer/profile" element={<UserProfile />} />
+            <Route path="/Common/Profile" element={<UserProfile />} />
+            <Route path="/common/profile" element={<UserProfile />} />
             <Route path="/play/statement" element={<UserStatement />} />
             <Route path="/play/ledger" element={<UserStatement />} />
             <Route path="/Customer/Statement" element={<UserStatement />} />

@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
-import { Filter, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
@@ -12,7 +12,6 @@ export default function Accounts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [isSearchHovered, setIsSearchHovered] = useState(false);
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,7 +53,7 @@ export default function Accounts() {
       if (!session) return [];
       const role = session.role?.toLowerCase();
       // Only Company role can list all clients
-      if (role === 'company') {
+      if (role === "company") {
         return ClientEntity.list("-created_at");
       }
       return ClientEntity.filter({ parent_username: session.username }, "-created_at");
@@ -63,7 +62,7 @@ export default function Accounts() {
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchInterval: 15000,
-    select: (data: any) => Array.isArray(data) ? data.map((c: any) => ({ ...c })) : [],
+    select: (data: any) => (Array.isArray(data) ? data.map((c: any) => ({ ...c })) : []),
   });
 
   // Admin's own record to show in summary table
@@ -75,13 +74,16 @@ export default function Accounts() {
   });
   const adminRecord = adminOwnData?.[0];
 
-  const clientsKey = Array.isArray(clients) ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join('|') : 'empty';
+  const clientsKey = Array.isArray(clients)
+    ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join("|")
+    : "empty";
 
   const suggestions = (Array.isArray(clients) ? clients : [])
-    .filter(c => 
-      searchQuery.length >= 3 && 
-      (c.username?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-       c.full_name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(
+      (c) =>
+        searchQuery.length >= 2 &&
+        (c.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.full_name?.toLowerCase().includes(searchQuery.toLowerCase()))
     )
     .slice(0, 8);
 
@@ -89,9 +91,9 @@ export default function Accounts() {
     if (!showSuggestions || suggestions.length === 0) return;
 
     if (e.key === "ArrowDown") {
-      setHighlightedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+      setHighlightedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev));
     } else if (e.key === "ArrowUp") {
-      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : prev));
+      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === "Enter") {
       if (highlightedIndex >= 0) {
         selectSuggestion(suggestions[highlightedIndex]);
@@ -109,7 +111,6 @@ export default function Accounts() {
     setHighlightedIndex(-1);
     setSelectedClient(client);
 
-    // Build parent chain using the loaded clients array
     const chain: string[] = [];
     let current = client;
     const visited = new Set<string>();
@@ -121,7 +122,6 @@ export default function Accounts() {
         if (parent) {
           current = parent;
         } else {
-          // Parent not in loaded list (could be session user or higher)
           chain.unshift(current.parent_username);
           break;
         }
@@ -134,251 +134,150 @@ export default function Accounts() {
 
   const handleSearchClick = () => {
     setShowSuggestions(false);
+    if (searchQuery.trim()) {
+      const match = (clients || []).find(
+        (c: any) => c.username?.toLowerCase() === searchQuery.trim().toLowerCase()
+      );
+      if (match) {
+        selectSuggestion(match);
+      }
+    }
   };
 
-  const isAdminRole = ['superadmin', 'admin', 'company', 'supermaster'].includes(session?.role?.toLowerCase() || '');
-
   return (
-    <div style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529" }}>
-      <main style={{ width: "100%", padding: "8px 5px 12px" }}>
-
+    <div
+      className="min-h-screen bg-[#ececed] text-[#212529]"
+      style={{
+        fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+      }}
+    >
+      <main className="w-full max-w-full px-2 sm:px-3 py-2 sm:py-3">
         {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
-        <div style={{
-          background: "#fff",
-          borderRadius: 4,
-          border: "1px solid #dee2e6",
-          boxShadow: "0 1px 3px rgba(0,0,0,.08)",
-          marginBottom: 16,
-          overflow: "visible", // Changed to visible for dropdown
-        }}>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "6px 12px",
-            backgroundColor: "#254465",
-            borderBottom: "1px solid #1e3650",
-          }}>
-            <Filter style={{ width: "16px", height: "16px", color: "#fff", flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: "13px", color: "#fff", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif' }}>Search-Users</span>
+        <div className="bg-white rounded-[4px] border border-[#dee2e6] shadow-[0_1px_3px_rgba(0,0,0,0.05)] mb-3 overflow-visible">
+          {/* Light Header matching original website */}
+          <div className="bg-[#f8f9fa] border-b border-[#dee2e6] px-3 py-2 flex items-center gap-2">
+            <svg
+              viewBox="0 0 24 24"
+              className="w-4 h-4 fill-black text-black shrink-0"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .71 1.71L14 11.42V19a1 1 0 0 1-.55.89l-4 2A1 1 0 0 1 8 21v-9.58L3.29 5.71A1 1 0 0 1 3 4z" />
+            </svg>
+            <span className="font-bold text-[14px] text-[#212529] tracking-tight">
+              Search-Users
+            </span>
           </div>
-          <div style={{ padding: "20px 16px 40px 16px" }}>
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div style={{ flex: "0 0 60%", minWidth: "300px", display: "flex", gap: 0 }}>
-                <div ref={dropdownRef} style={{ position: "relative", flex: "none", width: "160px" }}>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      ref={inputRef}
-                      type="search"
-                      autoComplete="off"
-                      placeholder="Username"
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setShowSuggestions(true);
-                        setHighlightedIndex(-1);
-                      }}
-                      onFocus={() => setShowSuggestions(true)}
-                      onKeyDown={handleKeyDown}
-                      style={{
-                        width: "100%",
-                        height: "28px",
-                        minHeight: "28px",
-                        maxHeight: "28px",
-                        border: "1px solid #d1d5db",
-                        borderRight: "none",
-                        borderRadius: "4px 0 0 4px",
-                        padding: "0 28px 0 8px",
-                        fontSize: "12px",
-                        color: "#374151",
-                        fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif',
-                        outline: "none",
-                        boxSizing: "border-box",
-                        background: "#fff",
-                      }}
-                    />
-                    {searchQuery.length > 0 && searchQuery.length < 3 && (
-                      <div style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        fontSize: "10px",
-                        color: "#6c757d",
-                        marginTop: "2px",
-                        fontWeight: "bold"
-                      }}>
-                        Type at least 3 characters to search
-                      </div>
-                    )}
-                    {searchQuery && (
-                      <button
-                        onClick={() => {
-                          setSearchQuery("");
-                          setShowSuggestions(false);
-                          setSelectedClient(null);
-                          setBreadcrumb([]);
-                          inputRef.current?.focus();
-                        }}
-                        style={{
-                          position: "absolute",
-                          right: "8px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          background: "none",
-                          border: "none",
-                          padding: "4px",
-                          cursor: "pointer",
-                          color: "#6c757d",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}
-                      >
-                        <X style={{ width: 12, height: 12 }} />
-                      </button>
-                    )}
-                  </div>
 
-                  {showSuggestions && suggestions.length > 0 && (
-                    <div style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      right: 0,
-                      backgroundColor: "#fff",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "4px",
-                      marginTop: "4px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-                      zIndex: 50,
-                      maxHeight: "300px",
-                      overflowY: "auto"
-                    }}>
-                      {suggestions.map((client, index) => (
-                        <div
-                          key={client.id}
-                          onClick={() => selectSuggestion(client)}
-                          onMouseEnter={() => setHighlightedIndex(index)}
-                          style={{
-                            padding: "8px 12px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            backgroundColor: highlightedIndex === index ? "#f0fff4" : "#fff",
-                            color: highlightedIndex === index ? "#00b181" : "inherit",
-                          }}
-                        >
-                          <span style={{ fontWeight: 700, fontSize: "13px", color: "#212529" }}>
-                            {client.username}
-                          </span>
-                          <span style={{ fontSize: "11px", color: "#6c757d", marginLeft: "6px" }}>
-                            {client.full_name}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+          {/* Search-Users Body */}
+          <div className="p-3.5 sm:p-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div ref={dropdownRef} className="relative flex-1 max-w-md flex">
+                <div className="relative flex-1">
+                  <input
+                    ref={inputRef}
+                    type="search"
+                    autoComplete="off"
+                    placeholder="Username"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowSuggestions(true);
+                      setHighlightedIndex(-1);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full h-[36px] border border-[#ced4da] rounded-l-[4px] px-3 text-[13px] text-[#374151] bg-white outline-none focus:border-[#00a676] focus:ring-1 focus:ring-[#00a676] transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery("");
+                        setShowSuggestions(false);
+                        setSelectedClient(null);
+                        setBreadcrumb([]);
+                        inputRef.current?.focus();
+                      }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   )}
                 </div>
+
                 <button
                   onClick={handleSearchClick}
-                  onMouseEnter={() => setIsSearchHovered(true)}
-                  onMouseLeave={() => setIsSearchHovered(false)}
-                  style={{
-                    height: "28px",
-                    minHeight: "28px",
-                    maxHeight: "28px",
-                    padding: "0 12px",
-                    background: isSearchHovered ? "#4dbd74" : "#00b181",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "0 4px 4px 0",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    fontFamily: "Roboto, system-ui, sans-serif",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    boxSizing: "border-box",
-                    flexShrink: 0,
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-                    transition: "background 0.15s",
-                  }}
+                  className="h-[36px] px-4 bg-[#00a676] hover:bg-[#008f65] text-white font-medium text-[13px] rounded-r-[4px] flex items-center gap-1.5 transition-colors shrink-0 shadow-sm"
                 >
-                  <Search style={{ width: 15, height: 15 }} />
-                  Search
+                  <Search className="w-4 h-4 stroke-[2.5]" />
+                  <span>Search</span>
                 </button>
-              </div>
 
-              <div style={{ flex: 1, overflowX: "auto" }}>
-                {breadcrumb.length > 0 && (
-                  <nav aria-label="Breadcrumb" style={{ height: "40px", display: "flex", alignItems: "center" }}>
-                    <ol style={{ display: "flex", listStyle: "none", margin: 0, padding: 0, alignItems: "center", whiteSpace: "nowrap" }}>
-                      {breadcrumb.map((item, index) => {
-                        const isLast = index === breadcrumb.length - 1;
-                        const clientInfo = (clients || []).find((c: any) => c.username === item);
-                        const isLeaf = isLast;
-                        
-                        // Rule: navigates to /accounts/view/${item} if it's an admin/agent, 
-                        // or /accounts/cash-credit/${item} if it's the leaf (selected client)
-                        const path = isLeaf ? `/accounts/cash-credit/${item}` : `/accounts/view/${item}`;
-
-                        return (
-                          <li key={item} style={{ display: "flex", alignItems: "center" }}>
-                            <a
-                              href={path}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                navigate(path);
-                              }}
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: isLast ? 700 : 600,
-                                color: isLast ? "#00b181" : "#212529",
-                                textDecoration: "none",
-                              }}
-                            >
-                              {item}
-                            </a>
-                            {!isLast && (
-                              <span style={{ margin: "0 4px", color: "#6c757d", fontSize: "12px" }}>&gt;</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  </nav>
+                {/* Suggestions dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#ced4da] rounded-[4px] shadow-lg z-50 max-h-[260px] overflow-y-auto">
+                    {suggestions.map((client, index) => (
+                      <div
+                        key={client.id}
+                        onClick={() => selectSuggestion(client)}
+                        onMouseEnter={() => setHighlightedIndex(index)}
+                        className={`px-3 py-2 cursor-pointer flex items-center justify-between text-[13px] border-b border-gray-100 last:border-0 ${
+                          highlightedIndex === index ? "bg-[#f0fdf4] text-[#00a676]" : "text-[#212529] hover:bg-gray-50"
+                        }`}
+                      >
+                        <span className="font-bold">{client.username}</span>
+                        <span className="text-[11px] text-gray-500">{client.role || client.full_name}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
+
+              {/* Breadcrumbs if user navigated */}
+              {breadcrumb.length > 0 && (
+                <div className="flex items-center gap-1.5 text-[13px] overflow-x-auto py-1">
+                  {breadcrumb.map((item, index) => {
+                    const isLast = index === breadcrumb.length - 1;
+                    const path = isLast ? `/accounts/cash-credit/${item}` : `/accounts/view/${item}`;
+                    return (
+                      <React.Fragment key={item}>
+                        <button
+                          onClick={() => navigate(path)}
+                          className={`font-semibold transition-colors ${
+                            isLast ? "text-[#00a676] font-bold" : "text-[#212529] hover:text-[#00a676]"
+                          }`}
+                        >
+                          {item}
+                        </button>
+                        {!isLast && <span className="text-gray-400 text-xs">&gt;</span>}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 3. Clients table/list — header shown inside ClientSummaryCard */}
+        {/* 3. Clients table/list */}
         <ClientSummaryCard
           key={clientsKey}
           clients={clients || []}
           isLoading={isLoading}
-          username={session?.username || 'Admin'}
+          username={session?.username || "Admin"}
           searchFilter={searchQuery}
           onRefresh={refetch}
           adminRecord={adminRecord}
         />
 
-        {/* News Ticker — only on Accounts page */}
-        <div className="mt-4 bg-[#1f3044] overflow-hidden flex items-center border-t border-white/10 h-[25px]">
-          <div className="animate-marquee whitespace-nowrap flex">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <span key={i} style={{ font: 'bold 10px Verdana, sans-serif', color: '#fff', padding: '0 7px' }}>
-                <b>Welcome to Exchange.</b>
-              </span>
-            ))}
-          </div>
+        {/* Footer Text */}
+        <div className="text-center py-5">
+          <p className="font-bold text-[13px] text-[#212529]">
+            Welcome to Exchange.
+          </p>
         </div>
-
       </main>
     </div>
   );

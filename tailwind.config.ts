@@ -73,6 +73,8 @@ export default {
 			},
 			fontFamily: {
 				sans: ['"Roboto Condensed"', 'Roboto', 'HelveticaNeue', '"Helvetica Neue"', 'Helvetica', 'Arial', '"Lucida Grande"', 'sans-serif'],
+				condensed: ['"Roboto Condensed"', 'HelveticaNeue', 'Arial', 'sans-serif'],
+				roboto: ['Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
 			},
 		}
 	},

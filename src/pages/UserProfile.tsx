@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClientSession } from "@/hooks/useClientAuth";
-import { UserHeader } from "@/components/user/UserHeader";
-import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/entities";
 
@@ -10,16 +8,10 @@ export default function UserProfile() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const session = getClientSession();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!session) {
       navigate("/login", { replace: true });
-      return;
-    }
-    const r = session.role?.toLowerCase()?.trim();
-    if (r && r !== "client" && r !== "user" && r !== "bettor") {
-      navigate("/dashboard", { replace: true });
       return;
     }
   }, [session, navigate]);
@@ -76,157 +68,113 @@ export default function UserProfile() {
   };
 
   return (
-    <div
-      className="min-h-screen text-[#212529] select-none"
-      style={{
-        backgroundColor: "#e8eff5",
-        fontFamily:
-          '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
-      }}
-    >
-      <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <main className="max-w-4xl mx-auto p-2 sm:p-4 pb-20">
+    <div className="min-h-screen bg-[#ececed] text-[#212529] p-2 sm:p-4 pb-20" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      <main className="max-w-[700px] mx-auto space-y-4">
         {/* Profile Card */}
-        <div className="bg-white rounded-none border border-[#c8d4e2] shadow-sm mb-4">
-          <div className="px-3 py-2 bg-[#eaeff5] border-b border-[#cbd7e6]">
-            <span className="font-bold text-[14px] text-[#142a45]">Profile</span>
+        <div className="bg-white rounded-[4px] border border-[#dee2e6] shadow-xs overflow-hidden">
+          <div className="px-3.5 py-2.5 bg-[#f8f9fa] border-b border-[#dee2e6]">
+            <span className="font-bold text-[15px] text-[#212529]">Profile</span>
           </div>
 
-          <form onSubmit={handleSaveStakes} className="p-4 space-y-4">
+          <form onSubmit={handleSaveStakes} className="p-4 space-y-3.5">
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Stake1</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Stake1</label>
               <input
                 type="text"
                 value={stakes.stake1}
                 onChange={(e) => setStakes({ ...stakes, stake1: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Stake2</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Stake2</label>
               <input
                 type="text"
                 value={stakes.stake2}
                 onChange={(e) => setStakes({ ...stakes, stake2: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Stake3</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Stake3</label>
               <input
                 type="text"
                 value={stakes.stake3}
                 onChange={(e) => setStakes({ ...stakes, stake3: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Stake4</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Stake4</label>
               <input
                 type="text"
                 value={stakes.stake4}
                 onChange={(e) => setStakes({ ...stakes, stake4: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Plus1</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Plus1</label>
               <input
                 type="text"
                 value={stakes.plus1}
                 onChange={(e) => setStakes({ ...stakes, plus1: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Plus2</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Plus2</label>
               <input
                 type="text"
                 value={stakes.plus2}
                 onChange={(e) => setStakes({ ...stakes, plus2: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Plus3</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Plus3</label>
               <input
                 type="text"
                 value={stakes.plus3}
                 onChange={(e) => setStakes({ ...stakes, plus3: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">Plus4</label>
+              <label className="block text-[14px] font-medium text-[#212529] mb-1">Plus4</label>
               <input
                 type="text"
                 value={stakes.plus4}
                 onChange={(e) => setStakes({ ...stakes, plus4: e.target.value })}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
+                className="w-full border border-[#ced4da] bg-white px-3 py-1.5 text-[14px] text-[#495057] rounded-[4px] focus:outline-none focus:border-[#00a65a]"
               />
             </div>
 
             <div className="flex items-center gap-2 pt-2">
               <button
                 type="submit"
-                className="bg-[#28a745] hover:bg-[#218838] text-white font-medium text-xs px-4 py-2 rounded-none transition-colors"
+                className="bg-[#28a745] hover:bg-[#218838] text-white font-medium text-[13px] px-3.5 py-1.5 rounded-[3px] transition-colors cursor-pointer"
               >
                 Save changes
               </button>
               <button
                 type="button"
-                onClick={() => navigate("/play")}
-                className="bg-[#dc3545] hover:bg-[#c82333] text-white font-medium text-xs px-4 py-2 rounded-none transition-colors"
+                onClick={() => navigate("/dashboard")}
+                className="bg-[#dc3545] hover:bg-[#c82333] text-white font-medium text-[13px] px-3.5 py-1.5 rounded-[3px] transition-colors cursor-pointer"
               >
                 Cancel
               </button>
             </div>
-          </form>
-        </div>
 
-        {/* Change Password Card */}
-        <div className="bg-white rounded-none border border-[#c8d4e2] shadow-sm">
-          <div className="px-3 py-2 bg-[#eaeff5] border-b border-[#cbd7e6]">
-            <span className="font-bold text-[14px] text-[#142a45]">Change Password</span>
-          </div>
-
-          <form onSubmit={handlePasswordChange} className="p-4 space-y-4">
-            <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">NewPassword</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[13px] font-bold text-[#142a45] mb-1">ConfirmPassword</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full border border-[#c8d4e2] bg-white px-3 py-2 text-sm text-[#142a45] rounded-none focus:outline-none focus:border-[#00a676]"
-              />
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="bg-[#28a745] hover:bg-[#218838] text-white font-medium text-xs px-4 py-2 rounded-none transition-colors"
-              >
-                Change password
-              </button>
+            <div className="p-3 bg-[#d4edda] border border-[#c3e6cb] rounded-[4px] text-[#155724] text-[13.5px] mt-2">
+              <span className="font-bold">Note:</span> Updated stakes will be applied to new users.
             </div>
           </form>
         </div>
@@ -234,4 +182,3 @@ export default function UserProfile() {
     </div>
   );
 }
-

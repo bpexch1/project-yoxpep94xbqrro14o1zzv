@@ -116,9 +116,13 @@ export function Header({ onOpenMobileSidebar, onToggleDesktopSidebar }: HeaderPr
       <div className="flex items-center shrink-0">
         <button
           onClick={handleHamburgerClick}
-          className="p-1.5 text-gray-600 hover:text-gray-800 transition-colors"
+          className="flex flex-col justify-center items-center w-[36px] h-[34px] border border-gray-400/80 rounded-[4px] bg-white hover:bg-gray-100 transition-colors gap-[4px] p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          aria-label="Toggle navigation menu"
+          title="Toggle navigation"
         >
-          <Menu className="w-5 h-5" />
+          <span className="w-[18px] h-[2px] bg-[#333] rounded-full block"></span>
+          <span className="w-[18px] h-[2px] bg-[#333] rounded-full block"></span>
+          <span className="w-[18px] h-[2px] bg-[#333] rounded-full block"></span>
         </button>
       </div>
 

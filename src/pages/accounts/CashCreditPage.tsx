@@ -128,6 +128,7 @@ export default function CashCreditPage() {
         afterBalance = beforeBalance + amount;
         clientUpdateData = { 
           cash: afterBalance,
+          balance_upline: afterBalance,
         };
       } else {
         beforeBalance = Number(client.credit_remaining || 0);
@@ -204,6 +205,7 @@ export default function CashCreditPage() {
         afterBalance = beforeBalance - amount;
         clientUpdateData = { 
           cash: afterBalance,
+          balance_upline: afterBalance,
         };
       } else {
         beforeBalance = Number(client.credit_remaining || 0);

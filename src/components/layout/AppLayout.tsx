@@ -65,7 +65,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Right side: header + content, offset by sidebar width on desktop */}
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-200",
-        sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-[200px]"
+        sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-[230px]"
       )}>
         <Header 
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} 

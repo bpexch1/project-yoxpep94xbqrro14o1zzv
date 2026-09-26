@@ -18,15 +18,15 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
-  
-  const [activeTab, setActiveTab] = useState<'cash' | 'credit'>('cash');
+
+  const [activeTab, setActiveTab] = useState<"cash" | "credit">("cash");
   const [showHistory, setShowHistory] = useState(false);
-  
-  const [depositDesc, setDepositDesc] = useState('');
-  const [depositAmount, setDepositAmount] = useState('0');
-  const [withdrawDesc, setWithdrawDesc] = useState('');
-  const [withdrawAmount, setWithdrawAmount] = useState('0');
-  
+
+  const [depositDesc, setDepositDesc] = useState("");
+  const [depositAmount, setDepositAmount] = useState("0");
+  const [withdrawDesc, setWithdrawDesc] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("0");
+
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
   const [isSubmittingWithdraw, setIsSubmittingWithdraw] = useState(false);
 
@@ -41,15 +41,15 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   useEffect(() => {
     if (!client) return;
     setShowHistory(false);
-    if (activeTab === 'cash') {
+    if (activeTab === "cash") {
       setDepositDesc(`Cash deposit in ${client.username}`);
       setWithdrawDesc(`Cash withdrawn from ${client.username}`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
     }
-    setDepositAmount('0');
-    setWithdrawAmount('0');
+    setDepositAmount("0");
+    setWithdrawAmount("0");
   }, [client?.username, activeTab, isOpen]);
 
   const refreshAll = async () => {
@@ -68,7 +68,6 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       return;
     }
 
-    // Dealer Credit Limit Validation: Dealer cannot deposit more Cash or Credit than their remaining credit limit
     const isCompany = session?.role?.toLowerCase() === "company";
     if (!isCompany && adminClient) {
       const dealerRemainingCredit = Number(adminClient.credit_remaining || 0);
@@ -76,19 +75,19 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
         toast({
           variant: "destructive",
           title: "Credit Limit Exceeded",
-          description: `Aapke pass sirf ${dealerRemainingCredit.toLocaleString()} Rs. credit limit remaining hai. Aap is se zyada Cash ya Credit deposit nahi kar sakte.`
+          description: `Aapke pass sirf ${dealerRemainingCredit.toLocaleString()} Rs. credit limit remaining hai.`,
         });
         return;
       }
     }
-    
+
     setIsSubmittingDeposit(true);
     try {
       let newBalance: number;
       let clientUpdateData: Record<string, number> = {};
       let beforeBalance: number;
 
-      if (activeTab === 'cash') {
+      if (activeTab === "cash") {
         beforeBalance = Number(client.cash || 0);
         newBalance = beforeBalance + amount;
         clientUpdateData = { cash: newBalance };
@@ -103,12 +102,11 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
 
       await Client.update(client.id, clientUpdateData);
 
-      // BIDIRECTIONAL: Deduct from Dealer/Admin's remaining credit pool
       if (adminClient) {
         const dealerUpdate: Record<string, number> = {
           credit_remaining: Math.max(0, Number(adminClient.credit_remaining || 0) - amount),
         };
-        if (activeTab === 'cash') {
+        if (activeTab === "cash") {
           dealerUpdate.cash = Number(adminClient.cash || 0) - amount;
         }
         await Client.update(adminClient.id, dealerUpdate);
@@ -124,17 +122,12 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       });
 
       await refreshAll();
-      setDepositAmount('0');
-      toast({ title: "Success", description: `${activeTab === 'cash' ? 'Cash' : 'Credit'} deposited successfully.` });
-      setTimeout(() => onClose(), 1500);
+      setDepositAmount("0");
+      toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} deposited successfully.` });
+      setTimeout(() => onClose(), 1200);
     } catch (err: any) {
-      console.error('Deposit error:', err);
-      const msg = err?.message || '';
-      if (msg.includes('Authentication') || msg.includes('auth') || msg.includes('token') || msg.includes('JWT')) {
-        toast({ variant: "destructive", title: "Session Expired", description: "Please refresh the page and try again" });
-      } else {
-        toast({ variant: "destructive", title: "Deposit Failed", description: msg || "Please try again" });
-      }
+      console.error("Deposit error:", err);
+      toast({ variant: "destructive", title: "Deposit Failed", description: err?.message || "Please try again" });
     } finally {
       setIsSubmittingDeposit(false);
     }
@@ -148,38 +141,37 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       return;
     }
 
-    // Insufficient balance check
-    if (activeTab === 'cash' && amount > Number(client.cash || 0) + Number(client.credit_remaining || 0)) {
+    if (activeTab === "cash" && amount > Number(client.cash || 0) + Number(client.credit_remaining || 0)) {
       toast({
         variant: "destructive",
         title: "Insufficient Balance",
-        description: `Available: ${(Number(client.cash || 0) + Number(client.credit_remaining || 0)).toLocaleString()} Rs. | Requested: ${amount.toLocaleString()} Rs.`,
+        description: `Available: ${(Number(client.cash || 0) + Number(client.credit_remaining || 0)).toLocaleString()} Rs.`,
       });
       return;
     }
-    if (activeTab === 'credit' && amount > Number(client.credit_remaining || 0)) {
+    if (activeTab === "credit" && amount > Number(client.credit_remaining || 0)) {
       toast({
         variant: "destructive",
         title: "Insufficient Credit",
-        description: `Available Credit: ${Number(client.credit_remaining || 0).toLocaleString()} Rs. | Requested: ${amount.toLocaleString()} Rs.`,
+        description: `Available Credit: ${Number(client.credit_remaining || 0).toLocaleString()} Rs.`,
       });
       return;
     }
-    
+
     setIsSubmittingWithdraw(true);
     try {
       let newBalance: number;
       let clientUpdateData: Record<string, number> = {};
       let beforeBalance: number;
 
-      if (activeTab === 'cash') {
+      if (activeTab === "cash") {
         beforeBalance = Number(client.cash || 0);
         newBalance = beforeBalance - amount;
         clientUpdateData = { cash: newBalance };
       } else {
         beforeBalance = Number(client.credit_remaining || 0);
         newBalance = Math.max(0, beforeBalance - amount);
-        clientUpdateData = { 
+        clientUpdateData = {
           credit_remaining: newBalance,
           credit_received: Math.max(0, Number(client.credit_received || 0) - amount),
         };
@@ -187,12 +179,11 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
 
       await Client.update(client.id, clientUpdateData);
 
-      // BIDIRECTIONAL: Restore Dealer/Admin's remaining credit pool
       if (adminClient) {
         const dealerUpdate: Record<string, number> = {
           credit_remaining: Number(adminClient.credit_remaining || 0) + amount,
         };
-        if (activeTab === 'cash') {
+        if (activeTab === "cash") {
           dealerUpdate.cash = Number(adminClient.cash || 0) + amount;
         }
         await Client.update(adminClient.id, dealerUpdate);
@@ -208,16 +199,11 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       });
 
       await refreshAll();
-      setWithdrawAmount('0');
-      setTimeout(() => onClose(), 1500);
+      setWithdrawAmount("0");
+      setTimeout(() => onClose(), 1200);
     } catch (err: any) {
-      console.error('Withdraw error:', err);
-      const msg = err?.message || '';
-      if (msg.includes('Authentication') || msg.includes('auth') || msg.includes('token') || msg.includes('JWT')) {
-        toast({ variant: "destructive", title: "Session Expired", description: "Please refresh the page and try again" });
-      } else {
-        toast({ variant: "destructive", title: "Withdraw Failed", description: msg || "Please try again" });
-      }
+      console.error("Withdraw error:", err);
+      toast({ variant: "destructive", title: "Withdraw Failed", description: err?.message || "Please try again" });
     } finally {
       setIsSubmittingWithdraw(false);
     }
@@ -225,28 +211,30 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="p-0 max-w-sm overflow-hidden border-0 shadow-2xl [&>button]:hidden">
+      <DialogContent
+        className="p-0 max-w-sm overflow-hidden border border-[#dee2e6] shadow-2xl [&>button]:hidden rounded-[4px]"
+        style={{
+          fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+      >
         <DialogTitle className="sr-only">Cash / Credit</DialogTitle>
-        {/* TABS */}
-        <div className="flex relative bg-white">
+
+        {/* TABS HEADER */}
+        <div className="flex relative bg-white border-b border-[#dee2e6]">
           <button
-            onClick={() => setActiveTab('cash')}
+            onClick={() => setActiveTab("cash")}
             className={cn(
-              "flex-1 py-3.5 text-base font-semibold transition-colors",
-              activeTab === 'cash'
-                ? "bg-[#3498db] text-white"
-                : "bg-white text-[#16a085]"
+              "flex-1 py-2.5 text-[15px] font-bold transition-colors select-none",
+              activeTab === "cash" ? "bg-[#0088cc] text-white" : "bg-white text-[#00a676] hover:bg-gray-50"
             )}
           >
             Cash
           </button>
           <button
-            onClick={() => setActiveTab('credit')}
+            onClick={() => setActiveTab("credit")}
             className={cn(
-              "flex-1 py-3.5 text-base font-semibold transition-colors",
-              activeTab === 'credit'
-                ? "bg-[#3498db] text-white"
-                : "bg-white text-[#16a085]"
+              "flex-1 py-2.5 text-[15px] font-bold transition-colors select-none",
+              activeTab === "credit" ? "bg-[#0088cc] text-white" : "bg-white text-[#00a676] hover:bg-gray-50"
             )}
           >
             Credit
@@ -254,86 +242,89 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 p-1 text-[#7f8c8d] hover:text-[#2c3e50] z-10"
+            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-700 z-10"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="h-px bg-[#d5d8dc]" />
-        
-        {/* CONTENT - scrollable */}
-        <div className="bg-[#f4f6f7] max-h-[85vh] overflow-y-auto">
-          
-          {/* White card: client name + summary table */}
-          <div className="bg-white p-4 mb-3 border-b border-[#d5d8dc]">
-            <h2 className="text-xl font-bold text-[#2c3e50] mb-4">{client?.username}</h2>
-            
-            {/* Summary table */}
-            <div className="border border-[#d5d8dc] rounded overflow-hidden text-xs">
+
+        {/* CONTENT */}
+        <div className="bg-[#f8f9fa] max-h-[85vh] overflow-y-auto p-3 space-y-3">
+          {/* Client summary info box */}
+          <div className="bg-white p-3 border border-[#dee2e6] rounded-[4px] shadow-sm">
+            <h2 className="text-[16px] font-bold text-[#212529] mb-2">{client?.username}</h2>
+
+            <div className="border border-[#dee2e6] rounded-[3px] overflow-hidden text-[12px]">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-white">
-                    {activeTab === 'cash' ? (
+                  <tr className="bg-[#f8f9fa]">
+                    {activeTab === "cash" ? (
                       <>
-                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">Credit</th>
-                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">Balance</th>
-                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium w-1/3">Max Withdraw</th>
+                        <th className="px-2.5 py-1.5 text-left text-[#212529] font-bold border-r border-[#dee2e6] w-1/3">
+                          Credit
+                        </th>
+                        <th className="px-2.5 py-1.5 text-left text-[#212529] font-bold border-r border-[#dee2e6] w-1/3">
+                          Balance
+                        </th>
+                        <th className="px-2.5 py-1.5 text-left text-[#212529] font-bold w-1/3">
+                          Max Withdraw
+                        </th>
                       </>
                     ) : (
                       <>
-                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">Credit limit</th>
-                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium border-r border-[#d5d8dc] w-1/3">{client?.username} Credit</th>
-                        <th className="px-3 py-2 text-left text-[#2c3e50] font-medium w-1/3">{client?.username} Available Balance</th>
+                        <th className="px-2.5 py-1.5 text-left text-[#212529] font-bold border-r border-[#dee2e6] w-1/3">
+                          Credit limit
+                        </th>
+                        <th className="px-2.5 py-1.5 text-left text-[#212529] font-bold border-r border-[#dee2e6] w-1/3">
+                          {client?.username} Credit
+                        </th>
+                        <th className="px-2.5 py-1.5 text-left text-[#212529] font-bold w-1/3">
+                          Available Balance
+                        </th>
                       </>
                     )}
                   </tr>
                 </thead>
-                <tbody className="border-t border-[#d5d8dc]">
+                <tbody className="border-t border-[#dee2e6]">
                   <tr className="bg-white">
-                    {activeTab === 'cash' ? (
+                    {activeTab === "cash" ? (
                       <>
-                        <td 
-                          className="px-3 py-2 font-bold border-r border-[#d5d8dc] text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
+                        <td
+                          className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
-                          title="Click to view transaction history"
                         >
                           {(client?.credit_remaining || 0).toLocaleString()} Rs.
                         </td>
-                        <td 
-                          className="px-3 py-2 font-bold border-r border-[#d5d8dc] text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
+                        <td
+                          className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
-                          title="Click to view transaction history"
                         >
                           {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
                         </td>
-                        <td 
-                          className="px-3 py-2 font-bold text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
+                        <td
+                          className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
-                          title="Click to view transaction history"
                         >
                           {Math.max(0, (client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
                         </td>
                       </>
                     ) : (
                       <>
-                        <td 
-                          className="px-3 py-2 font-bold border-r border-[#d5d8dc] text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
+                        <td
+                          className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
-                          title="Click to view transaction history"
                         >
                           {(adminClient?.credit_remaining ?? 54727).toLocaleString()} Rs.
                         </td>
-                        <td 
-                          className="px-3 py-2 font-bold border-r border-[#d5d8dc] text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
+                        <td
+                          className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
-                          title="Click to view transaction history"
                         >
                           {(client?.credit_remaining || 0).toLocaleString()} Rs.
                         </td>
-                        <td 
-                          className="px-3 py-2 font-bold text-[#212529] underline cursor-pointer hover:opacity-75 transition-opacity"
+                        <td
+                          className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
-                          title="Click to view transaction history"
                         >
                           {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
                         </td>
@@ -343,140 +334,125 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                 </tbody>
               </table>
             </div>
-            <p className="text-[10px] text-[#7f8c8d] mt-1 text-right">
-              * Click on any amount to view transaction history
+            <p className="text-[10px] text-gray-500 mt-1 text-right">
+              * Click on any amount to view history
             </p>
           </div>
-          
-          {/* DEPOSIT SECTION */}
-          <div className="mb-3 px-2">
-            <div className="rounded overflow-hidden border border-[#d5d8dc]">
-              {/* Green header */}
-              <div className="bg-[#16a085] px-4 py-2.5">
-                {activeTab === 'cash' ? (
-                  <p className="text-white text-sm">
-                    <span className="font-bold uppercase">Deposit</span> Cash in <span className="font-bold">{client?.username}</span> Account
-                  </p>
-                ) : (
-                  <p className="text-white text-sm font-medium">
-                    Deposit Credit in {client?.username} Account
-                  </p>
-                )}
+
+          {/* DEPOSIT SECTION (Green Header) */}
+          <div className="rounded-[4px] overflow-hidden border border-[#dee2e6] bg-white shadow-sm">
+            <div className="bg-[#00a676] px-3 py-2 text-white font-bold text-[13px]">
+              {activeTab === "cash"
+                ? `Deposit Cash in ${client?.username} account`
+                : `Deposit Credit in ${client?.username} Account`}
+            </div>
+            <div className="p-3 space-y-3">
+              <div>
+                <label className="block text-[12px] font-bold text-[#212529] mb-1">Description</label>
+                <input
+                  type="text"
+                  value={depositDesc}
+                  onChange={(e) => setDepositDesc(e.target.value)}
+                  className="w-full border border-[#ced4da] rounded-[3px] px-2.5 py-1.5 text-[13px] outline-none focus:border-[#00a676]"
+                />
               </div>
-              {/* White form */}
-              <div className="bg-white px-4 py-4 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Description</label>
+              <div>
+                <label className="block text-[12px] font-bold text-[#212529] mb-1">Amount</label>
+                <div className="flex rounded-[3px] border border-[#ced4da] overflow-hidden">
+                  <span className="bg-[#e9ecef] px-3 py-1.5 text-[12px] text-gray-600 border-r border-[#ced4da] flex items-center font-bold">
+                    Rs.
+                  </span>
                   <input
-                    type="text"
-                    value={depositDesc}
-                    onChange={(e) => setDepositDesc(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#16a085]/20 focus:border-[#16a085] transition-all"
+                    type="number"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    className="flex-1 px-2.5 py-1.5 text-[13px] font-semibold outline-none"
+                    min="0"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Amount</label>
-                  <div className="flex rounded overflow-hidden shadow-sm border border-[#d5d8dc] focus-within:ring-2 focus-within:ring-[#16a085]/20 focus-within:border-[#16a085] transition-all">
-                    <span className="bg-[#ecf0f1] px-4 py-2.5 text-sm text-[#7f8c8d] border-r border-[#d5d8dc] flex items-center font-medium">Rs.</span>
+              </div>
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={handleDeposit}
+                  disabled={isSubmittingDeposit}
+                  className="bg-[#00a676] hover:bg-[#008f65] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
+                >
+                  {isSubmittingDeposit && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* WITHDRAW SECTION (Red Header) */}
+          <div className="rounded-[4px] overflow-hidden border border-[#dee2e6] bg-white shadow-sm">
+            <div className="bg-[#dc3545] px-3 py-2 text-white font-bold text-[13px]">
+              {activeTab === "cash"
+                ? `Withdraw cash from ${client?.username} account`
+                : `Withdraw Credit from ${client?.username}`}
+            </div>
+            <div className="p-3 space-y-3">
+              <div>
+                <label className="block text-[12px] font-bold text-[#212529] mb-1">Description</label>
+                <input
+                  type="text"
+                  value={withdrawDesc}
+                  onChange={(e) => setWithdrawDesc(e.target.value)}
+                  className="w-full border border-[#ced4da] rounded-[3px] px-2.5 py-1.5 text-[13px] outline-none focus:border-[#dc3545]"
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] font-bold text-[#212529] mb-1">Amount</label>
+                <div className="flex gap-2">
+                  <div className="flex-1 flex rounded-[3px] border border-[#ced4da] overflow-hidden">
+                    <span className="bg-[#e9ecef] px-3 py-1.5 text-[12px] text-gray-600 border-r border-[#ced4da] flex items-center font-bold">
+                      Rs.
+                    </span>
                     <input
                       type="number"
-                      value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
-                      className="flex-1 px-3 py-2.5 text-sm focus:outline-none"
+                      value={withdrawAmount}
+                      onChange={(e) => setWithdrawAmount(e.target.value)}
+                      className="flex-1 px-2.5 py-1.5 text-[13px] font-semibold outline-none"
                       min="0"
                     />
                   </div>
-                </div>
-                <div className="flex justify-end pt-1">
                   <button
-                    onClick={handleDeposit}
-                    disabled={isSubmittingDeposit}
-                    className="bg-[#16a085] hover:bg-[#138d75] text-white font-bold px-8 py-2 rounded shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+                    type="button"
+                    onClick={() => {
+                      const available = activeTab === "cash" ? client?.cash || 0 : client?.credit_remaining || 0;
+                      setWithdrawAmount(Math.max(0, available).toString());
+                    }}
+                    className="px-2.5 bg-gray-100 hover:bg-gray-200 text-[#212529] font-bold rounded-[3px] text-[11px] uppercase transition-colors"
                   >
-                    {isSubmittingDeposit && <Loader2 className="w-4 h-4 animate-spin" />}
-                    Submit
+                    Max
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          {/* WITHDRAW SECTION */}
-          <div className="mb-6 px-2">
-            <div className="rounded overflow-hidden border border-[#d5d8dc]">
-              {/* Red header */}
-              <div className="bg-[#e74c3c] px-4 py-2.5">
-                {activeTab === 'cash' ? (
-                  <p className="text-white text-sm">
-                    <span className="font-bold uppercase">Withdraw</span> Cash from <span className="font-bold">{client?.username}</span> Account
-                  </p>
-                ) : (
-                  <p className="text-white text-sm font-medium">
-                    Withdraw Credit from {client?.username}
-                  </p>
-                )}
-              </div>
-              {/* White form */}
-              <div className="bg-white px-4 py-4 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Description</label>
-                  <input
-                    type="text"
-                    value={withdrawDesc}
-                    onChange={(e) => setWithdrawDesc(e.target.value)}
-                    className="w-full border border-[#d5d8dc] rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#e74c3c]/20 focus:border-[#e74c3c] transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#2c3e50] mb-1.5">Amount</label>
-                  <div className="flex gap-2">
-                    <div className="flex-1 flex rounded overflow-hidden shadow-sm border border-[#d5d8dc] focus-within:ring-2 focus-within:ring-[#e74c3c]/20 focus-within:border-[#e74c3c] transition-all">
-                      <span className="bg-[#ecf0f1] px-4 py-2.5 text-sm text-[#7f8c8d] border-r border-[#d5d8dc] flex items-center font-medium">Rs.</span>
-                      <input
-                        type="number"
-                        value={withdrawAmount}
-                        onChange={(e) => setWithdrawAmount(e.target.value)}
-                        className="flex-1 px-3 py-2.5 text-sm focus:outline-none"
-                        min="0"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const available = activeTab === 'cash' ? (client?.cash || 0) : (client?.credit_remaining || 0);
-                        setWithdrawAmount(Math.max(0, available).toString());
-                      }}
-                      className="px-3 bg-gray-100 hover:bg-gray-200 text-[#2c3e50] font-bold rounded text-xs uppercase transition-colors"
-                    >
-                      Max
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-end pt-1">
-                  <button
-                    onClick={handleWithdraw}
-                    disabled={isSubmittingWithdraw}
-                    className="bg-[#e74c3c] hover:bg-red-600 text-white font-bold px-8 py-2 rounded shadow-md flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
-                  >
-                    {isSubmittingWithdraw && <Loader2 className="w-4 h-4 animate-spin" />}
-                    Submit
-                  </button>
-                </div>
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={handleWithdraw}
+                  disabled={isSubmittingWithdraw}
+                  className="bg-[#dc3545] hover:bg-[#c82333] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
+                >
+                  {isSubmittingWithdraw && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  Submit
+                </button>
               </div>
             </div>
           </div>
+
           {/* BACK BUTTON */}
-          <div className="px-3 pb-5">
+          <div className="pt-1 flex justify-start">
             <button
               onClick={onClose}
-              className="flex items-center gap-2 bg-[#ecf0f1] hover:bg-[#d5d8dc] text-[#2c3e50] font-semibold px-5 py-2.5 rounded transition-colors active:scale-95"
+              className="flex items-center gap-1 bg-[#e9ecef] hover:bg-[#dee2e6] text-[#212529] font-bold px-4 py-1.5 rounded-[3px] text-[12px] transition-colors"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
               Back
             </button>
           </div>
-          
         </div>
+
         <TransactionHistoryModal
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
