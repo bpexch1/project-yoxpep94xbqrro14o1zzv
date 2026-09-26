@@ -199,11 +199,11 @@ export default function Dashboard() {
               placeholder="Username"
               value={searchUsername}
               onChange={(e) => setSearchUsername(e.target.value)}
-              className="flex-1 h-[34px] border border-[rgb(200,206,211)] border-r-0 rounded-l-[0.2rem] px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00b98a]"
+              className="flex-1 h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00B181]"
             />
             <button
               type="submit"
-              className="h-[34px] bg-[#00b98a] hover:bg-[#138a72] text-white border border-[#00b98a] rounded-r-[0.2rem] px-3.5 text-[0.875rem] font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors"
+              className="h-[34px] bg-[#00B181] hover:bg-[#009e74] text-white border border-[#00B181] rounded-r-sm px-3.5 text-[0.875rem] font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors"
             >
               <Search size={14} strokeWidth={2.5} />
               Search
@@ -214,17 +214,17 @@ export default function Dashboard() {
 
       {/* 2. Sport Highlights Card */}
       <div
-        className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-4 shadow-[0_1px_1px_rgba(0,0,0,0.05)]"
+        className="bg-white rounded-sm border border-[#c8ced3] mb-4 shadow-[0_1px_1px_rgba(0,0,0,0.05)]"
       >
         {/* Card Header */}
         <div
-          className="flex items-center gap-2.5 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]"
+          className="flex items-center gap-2.5 px-3 py-2 bg-[#f0f3f5] border-b border-[#c8ced3]"
         >
-          <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">Sport Highlights</span>
+          <span className="font-bold text-[0.875rem] text-[#23282C]">Sport Highlights</span>
           <button
             onClick={handleRefresh}
             disabled={isFetching}
-            className="bg-[#00b98a] hover:bg-[#138a72] text-white rounded-[0.2rem] px-2 py-0.5 text-[12px] font-bold transition-colors disabled:opacity-75"
+            className="bg-[#00B181] hover:bg-[#009e74] text-white rounded-sm px-2 py-0.5 text-[12px] font-bold transition-colors disabled:opacity-75"
           >
             {isFetching ? "Refreshing..." : "Refresh"}
           </button>

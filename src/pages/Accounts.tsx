@@ -189,7 +189,7 @@ export default function Accounts() {
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
-                    className="w-full h-[34px] border border-[rgb(200,206,211)] border-r-0 rounded-l-[0.2rem] px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00b98a] transition-all"
+                    className="w-full h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00B181] transition-all"
                   />
                   {searchQuery && (
                     <button
@@ -209,7 +209,7 @@ export default function Accounts() {
 
                 <button
                   onClick={handleSearchClick}
-                  className="h-[34px] px-3.5 bg-[#00b98a] hover:bg-[#138a72] text-white font-medium text-[0.875rem] rounded-r-[0.2rem] flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#00b98a]"
+                  className="h-[34px] px-3.5 bg-[#00B181] hover:bg-[#009e74] text-white font-medium text-[0.875rem] rounded-r-sm flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#00B181]"
                 >
                   <Search className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Search</span>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { cn } from "@/lib/utils";
@@ -28,9 +28,15 @@ export const isStaffOrAdmin = (role?: string) => {
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const session = getClientSession();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Auto-close mobile drawer when user navigates to any route
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!session) {
@@ -53,8 +59,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   return (
-    <div className="app app-dashboard app-root min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-      {/* Sidebar handles both desktop and mobile modes */}
+    <div className="app app-dashboard app-root min-h-screen bg-[#E4E5E6] text-[#23282C] overflow-x-hidden" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      {/* Header: fixed at top 55px */}
+      <Header 
+        isMobileSidebarOpen={isMobileSidebarOpen}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)} 
+        onToggleDesktopSidebar={() => setSidebarCollapsed(prev => !prev)}
+      />
+
+      {/* Sidebar handles desktop fixed navigation and mobile overlay drawer */}
       <Sidebar 
         isMobileOpen={isMobileSidebarOpen} 
         onMobileClose={() => setIsMobileSidebarOpen(false)} 
@@ -62,16 +75,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
       />
       
-      {/* Right side: header + content, offset by sidebar width on desktop */}
+      {/* Main content body: width 100% on mobile without squeeze/shift, offset on desktop (>=768px) */}
       <div className={cn(
-        "flex flex-col min-h-screen transition-all duration-200",
-        sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-[230px]"
+        "flex flex-col min-h-[calc(100dvh-55px)] md:min-h-[calc(100vh-55px)] w-full max-w-full overflow-x-hidden transition-all duration-250 ease-in-out bg-[#E4E5E6]",
+        sidebarCollapsed ? "md:ml-[60px] md:w-[calc(100%-60px)]" : "md:ml-[230px] md:w-[calc(100%-230px)]",
+        "ml-0"
       )}>
-        <Header 
-          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} 
-          onToggleDesktopSidebar={() => setSidebarCollapsed(prev => !prev)}
-        />
-        <main className="flex-1 overflow-x-hidden p-2 sm:p-3">
+        <main className="flex-1 w-full max-w-full overflow-x-hidden p-2 sm:p-3">
           {children}
         </main>
       </div>

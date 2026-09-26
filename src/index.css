@@ -646,11 +646,141 @@ table.dataTable tbody tr:hover {
   flex-direction: column;
   min-height: 100vh;
   box-sizing: border-box;
-  background-color: rgb(228, 229, 230);
-  color: rgb(35, 40, 44);
+  background-color: #E4E5E6;
+  color: #23282C;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 0.875rem;
   line-height: 1.5;
+}
+
+/* Fixed 55px Header Navbar */
+.app-header.navbar {
+  height: 55px;
+  min-height: 55px;
+  max-height: 55px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #c8ced3;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.header-user-status {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: inline-block;
+  min-width: 0;
+}
+
+.navbar-toggler {
+  min-width: 50px;
+  background: transparent;
+  border: none;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-toggler:focus {
+  outline: none;
+}
+
+.green-logo-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #00B181;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+@media (max-width: 767.98px) {
+  .green-logo-text {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .green-logo-text {
+    display: inline-block !important;
+    font-size: 25px;
+  }
+}
+
+/* Sidebar Drawer / Overlay & Desktop Styles */
+.app-sidebar, aside.app-sidebar {
+  background-color: #2f353a;
+  box-sizing: border-box;
+}
+
+@media (max-width: 767.98px) {
+  .app-sidebar, aside.app-sidebar {
+    position: fixed !important;
+    top: 55px !important;
+    left: 0 !important;
+    width: 250px !important;
+    height: calc(100dvh - 55px) !important;
+    z-index: 1040 !important;
+    transform: translateX(-100%) !important;
+    visibility: hidden !important;
+    transition: transform 0.25s ease-in-out, visibility 0.25s ease-in-out !important;
+    background-color: #2f353a;
+    will-change: transform;
+  }
+  
+  /* When .sidebar-show is active on mobile */
+  .app-sidebar.sidebar-show, aside.app-sidebar.sidebar-show {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-sidebar, aside.app-sidebar {
+    position: fixed !important;
+    top: 55px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 1030 !important;
+    height: calc(100vh - 55px) !important;
+    transform: none !important;
+    visibility: visible !important;
+    background-color: #2f353a;
+    transition: width 0.25s ease-in-out !important;
+  }
+}
+
+body.sidebar-open, body.sidebar-show {
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+}
+
+.sidebar-backdrop {
+  position: fixed !important;
+  top: 55px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 1039 !important;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.sidebar {
+  background-color: #2f353a;
+  transition: all 0.25s ease;
 }
 
 .table {
@@ -680,13 +810,14 @@ table.dataTable tbody tr:hover {
 }
 
 .btn-success {
-  background-color: #00b98a;
-  border-color: #00b98a;
+  background-color: #00B181;
+  border-color: #00B181;
   color: #ffffff;
 }
 
 .btn-success:hover {
-  background-color: #138a72;
-  border-color: #138a72;
+  background-color: #009e74;
+  border-color: #009e74;
   color: #ffffff;
 }
+
