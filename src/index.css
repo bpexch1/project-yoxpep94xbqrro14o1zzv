@@ -821,3 +821,100 @@ body.sidebar-open, body.sidebar-show {
   color: #ffffff;
 }
 
+/* CoreUI / Bootstrap container-fluid styling matching exact inspect panel */
+.container-fluid {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 15px;
+  padding-left: 15px;
+  box-sizing: border-box;
+}
+
+.main .container-fluid {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+@media (min-width: 768px) {
+  .main .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+}
+
+/* Login input autofill and transparent reset */
+.login-transparent-input {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+.login-transparent-input::placeholder {
+  color: #cbd5e0 !important;
+  opacity: 0.8 !important;
+}
+
+.login-transparent-input:-webkit-autofill,
+.login-transparent-input:-webkit-autofill:hover,
+.login-transparent-input:-webkit-autofill:focus,
+.login-transparent-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0f253d inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+.card-body.reportmenubuttons {
+  display: block;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  padding: 1.25rem; /* 20px */
+}
+
+/* Inspected Outline Primary Button */
+.btn-outline-primary {
+  display: inline-block;
+  font-size: 14px; /* 0.875rem */
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  color: rgb(32, 168, 216);
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid rgb(32, 168, 216);
+  border-radius: 4px; /* 0.25rem */
+  padding: 6px 12px; /* 0.375rem 0.75rem */
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  color: #ffffff;
+  background-color: rgb(32, 168, 216);
+  border-color: rgb(32, 168, 216);
+  text-decoration: none;
+}
+
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+  color: #ffffff;
+  background-color: #1b8eb7;
+  border-color: #1985ac;
+}
+

@@ -81,8 +81,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         sidebarCollapsed ? "md:ml-[60px] md:w-[calc(100%-60px)]" : "md:ml-[230px] md:w-[calc(100%-230px)]",
         "ml-0"
       )}>
-        <main className="flex-1 w-full max-w-full overflow-x-hidden p-2 sm:p-3">
-          {children}
+        <main className="main flex-1 w-full max-w-full overflow-x-hidden">
+          <div className="container-fluid">
+            {children}
+          </div>
         </main>
       </div>
     </div>

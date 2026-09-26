@@ -64,17 +64,58 @@ export default {
 				'brand-blue': '#254465',
 				'brand-blue-dark': '#3d6b8b',
 				'brand-bg': '#ecf0f1',
+
+				// Logo cyan/teal
+				'bp-cyan': '#20c9c9',
+				'bp-cyan-light': '#1fd1d1',
+				'bp-cyan-dark': '#00b8b8',
+
+				// Card dark blue shades
+				'bp-navy': '#0a1a2e',
+				'bp-navy-light': '#0d2137',
+				'bp-navy-mid': '#122a45',
+				'bp-navy-deep': '#0b1726',
+
+				// Button blue gradient
+				'bp-blue': '#2a6bb5',
+				'bp-blue-dark': '#1a4a8a',
+				'bp-blue-mid': '#2c6db8',
+				'bp-blue-deep': '#1e3f7a',
+
+				// Text & accents
+				'bp-white': '#ffffff',
+				'bp-gray': '#a0aec0',
+				'bp-gray-light': '#cbd5e0',
 			},
 			borderRadius: {
 				xl: 'calc(var(--radius) + 4px)',
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				card: '18px',
+				btn: '28px',
+				logo: '50%',
+			},
+			boxShadow: {
+				card: '0 10px 40px rgba(0, 0, 0, 0.45)',
+				btn: '0 8px 20px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.25)',
+				'btn-hover': '0 12px 28px rgba(0, 0, 0, 0.4)',
+			},
+			backgroundImage: {
+				'card-gradient': 'linear-gradient(to bottom, #0d2137, #122a45)',
+				'btn-gradient': 'linear-gradient(to bottom, #2a6bb5, #1a4a8a)',
+				'btn-gradient-hover': 'linear-gradient(to bottom, #3a7bc5, #245a9a)',
+				'page-pattern': "url('/img/bg-triangles.png')",
+			},
+			spacing: {
+				'18': '4.5rem',
+				'22': '5.5rem',
 			},
 			fontFamily: {
 				sans: ['"Roboto Condensed"', 'Roboto', 'HelveticaNeue', '"Helvetica Neue"', 'Helvetica', 'Arial', '"Lucida Grande"', 'sans-serif'],
 				condensed: ['"Roboto Condensed"', 'HelveticaNeue', 'Arial', 'sans-serif'],
 				roboto: ['Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+				poppins: ['Poppins', 'sans-serif'],
 			},
 		}
 	},
