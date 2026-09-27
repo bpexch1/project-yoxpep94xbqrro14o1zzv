@@ -103,7 +103,6 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
   if (!session) return null;
 
   const menuItems = [
-    { label: "Current Position", path: "/play/current-position" },
     { label: "Statement", path: "/play/statement" },
     { label: "Result", path: "/play/result" },
     { label: "Profit Loss", path: "/play/profit-loss" },
