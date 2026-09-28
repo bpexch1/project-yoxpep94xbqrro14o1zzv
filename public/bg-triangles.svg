@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="375" viewBox="0 0 600 375">
+  <defs>
+    <style>
+      .c1 { fill: #1e1f21; }
+      .c2 { fill: #242528; }
+      .c3 { fill: #292a2d; }
+      .c4 { fill: #2e3034; }
+      .c5 { fill: #333539; }
+      .c6 { fill: #383a3f; }
+      .c7 { fill: #3d4045; }
+      .c8 { fill: #42454a; }
+      .c9 { fill: #27282b; }
+      .c10 { fill: #35373c; }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="600" height="375" fill="#292a2d" />
+
+  <g>
+    <!-- Row 1: y = 0 to 125 -->
+    <!-- (0,0) to (150, 125) -->
+    <polygon class="c2" points="0,0 150,0 75,125" />
+    <polygon class="c5" points="0,0 75,125 0,125" />
+    <polygon class="c7" points="150,0 300,0 225,125" />
+    <polygon class="c3" points="75,125 150,0 225,125" />
+    <polygon class="c6" points="300,0 450,0 375,125" />
+    <polygon class="c4" points="225,125 300,0 375,125" />
+    <polygon class="c8" points="450,0 600,0 525,125" />
+    <polygon class="c2" points="375,125 450,0 525,125" />
+    <polygon class="c5" points="525,125 600,0 600,125" />
+
+    <!-- Sub-divisions for geometric facets -->
+    <polygon class="c1" points="0,0 75,62.5 0,125" />
+    <polygon class="c4" points="0,0 150,0 75,62.5" />
+    <polygon class="c6" points="150,0 75,62.5 75,125" />
+    <polygon class="c8" points="150,0 225,62.5 75,125" />
+    <polygon class="c3" points="150,0 300,0 225,62.5" />
+    <polygon class="c5" points="300,0 225,62.5 225,125" />
+    <polygon class="c2" points="300,0 375,62.5 225,125" />
+    <polygon class="c7" points="300,0 450,0 375,62.5" />
+    <polygon class="c4" points="450,0 375,62.5 375,125" />
+    <polygon class="c9" points="450,0 525,62.5 375,125" />
+    <polygon class="c6" points="450,0 600,0 525,62.5" />
+    <polygon class="c3" points="600,0 525,62.5 525,125" />
+    <polygon class="c7" points="600,0 525,125 600,125" />
+
+    <!-- Row 2: y = 125 to 250 -->
+    <polygon class="c3" points="0,125 75,125 0,250" />
+    <polygon class="c7" points="75,125 150,250 0,250" />
+    <polygon class="c5" points="75,125 225,125 150,250" />
+    <polygon class="c2" points="225,125 300,250 150,250" />
+    <polygon class="c8" points="225,125 375,125 300,250" />
+    <polygon class="c4" points="375,125 450,250 300,250" />
+    <polygon class="c6" points="375,125 525,125 450,250" />
+    <polygon class="c1" points="525,125 600,250 450,250" />
+    <polygon class="c4" points="525,125 600,125 600,250" />
+
+    <!-- Sub-divisions -->
+    <polygon class="c6" points="0,125 75,187.5 0,250" />
+    <polygon class="c2" points="0,125 75,125 75,187.5" />
+    <polygon class="c9" points="75,125 150,187.5 75,187.5" />
+    <polygon class="c5" points="75,187.5 150,187.5 0,250" />
+    <polygon class="c7" points="150,187.5 150,250 0,250" />
+    <polygon class="c4" points="75,125 225,125 150,187.5" />
+    <polygon class="c8" points="225,125 225,187.5 150,187.5" />
+    <polygon class="c3" points="150,187.5 225,187.5 150,250" />
+    <polygon class="c6" points="225,187.5 300,250 150,250" />
+    <polygon class="c1" points="225,125 375,125 300,187.5" />
+    <polygon class="c7" points="225,125 300,187.5 225,187.5" />
+    <polygon class="c5" points="300,187.5 375,187.5 300,250" />
+    <polygon class="c2" points="300,187.5 300,250 225,187.5" />
+    <polygon class="c8" points="375,125 450,187.5 300,187.5" />
+    <polygon class="c4" points="375,125 525,125 450,187.5" />
+    <polygon class="c10" points="450,187.5 525,187.5 450,250" />
+    <polygon class="c3" points="375,187.5 450,187.5 300,250" />
+    <polygon class="c6" points="450,187.5 450,250 300,250" />
+    <polygon class="c2" points="525,125 600,187.5 450,187.5" />
+    <polygon class="c7" points="525,125 600,125 600,187.5" />
+    <polygon class="c5" points="600,187.5 600,250 450,250" />
+    <polygon class="c9" points="450,187.5 600,187.5 450,250" />
+
+    <!-- Row 3: y = 250 to 375 -->
+    <polygon class="c4" points="0,250 150,250 75,375" />
+    <polygon class="c1" points="0,250 75,375 0,375" />
+    <polygon class="c8" points="150,250 300,250 225,375" />
+    <polygon class="c5" points="75,375 150,250 225,375" />
+    <polygon class="c3" points="300,250 450,250 375,375" />
+    <polygon class="c7" points="225,375 300,250 375,375" />
+    <polygon class="c6" points="450,250 600,250 525,375" />
+    <polygon class="c2" points="375,375 450,250 525,375" />
+    <polygon class="c9" points="525,375 600,250 600,375" />
+
+    <!-- Sub-divisions -->
+    <polygon class="c5" points="0,250 75,312.5 0,375" />
+    <polygon class="c2" points="0,250 150,250 75,312.5" />
+    <polygon class="c7" points="150,250 75,312.5 75,375" />
+    <polygon class="c3" points="150,250 225,312.5 75,375" />
+    <polygon class="c6" points="150,250 300,250 225,312.5" />
+    <polygon class="c4" points="300,250 225,312.5 225,375" />
+    <polygon class="c8" points="300,250 375,312.5 225,375" />
+    <polygon class="c1" points="300,250 450,250 375,312.5" />
+    <polygon class="c5" points="450,250 375,312.5 375,375" />
+    <polygon class="c7" points="450,250 525,312.5 375,375" />
+    <polygon class="c2" points="450,250 600,250 525,312.5" />
+    <polygon class="c9" points="600,250 525,312.5 525,375" />
+    <polygon class="c4" points="600,250 525,375 600,375" />
+
+    <!-- Bottom seam matching top for smooth repeating -->
+    <polygon class="c2" points="0,375 150,375 75,375" />
+    <polygon class="c7" points="150,375 300,375 225,375" />
+    <polygon class="c6" points="300,375 450,375 375,375" />
+    <polygon class="c8" points="450,375 600,375 525,375" />
+  </g>
+</svg>

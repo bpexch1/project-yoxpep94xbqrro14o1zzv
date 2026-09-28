@@ -170,14 +170,14 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] min-h-screen w-full flex flex-col items-center justify-start pt-6 sm:pt-14 p-4 overflow-x-hidden bg-[#202124]">
-      {/* Background: Exact dark diamond pattern matching bpexch bg-login */}
+    <div className="relative min-h-[100dvh] min-h-screen w-full flex flex-col items-center justify-start pt-6 sm:pt-14 p-4 overflow-x-hidden bg-[#242629]">
+      {/* Background: Geometric Triangle Facets Pattern matching Screenshot_20260928-161801.jpg */}
       <div 
         className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundColor: "#202124",
-          backgroundImage: "url('/bg-login.svg')",
-          backgroundSize: "280px 280px",
+          backgroundColor: "#27292d",
+          backgroundImage: "url('/bg-triangles.svg')",
+          backgroundSize: "460px 287.5px",
           backgroundRepeat: "repeat",
         }}
       />
