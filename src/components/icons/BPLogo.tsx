@@ -6,7 +6,7 @@ interface BPLogoProps {
   style?: React.CSSProperties;
 }
 
-export function BPLogo({ className = "", size = 115, style = {} }: BPLogoProps) {
+export function BPLogo({ className = "", size = 130, style = {} }: BPLogoProps) {
   return (
     <div
       className={className}
@@ -14,8 +14,7 @@ export function BPLogo({ className = "", size = 115, style = {} }: BPLogoProps) 
         width: size,
         height: size,
         borderRadius: "50%",
-        backgroundColor: "#20c9c9",
-        boxShadow: "0 10px 25px rgba(32, 201, 201, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.3)",
+        backgroundColor: "#56e2ce",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -34,20 +33,20 @@ export function BPLogo({ className = "", size = 115, style = {} }: BPLogoProps) 
         xmlns="http://www.w3.org/2000/svg"
         style={{ width: "100%", height: "100%", display: "block" }}
       >
-        <circle cx="100" cy="100" r="100" fill="#20c9c9" />
+        <circle cx="100" cy="100" r="100" fill="#56e2ce" />
         
-        {/* Stylized Modern Display BP Letters */}
-        <g fill="#0a1a2e">
+        {/* Exact Italic Script BP Matching bpexch Original */}
+        <g fill="#111822">
           <text
             x="98"
-            y="138"
+            y="135"
             textAnchor="middle"
-            fill="#0a1a2e"
-            fontSize="114"
+            fill="#111822"
+            fontSize="108"
             fontWeight="900"
             fontStyle="italic"
-            fontFamily="'Playfair Display', 'Bodoni MT', 'Didot', 'Georgia', serif"
-            letterSpacing="-4px"
+            fontFamily="'Brush Script MT', 'Playfair Display', 'Bodoni MT', 'Times New Roman', 'Georgia', cursive, serif"
+            letterSpacing="-3px"
           >
             BP
           </text>

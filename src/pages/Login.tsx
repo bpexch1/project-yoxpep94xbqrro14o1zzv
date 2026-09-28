@@ -170,43 +170,39 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] min-h-screen w-full flex items-center justify-center p-4 overflow-x-hidden bg-[#0d0f12]">
-      {/* Background: Geometric Dark Charcoal/Black Triangle Pattern with Soft Vignette Overlay */}
+    <div className="relative min-h-[100dvh] min-h-screen w-full flex flex-col items-center justify-start pt-6 sm:pt-14 p-4 overflow-x-hidden bg-[#202124]">
+      {/* Background: Exact dark diamond pattern matching bpexch bg-login */}
       <div 
-        className="absolute inset-0 pointer-events-none z-0"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundColor: "#0d0f12",
-          backgroundImage: `
-            radial-gradient(circle at 50% 30%, rgba(18, 42, 69, 0.45) 0%, rgba(10, 15, 22, 0.88) 70%, #080a0c 100%),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill-rule='evenodd'%3E%3Cpolygon fill='%23191c21' points='0 0 105 0 52.5 84'/%3E%3Cpolygon fill='%23131518' points='105 0 210 0 157.5 84'/%3E%3Cpolygon fill='%231d2026' points='210 0 315 0 262.5 84'/%3E%3Cpolygon fill='%2316181d' points='315 0 420 0 367.5 84'/%3E%3Cpolygon fill='%2322262d' points='52.5 84 157.5 84 105 0'/%3E%3Cpolygon fill='%23181a1f' points='157.5 84 262.5 84 210 0'/%3E%3Cpolygon fill='%23252932' points='262.5 84 367.5 84 315 0'/%3E%3Cpolygon fill='%2314161a' points='0 0 52.5 84 0 168'/%3E%3Cpolygon fill='%2320242b' points='52.5 84 157.5 84 105 168'/%3E%3Cpolygon fill='%231a1d23' points='157.5 84 262.5 84 210 168'/%3E%3Cpolygon fill='%23272c35' points='262.5 84 367.5 84 315 168'/%3E%3Cpolygon fill='%2315171c' points='367.5 84 420 0 420 168'/%3E%3Cpolygon fill='%23181b20' points='0 168 52.5 84 105 168'/%3E%3Cpolygon fill='%23262b34' points='105 168 157.5 84 210 168'/%3E%3Cpolygon fill='%231b1e25' points='210 168 262.5 84 315 168'/%3E%3Cpolygon fill='%232a2f3a' points='315 168 367.5 84 420 168'/%3E%3Cpolygon fill='%2316181e' points='0 168 105 168 52.5 252'/%3E%3Cpolygon fill='%2322262e' points='105 168 210 168 157.5 252'/%3E%3Cpolygon fill='%2317191f' points='210 168 315 168 262.5 252'/%3E%3Cpolygon fill='%23242932' points='315 168 420 168 367.5 252'/%3E%3Cpolygon fill='%231c2027' points='52.5 252 157.5 252 105 168'/%3E%3Cpolygon fill='%2314161a' points='157.5 252 262.5 252 210 168'/%3E%3Cpolygon fill='%23232831' points='262.5 252 367.5 252 315 168'/%3E%3Cpolygon fill='%23191c22' points='0 168 52.5 252 0 336'/%3E%3Cpolygon fill='%23282d37' points='52.5 252 157.5 252 105 336'/%3E%3Cpolygon fill='%2317191e' points='157.5 252 262.5 252 210 336'/%3E%3Cpolygon fill='%2322262e' points='262.5 252 367.5 252 315 336'/%3E%3Cpolygon fill='%23181a1f' points='367.5 252 420 168 420 336'/%3E%3Cpolygon fill='%231e2229' points='0 336 52.5 252 105 336'/%3E%3Cpolygon fill='%2315171c' points='105 336 157.5 252 210 336'/%3E%3Cpolygon fill='%23262a33' points='210 336 262.5 252 315 336'/%3E%3Cpolygon fill='%231b1e24' points='315 336 367.5 252 420 336'/%3E%3Cpolygon fill='%23131519' points='0 336 105 336 52.5 420'/%3E%3Cpolygon fill='%2321252d' points='105 336 210 336 157.5 420'/%3E%3Cpolygon fill='%23181a20' points='210 336 315 336 262.5 420'/%3E%3Cpolygon fill='%23242831' points='315 336 420 336 367.5 420'/%3E%3Cpolygon fill='%231e2128' points='52.5 420 157.5 420 105 336'/%3E%3Cpolygon fill='%2316181d' points='157.5 420 262.5 420 210 336'/%3E%3Cpolygon fill='%23232831' points='262.5 420 367.5 420 315 336'/%3E%3C/g%3E%3C/svg%3E")
-          `,
-          backgroundSize: "420px 420px",
+          backgroundColor: "#202124",
+          backgroundImage: "url('/bg-login.svg')",
+          backgroundSize: "280px 280px",
           backgroundRepeat: "repeat",
         }}
       />
 
-      {/* Main Login Card: Centered, Deep Blue Gradient (#0d2137 to #122a45), Subtle Glow & Depth */}
-      <div className="relative z-10 w-full max-w-[370px] mx-auto my-auto animate-in fade-in zoom-in-95 duration-300 font-poppins">
+      {/* Main Login Card: Exact match to original bpexch screenshot */}
+      <div className="relative z-10 w-full max-w-[360px] sm:max-w-[380px] mx-auto animate-in fade-in zoom-in-95 duration-200 font-poppins">
         <div 
-          className="w-full rounded-[18px] p-7 sm:p-8 overflow-hidden transition-all duration-300 border border-white/10"
+          className="w-full rounded-[14px] px-6 py-8 sm:px-7 sm:py-9 overflow-hidden transition-all duration-200"
           style={{
-            background: "linear-gradient(180deg, #0d2137 0%, #122a45 100%)",
-            boxShadow: "0 15px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1)",
+            background: "linear-gradient(180deg, #34638d 0%, #204970 35%, #102d4e 70%, #08182b 100%)",
+            boxShadow: "0 15px 35px rgba(0, 0, 0, 0.55)",
           }}
         >
-          {/* Top Logo: Perfect Circle, Bright Cyan/Teal Background (#20c9c9), Stylized Dark Navy BP Letters */}
-          <div className="flex justify-center mb-7 sm:mb-8">
-            <BPLogo size={115} />
+          {/* Top Logo: Aqua-Mint Circle with BP Letters */}
+          <div className="flex justify-center mb-8">
+            <BPLogo size={130} />
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Username Field: Icon on left (pure white), placeholder in light gray, clean transparent background, thin border-bottom only */}
-            <div className="space-y-1 group">
-              <div className="flex items-center gap-3 pb-2 transition-colors">
+            {/* Username Field: Icon on left, thin underline border */}
+            <div className="group">
+              <div className="flex items-center gap-3.5 pb-2 border-b border-white/35 transition-colors group-focus-within:border-white">
                 <User 
                   size={19} 
-                  className="text-white shrink-0" 
-                  fill="#ffffff" 
+                  className="text-white shrink-0 fill-white" 
                   color="#ffffff"
                   strokeWidth={1}
                 />
@@ -220,24 +216,22 @@ export default function Login() {
                   }}
                   required
                   autoComplete="username"
-                  className="login-transparent-input w-full bg-transparent text-white text-[15.5px] font-normal placeholder:text-[#cbd5e0] focus:outline-none"
+                  className="w-full bg-transparent text-white text-[15px] font-normal placeholder:text-[#d1dbe6] focus:outline-none"
                 />
               </div>
-              <div className="h-[1px] w-full bg-white/30 group-focus-within:bg-[#20c9c9] transition-colors duration-300" />
             </div>
 
-            {/* Password Field: Padlock icon on left (pure white), placeholder in light gray, clean transparent background, thin border-bottom only */}
-            <div className="space-y-1 group">
-              <div className="flex items-center gap-3 pb-2 transition-colors">
+            {/* Password Field: Padlock icon on left, thin underline border */}
+            <div className="group">
+              <div className="flex items-center gap-3.5 pb-2 border-b border-white/35 transition-colors group-focus-within:border-white">
                 <Lock 
                   size={19} 
-                  className="text-white shrink-0" 
-                  fill="#ffffff" 
+                  className="text-white shrink-0 fill-white" 
                   color="#ffffff"
                   strokeWidth={1} 
                 />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => {
@@ -246,46 +240,33 @@ export default function Login() {
                   }}
                   required
                   autoComplete="current-password"
-                  className="login-transparent-input w-full bg-transparent text-white text-[15.5px] font-normal placeholder:text-[#cbd5e0] focus:outline-none"
+                  className="w-full bg-transparent text-white text-[15px] font-normal placeholder:text-[#d1dbe6] focus:outline-none"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-300 hover:text-white transition-colors p-0.5 focus:outline-none"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff size={16} className="text-gray-300 hover:text-white" />
-                  ) : (
-                    <Eye size={16} className="text-gray-300 hover:text-white" />
-                  )}
-                </button>
               </div>
-              <div className="h-[1px] w-full bg-white/30 group-focus-within:bg-[#20c9c9] transition-colors duration-300" />
             </div>
 
             {/* Error Message */}
             {loginError && (
-              <div className="text-[#ff5252] text-center text-[14px] font-medium pt-1 animate-in fade-in duration-200">
+              <div className="text-[#ff5c5c] text-center text-[13.5px] font-medium pt-1 animate-in fade-in duration-200">
                 {loginError}
               </div>
             )}
 
-            {/* Login Button: Full-width Rounded Pill Button (top #2a6bb5, bottom #1a4a8a) & Soft Shadow */}
-            <div className="pt-3 flex justify-center">
+            {/* Login Button: Centered Pill Shaped Blue Gradient Button */}
+            <div className="pt-6 pb-1 flex justify-center">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-[48px] rounded-[28px] flex items-center justify-center gap-2 text-white text-[16px] font-medium tracking-wide transition-all duration-300 cursor-pointer select-none active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed hover:brightness-110 border border-white/20"
+                className="w-[145px] h-[46px] rounded-full flex items-center justify-center gap-2 text-white text-[15.5px] font-medium tracking-wide transition-all duration-200 cursor-pointer select-none active:scale-[0.97] hover:brightness-105"
                 style={{
-                  background: "linear-gradient(180deg, #2a6bb5 0%, #1a4a8a 100%)",
-                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3)",
+                  background: "linear-gradient(180deg, #5891ce 0%, #316eb2 50%, #17457a 100%)",
+                  boxShadow: "0 10px 22px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.35)",
                 }}
               >
                 {loading ? (
                   <>
-                    <Loader2 size={19} className="animate-spin" />
-                    <span>Signing In...</span>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>Login...</span>
                   </>
                 ) : (
                   <span>Login</span>

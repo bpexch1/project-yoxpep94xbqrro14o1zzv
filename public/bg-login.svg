@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360">
+  <defs>
+    <style>
+      .p0 { fill: #18191a; }
+      .p1 { fill: #1d1e20; }
+      .p2 { fill: #222326; }
+      .p3 { fill: #27282c; }
+      .p4 { fill: #2c2e32; }
+      .p5 { fill: #313338; }
+      .p6 { fill: #37393f; }
+      .p7 { fill: #1a1b1d; }
+      .p8 { fill: #25262a; }
+      .p9 { fill: #2e3035; }
+    </style>
+  </defs>
+
+  <!-- Solid background -->
+  <rect width="360" height="360" fill="#202124" />
+
+  <!-- Isometric diamond & triangle facets matching original bpexch bg-login -->
+  <g>
+    <!-- Row 1: y 0 to 60 -->
+    <polygon class="p2" points="0,0 60,0 30,30" />
+    <polygon class="p4" points="60,0 120,0 90,30" />
+    <polygon class="p1" points="120,0 180,0 150,30" />
+    <polygon class="p5" points="180,0 240,0 210,30" />
+    <polygon class="p3" points="240,0 300,0 270,30" />
+    <polygon class="p0" points="300,0 360,0 330,30" />
+
+    <polygon class="p6" points="0,0 30,30 0,60" />
+    <polygon class="p3" points="30,30 60,0 90,30 60,60" />
+    <polygon class="p5" points="90,30 120,0 150,30 120,60" />
+    <polygon class="p2" points="150,30 180,0 210,30 180,60" />
+    <polygon class="p4" points="210,30 240,0 270,30 240,60" />
+    <polygon class="p1" points="270,30 300,0 330,30 300,60" />
+    <polygon class="p6" points="330,30 360,0 360,60" />
+
+    <!-- Row 2: y 60 to 120 -->
+    <polygon class="p0" points="0,60 30,30 60,60 30,90" />
+    <polygon class="p4" points="60,60 90,30 120,60 90,90" />
+    <polygon class="p6" points="120,60 150,30 180,60 150,90" />
+    <polygon class="p1" points="180,60 210,30 240,60 210,90" />
+    <polygon class="p5" points="240,60 270,30 300,60 270,90" />
+    <polygon class="p3" points="300,60 330,30 360,60 330,90" />
+
+    <polygon class="p5" points="0,60 30,90 0,120" />
+    <polygon class="p1" points="30,90 60,60 90,90 60,120" />
+    <polygon class="p3" points="90,90 120,60 150,90 120,120" />
+    <polygon class="p7" points="150,90 180,60 210,90 180,120" />
+    <polygon class="p2" points="210,90 240,60 270,90 240,120" />
+    <polygon class="p6" points="270,90 300,60 330,90 300,120" />
+    <polygon class="p5" points="330,90 360,60 360,120" />
+
+    <!-- Row 3: y 120 to 180 -->
+    <polygon class="p2" points="0,120 30,90 60,120 30,150" />
+    <polygon class="p5" points="60,120 90,90 120,120 90,150" />
+    <polygon class="p0" points="120,120 150,90 180,120 150,150" />
+    <polygon class="p4" points="180,120 210,90 240,120 210,150" />
+    <polygon class="p8" points="240,120 270,90 300,120 270,150" />
+    <polygon class="p1" points="300,120 330,90 360,120 330,150" />
+
+    <polygon class="p4" points="0,120 30,150 0,180" />
+    <polygon class="p6" points="30,150 60,120 90,150 60,180" />
+    <polygon class="p2" points="90,150 120,120 150,150 120,180" />
+    <polygon class="p5" points="120,150 150,120 180,150 150,180" />
+    <polygon class="p1" points="180,150 210,120 240,150 210,180" />
+    <polygon class="p3" points="240,150 270,120 300,150 270,180" />
+    <polygon class="p4" points="300,150 330,120 360,150 330,180" />
+
+    <!-- Row 4: y 180 to 240 -->
+    <polygon class="p3" points="0,180 30,150 60,180 30,210" />
+    <polygon class="p1" points="60,180 90,150 120,180 90,210" />
+    <polygon class="p7" points="120,180 150,150 180,180 150,210" />
+    <polygon class="p6" points="180,180 210,150 240,180 210,210" />
+    <polygon class="p0" points="240,180 270,150 300,180 270,210" />
+    <polygon class="p5" points="300,180 330,150 360,180 330,210" />
+
+    <polygon class="p1" points="0,180 30,210 0,240" />
+    <polygon class="p8" points="30,210 60,180 90,210 60,240" />
+    <polygon class="p3" points="90,210 120,180 150,210 120,240" />
+    <polygon class="p4" points="120,210 150,180 180,210 150,240" />
+    <polygon class="p6" points="180,210 210,180 240,210 210,240" />
+    <polygon class="p2" points="240,210 270,180 300,210 270,240" />
+    <polygon class="p1" points="300,210 330,180 360,210 330,240" />
+
+    <!-- Row 5: y 240 to 300 -->
+    <polygon class="p5" points="0,240 30,210 60,240 30,270" />
+    <polygon class="p0" points="60,240 90,210 120,240 90,270" />
+    <polygon class="p4" points="120,240 150,210 180,240 150,270" />
+    <polygon class="p2" points="180,240 210,210 240,240 210,270" />
+    <polygon class="p7" points="240,240 270,210 300,240 270,270" />
+    <polygon class="p6" points="300,240 330,210 360,240 330,270" />
+
+    <polygon class="p3" points="0,240 30,270 0,300" />
+    <polygon class="p2" points="30,270 60,240 90,270 60,300" />
+    <polygon class="p5" points="90,270 120,240 150,270 120,300" />
+    <polygon class="p1" points="120,270 150,240 180,270 150,300" />
+    <polygon class="p4" points="180,270 210,240 240,270 210,300" />
+    <polygon class="p0" points="240,270 270,240 300,270 270,300" />
+    <polygon class="p3" points="300,270 330,240 360,270 330,300" />
+
+    <!-- Row 6: y 300 to 360 -->
+    <polygon class="p6" points="0,300 30,270 60,300 30,330" />
+    <polygon class="p4" points="60,300 90,270 120,300 90,330" />
+    <polygon class="p1" points="120,300 150,270 180,300 150,330" />
+    <polygon class="p3" points="180,300 210,270 240,300 210,330" />
+    <polygon class="p5" points="240,300 270,270 300,300 270,330" />
+    <polygon class="p2" points="300,300 330,270 360,300 330,330" />
+
+    <polygon class="p0" points="0,300 30,330 0,360" />
+    <polygon class="p7" points="30,330 60,300 90,330 60,360" />
+    <polygon class="p4" points="90,330 120,300 150,330 120,360" />
+    <polygon class="p6" points="120,330 150,300 180,330 150,360" />
+    <polygon class="p1" points="180,330 210,300 240,330 210,360" />
+    <polygon class="p3" points="240,330 270,300 300,330 270,360" />
+    <polygon class="p0" points="300,330 330,300 360,330 330,360" />
+
+    <!-- Seamless bottom edge matching row 1 -->
+    <polygon class="p2" points="0,360 60,360 30,330" />
+    <polygon class="p4" points="60,360 120,360 90,330" />
+    <polygon class="p1" points="120,360 180,360 150,330" />
+    <polygon class="p5" points="180,360 240,360 210,330" />
+    <polygon class="p3" points="240,360 300,360 270,330" />
+    <polygon class="p0" points="300,360 360,360 330,330" />
+  </g>
+</svg>

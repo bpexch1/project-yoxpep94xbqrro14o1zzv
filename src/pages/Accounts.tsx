@@ -156,23 +156,15 @@ export default function Accounts() {
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
-        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] shadow-[0_1px_1px_rgba(0,0,0,0.05)] mb-3 overflow-visible">
-          {/* Light Header matching original website */}
-          <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center gap-2">
-            <svg
-              viewBox="0 0 24 24"
-              className="w-4 h-4 fill-[rgb(35,40,44)] text-[rgb(35,40,44)] shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .71 1.71L14 11.42V19a1 1 0 0 1-.55.89l-4 2A1 1 0 0 1 8 21v-9.58L3.29 5.71A1 1 0 0 1 3 4z" />
-            </svg>
-            <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)] tracking-tight">
-              Search-Users
-            </span>
+        <div className="card" id="Usersearchcustom">
+          {/* Inspected Card Header */}
+          <div className="card-header">
+            <i className="fa fa-filter text-[13px]"></i>
+            <strong>Search-Users</strong>
           </div>
 
           {/* Search-Users Body */}
-          <div className="p-3">
+          <div className="card-body">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <div ref={dropdownRef} className="relative flex-1 max-w-md flex">
                 <div className="relative flex-1">
@@ -189,7 +181,7 @@ export default function Accounts() {
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
-                    className="w-full h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#009678] transition-all"
+                    className="w-full h-[35px] border border-[#c8ced3] border-r-0 rounded-l-[0.25rem] px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#009678] transition-all"
                   />
                   {searchQuery && (
                     <button
@@ -209,7 +201,7 @@ export default function Accounts() {
 
                 <button
                   onClick={handleSearchClick}
-                  className="h-[34px] px-3.5 bg-[#009678] hover:bg-[#007a62] text-white font-medium text-[0.875rem] rounded-r-sm flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#009678]"
+                  className="h-[35px] px-3.5 bg-[#009678] hover:bg-[#007a62] text-white font-medium text-[0.875rem] rounded-r-[0.25rem] flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#009678]"
                 >
                   <Search className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Search</span>

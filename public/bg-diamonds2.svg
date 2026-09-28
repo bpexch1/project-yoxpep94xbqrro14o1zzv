@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <defs>
+    <style>
+      .d1 { fill: #1c1c1c; }
+      .d2 { fill: #222222; }
+      .d3 { fill: #262626; }
+      .d4 { fill: #2a2a2a; }
+      .d5 { fill: #2f2f2f; }
+      .d6 { fill: #333333; }
+      .d7 { fill: #383838; }
+      .d8 { fill: #202020; }
+      .d9 { fill: #2d2d2d; }
+    </style>
+  </defs>
+  
+  <!-- Base Background -->
+  <rect width="300" height="300" fill="#222222" />
+
+  <!-- Seamless repeating diamond & isometric triangle mesh matching bg-diamonds2.png -->
+  <g>
+    <!-- Row 0: y=0 -->
+    <polygon class="d3" points="0,0 50,0 25,25" />
+    <polygon class="d5" points="50,0 100,0 75,25" />
+    <polygon class="d2" points="100,0 150,0 125,25" />
+    <polygon class="d6" points="150,0 200,0 175,25" />
+    <polygon class="d4" points="200,0 250,0 225,25" />
+    <polygon class="d1" points="250,0 300,0 275,25" />
+
+    <polygon class="d7" points="0,0 25,25 0,50" />
+    <polygon class="d4" points="25,25 50,0 75,25 50,50" />
+    <polygon class="d6" points="75,25 100,0 125,25 100,50" />
+    <polygon class="d3" points="125,25 150,0 175,25 150,50" />
+    <polygon class="d5" points="175,25 200,0 225,25 200,50" />
+    <polygon class="d2" points="225,25 250,0 275,25 250,50" />
+    <polygon class="d7" points="275,25 300,0 300,50" />
+
+    <!-- Row 1: y=50 -->
+    <polygon class="d1" points="0,50 25,25 50,50 25,75" />
+    <polygon class="d5" points="50,50 75,25 100,50 75,75" />
+    <polygon class="d7" points="100,50 125,25 150,50 125,75" />
+    <polygon class="d2" points="150,50 175,25 200,50 175,75" />
+    <polygon class="d6" points="200,50 225,25 250,50 225,75" />
+    <polygon class="d4" points="250,50 275,25 300,50 275,75" />
+
+    <polygon class="d6" points="0,50 25,75 0,100" />
+    <polygon class="d2" points="25,75 50,50 75,75 50,100" />
+    <polygon class="d4" points="75,75 100,50 125,75 100,100" />
+    <polygon class="d8" points="125,75 150,50 175,75 150,100" />
+    <polygon class="d3" points="175,75 200,50 225,75 200,100" />
+    <polygon class="d7" points="225,75 250,50 275,75 250,100" />
+    <polygon class="d6" points="275,75 300,50 300,100" />
+
+    <!-- Row 2: y=100 -->
+    <polygon class="d3" points="0,100 25,75 50,100 25,125" />
+    <polygon class="d6" points="50,100 75,75 100,100 75,125" />
+    <polygon class="d1" points="100,100 125,75 150,100 125,125" />
+    <polygon class="d5" points="150,100 175,75 200,100 175,125" />
+    <polygon class="d9" points="200,100 225,75 250,100 225,125" />
+    <polygon class="d2" points="250,100 275,75 300,100 275,125" />
+
+    <polygon class="d5" points="0,100 25,125 0,150" />
+    <polygon class="d7" points="25,125 50,100 75,125 50,150" />
+    <polygon class="d3" points="75,125 100,100 125,125 100,150" />
+    <polygon class="d6" points="125,125 150,100 175,125 150,150" />
+    <polygon class="d2" points="175,125 200,100 225,125 200,150" />
+    <polygon class="d4" points="225,125 250,100 275,125 250,150" />
+    <polygon class="d5" points="275,125 300,100 300,150" />
+
+    <!-- Row 3: y=150 -->
+    <polygon class="d4" points="0,150 25,125 50,150 25,175" />
+    <polygon class="d2" points="50,150 75,125 100,150 75,175" />
+    <polygon class="d8" points="100,150 125,125 150,150 125,175" />
+    <polygon class="d7" points="150,150 175,125 200,150 175,175" />
+    <polygon class="d1" points="200,150 225,125 250,150 225,175" />
+    <polygon class="d6" points="250,150 275,125 300,150 275,175" />
+
+    <polygon class="d2" points="0,150 25,175 0,200" />
+    <polygon class="d9" points="25,175 50,150 75,175 50,200" />
+    <polygon class="d4" points="75,175 100,150 125,175 100,200" />
+    <polygon class="d5" points="125,175 150,150 175,175 150,200" />
+    <polygon class="d7" points="175,175 200,150 225,175 200,200" />
+    <polygon class="d3" points="225,175 250,150 275,175 250,200" />
+    <polygon class="d2" points="275,175 300,150 300,200" />
+
+    <!-- Row 4: y=200 -->
+    <polygon class="d6" points="0,200 25,175 50,200 25,225" />
+    <polygon class="d1" points="50,200 75,175 100,200 75,225" />
+    <polygon class="d5" points="100,200 125,175 150,200 125,225" />
+    <polygon class="d3" points="150,200 175,175 200,200 175,225" />
+    <polygon class="d8" points="200,200 225,175 250,200 225,225" />
+    <polygon class="d7" points="250,200 275,175 300,200 275,225" />
+
+    <polygon class="d4" points="0,200 25,225 0,250" />
+    <polygon class="d3" points="25,225 50,200 75,225 50,250" />
+    <polygon class="d6" points="75,225 100,200 125,225 100,250" />
+    <polygon class="d2" points="125,225 150,200 175,225 150,250" />
+    <polygon class="d5" points="175,225 200,200 225,225 200,250" />
+    <polygon class="d1" points="225,225 250,200 275,225 250,250" />
+    <polygon class="d4" points="275,225 300,200 300,250" />
+
+    <!-- Row 5: y=250 -->
+    <polygon class="d7" points="0,250 25,225 50,250 25,275" />
+    <polygon class="d5" points="50,250 75,225 100,250 75,275" />
+    <polygon class="d2" points="100,250 125,225 150,250 125,275" />
+    <polygon class="d4" points="150,250 175,225 200,250 175,275" />
+    <polygon class="d6" points="200,250 225,225 250,250 225,275" />
+    <polygon class="d3" points="250,250 275,225 300,250 275,275" />
+
+    <polygon class="d1" points="0,250 25,275 0,300" />
+    <polygon class="d8" points="25,275 50,250 75,275 50,300" />
+    <polygon class="d5" points="75,275 100,250 125,275 100,300" />
+    <polygon class="d7" points="125,275 150,250 175,275 150,300" />
+    <polygon class="d2" points="175,275 200,250 225,275 200,300" />
+    <polygon class="d4" points="225,275 250,250 275,275 250,300" />
+    <polygon class="d1" points="275,275 300,250 300,300" />
+
+    <!-- Bottom border closures matching y=0 -->
+    <polygon class="d3" points="0,300 50,300 25,275" />
+    <polygon class="d5" points="50,300 100,300 75,275" />
+    <polygon class="d2" points="100,300 150,300 125,275" />
+    <polygon class="d6" points="150,300 200,300 175,275" />
+    <polygon class="d4" points="200,300 250,300 225,275" />
+    <polygon class="d1" points="250,300 300,300 275,275" />
+  </g>
+</svg>

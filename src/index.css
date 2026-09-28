@@ -1040,4 +1040,257 @@ body.sidebar-open, body.sidebar-show {
   color: #646464;
 }
 
+/* ==========================================================================
+   LOGIN PAGE EXACT STYLES (MATCHING SCREENSHOTS)
+   ========================================================================== */
+
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container-login100 {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background-color: #0b0d10;
+  position: relative;
+  overflow: hidden;
+}
+
+.wrap-login100 {
+  width: 375px;
+  background: linear-gradient(180deg, #0d2137 0%, #122a45 100%);
+  border-radius: 18px;
+  overflow: hidden;
+  padding: 40px 32px 35px 32px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 2;
+}
+
+.login100-form {
+  width: 100%;
+}
+
+.wrap-input100 {
+  width: 100%;
+  position: relative;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.24);
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  padding-bottom: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.wrap-input100:focus-within {
+  border-bottom-color: #20c9c9;
+}
+
+.input100 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.2;
+  display: block;
+  width: 100%;
+  height: 40px;
+  background: transparent;
+  padding: 0 10px 0 12px;
+  border: none;
+  outline: none;
+}
+
+.input100::placeholder {
+  color: #cbd5e0;
+  opacity: 0.85;
+}
+
+.container-login100-form-btn {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.login100-form-btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.2;
+  text-transform: none;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 35px;
+  min-width: 170px;
+  height: 48px;
+  background: linear-gradient(180deg, #2a6bb5 0%, #1a4a8a 100%);
+  border-radius: 28px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.login100-form-btn:hover {
+  background: linear-gradient(180deg, #3a7bc5 0%, #245a9a 100%);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  transform: translateY(-1px);
+}
+
+.login100-form-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#errorBox {
+  font-size: 16px;
+  color: #ff5252;
+  text-align: center;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+
+/* CARD */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #ffffff;
+  background-clip: border-box;
+  border: 1px solid rgb(200, 206, 211);
+  border-radius: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+/* CARD HEADER (Inspected: bg rgb(240, 243, 245), padding 4.8px 20px / 0.3rem 1.25rem, border-bottom 1px solid rgb(200, 206, 211)) */
+.card-header {
+  padding: 0.3rem 1.25rem; /* 4.8px 20px */
+  margin-bottom: 0;
+  background-color: rgb(240, 243, 245);
+  border-bottom: 1px solid rgb(200, 206, 211);
+  color: rgb(35, 40, 44);
+  font-size: 0.875rem; /* 14px */
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-header:first-child {
+  border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+}
+
+/* CARD BODY (Inspected: padding 1.25rem / 20px, flex: 1 1 auto, display: block) */
+.card-body {
+  flex: 1 1 auto;
+  padding: 1.25rem; /* 20px */
+  box-sizing: border-box;
+  display: block;
+}
+
+.card-body.reportmenubuttons {
+  display: block;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  padding: 1.25rem; /* 20px */
+  background-color: #ffffff;
+}
+
+/* REPORT BUTTONS WRAPPER */
+.report-buttons-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.5rem;
+  margin-bottom: 0;
+}
+
+/* BASE BUTTON CLASS (.btn) - Inspected: 6px 12px (0.375rem 0.75rem), font-size 14px (0.875rem), border-radius 4px (0.25rem) */
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  border-radius: 0.25rem; /* 4px */
+  transition: color 0.15s ease-in-out,
+              background-color 0.15s ease-in-out,
+              border-color 0.15s ease-in-out,
+              box-shadow 0.15s ease-in-out;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.btn:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+/* OUTLINE PRIMARY BUTTON (.btn-outline-primary) - Inspected: color rgb(32, 168, 216), 1px solid rgb(32, 168, 216), transparent bg */
+.btn-outline-primary {
+  color: rgb(32, 168, 216);
+  background-color: transparent;
+  background-image: none;
+  border-color: rgb(32, 168, 216);
+  border-top-color: rgb(32, 168, 216);
+  border-right-color: rgb(32, 168, 216);
+  border-bottom-color: rgb(32, 168, 216);
+  border-left-color: rgb(32, 168, 216);
+  text-decoration: none;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  color: #ffffff;
+  background-color: rgb(32, 168, 216);
+  border-color: rgb(32, 168, 216);
+  text-decoration: none;
+}
+
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+  color: #ffffff;
+  background-color: #1b8eb7;
+  border-color: #1985ac;
+}
+
+/* FILLED ACTIVE BUTTON (Accounts tab in Report Type) */
+.btn-primary.btn-report-active,
+.btn-accounts-filled {
+  color: #ffffff;
+  background-color: rgb(32, 168, 216);
+  border-color: rgb(32, 168, 216);
+  text-decoration: none;
+}
+
+.btn-primary.btn-report-active:hover,
+.btn-accounts-filled:hover {
+  color: #ffffff;
+  background-color: #1b8eb7;
+  border-color: #1985ac;
+}
+
+
+
+
+
 
