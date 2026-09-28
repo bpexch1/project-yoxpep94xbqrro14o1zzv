@@ -294,7 +294,7 @@ export default function CashCreditPage() {
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
               activeTab === 'cash' 
                 ? "bg-[#0088cc] text-white border-[#0088cc]" 
-                : "bg-white text-[#00b98a] border-[#00b98a] hover:bg-gray-50"
+                : "bg-white text-[#009678] border-[#009678] hover:bg-gray-50"
             )}
           >
             Cash
@@ -306,7 +306,7 @@ export default function CashCreditPage() {
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
               activeTab === 'credit' 
                 ? "bg-[#0088cc] text-white border-[#0088cc]" 
-                : "bg-white text-[#00b98a] border-[#00b98a] hover:bg-gray-50"
+                : "bg-white text-[#009678] border-[#009678] hover:bg-gray-50"
             )}
           >
             Credit
@@ -315,7 +315,7 @@ export default function CashCreditPage() {
         
         {/* Username Header & 3-Column Info Table Box */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-3 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="font-bold text-[1rem] text-[rgb(35,40,44)] mb-2.5">
+          <div className="font-bold text-[1.1rem] text-[#00B496] mb-2.5">
             {client.username}
           </div>
           
@@ -370,9 +370,9 @@ export default function CashCreditPage() {
           )}
         </div>
         
-        {/* DEPOSIT FORM BOX (Green Header) */}
+        {/* DEPOSIT FORM BOX (Dark Teal Header #009678) */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="bg-[#00b98a] px-3.5 py-2 text-[0.875rem] text-white font-bold">
+          <div className="bg-[#009678] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash' 
               ? `Deposit Cash in ${client.username} account` 
               : `Deposit Credit in ${client.username} Account`}
@@ -388,7 +388,7 @@ export default function CashCreditPage() {
                 type="text"
                 value={depositDesc}
                 onChange={(e) => setDepositDesc(e.target.value)}
-                className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] text-[rgb(35,40,44)] outline-none focus:border-[#00b98a]"
+                className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] text-[rgb(35,40,44)] outline-none focus:border-[#009678]"
               />
             </div>
             
@@ -417,7 +417,7 @@ export default function CashCreditPage() {
                 type="button"
                 onClick={handleDeposit}
                 disabled={isSubmittingDeposit}
-                className="bg-[#00b98a] hover:bg-[#138a72] text-white border border-[#00b98a] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
+                className="bg-[#009678] hover:bg-[#007a62] text-white border border-[#009678] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingDeposit ? "Submitting..." : "Submit"}
               </button>

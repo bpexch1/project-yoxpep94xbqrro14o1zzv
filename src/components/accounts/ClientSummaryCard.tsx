@@ -303,40 +303,40 @@ export function ClientSummaryCard({
           </div>
 
           {/* Legend Badges Row */}
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[0.75rem] text-[rgb(35,40,44)]">
-            <div className="flex items-center gap-1">
-              <span className="w-[18px] h-[18px] bg-[#ffc107] text-black flex items-center justify-center rounded-[2px] text-[11px] font-bold">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.75rem] text-[rgb(35,40,44)]">
+            <div className="flex items-center gap-1.5">
+              <span className="w-[20px] h-[20px] bg-[#FFC107] text-black flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
                 C
               </span>
-              <span className="font-normal">Cash / Credit</span>
+              <span className="font-medium">Cash / Credit</span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className="w-[18px] h-[18px] bg-[#00b98a] text-white flex items-center justify-center rounded-[2px]">
-                <Pencil className="w-2.5 h-2.5" />
+            <div className="flex items-center gap-1.5">
+              <span className="w-[20px] h-[20px] bg-[#4CAF50] text-white flex items-center justify-center rounded-[3px] shadow-sm">
+                <Pencil className="w-2.5 h-2.5 stroke-[2.5]" />
               </span>
-              <span className="font-normal">Edit</span>
+              <span className="font-medium">Edit</span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className="w-[18px] h-[18px] bg-[#5bc0de] text-white flex items-center justify-center rounded-[2px] text-[11px] font-bold">
+            <div className="flex items-center gap-1.5">
+              <span className="w-[20px] h-[20px] bg-[#6496C8] text-white flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
                 L
               </span>
-              <span className="font-normal">Ledger</span>
+              <span className="font-medium">Ledger</span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className="w-[18px] h-[18px] bg-[#5cb85c] text-white flex items-center justify-center rounded-[2px] text-[11px] font-bold">
+            <div className="flex items-center gap-1.5">
+              <span className="w-[20px] h-[20px] bg-[#4CAF50] text-white flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
                 A
               </span>
-              <span className="font-normal">Active</span>
+              <span className="font-medium">Active</span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className="w-[18px] h-[18px] bg-white border border-[#d9534f] text-[#d9534f] flex items-center justify-center rounded-[2px] text-[11px] font-bold">
+            <div className="flex items-center gap-1.5">
+              <span className="w-[20px] h-[20px] bg-white border border-[#d9534f] text-[#d9534f] flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
                 D
               </span>
-              <span className="font-normal">InActive</span>
+              <span className="font-medium">InActive</span>
             </div>
           </div>
         </div>
@@ -353,32 +353,32 @@ export function ClientSummaryCard({
               setTableSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full max-w-[240px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1 text-[0.875rem] text-[rgb(35,40,44)] bg-white outline-none focus:border-[#00b98a]"
+            className="w-full max-w-[240px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1 text-[0.875rem] text-[rgb(35,40,44)] bg-white outline-none focus:border-[#009678]"
           />
         </div>
 
         {/* 5. Main Users Table */}
-        <div className="overflow-x-auto border border-[rgb(200,206,211)] rounded-[0.2rem]">
-          <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
+        <div className="overflow-x-auto border border-[#DCDCDC] rounded-[0.2rem]">
+          <table className="accounts-table table table-bordered table-sm mb-0 text-[0.875rem]">
             <tbody>
-              {/* TOP GREEN BAR / LOAD BALANCE */}
-              <tr className="bg-[#00b98a] text-white font-bold">
+              {/* TOP DARK TEAL BAR / LOAD BALANCE (#009678) */}
+              <tr className="table-header-row bg-[#009678] text-black font-bold h-[45px] sm:h-[50px]">
                 {!balancesLoaded ? (
-                  <td colSpan={3} className="px-3 py-2 border-b border-[#009e74]">
+                  <td colSpan={3} className="px-3.5 py-2.5 border-b border-[#007a62]">
                     <button
                       onClick={handleLoadBalance}
-                      className="bg-[#ffc107] hover:bg-[#e0a800] text-black text-[12px] font-bold py-1 px-3 rounded-[2px] shadow-sm transition-colors"
+                      className="bg-[#FFC107] hover:bg-[#e0a800] text-black text-[13px] font-bold py-1.5 px-3.5 rounded-[4px] shadow-sm transition-all hover:scale-105 active:scale-95"
                     >
                       {isLoadingBalances ? "Loading..." : "Load Balance"}
                     </button>
                   </td>
                 ) : (
                   <>
-                    <td className="px-3 py-2 border-r border-[#009e74] font-bold text-left text-[0.875rem]">
+                    <td className="px-3.5 py-2.5 border-r border-[#007a62] font-bold text-left text-[15px] sm:text-[16px] text-black">
                       Total
                     </td>
-                    <td className="px-3 py-2 border-r border-[#009e74]"></td>
-                    <td className="px-3 py-2 font-bold text-left text-[0.875rem]">
+                    <td className="px-3.5 py-2.5 border-r border-[#007a62]"></td>
+                    <td className="px-3.5 py-2.5 font-bold text-left text-[15px] sm:text-[16px] text-black">
                       {totalCreditSum.toLocaleString()}
                     </td>
                   </>
@@ -386,14 +386,14 @@ export function ClientSummaryCard({
               </tr>
 
               {/* TABLE HEADERS */}
-              <tr className="bg-white border-b border-[rgb(200,206,211)] font-bold text-[rgb(35,40,44)]">
-                <th className="px-3 py-2 text-left border-r border-[rgb(200,206,211)] w-[40%] font-bold">
+              <tr className="bg-white border-b border-[#DCDCDC] font-bold text-[rgb(35,40,44)]">
+                <th className="px-3.5 py-2 text-left border-r border-[#DCDCDC] w-[40%] font-bold">
                   Username
                 </th>
-                <th className="px-3 py-2 text-left border-r border-[rgb(200,206,211)] w-[35%] font-bold">
+                <th className="px-3.5 py-2 text-left border-r border-[#DCDCDC] w-[35%] font-bold">
                   Type
                 </th>
-                <th className="px-3 py-2 text-left w-[25%] font-bold">
+                <th className="px-3.5 py-2 text-left w-[25%] font-bold">
                   Credit
                 </th>
               </tr>
@@ -402,7 +402,7 @@ export function ClientSummaryCard({
               {isLoading ? (
                 <tr>
                   <td colSpan={3} className="px-3 py-8 text-center text-gray-500">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#00b98a]" />
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#009678]" />
                     <span>Loading clients...</span>
                   </td>
                 </tr>
@@ -422,16 +422,16 @@ export function ClientSummaryCard({
                       {/* Main user row */}
                       <tr
                         onClick={() => toggleExpand(client.id)}
-                        className="border-b border-[rgb(200,206,211)] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
+                        className="data-row border-b border-[#DCDCDC] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
                       >
-                        <td className="px-3 py-2.5 border-r border-[rgb(200,206,211)]">
+                        <td className="px-3.5 py-2.5 border-r border-[#DCDCDC]">
                           <div className="flex items-center gap-1.5">
                             <span
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/accounts/view/${client.username}`);
                               }}
-                              className="text-[#00b98a] hover:text-[#138a72] font-bold text-[0.875rem] hover:underline cursor-pointer"
+                              className="username-text text-[#00B496] hover:text-[#009678] font-bold text-[14px] hover:underline cursor-pointer"
                             >
                               {client.username}
                             </span>
@@ -450,19 +450,19 @@ export function ClientSummaryCard({
                           </div>
                         </td>
 
-                        <td className="px-3 py-2.5 border-r border-[rgb(200,206,211)] text-[rgb(35,40,44)]">
+                        <td className="px-3.5 py-2.5 border-r border-[#DCDCDC] text-[rgb(35,40,44)] font-medium">
                           {getTypeLabel(client.role)}
                         </td>
 
-                        <td className="px-3 py-2.5 text-[rgb(35,40,44)]">
+                        <td className="px-3.5 py-2.5 text-[rgb(35,40,44)] font-medium">
                           {balancesLoaded ? display.credit.toLocaleString() : "-"}
                         </td>
                       </tr>
 
                       {/* Expanded Sub-Details Row */}
                       {isExpanded && (
-                        <tr className="bg-white border-b border-[rgb(200,206,211)]">
-                          <td colSpan={3} className="px-4 py-3 bg-[#fafafa]/50">
+                        <tr className="detail-row bg-[#FAFAFA] border-b border-[#DCDCDC]">
+                          <td colSpan={3} className="px-4 py-3">
                             <ul className="space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
                               <li>
                                 • Balance{" "}
@@ -510,45 +510,49 @@ export function ClientSummaryCard({
                               </li>
                             </ul>
 
-                            {/* Options Action Buttons */}
+                            {/* Options Action Buttons (C, Edit, L, A) */}
                             <div className="flex items-center gap-1.5 pt-1">
                               <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)] mr-1">
                                 • Options
                               </span>
 
+                              {/* Yellow (C) Button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigate(`/accounts/cash-credit/${client.username}`);
                                 }}
                                 title="Cash / Credit"
-                                className="w-6 h-6 bg-[#ffc107] text-black font-bold rounded-[2px] text-[11px] flex items-center justify-center hover:opacity-85 shadow-sm transition-opacity"
+                                className="btn-action btn-copy text-black font-bold"
                               >
                                 C
                               </button>
 
+                              {/* Medium Green (Edit) Button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigate(`/accounts/edit/${client.username}`);
                                 }}
                                 title="Edit"
-                                className="w-6 h-6 bg-[#00b98a] text-white rounded-[2px] flex items-center justify-center hover:opacity-85 shadow-sm transition-opacity"
+                                className="btn-action btn-edit text-white"
                               >
-                                <Pencil className="w-3 h-3" />
+                                <Pencil className="w-3.5 h-3.5 stroke-[2.5]" />
                               </button>
 
+                              {/* Light Blue (L) Button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigate(`/accounts/ledger/${client.username}`);
                                 }}
                                 title="Ledger"
-                                className="w-6 h-6 bg-[#5bc0de] text-white font-bold rounded-[2px] text-[11px] flex items-center justify-center hover:opacity-85 shadow-sm transition-opacity"
+                                className="btn-action btn-ledger text-white font-bold"
                               >
                                 L
                               </button>
 
+                              {/* Medium Green (A) or InActive (D) Button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -556,10 +560,10 @@ export function ClientSummaryCard({
                                 }}
                                 title={client.status === "active" ? "Active" : "InActive"}
                                 className={cn(
-                                  "w-6 h-6 rounded-[2px] text-[11px] font-bold flex items-center justify-center shadow-sm transition-opacity hover:opacity-85",
+                                  "btn-action",
                                   client.status === "active"
-                                    ? "bg-[#5cb85c] text-white"
-                                    : "bg-white border border-[#d9534f] text-[#d9534f]"
+                                    ? "btn-account text-white"
+                                    : "btn-inactive-status font-bold"
                                 )}
                               >
                                 {client.status === "active" ? "A" : "D"}
@@ -577,7 +581,7 @@ export function ClientSummaryCard({
         </div>
 
         {/* 6. Footer Entries Counter */}
-        <div className="mt-3 text-center text-[0.875rem] text-[rgb(35,40,44)]">
+        <div className="table-footer mt-3 rounded-[0.2rem] bg-[#F5F5F5] border-t border-[#DCDCDC] p-3 text-center text-[12px] text-[#646464]">
           Showing 1 to {paginatedClients.length} of {tableFilteredClients.length} entries
         </div>
 

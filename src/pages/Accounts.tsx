@@ -189,7 +189,7 @@ export default function Accounts() {
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
-                    className="w-full h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00B181] transition-all"
+                    className="w-full h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#009678] transition-all"
                   />
                   {searchQuery && (
                     <button
@@ -209,7 +209,7 @@ export default function Accounts() {
 
                 <button
                   onClick={handleSearchClick}
-                  className="h-[34px] px-3.5 bg-[#00B181] hover:bg-[#009e74] text-white font-medium text-[0.875rem] rounded-r-sm flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#00B181]"
+                  className="h-[34px] px-3.5 bg-[#009678] hover:bg-[#007a62] text-white font-medium text-[0.875rem] rounded-r-sm flex items-center gap-1.5 transition-colors shrink-0 shadow-sm border border-[#009678]"
                 >
                   <Search className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Search</span>
@@ -224,10 +224,10 @@ export default function Accounts() {
                         onClick={() => selectSuggestion(client)}
                         onMouseEnter={() => setHighlightedIndex(index)}
                         className={`px-3 py-2 cursor-pointer flex items-center justify-between text-[0.875rem] border-b border-gray-100 last:border-0 ${
-                          highlightedIndex === index ? "bg-[#f0fdf4] text-[#00b98a]" : "text-[rgb(35,40,44)] hover:bg-gray-50"
+                          highlightedIndex === index ? "bg-[#e6f5f1] text-[#009678]" : "text-[rgb(35,40,44)] hover:bg-gray-50"
                         }`}
                       >
-                        <span className="font-bold">{client.username}</span>
+                        <span className="font-bold text-[#00B496]">{client.username}</span>
                         <span className="text-[11px] text-gray-500">{client.role || client.full_name}</span>
                       </div>
                     ))}
@@ -246,7 +246,7 @@ export default function Accounts() {
                         <button
                           onClick={() => navigate(path)}
                           className={`font-semibold transition-colors ${
-                            isLast ? "text-[#00b98a] font-bold" : "text-[rgb(35,40,44)] hover:text-[#00b98a]"
+                            isLast ? "text-[#00B496] font-bold" : "text-[rgb(35,40,44)] hover:text-[#00B496]"
                           }`}
                         >
                           {item}
