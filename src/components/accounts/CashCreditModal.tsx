@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TransactionHistoryModal } from "./TransactionHistoryModal";
-import { Client, Transaction } from "@/entities";
+import { Client } from "@/entities";
+import { manualWalletTransfer } from "@/lib/manualWallet";
 import { getClientSession } from "@/hooks/useClientAuth";
 
 interface CashCreditModalProps {
@@ -19,6 +20,9 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   const { toast } = useToast();
   const session = getClientSession();
 
+  const [operatorPassword, setOperatorPassword] = useState("");
+  const inFlight = useRef(false);
+  const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"cash" | "credit">("cash");
   const [showHistory, setShowHistory] = useState(false);
 
@@ -41,6 +45,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   useEffect(() => {
     if (!client) return;
     setShowHistory(false);
+    setOperatorPassword("");
     if (activeTab === "cash") {
       setDepositDesc(`Cash deposit in ${client.username}`);
       setWithdrawDesc(`Cash withdrawn from ${client.username}`);
@@ -60,154 +65,39 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     queryClient.invalidateQueries({ queryKey: ["admin-own-record"] });
   };
 
-  const handleDeposit = async () => {
-    if (!client) return;
-    const amount = parseFloat(depositAmount) || 0;
-    if (amount <= 0) {
-      toast({ variant: "destructive", title: "Invalid Amount", description: "Enter an amount greater than 0" });
-      return;
+  const submitTransfer = async (direction: "deposit" | "withdraw") => {
+    if (!client || !session || inFlight.current) return;
+    const amount = direction === "deposit" ? depositAmount : withdrawAmount;
+    const description = direction === "deposit" ? depositDesc : withdrawDesc;
+    const fingerprint = JSON.stringify([client.id, activeTab, direction, amount, description]);
+    if (pendingRequest.current?.fingerprint !== fingerprint) {
+      pendingRequest.current = { fingerprint, id: crypto.randomUUID() };
     }
-
-    const isCompany = session?.role?.toLowerCase() === "company";
-    if (!isCompany && adminClient) {
-      const dealerRemainingCredit = Number(adminClient.credit_remaining || 0);
-      if (amount > dealerRemainingCredit) {
-        toast({
-          variant: "destructive",
-          title: "Credit Limit Exceeded",
-          description: `Aapke pass sirf ${dealerRemainingCredit.toLocaleString()} Rs. credit limit remaining hai.`,
-        });
-        return;
-      }
-    }
-
-    setIsSubmittingDeposit(true);
+    inFlight.current = true;
+    const setSubmitting = direction === "deposit" ? setIsSubmittingDeposit : setIsSubmittingWithdraw;
+    setSubmitting(true);
     try {
-      let newBalance: number;
-      let clientUpdateData: Record<string, number> = {};
-      let beforeBalance: number;
-
-      if (activeTab === "cash") {
-        beforeBalance = Number(client.cash || 0);
-        newBalance = beforeBalance + amount;
-        clientUpdateData = { cash: newBalance };
-      } else {
-        beforeBalance = Number(client.credit_remaining || 0);
-        newBalance = beforeBalance + amount;
-        clientUpdateData = {
-          credit_received: Number(client.credit_received || 0) + amount,
-          credit_remaining: newBalance,
-        };
-      }
-
-      await Client.update(client.id, clientUpdateData);
-
-      if (adminClient) {
-        const dealerUpdate: Record<string, number> = {
-          credit_remaining: Math.max(0, Number(adminClient.credit_remaining || 0) - amount),
-        };
-        if (activeTab === "cash") {
-          dealerUpdate.cash = Number(adminClient.cash || 0) - amount;
-        }
-        await Client.update(adminClient.id, dealerUpdate);
-      }
-
-      await Transaction.create({
-        client_username: client.username,
-        type: activeTab,
-        amount: amount,
-        description: depositDesc,
-        before_balance: beforeBalance,
-        after_balance: newBalance,
+      await manualWalletTransfer({
+        operatorUsername: session.username, operatorPassword,
+        clientId: client.id, wallet: activeTab, direction, amount, description,
+        requestId: pendingRequest.current!.id,
       });
-
-      await refreshAll();
-      setDepositAmount("0");
-      toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} deposited successfully.` });
-      setTimeout(() => onClose(), 1200);
-    } catch (err: any) {
-      console.error("Deposit error:", err);
-      toast({ variant: "destructive", title: "Deposit Failed", description: err?.message || "Please try again" });
+      pendingRequest.current = null;
+      setOperatorPassword("");
+      if (direction === "deposit") setDepositAmount("0");
+      else setWithdrawAmount("0");
+      toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
+      // A refresh failure must not turn a confirmed transfer into a failed transfer.
+      await refreshAll().catch(() => undefined);
+    } catch (err: unknown) {
+      toast({ variant: "destructive", title: "Transfer Failed", description: err instanceof Error ? err.message : "Unable to confirm transfer. Retry with the same details." });
     } finally {
-      setIsSubmittingDeposit(false);
+      setSubmitting(false);
+      inFlight.current = false;
     }
   };
-
-  const handleWithdraw = async () => {
-    if (!client) return;
-    const amount = parseFloat(withdrawAmount) || 0;
-    if (amount <= 0) {
-      toast({ variant: "destructive", title: "Invalid Amount", description: "Enter an amount greater than 0" });
-      return;
-    }
-
-    if (activeTab === "cash" && amount > Number(client.cash || 0) + Number(client.credit_remaining || 0)) {
-      toast({
-        variant: "destructive",
-        title: "Insufficient Balance",
-        description: `Available: ${(Number(client.cash || 0) + Number(client.credit_remaining || 0)).toLocaleString()} Rs.`,
-      });
-      return;
-    }
-    if (activeTab === "credit" && amount > Number(client.credit_remaining || 0)) {
-      toast({
-        variant: "destructive",
-        title: "Insufficient Credit",
-        description: `Available Credit: ${Number(client.credit_remaining || 0).toLocaleString()} Rs.`,
-      });
-      return;
-    }
-
-    setIsSubmittingWithdraw(true);
-    try {
-      let newBalance: number;
-      let clientUpdateData: Record<string, number> = {};
-      let beforeBalance: number;
-
-      if (activeTab === "cash") {
-        beforeBalance = Number(client.cash || 0);
-        newBalance = beforeBalance - amount;
-        clientUpdateData = { cash: newBalance };
-      } else {
-        beforeBalance = Number(client.credit_remaining || 0);
-        newBalance = Math.max(0, beforeBalance - amount);
-        clientUpdateData = {
-          credit_remaining: newBalance,
-          credit_received: Math.max(0, Number(client.credit_received || 0) - amount),
-        };
-      }
-
-      await Client.update(client.id, clientUpdateData);
-
-      if (adminClient) {
-        const dealerUpdate: Record<string, number> = {
-          credit_remaining: Number(adminClient.credit_remaining || 0) + amount,
-        };
-        if (activeTab === "cash") {
-          dealerUpdate.cash = Number(adminClient.cash || 0) + amount;
-        }
-        await Client.update(adminClient.id, dealerUpdate);
-      }
-
-      await Transaction.create({
-        client_username: client.username,
-        type: activeTab,
-        amount: -amount,
-        description: withdrawDesc,
-        before_balance: beforeBalance,
-        after_balance: newBalance,
-      });
-
-      await refreshAll();
-      setWithdrawAmount("0");
-      setTimeout(() => onClose(), 1200);
-    } catch (err: any) {
-      console.error("Withdraw error:", err);
-      toast({ variant: "destructive", title: "Withdraw Failed", description: err?.message || "Please try again" });
-    } finally {
-      setIsSubmittingWithdraw(false);
-    }
-  };
+  const handleDeposit = () => submitTransfer("deposit");
+  const handleWithdraw = () => submitTransfer("withdraw");
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -305,7 +195,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {Math.max(0, (client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
+                          {Math.max(0, client?.cash || 0).toLocaleString()} Rs.
                         </td>
                       </>
                     ) : (
@@ -314,7 +204,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {(adminClient?.credit_remaining ?? 54727).toLocaleString()} Rs.
+                          {(adminClient?.credit_remaining ?? 0).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
@@ -339,6 +229,10 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
             </p>
           </div>
 
+          <div className="bg-white border border-gray-300 rounded p-3 mb-3">
+            <label className="block text-sm font-semibold mb-1" htmlFor="wallet-operator-password">Your administrator password</label>
+            <input id="wallet-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Confirm your identity" />
+          </div>
           {/* DEPOSIT SECTION (Green Header) */}
           <div className="rounded-[4px] overflow-hidden border border-[#dee2e6] bg-white shadow-sm">
             <div className="bg-[#00a676] px-3 py-2 text-white font-bold text-[13px]">
@@ -374,7 +268,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               <div className="flex justify-end pt-1">
                 <button
                   onClick={handleDeposit}
-                  disabled={isSubmittingDeposit}
+                  disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
                   className="bg-[#00a676] hover:bg-[#008f65] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
                 >
                   {isSubmittingDeposit && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -431,7 +325,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               <div className="flex justify-end pt-1">
                 <button
                   onClick={handleWithdraw}
-                  disabled={isSubmittingWithdraw}
+                  disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
                   className="bg-[#dc3545] hover:bg-[#c82333] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
                 >
                   {isSubmittingWithdraw && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
