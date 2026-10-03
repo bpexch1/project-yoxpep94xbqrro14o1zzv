@@ -172,23 +172,23 @@ export default function Dashboard() {
 
   return (
     <div
-      className="w-full"
+      className="w-full reference-dashboard"
       style={{
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        fontSize: "0.875rem",
+        fontSize: "1rem",
         color: "rgb(35, 40, 44)",
       }}
     >
       {/* 1. Search-Users Card */}
       <div
-        className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]"
+        className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 "
       >
         {/* Card Header */}
         <div
           className="flex items-center gap-2 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]"
         >
           <Filter size={14} className="text-[rgb(35,40,44)] shrink-0" strokeWidth={2.5} />
-          <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">Search-Users</span>
+          <span className="font-bold text-[1rem] text-[rgb(35,40,44)]">Search-Users</span>
         </div>
 
         {/* Card Body */}
@@ -199,11 +199,11 @@ export default function Dashboard() {
               placeholder="Username"
               value={searchUsername}
               onChange={(e) => setSearchUsername(e.target.value)}
-              className="flex-1 h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[0.875rem] text-[#495057] bg-white outline-none focus:border-[#00B181]"
+              className="flex-1 h-[34px] border border-[#c8ced3] border-r-0 rounded-l-sm px-3 text-[1rem] text-[#495057] bg-white outline-none focus:border-[#00B181]"
             />
             <button
               type="submit"
-              className="h-[34px] bg-[#00B181] hover:bg-[#009e74] text-white border border-[#00B181] rounded-r-sm px-3.5 text-[0.875rem] font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors"
+              className="h-[34px] bg-[#00B181] hover:bg-[#009e74] text-white border border-[#00B181] rounded-r-sm px-3.5 text-[1rem] font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors"
             >
               <Search size={14} strokeWidth={2.5} />
               Search
@@ -214,13 +214,13 @@ export default function Dashboard() {
 
       {/* 2. Sport Highlights Card */}
       <div
-        className="bg-white rounded-sm border border-[#c8ced3] mb-4 shadow-[0_1px_1px_rgba(0,0,0,0.05)]"
+        className="bg-white rounded-sm border border-[#c8ced3] mb-4 "
       >
         {/* Card Header */}
         <div
           className="flex items-center gap-2.5 px-3 py-2 bg-[#f0f3f5] border-b border-[#c8ced3]"
         >
-          <span className="font-bold text-[0.875rem] text-[#23282C]">Sport Highlights</span>
+          <span className="font-bold text-[1rem] text-[#23282C]">Sport Highlights</span>
           <button
             onClick={handleRefresh}
             disabled={isFetching}
@@ -237,10 +237,10 @@ export default function Dashboard() {
             <table className="table table-bordered table-striped table-sm mb-0">
               <thead>
                 <tr className="bg-[#f0f3f5]">
-                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
+                  <th className="text-left font-bold text-[1rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
                     Soccer
                   </th>
-                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
+                  <th className="text-left font-bold text-[1rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
                     Amount
                   </th>
                 </tr>
@@ -252,13 +252,13 @@ export default function Dashboard() {
                     onClick={() => handleMatchClick(m)}
                     className="hover:bg-gray-50 cursor-pointer bg-white"
                   >
-                    <td className="border-[rgb(200,206,211)] font-bold text-[0.875rem] text-[#009e74] leading-tight py-1.5 px-2">
+                    <td className="border-[rgb(200,206,211)] font-bold text-[1rem] text-[#009e74] leading-tight py-1.5 px-2">
                       <span>{m.title}</span>
                       {m.isLive && (
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle animate-pulse" />
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle " />
                       )}
                     </td>
-                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[0.875rem] py-1.5 px-2">
+                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[1rem] py-1.5 px-2">
                       {m.amount}
                     </td>
                   </tr>
@@ -272,10 +272,10 @@ export default function Dashboard() {
             <table className="table table-bordered table-striped table-sm mb-0">
               <thead>
                 <tr className="bg-[#f0f3f5]">
-                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
+                  <th className="text-left font-bold text-[1rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
                     Cricket
                   </th>
-                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
+                  <th className="text-left font-bold text-[1rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
                     Amount
                   </th>
                 </tr>
@@ -287,13 +287,13 @@ export default function Dashboard() {
                     onClick={() => handleMatchClick(m)}
                     className="hover:bg-gray-50 cursor-pointer bg-white"
                   >
-                    <td className="border-[rgb(200,206,211)] font-bold text-[0.875rem] text-[#009e74] leading-tight py-1.5 px-2">
+                    <td className="border-[rgb(200,206,211)] font-bold text-[1rem] text-[#009e74] leading-tight py-1.5 px-2">
                       <span>{m.title}</span>
                       {m.isLive && (
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle animate-pulse" />
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle " />
                       )}
                     </td>
-                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[0.875rem] py-1.5 px-2">
+                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[1rem] py-1.5 px-2">
                       {m.amount}
                     </td>
                   </tr>
@@ -307,10 +307,10 @@ export default function Dashboard() {
             <table className="table table-bordered table-striped table-sm mb-0">
               <thead>
                 <tr className="bg-[#f0f3f5]">
-                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
+                  <th className="text-left font-bold text-[1rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)]">
                     Tennis
                   </th>
-                  <th className="text-left font-bold text-[0.875rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
+                  <th className="text-left font-bold text-[1rem] text-[rgb(35,40,44)] border-[rgb(200,206,211)] w-[120px]">
                     Amount
                   </th>
                 </tr>
@@ -322,13 +322,13 @@ export default function Dashboard() {
                     onClick={() => handleMatchClick(m)}
                     className="hover:bg-gray-50 cursor-pointer bg-white"
                   >
-                    <td className="border-[rgb(200,206,211)] font-bold text-[0.875rem] text-[#009e74] leading-tight py-1.5 px-2">
+                    <td className="border-[rgb(200,206,211)] font-bold text-[1rem] text-[#009e74] leading-tight py-1.5 px-2">
                       <span>{m.title}</span>
                       {m.isLive && (
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle animate-pulse" />
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#1b5e20] ml-1.5 align-middle " />
                       )}
                     </td>
-                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[0.875rem] py-1.5 px-2">
+                    <td className="border-[rgb(200,206,211)] text-[rgb(35,40,44)] text-[1rem] py-1.5 px-2">
                       {m.amount}
                     </td>
                   </tr>
@@ -339,7 +339,7 @@ export default function Dashboard() {
 
           {/* Status when empty */}
           {totalHighlightsCount === 0 && (
-            <div className="p-8 text-center text-gray-500 text-[0.875rem]">
+            <div className="p-8 text-center text-gray-500 text-[1rem]">
               <div className="flex items-center justify-center gap-2 text-amber-700 font-bold mb-2">
                 <AlertTriangle size={18} />
                 <span>No Active Matches Currently Available</span>
@@ -351,7 +351,7 @@ export default function Dashboard() {
       </div>
 
       {/* Footer */}
-      <div className="text-center py-4 font-bold text-[0.875rem] text-[rgb(35,40,44)]">
+      <div className="text-center py-4 font-bold text-[1rem] text-[rgb(35,40,44)]">
         Welcome to Exchange.
       </div>
     </div>

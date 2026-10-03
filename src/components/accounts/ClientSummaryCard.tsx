@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/entities";
-import { DataTablePagination } from "./DataTablePagination";
 
 interface ClientSummaryCardProps {
   clients: any[];
@@ -27,6 +26,14 @@ export function ClientSummaryCard({
   hideHeader = false,
   adminRecord,
 }: ClientSummaryCardProps) {
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 992px)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 992px)");
+    const update = () => setIsDesktop(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  const columnCount = isDesktop ? 9 : 3;
   const navigate = useNavigate();
   const { toast } = useToast();
   const [balancesLoaded, setBalancesLoaded] = useState(false);
@@ -177,8 +184,67 @@ export function ClientSummaryCard({
     return filteredClients.reduce((sum, c) => sum + (Number(c.credit_remaining) || 0), 0) || 700000;
   }, [filteredClients]);
 
+  const renderOptions = (client: any) => (
+    <div className="flex items-center gap-1.5 pt-1">
+
+
+      {/* Yellow (C) Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/accounts/cash-credit/${client.username}`);
+        }}
+        title="Cash / Credit"
+        className="btn-action btn-copy text-black font-bold"
+      >
+        C
+      </button>
+
+      {/* Medium Green (Edit) Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/accounts/edit/${client.username}`);
+        }}
+        title="Edit"
+        className="btn-action btn-edit text-white"
+      >
+        <Pencil className="w-3.5 h-3.5 stroke-[2.5]" />
+      </button>
+
+      {/* Light Blue (L) Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/accounts/ledger/${client.username}`);
+        }}
+        title="Ledger"
+        className="btn-action btn-ledger text-white font-bold"
+      >
+        L
+      </button>
+
+      {/* Medium Green (A) or InActive (D) Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleStatus(client);
+        }}
+        title={client.status === "active" ? "Active" : "InActive"}
+        className={cn(
+          "btn-action",
+          client.status === "active"
+            ? "btn-account text-white"
+            : "btn-inactive-status font-bold"
+        )}
+      >
+        {client.status === "active" ? "A" : "D"}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="card">
+    <div className="card reference-accounts">
       {/* 1. Header Bar (Inspected card-header) */}
       {!hideHeader && (
         <div className="card-header">
@@ -192,7 +258,7 @@ export function ClientSummaryCard({
         {/* 2. Top Summary Stats Table */}
         <div className="mb-3.5 overflow-x-auto">
           {!balancesLoaded ? (
-            <table className="border-collapse border border-[rgb(200,206,211)] text-[0.875rem] bg-white">
+            <table className="table table-bordered table-sm border-collapse border border-[rgb(200,206,211)] bg-white">
               <thead>
                 <tr className="bg-white">
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
@@ -227,7 +293,7 @@ export function ClientSummaryCard({
               </tbody>
             </table>
           ) : (
-            <table className="border-collapse border border-[rgb(200,206,211)] text-[0.875rem] bg-white">
+            <table className="table table-bordered table-sm border-collapse border border-[rgb(200,206,211)] bg-white">
               <thead>
                 <tr className="bg-white">
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
@@ -283,14 +349,14 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="bg-[#00b98a] hover:bg-[#138a72] text-white font-medium text-[0.75rem] py-1 px-2.5 rounded-[0.2rem] flex items-center gap-1 transition-colors shadow-sm"
+                className="btn btn-sm btn-primary inline-flex items-center gap-1"
               >
                 <span>New User</span>
               </button>
             )}
             <button
               onClick={() => navigate("/reports/daily")}
-              className="bg-[#00b98a] hover:bg-[#138a72] text-white font-medium text-[0.75rem] py-1 px-2.5 rounded-[0.2rem] flex items-center gap-1 transition-colors shadow-sm"
+              className="btn btn-sm btn-primary inline-flex items-center gap-1"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Account Ledger</span>
@@ -298,37 +364,37 @@ export function ClientSummaryCard({
           </div>
 
           {/* Legend Badges Row */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.75rem] text-[rgb(35,40,44)]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[16px] text-[rgb(35,40,44)]">
             <div className="flex items-center gap-1.5">
-              <span className="w-[20px] h-[20px] bg-[#FFC107] text-black flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
+              <span className="btn btn-sm btn-warning">
                 C
               </span>
               <span className="font-medium">Cash / Credit</span>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="w-[20px] h-[20px] bg-[#4CAF50] text-white flex items-center justify-center rounded-[3px] shadow-sm">
+              <span className="btn btn-sm btn-primary">
                 <Pencil className="w-2.5 h-2.5 stroke-[2.5]" />
               </span>
               <span className="font-medium">Edit</span>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="w-[20px] h-[20px] bg-[#6496C8] text-white flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
+              <span className="btn btn-sm btn-info">
                 L
               </span>
               <span className="font-medium">Ledger</span>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="w-[20px] h-[20px] bg-[#4CAF50] text-white flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
+              <span className="btn btn-sm btn-success">
                 A
               </span>
               <span className="font-medium">Active</span>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="w-[20px] h-[20px] bg-white border border-[#d9534f] text-[#d9534f] flex items-center justify-center rounded-[3px] text-[11px] font-bold shadow-sm">
+              <span className="btn btn-sm btn-outline-danger">
                 D
               </span>
               <span className="font-medium">InActive</span>
@@ -336,33 +402,29 @@ export function ClientSummaryCard({
           </div>
         </div>
 
-        {/* 4. Table Search Box - Centered like original website */}
-        <div className="flex flex-col items-center justify-center my-3">
-          <label className="text-[0.875rem] text-[rgb(35,40,44)] font-normal mb-1">
-            Search:
+        {/* Reference DataTables entry selector and search */}
+        <div className="admin-datatable-controls flex flex-wrap justify-between items-center gap-3 mb-3">
+          <label className="flex items-center gap-2">Show
+            <select value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setCurrentPage(1); }} aria-label="Entries per page" className="px-2 py-1 border bg-white">
+              {[25, 50, 100, 250].map(size => <option key={size} value={size}>{size}</option>)}
+            </select> entries
           </label>
-          <input
-            type="search"
-            value={tableSearch}
-            onChange={(e) => {
-              setTableSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full max-w-[240px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1 text-[0.875rem] text-[rgb(35,40,44)] bg-white outline-none focus:border-[#009678]"
-          />
+          <label className="flex items-center gap-2">Search:
+            <input type="search" value={tableSearch} onChange={event => { setTableSearch(event.target.value); setCurrentPage(1); }} className="px-2 py-1 border bg-white" />
+          </label>
         </div>
 
         {/* 5. Main Users Table */}
         <div className="overflow-x-auto border border-[#DCDCDC] rounded-[0.2rem]">
-          <table className="accounts-table table table-bordered table-sm mb-0 text-[0.875rem]">
+          <table className="accounts-table tbl-datatable1 table table-bordered table-sm mb-0 text-[0.875rem]">
             <tbody>
-              {/* TOP DARK TEAL BAR / LOAD BALANCE (#009678) */}
+              {/* Reference Load Balance header */}
               <tr className="table-header-row bg-[#009678] text-black font-bold h-[45px] sm:h-[50px]">
                 {!balancesLoaded ? (
-                  <td colSpan={3} className="px-3.5 py-2.5 border-b border-[#007a62]">
+                  <td colSpan={columnCount} className="px-3.5 py-2.5 border-b border-[#007a62]">
                     <button
                       onClick={handleLoadBalance}
-                      className="bg-[#FFC107] hover:bg-[#e0a800] text-black text-[13px] font-bold py-1.5 px-3.5 rounded-[4px] shadow-sm transition-all hover:scale-105 active:scale-95"
+                      className="btn btn-warning"
                     >
                       {isLoadingBalances ? "Loading..." : "Load Balance"}
                     </button>
@@ -376,34 +438,44 @@ export function ClientSummaryCard({
                     <td className="px-3.5 py-2.5 font-bold text-left text-[15px] sm:text-[16px] text-black">
                       {totalCreditSum.toLocaleString()}
                     </td>
+                    {isDesktop && (
+                      <>
+                        <td>{filteredClients.reduce((sum, client) => sum + getClientDisplay(client).balance, 0).toLocaleString()}</td>
+                        <td>{filteredClients.reduce((sum, client) => sum + Number(getClientDisplay(client).clientPL), 0).toLocaleString()}</td>
+                        <td></td><td></td><td></td><td></td>
+                      </>
+                    )}
                   </>
                 )}
               </tr>
 
               {/* TABLE HEADERS */}
               <tr className="bg-white border-b border-[#DCDCDC] font-bold text-[rgb(35,40,44)]">
-                <th className="px-3.5 py-2 text-left border-r border-[#DCDCDC] w-[40%] font-bold">
+                <th className="px-3.5 py-2 text-left border-r border-[#DCDCDC] font-bold">
                   Username
                 </th>
-                <th className="px-3.5 py-2 text-left border-r border-[#DCDCDC] w-[35%] font-bold">
+                <th className="px-3.5 py-2 text-left border-r border-[#DCDCDC] font-bold">
                   Type
                 </th>
-                <th className="px-3.5 py-2 text-left w-[25%] font-bold">
+                <th className="px-3.5 py-2 text-left font-bold">
                   Credit
                 </th>
+                {isDesktop && ["Balance", "Client (P/L)", "Share", "Exposure", "Available Balance", "Options"].map(label => (
+                  <th key={label} className="text-left font-bold">{label}</th>
+                ))}
               </tr>
 
               {/* USER ROWS */}
               {isLoading ? (
                 <tr>
-                  <td colSpan={3} className="px-3 py-8 text-center text-gray-500">
+                  <td colSpan={columnCount} className="px-3 py-8 text-center text-gray-500">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#009678]" />
                     <span>Loading clients...</span>
                   </td>
                 </tr>
               ) : paginatedClients.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-3 py-8 text-center text-gray-500 italic">
+                  <td colSpan={columnCount} className="px-3 py-8 text-center text-gray-500 italic">
                     No users found
                   </td>
                 </tr>
@@ -416,7 +488,7 @@ export function ClientSummaryCard({
                     <React.Fragment key={client.id}>
                       {/* Main user row */}
                       <tr
-                        onClick={() => toggleExpand(client.id)}
+                        onClick={() => { if (!isDesktop) toggleExpand(client.id); }}
                         className="data-row border-b border-[#DCDCDC] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
                       >
                         <td className="px-3.5 py-2.5 border-r border-[#DCDCDC]">
@@ -430,7 +502,7 @@ export function ClientSummaryCard({
                             >
                               {client.username}
                             </span>
-                            {!balancesLoaded && (
+                            {!balancesLoaded && !isDesktop && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -452,12 +524,22 @@ export function ClientSummaryCard({
                         <td className="px-3.5 py-2.5 text-[rgb(35,40,44)] font-medium">
                           {balancesLoaded ? display.credit.toLocaleString() : "-"}
                         </td>
+                        {isDesktop && (
+                          <>
+                            <td>{balancesLoaded ? display.balance.toLocaleString() : "-"}</td>
+                            <td style={{ color: display.clientPL < 0 ? "#f86c6b" : undefined }}>{balancesLoaded ? Number(display.clientPL).toLocaleString() : "-"}</td>
+                            <td>{display.share}</td>
+                            <td>{display.exposure}</td>
+                            <td>{balancesLoaded ? display.available.toLocaleString() : "-"}</td>
+                            <td>{renderOptions(client)}</td>
+                          </>
+                        )}
                       </tr>
 
                       {/* Expanded Sub-Details Row */}
-                      {isExpanded && (
+                      {isExpanded && !isDesktop && (
                         <tr className="detail-row bg-[#FAFAFA] border-b border-[#DCDCDC]">
-                          <td colSpan={3} className="px-4 py-3">
+                          <td colSpan={columnCount} className="px-4 py-3">
                             <ul className="space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
                               <li>
                                 • Balance{" "}
@@ -505,64 +587,9 @@ export function ClientSummaryCard({
                               </li>
                             </ul>
 
-                            {/* Options Action Buttons (C, Edit, L, A) */}
-                            <div className="flex items-center gap-1.5 pt-1">
-                              <span className="font-bold text-[0.875rem] text-[rgb(35,40,44)] mr-1">
-                                • Options
-                              </span>
-
-                              {/* Yellow (C) Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/accounts/cash-credit/${client.username}`);
-                                }}
-                                title="Cash / Credit"
-                                className="btn-action btn-copy text-black font-bold"
-                              >
-                                C
-                              </button>
-
-                              {/* Medium Green (Edit) Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/accounts/edit/${client.username}`);
-                                }}
-                                title="Edit"
-                                className="btn-action btn-edit text-white"
-                              >
-                                <Pencil className="w-3.5 h-3.5 stroke-[2.5]" />
-                              </button>
-
-                              {/* Light Blue (L) Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/accounts/ledger/${client.username}`);
-                                }}
-                                title="Ledger"
-                                className="btn-action btn-ledger text-white font-bold"
-                              >
-                                L
-                              </button>
-
-                              {/* Medium Green (A) or InActive (D) Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleStatus(client);
-                                }}
-                                title={client.status === "active" ? "Active" : "InActive"}
-                                className={cn(
-                                  "btn-action",
-                                  client.status === "active"
-                                    ? "btn-account text-white"
-                                    : "btn-inactive-status font-bold"
-                                )}
-                              >
-                                {client.status === "active" ? "A" : "D"}
-                              </button>
+                            <div className="flex items-center gap-2">
+                              <span>• Options</span>
+                              {renderOptions(client)}
                             </div>
                           </td>
                         </tr>
@@ -575,27 +602,14 @@ export function ClientSummaryCard({
           </table>
         </div>
 
-        {/* 6. Footer Entries Counter */}
-        <div className="table-footer mt-3 rounded-[0.2rem] bg-[#F5F5F5] border-t border-[#DCDCDC] p-3 text-center text-[12px] text-[#646464]">
-          Showing 1 to {paginatedClients.length} of {tableFilteredClients.length} entries
-        </div>
-
-        {/* Pagination if multiple pages */}
-        {totalPages > 1 && (
-          <div className="mt-3 flex justify-center">
-            <DataTablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              pageSize={pageSize}
-              totalRecords={tableFilteredClients.length}
-              onPageChange={setCurrentPage}
-              onPageSizeChange={(newSize) => {
-                setPageSize(newSize);
-                setCurrentPage(1);
-              }}
-            />
+        <div className="admin-datatable-footer flex flex-wrap justify-between items-center gap-3 mt-3">
+          <span>Showing {tableFilteredClients.length ? (currentPage - 1) * pageSize + 1 : 0} to {Math.min(currentPage * pageSize, tableFilteredClients.length)} of {tableFilteredClients.length} entries</span>
+          <div className="inline-flex" aria-label="User table pagination">
+            <button type="button" className="admin-page-button" onClick={() => setCurrentPage(page => Math.max(1, page - 1))} disabled={currentPage <= 1}>Previous</button>
+            <span className="admin-page-button admin-page-current" aria-current="page">{currentPage}</span>
+            <button type="button" className="admin-page-button" onClick={() => setCurrentPage(page => Math.min(totalPages, page + 1))} disabled={currentPage >= totalPages}>Next</button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

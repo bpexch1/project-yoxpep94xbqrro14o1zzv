@@ -32,7 +32,7 @@ const mainMenuItems = [
   { label: "Dashboard", icon: DashboardIcon, link: "/dashboard" },
   { label: "Users", icon: UsersIcon, link: "/accounts" },
   { label: "Current Position", icon: CurrentPositionIcon, link: "/current-position" },
-  { label: "Reports", icon: ReportsIcon, link: "/reports/daily-pl" },
+  { label: "Reports", icon: ReportsIcon, link: "/reports/book-detail" },
   { label: "Bet Lock", icon: BetLockIcon, link: "/bet-lock" },
   { label: "Star Casino", icon: StarCasinoIcon, link: "/star-casino" },
   { label: "World Casino", icon: GlobeIcon, link: "/world-casino" },
@@ -106,7 +106,7 @@ function SportDropdown({
         onClick={toggleOpen}
         className={cn(
           "flex items-center w-full text-left transition-all duration-200 group select-none",
-          isCollapsed && !isMobile ? "justify-center py-3 px-0 h-[46px]" : "gap-3.5 py-2.5 px-4 h-[46px]",
+          isCollapsed && !isMobile ? "justify-center py-3 px-0 h-[48px]" : "gap-3.5 py-2.5 px-4 h-[48px]",
           "text-white hover:bg-[#3a4248] focus:outline-none"
         )}
         title={isCollapsed && !isMobile ? label : undefined}
@@ -116,7 +116,7 @@ function SportDropdown({
         </div>
         {showLabels && (
           <>
-            <span className="flex-1 text-[14px] font-normal leading-normal whitespace-nowrap text-white group-hover:text-white">
+            <span className="flex-1 text-[16px] font-normal leading-normal whitespace-nowrap text-white group-hover:text-white">
               {label}
             </span>
             <svg
@@ -211,7 +211,7 @@ function SidebarNavItems({
       !location.pathname.startsWith("/accounts") &&
       location.pathname.startsWith(item.link);
 
-    const isActive = isUsersTab || isDashboardTab || isOtherTab;
+    const isActive = isUsersTab || isDashboardTab || isOtherTab || (item.label === "Reports" && location.pathname.startsWith("/reports"));
     const showLabels = !isCollapsed || isMobile;
 
     return (
@@ -220,9 +220,9 @@ function SidebarNavItems({
         onClick={() => handleNavigate(item.link)}
         className={cn(
           "flex items-center w-full text-left transition-all duration-200 group border-b border-[#23282c]/80 select-none",
-          isCollapsed && !isMobile ? "justify-center py-3 px-0 h-[46px]" : "gap-3.5 py-2.5 px-4 h-[46px]",
+          isCollapsed && !isMobile ? "justify-center py-3 px-0 h-[48px]" : "gap-3.5 py-2.5 px-4 h-[48px]",
           isActive
-            ? "bg-[#20a8d8] text-white border-l-4 border-[#187da1]"
+            ? "bg-[#3a4248] text-white"
             : "bg-[#2f353a] text-white hover:bg-[#3a4248]"
         )}
         title={isCollapsed && !isMobile ? item.label : undefined}
@@ -240,8 +240,8 @@ function SidebarNavItems({
         {showLabels && (
           <span
             className={cn(
-              "flex-1 text-[14px] leading-normal whitespace-nowrap text-white",
-              isActive ? "font-semibold text-white" : "font-normal"
+              "flex-1 text-[16px] leading-normal whitespace-nowrap text-white",
+              "font-normal"
             )}
           >
             {item.label}
@@ -286,7 +286,15 @@ export function Sidebar({
   isMobileOpen,
   onMobileClose,
   isCollapsed = false,
+  onToggleCollapse,
 }: SidebarProps) {
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 992px)").matches);
+  React.useEffect(() => {
+    const media = window.matchMedia("(min-width: 992px)");
+    const update = () => setIsDesktop(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   React.useEffect(() => {
     if (isMobileOpen) {
       document.body.classList.add("sidebar-show");
@@ -310,7 +318,7 @@ export function Sidebar({
       <div
         onClick={onMobileClose}
         className={cn(
-          "sidebar-backdrop md:hidden cursor-pointer",
+          "sidebar-backdrop lg:hidden cursor-pointer",
           isMobileOpen ? "opacity-100 pointer-events-auto visible" : "opacity-0 pointer-events-none invisible"
         )}
         aria-hidden="true"
@@ -321,18 +329,21 @@ export function Sidebar({
         className={cn(
           "app-sidebar sidebar flex flex-col overflow-y-auto border-r border-[#23282c] select-none",
           isMobileOpen ? "sidebar-show" : "",
-          isCollapsed ? "md:w-[60px]" : "md:w-[230px]"
+          isCollapsed ? "lg:w-[50px]" : "lg:w-[200px]"
         )}
       >
         <SidebarNavItems
           onNavigate={() => {
-            if (window.innerWidth < 768) {
+            if (window.innerWidth < 992) {
               onMobileClose();
             }
           }}
           isCollapsed={isCollapsed}
-          isMobile={false}
+          isMobile={!isDesktop}
         />
+        <button type="button" onClick={onToggleCollapse} className="admin-sidebar-minimizer" aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!isCollapsed}>
+          <span aria-hidden="true">{isCollapsed ? "›" : "‹"}</span>
+        </button>
       </aside>
     </>
   );

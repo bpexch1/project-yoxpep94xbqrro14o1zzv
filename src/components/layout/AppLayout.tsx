@@ -59,7 +59,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   return (
-    <div className="app app-dashboard app-root min-h-screen bg-[#E4E5E6] text-[#23282C] overflow-x-hidden" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div className="app app-dashboard app-root reference-admin min-h-screen bg-[#E4E5E6] text-[#23282C] overflow-x-hidden" data-panel-role={session.role.toLowerCase()} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       {/* Header: fixed at top 55px */}
       <Header 
         isMobileSidebarOpen={isMobileSidebarOpen}
@@ -77,15 +77,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       
       {/* Main content body: width 100% on mobile without squeeze/shift, offset on desktop (>=768px) */}
       <div className={cn(
-        "flex flex-col min-h-[calc(100dvh-55px)] md:min-h-[calc(100vh-55px)] w-full max-w-full overflow-x-hidden transition-all duration-250 ease-in-out bg-[#E4E5E6]",
-        sidebarCollapsed ? "md:ml-[60px] md:w-[calc(100%-60px)]" : "md:ml-[230px] md:w-[calc(100%-230px)]",
-        "ml-0"
+        "admin-content flex flex-col min-h-[calc(100dvh-55px)] lg:min-h-[calc(100vh-55px)] w-full max-w-full overflow-x-hidden transition-all duration-250 ease-in-out bg-[#E4E5E6]",
+        sidebarCollapsed ? "lg:ml-[50px] lg:w-[calc(100%-50px)]" : "lg:ml-[200px] lg:w-[calc(100%-200px)]",
+        "ml-0", sidebarCollapsed ? "admin-content-collapsed" : ""
       )}>
         <main className="main flex-1 w-full max-w-full overflow-x-hidden">
           <div className="container-fluid">
             {children}
           </div>
         </main>
+        <footer className="admin-footer">Welcome to BPEXCH</footer>
       </div>
     </div>
   );

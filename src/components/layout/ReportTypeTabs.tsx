@@ -39,10 +39,9 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
       <div className="card-body reportmenubuttons">
         <div className="report-buttons-wrapper">
           {reportButtons.map((tab) => {
-            const isAccounts = tab.label === "Accounts";
             const active = isCurrentActive(tab.path);
 
-            if (isAccounts || active) {
+            if (active) {
               return (
                 <button
                   key={tab.id}

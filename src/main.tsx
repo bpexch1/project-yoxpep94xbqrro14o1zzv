@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import "./admin-reference.css";
 import { initClarity } from "./lib/clarity";
 
 // Initialize Microsoft Clarity Analytics if Project ID is configured

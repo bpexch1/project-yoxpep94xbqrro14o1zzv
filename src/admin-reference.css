@@ -1,0 +1,187 @@
+/* Measured bpexch.org Admin desktop UI, 3 October 2026.
+   Scoped to staff AppLayout; player and login pages use their existing styles. */
+.reference-admin {
+  --admin-header: 55px;
+  --admin-sidebar: 200px;
+  --admin-minimized: 50px;
+  --admin-paper: #fff;
+  --admin-canvas: #e4e5e6;
+  --admin-ink: #23282c;
+  --admin-border: #c8ced3;
+  --admin-sidebar-bg: #2f353a;
+  --admin-active: #3a4248;
+  --admin-primary: #00b181;
+  --admin-outline: #20a8d8;
+  padding-top: var(--admin-header);
+  font-size: 16px;
+  line-height: 1.5;
+  background: var(--admin-canvas);
+  color: var(--admin-ink);
+}
+.reference-admin *, .reference-admin *::before, .reference-admin *::after { box-sizing: border-box; }
+.reference-admin .app-header.navbar {
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--admin-header);
+  padding: 8px 16px;
+  background: var(--admin-paper);
+  box-shadow: none;
+  font-size: 16px;
+}
+.reference-admin .app-header nav a,
+.reference-admin .header-user-status,
+.reference-admin .app-header > div:last-of-type span { font-size: 16px; }
+.reference-admin .green-logo-text { font-size: 25px; font-weight: 700; line-height: 37.5px; letter-spacing: normal; color: var(--admin-primary); }
+.reference-admin aside.app-sidebar {
+  top: var(--admin-header) !important;
+  width: var(--admin-sidebar) !important;
+  height: calc(100dvh - var(--admin-header)) !important;
+  background: var(--admin-sidebar-bg);
+  border: 0;
+}
+.reference-admin .app-sidebar > nav { flex: 1; min-height: 0; overflow-y: auto; }
+.reference-admin .app-sidebar nav button {
+  min-height: 48px;
+  border: 0;
+  font-size: 16px;
+  font-weight: 400;
+}
+.reference-admin .app-sidebar nav button:hover { background: var(--admin-active); }
+.reference-admin .admin-sidebar-minimizer {
+  display: none;
+  flex: 0 0 50px;
+  width: 100%;
+  height: 50px;
+  border: 0;
+  background: rgb(0 0 0 / 20%);
+  color: #a5afb8;
+  cursor: pointer;
+  text-align: right;
+  padding: 0 18px;
+  font-size: 28px;
+}
+.reference-admin .main .container-fluid { padding: 10px 5px; }
+.reference-admin .card,
+.reference-admin main .bg-white.border {
+  background: var(--admin-paper);
+  border-color: var(--admin-border);
+  border-radius: 4px;
+  box-shadow: none;
+}
+.reference-admin .card { margin-bottom: 24px; }
+.reference-admin .card-header {
+  padding: 4.8px 20px;
+  background: #f0f3f5;
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 16px;
+  line-height: 24px;
+}
+.reference-admin .card-body, .reference-admin .card-body.reportmenubuttons { padding: 20px; }
+.reference-admin .btn { padding: 6px 12px; font-size: 14px; border-radius: 4px; box-shadow: none; }
+.reference-admin .btn-primary { background: var(--admin-primary); border-color: var(--admin-primary); color: #fff; }
+.reference-admin .btn-primary:hover { background: #008b65; border-color: #008b65; }
+.reference-admin .btn-outline-primary { border-color: var(--admin-outline); color: var(--admin-outline); background: transparent; }
+.reference-admin .btn-outline-primary:hover { background: var(--admin-outline); color: #fff; }
+.reference-admin .btn-success { background: #4dbd74; border-color: #4dbd74; }
+.reference-admin .btn-info { background: #63c2de; border-color: #63c2de; color: var(--admin-ink); }
+.reference-admin .report-buttons-wrapper { gap: 6px 8px; }
+.reference-admin main table { border-collapse: collapse; font-size: 16px; line-height: 24px; }
+.reference-admin main table th, .reference-admin main table td { border-color: var(--admin-border); }
+.reference-admin main .table-sm th, .reference-admin main .table-sm td { padding: 4.8px; font-size: 16px; }
+.reference-admin main .table-striped tbody tr:nth-of-type(odd) { background: rgb(0 0 0 / 5%); }
+.reference-admin main .table-striped tbody tr:hover { background: rgb(0 0 0 / 7.5%); }
+.reference-admin main .table-striped tbody td { background: transparent; }
+.reference-admin main .tbl-datatable1 th { padding: 10px 18px; }
+.reference-admin main .tbl-datatable1 td { padding: 8px 10px; font-size: 16px; }
+.reference-admin main input:not([type="checkbox"]):not([type="radio"]),
+.reference-admin main select {
+  min-width: 0;
+  border-color: #e4e7ea;
+  border-radius: 4px;
+  color: #5c6873;
+  font-size: 16px;
+  line-height: 24px;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.reference-admin main input:focus-visible, .reference-admin main select:focus-visible {
+  outline: 0;
+  border-color: #8ad4ee;
+  box-shadow: 0 0 0 3px rgb(32 168 216 / 20%);
+}
+.reference-admin button:focus-visible, .reference-admin a:focus-visible { outline: 2px solid var(--admin-outline); outline-offset: 2px; }
+.reference-admin .admin-footer { min-height: 50px; padding: 12px 16px; background: #f0f3f5; border-top: 1px solid var(--admin-border); }
+/* Additional exact measurements from the reference Users page. */
+.reference-admin .app-header nav a { color: #73818f; font-weight: 400; }
+.reference-admin .app-header nav a:hover { color: #536c79; }
+.reference-admin .btn-sm { padding: 4px 8px; font-size: 12.25px; line-height: 1.5; border-radius: 3.2px; }
+.reference-admin .btn-warning { background: #ffc107; border-color: #ffc107; color: #23282c; }
+.reference-admin .btn-outline-danger { background: transparent; border-color: #f86c6b; color: #f86c6b; }
+.reference-admin .btn-outline-danger:hover { background: #f86c6b; color: white; }
+.reference-admin .reference-accounts .table-header-row { background: #00b181 !important; color: #23282c !important; height: auto; }
+.reference-admin .reference-accounts .table-header-row > td { padding: 10px 18px; border-color: #c8ced3; }
+.reference-admin .reference-accounts .username-text { color: #00b181 !important; font-size: 16px; }
+.reference-admin .reference-accounts .data-row > td { font-weight: 400; }
+.reference-admin .reference-accounts .data-row > td:last-child > div { flex-wrap: wrap; gap: 4px; padding: 0; }
+.reference-admin .btn-action {
+  width: auto; height: auto; min-width: 0; min-height: 0;
+  padding: 6px 12px; margin: 0; border: 1px solid transparent;
+  font-size: 14px; font-weight: 400; line-height: 21px; border-radius: 4px;
+  box-shadow: none; transform: none;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+}
+.reference-admin .btn-action:hover, .reference-admin .btn-action:active { transform: none; box-shadow: none; }
+.reference-admin .btn-edit { background: #00b181 !important; border-color: #00b181; }
+.reference-admin .btn-ledger { background: #63c2de !important; border-color: #63c2de; color: #23282c !important; }
+.reference-admin .btn-account { background: #4dbd74 !important; border-color: #4dbd74; }
+.reference-admin .btn-inactive-status { background: transparent !important; border-color: #f86c6b !important; color: #f86c6b !important; }
+.reference-admin .reference-accounts .card-body label { font-size: 16px; font-weight: 400; }
+.reference-admin .admin-datatable-controls input { width: 233px; max-width: 100%; }
+.reference-admin .admin-page-button {
+  display: inline-block; padding: 8px 12px; font-size: 16px; line-height: 20px;
+  border: 1px solid #c8ced3; background: white; color: #20a8d8;
+}
+.reference-admin .admin-page-button:first-child { border-radius: 4px 0 0 4px; }
+.reference-admin .admin-page-button:last-child { border-radius: 0 4px 4px 0; }
+.reference-admin .admin-page-button:disabled { color: #73818f; cursor: default; }
+.reference-admin .admin-page-current { background: #20a8d8; border-color: #20a8d8; color: white; }
+@media (min-width: 992px) {
+  .reference-admin .app-header > div:first-child { gap: 0; }
+  .reference-admin .app-header > div:first-child .green-logo-text { order: 1; }
+  .reference-admin .app-header > div:first-child .navbar-toggler { order: 2; height: 33px; }
+  .reference-admin .app-header nav { margin-left: 0; gap: 0; }
+  .reference-admin .app-header nav a { padding: 0 16px; }
+  .reference-admin .sidebar-backdrop { display: none !important; }
+  .reference-admin .app-header .green-logo-text { display: inline !important; }
+  .reference-admin .app-header nav { display: flex !important; }
+  .reference-admin aside.app-sidebar { transform: none !important; visibility: visible !important; }
+  .reference-admin .admin-content { margin-left: 200px; width: calc(100% - 200px); }
+  .reference-admin .admin-content-collapsed { margin-left: 50px; width: calc(100% - 50px); }
+  .reference-admin:has(.admin-content-collapsed) aside.app-sidebar { width: 50px !important; }
+  .reference-admin .admin-sidebar-minimizer { display: block; }
+}
+@media (max-width: 991.98px) {
+  .reference-admin .app-header .green-logo-text { display: none !important; }
+  .reference-admin .app-header nav { display: none; }
+  .reference-admin .app-header.navbar { padding: 8px; }
+  .reference-admin aside.app-sidebar {
+    transform: translateX(-100%) !important;
+    visibility: hidden !important;
+    z-index: 1040 !important;
+    transition: transform .25s ease-in-out, visibility .25s ease-in-out !important;
+  }
+  .reference-admin aside.app-sidebar.sidebar-show { transform: translateX(0) !important; visibility: visible !important; }
+  .reference-admin .admin-content { margin-left: 0; width: 100%; }
+  .reference-admin .app-header .header-user-status { max-width: 40vw; overflow: hidden; text-overflow: ellipsis; }
+  .reference-admin .app-header > div:last-of-type span { font-size: 13px; }
+  .reference-admin .sidebar-backdrop { background: rgb(0 0 0 / 70%) !important; }
+  .reference-admin main table { white-space: nowrap; }
+  .reference-admin main .overflow-x-auto { max-width: 100%; overflow-x: auto; }
+  .reference-admin .report-buttons-wrapper { align-items: stretch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reference-admin *, .reference-admin *::before, .reference-admin *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
