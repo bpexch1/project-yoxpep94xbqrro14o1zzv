@@ -1,0 +1,6 @@
+project_id = "bpexch"
+
+# Existing application uses custom username login. The handler reauthenticates
+# the operator against the database; it never trusts browser role/user claims.
+[functions.manual-wallet]
+verify_jwt = false
