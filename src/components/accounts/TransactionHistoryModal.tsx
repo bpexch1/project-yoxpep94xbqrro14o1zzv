@@ -54,7 +54,7 @@ export function TransactionHistoryModal({
       month: 'short',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false, timeZone: 'Asia/Karachi'
     });
   };
 
@@ -110,7 +110,7 @@ export function TransactionHistoryModal({
                 <div className="p-1 bg-blue-50 rounded">
                   <TrendingUp className={cn("w-3.5 h-3.5", netBalance >= 0 ? "text-blue-600" : "text-[#e74c3c]")} />
                 </div>
-                <span className="text-[10px] font-bold text-[#7f8c8d] uppercase">Net P/L</span>
+                <span className="text-[10px] font-bold text-[#7f8c8d] uppercase">Net Movement</span>
               </div>
               <p className={cn("text-sm font-bold", netBalance >= 0 ? "text-blue-600" : "text-[#e74c3c]")}>
                 {formatAmount(netBalance)}
@@ -160,7 +160,8 @@ export function TransactionHistoryModal({
                           {formatDate(tx.created_at)}
                         </td>
                         <td className="px-3 py-2.5 text-[#2c3e50] border-r border-[#d5d8dc]">
-                          {tx.description || "Settlement"}
+                          {tx.description || "Manual transfer"}
+                          {tx.operator_username && <div className="text-[10px] text-gray-500">By: {tx.operator_username}</div>}
                         </td>
                         <td className="px-3 py-2.5 text-[#1a9e71] font-bold text-right border-r border-[#d5d8dc]">
                           {tx.amount > 0 ? formatAmount(tx.amount) : "—"}

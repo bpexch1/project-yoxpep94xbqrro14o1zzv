@@ -886,7 +886,7 @@ class ResilientQueryBuilder {
 }
 
 // Create real client if valid URL and Key are present
-let realClient: any = null;
+export let realClient: any = null;
 if (supabaseUrl && supabaseAnonKey && typeof supabaseUrl === "string" && supabaseUrl.startsWith("http")) {
   try {
     realClient = createClient(supabaseUrl, supabaseAnonKey);
