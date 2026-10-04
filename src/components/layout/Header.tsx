@@ -190,7 +190,7 @@ export function Header({ onToggleMobileSidebar, onToggleDesktopSidebar }: Header
                   Logged in as <span className="font-semibold text-[#23282C]">{session.username}</span>
                 </div>
                 <DropdownMenuItem
-                  onClick={() => setIsProfileModalOpen(true)}
+                  onClick={() => navigate("/admin/profile")}
                   className="text-[#23282C] hover:bg-gray-50 hover:text-[#00B181] cursor-pointer text-xs font-medium p-2 focus:bg-gray-50 focus:text-[#00B181]"
                 >
                   <User className="w-3.5 h-3.5 mr-2 opacity-70" />
@@ -209,10 +209,10 @@ export function Header({ onToggleMobileSidebar, onToggleDesktopSidebar }: Header
 
             <div className="flex items-center gap-2 whitespace-nowrap text-xs lg:text-sm shrink-0">
               <span className="text-[#23282C] font-normal whitespace-nowrap">
-                B: <span className="font-normal text-[#23282C]">{liveBalance.toLocaleString("en-IN")}</span>
+                <strong>B:</strong> <span className="font-normal text-[#23282C]">{liveBalance.toLocaleString("en-IN")}</span>
               </span>
               <span className="text-[#23282C] font-normal whitespace-nowrap">
-                Exp: <span className="font-normal text-[#23282C]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
+                <strong>Exp:</strong> <span className="font-normal text-[#23282C]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
               </span>
             </div>
           </div>

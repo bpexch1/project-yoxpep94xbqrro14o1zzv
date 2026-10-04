@@ -129,7 +129,7 @@ export default function CreateUser() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ececed] p-2 sm:p-4 pb-24 text-[#212529]" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+    <div className="reference-create min-h-screen bg-[#ececed] p-2 sm:p-4 pb-24 text-[#212529]" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
       <div className="w-full max-w-[800px] mx-auto">
         {/* Main Card Container matching video */}
         <div className="bg-white border border-[#dee2e6] rounded-[4px] shadow-xs overflow-hidden">

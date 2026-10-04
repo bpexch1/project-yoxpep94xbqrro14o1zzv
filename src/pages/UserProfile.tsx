@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/entities";
 
 export default function UserProfile() {
   const navigate = useNavigate();
+  const isAdminProfile = useLocation().pathname === "/admin/profile";
   const { toast } = useToast();
   const session = getClientSession();
 
@@ -27,6 +28,12 @@ export default function UserProfile() {
     plus3: "10000",
     plus4: "25000",
   });
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("user_custom_stakes") || "null");
+      if (saved && typeof saved === "object") setStakes(previous => Object.fromEntries(Object.entries(previous).map(([key, value]) => [key, typeof saved[key] === "string" ? saved[key] : value])) as typeof previous);
+    } catch { /* Ignore invalid local preferences. */ }
+  }, []);
 
   // Password fields
   const [newPassword, setNewPassword] = useState("");
@@ -56,9 +63,8 @@ export default function UserProfile() {
       return;
     }
     try {
-      if (session?.id) {
-        await Client.update(session.id, { password: newPassword });
-      }
+      if (!session?.id) throw new Error("Account is not available.");
+      await Client.update(session.id, { password: newPassword });
       toast({ title: "Success", description: "Password changed successfully." });
       setNewPassword("");
       setConfirmPassword("");
@@ -68,7 +74,7 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ececed] text-[#212529] p-2 sm:p-4 pb-20" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+    <div className="reference-profile min-h-screen bg-[#ececed] text-[#212529] p-2 sm:p-4 pb-20" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
       <main className="max-w-[700px] mx-auto space-y-4">
         {/* Profile Card */}
         <div className="bg-white rounded-[4px] border border-[#dee2e6] shadow-xs overflow-hidden">
@@ -178,6 +184,14 @@ export default function UserProfile() {
             </div>
           </form>
         </div>
+        {isAdminProfile && <section className="card">
+          <div className="card-header">Change Password</div>
+          <form onSubmit={handlePasswordChange} className="card-body space-y-3">
+            <label className="block">NewPassword<input aria-label="New password" type="password" autoComplete="new-password" required minLength={4} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="block w-full border px-3 py-2" /></label>
+            <label className="block">Confirm Password<input aria-label="Confirm password" type="password" autoComplete="new-password" required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="block w-full border px-3 py-2" /></label>
+            <button type="submit" className="btn btn-primary">Update</button>
+          </form>
+        </section>}
       </main>
     </div>
   );

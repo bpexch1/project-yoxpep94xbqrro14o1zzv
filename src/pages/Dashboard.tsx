@@ -192,8 +192,8 @@ export default function Dashboard() {
         </div>
 
         {/* Card Body */}
-        <div className="p-3">
-          <form onSubmit={handleSearch} className="flex items-center max-w-md">
+        <div className="p-3 reference-search-body">
+          <form onSubmit={handleSearch} className="flex items-center reference-search-form">
             <input
               type="text"
               placeholder="Username"
@@ -231,7 +231,7 @@ export default function Dashboard() {
         </div>
 
         {/* Tables Container */}
-        <div>
+        <div className="reference-highlights-body">
           {/* Soccer Table */}
           {soccerMatches.length > 0 && (
             <table className="table table-bordered table-striped table-sm mb-0">
@@ -350,10 +350,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="text-center py-4 font-bold text-[1rem] text-[rgb(35,40,44)]">
-        Welcome to Exchange.
-      </div>
     </div>
   );
 }

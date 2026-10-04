@@ -163,7 +163,7 @@ export default function CashCreditPage() {
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
 
   return (
-    <div className="min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div className="reference-cash min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <div className="max-w-md mx-auto px-2 py-3">
         
           <div className="bg-white border border-gray-300 rounded p-3 mb-3">

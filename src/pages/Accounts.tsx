@@ -146,14 +146,12 @@ export default function Accounts() {
 
   return (
     <div
-      className="min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]"
+      className="reference-users min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]"
       style={{
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
       <main className="w-full max-w-full px-2 sm:px-3 py-2 sm:py-3">
-        {/* 1. Report Type Card */}
-        <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
         <div className="card" id="Usersearchcustom">

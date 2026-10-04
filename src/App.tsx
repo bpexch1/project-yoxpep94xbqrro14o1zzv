@@ -102,6 +102,7 @@ const App = () => (
             <Route path="/api-settings" element={<AppLayout><ApiSettings /></AppLayout>} />
             <Route path="/api-diagnostics" element={<AppLayout><ApiSettings /></AppLayout>} />
             
+            <Route path="/admin/profile" element={<AppLayout><UserProfile /></AppLayout>} />
             {/* User Client Routes */}
             <Route path="/play" element={<UserDashboard />} />
             <Route path="/casino" element={<UserDashboard />} />

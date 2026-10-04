@@ -36,9 +36,9 @@ export function ClientSummaryCard({
   const columnCount = isDesktop ? 9 : 3;
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [balancesLoaded, setBalancesLoaded] = useState(false);
+  const [balancesLoaded, setBalancesLoaded] = useState(true);
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
 
   // DataTable states
   const [pageSize, setPageSize] = useState(25);
@@ -52,12 +52,11 @@ export function ClientSummaryCard({
     setIsLoadingBalances(false);
 
     // Auto-expand all client rows on load balance
-    const allIds = new Set((filteredClients || []).map((c: any) => c.id));
-    setExpandedIds(allIds);
+    setCollapsedIds(new Set());
   };
 
   const toggleExpand = (id: string) => {
-    setExpandedIds((prev) => {
+    setCollapsedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -82,7 +81,7 @@ export function ClientSummaryCard({
       case "dealer":
         return "Dealer";
       case "client":
-        return "Client";
+        return "Bettor";
       default:
         return role ? role.charAt(0).toUpperCase() + role.slice(1) : "Client";
     }
@@ -278,16 +277,16 @@ export function ClientSummaryCard({
               <tbody>
                 <tr className="bg-white font-bold">
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.credit_remaining || 750000).toLocaleString()}
+                    {(summaryData.credit_remaining ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.cash || 1000000).toLocaleString()}
+                    {(summaryData.cash ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
                     {(summaryData.pl_downline || 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
-                    {filteredClients.length || 4}
+                    {filteredClients.length}
                   </td>
                 </tr>
               </tbody>
@@ -334,7 +333,7 @@ export function ClientSummaryCard({
                     0
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
-                    {filteredClients.length || 4}
+                    {filteredClients.length}
                   </td>
                 </tr>
               </tbody>
@@ -482,7 +481,7 @@ export function ClientSummaryCard({
               ) : (
                 paginatedClients.map((client) => {
                   const display = getClientDisplay(client);
-                  const isExpanded = expandedIds.has(client.id);
+                  const isExpanded = !collapsedIds.has(client.id);
 
                   return (
                     <React.Fragment key={client.id}>
@@ -540,7 +539,7 @@ export function ClientSummaryCard({
                       {isExpanded && !isDesktop && (
                         <tr className="detail-row bg-[#FAFAFA] border-b border-[#DCDCDC]">
                           <td colSpan={columnCount} className="px-4 py-3">
-                            <ul className="space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
+                            <ul className="reference-client-details space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
                               <li>
                                 • Balance{" "}
                                 <span className="font-bold">

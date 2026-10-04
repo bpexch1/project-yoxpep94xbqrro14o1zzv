@@ -86,7 +86,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             {children}
           </div>
         </main>
-        <footer className="admin-footer">Welcome to BPEXCH</footer>
+        <footer className="admin-footer">Welcome to Exchange.</footer>
       </div>
     </div>
   );

@@ -185,3 +185,80 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Mobile reference: 321552.mp4, 720 x 1600 recording (browser chrome excluded).
+   Keep CSS pixels independent of the recording's device pixel ratio. */
+.reference-admin { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+.reference-admin .app-header.navbar { color: #73818f; }
+.reference-admin .app-header > div:last-of-type span { color: #73818f; }
+.reference-admin .admin-footer { text-align: center; font-size: 12px; font-weight: 700; }
+.reference-admin .main .container-fluid > div > main { padding: 0; max-width: none; margin: 0; }
+.reference-admin .reference-users #Usersearchcustom .card-header { display: none; }
+.reference-admin .reference-users #Usersearchcustom .card-body { min-height: 118px; }
+.reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child { flex: 0 1 290px; }
+.reference-admin .reference-dashboard > div { margin-bottom: 24px; }
+.reference-admin .reference-dashboard > div > div:first-child { padding: 4.8px 20px; }
+.reference-admin .reference-search-body { padding: 20px; min-height: 138px; }
+.reference-admin .reference-search-form { width: 218px; max-width: 100%; }
+.reference-admin .reference-search-form input { width: 126px; min-width: 0; }
+.reference-admin .reference-highlights-body { padding: 20px; }
+.reference-admin .reference-highlights-body table { table-layout: fixed; white-space: normal; }
+.reference-admin .reference-highlights-body th:last-child { width: 76px; }
+.reference-admin .reference-highlights-body td:first-child { font-weight: 400; color: var(--admin-primary); overflow-wrap: anywhere; }
+.reference-admin .reference-highlights-body td:last-child { color: #215a35; }
+.reference-admin .report-buttons-wrapper { justify-content: center; gap: 2px; max-width: 300px; margin: auto; }
+.reference-admin .report-buttons-wrapper .btn { padding: 6px 10px; font-size: 12px; }
+.reference-admin .report-buttons-wrapper .btn-report-active { background: var(--admin-primary); border-color: var(--admin-primary); }
+.reference-admin .reference-accounts .username-text { color: #23282c !important; font-weight: 700; }
+.reference-admin .reference-accounts .detail-row > td { padding: 10px 35px 20px; }
+.reference-admin .reference-client-details { font-size: 16px; line-height: 24px; margin: 0; }
+.reference-admin .reference-client-details li { margin: 0; }
+.reference-admin .reference-client-details span { font-weight: 400; color: inherit !important; }
+.reference-admin .reference-accounts .detail-row > td > div { gap: 5px; }
+.reference-admin .reference-accounts .detail-row .btn-action { font-weight: 700; }
+.reference-admin .reference-accounts .data-row:nth-of-type(4n) { background: #f1f1f1; }
+.reference-admin .reference-accounts .admin-page-current { background: var(--admin-primary); border-color: var(--admin-primary); }
+.reference-admin .reference-edit, .reference-admin .reference-cash { background: transparent !important; font-family: inherit !important; min-height: 0 !important; }
+.reference-admin .reference-edit > div, .reference-admin .reference-cash > div { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+.reference-admin .reference-edit > div > div { box-shadow: none !important; margin-bottom: 24px !important; }
+.reference-admin .reference-edit form { padding: 20px !important; }
+.reference-admin .reference-edit form > div { gap: 20px !important; }
+.reference-admin .reference-cash > div > div { box-shadow: none; }
+.reference-admin .reference-cash input { height: 35px; }
+.reference-admin .reference-ledger .ledger-controls { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 12px; }
+.reference-admin .reference-ledger .ledger-exports { display: flex; width: 100%; }
+.reference-admin .reference-ledger .ledger-exports button { flex: 1; background: #90999e; color: white; padding: 6px; font-size: 14px; }
+.reference-admin .reference-ledger .ledger-exports button:disabled { opacity: .5; cursor: not-allowed; }
+.reference-admin .reference-ledger .ledger-pagination { display: flex; justify-content: center; margin-top: 8px; }
+.reference-admin .reference-ledger .ledger-meta { padding: 8px; background: #fafafa; }
+.reference-admin .reference-ledger .ledger-meta strong { display: inline-block; width: 85px; }
+.reference-admin .reference-ledger input[type="datetime-local"] { width: 100%; padding: 6px 10px; border: 1px solid #e4e7ea; }
+@media (max-width: 991.98px) {
+  .reference-admin .app-header > div:last-of-type span { font-size: 16px; }
+  .reference-admin .app-header .header-user-status { max-width: none; }
+  .reference-admin .app-header > div:last-of-type { min-width: 0; }
+  .reference-admin .reference-accounts .admin-datatable-controls { justify-content: center; margin: 40px 0 8px; }
+  .reference-admin .reference-accounts .admin-datatable-controls > label:first-child { display: none; }
+  .reference-admin .reference-accounts .admin-datatable-controls > label:last-child { flex-direction: column; gap: 0; }
+  .reference-admin .reference-accounts .admin-datatable-controls input { height: 29px; }
+}
+@media (max-width: 359px) {
+  .reference-admin .app-header > div:last-of-type span { font-size: 13px; }
+  .reference-admin .app-header .navbar-toggler { min-width: 34px; width: 34px; }
+  .reference-admin .card-body, .reference-admin .reference-highlights-body { padding: 14px; }
+}
+.reference-admin .reference-create, .reference-admin .reference-profile { padding: 0; background: transparent; min-height: 0; font-family: inherit !important; }
+.reference-admin .reference-create > div, .reference-admin .reference-profile > main { max-width: none; }
+.reference-admin .reference-create h1 { font-size: 16px; }
+.reference-admin .reference-profile .bg-\[\#d4edda\] { background: white; border: 0; padding: 0; color: #23282c; font-weight: 700; }
+.reference-admin .reference-betlock { background: white; min-height: 0; font-family: inherit !important; }
+.reference-admin .reference-betlock > div > div { max-width: none !important; border: 0 !important; }
+.reference-admin .reference-betlock > div > div > div { border: 0 !important; }
+.reference-admin .reference-betlock > div > div > div > div > div:first-child { background: white !important; border: 0 !important; padding-bottom: 0 !important; }
+.reference-admin .reference-betlock input { accent-color: #087ff5 !important; }
+@media print {
+  .reference-admin .app-header, .reference-admin .app-sidebar, .reference-admin .admin-footer,
+  .reference-ledger > section:first-child, .reference-ledger .ledger-controls, .reference-ledger .ledger-pagination { display: none !important; }
+  .reference-admin { padding: 0; }
+  .reference-admin .admin-content { margin: 0; width: 100%; }
+}
