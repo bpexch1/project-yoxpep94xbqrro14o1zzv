@@ -193,23 +193,24 @@
 .reference-admin .app-header > div:last-of-type span { color: #73818f; }
 .reference-admin .admin-footer { text-align: center; font-size: 12px; font-weight: 700; }
 .reference-admin .main .container-fluid > div > main { padding: 0; max-width: none; margin: 0; }
-.reference-admin .reference-users #Usersearchcustom .card-header { display: none; }
-.reference-admin .reference-users #Usersearchcustom .card-body { min-height: 118px; }
+
+.reference-admin .reference-users #Usersearchcustom .card-body { min-height: 0; }
 .reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child { flex: 0 1 290px; }
 .reference-admin .reference-dashboard > div { margin-bottom: 24px; }
 .reference-admin .reference-dashboard > div > div:first-child { padding: 4.8px 20px; }
-.reference-admin .reference-search-body { padding: 20px; min-height: 138px; }
-.reference-admin .reference-search-form { width: 218px; max-width: 100%; }
-.reference-admin .reference-search-form input { width: 126px; min-width: 0; }
+.reference-admin .reference-search-body { padding: 20px; min-height: 86px; }
+.reference-admin .reference-search-form { width: 360px; max-width: 100%; }
+.reference-admin .reference-search-form input { flex: 1; width: 0; min-width: 0; }
 .reference-admin .reference-highlights-body { padding: 20px; }
 .reference-admin .reference-highlights-body table { table-layout: fixed; white-space: normal; }
 .reference-admin .reference-highlights-body th:last-child { width: 76px; }
 .reference-admin .reference-highlights-body td:first-child { font-weight: 400; color: var(--admin-primary); overflow-wrap: anywhere; }
 .reference-admin .reference-highlights-body td:last-child { color: #215a35; }
-.reference-admin .report-buttons-wrapper { justify-content: center; gap: 2px; max-width: 300px; margin: auto; }
-.reference-admin .report-buttons-wrapper .btn { padding: 6px 10px; font-size: 12px; }
+.reference-admin .report-buttons-wrapper { justify-content: flex-start; gap: 6px 8px; max-width: none; margin: 0; }
+.reference-admin .report-buttons-wrapper .btn { padding: 6px 12px; font-size: 14px; }
 .reference-admin .report-buttons-wrapper .btn-report-active { background: var(--admin-primary); border-color: var(--admin-primary); }
-.reference-admin .reference-accounts .username-text { color: #23282c !important; font-weight: 700; }
+.reference-admin .reference-accounts .username-bettor { color: #23282c !important; font-weight: 700; }
+.reference-admin .reference-accounts .username-staff { color: #00b181 !important; font-weight: 700; }
 .reference-admin .reference-accounts .detail-row > td { padding: 10px 35px 20px; }
 .reference-admin .reference-client-details { font-size: 16px; line-height: 24px; margin: 0; }
 .reference-admin .reference-client-details li { margin: 0; }
@@ -261,4 +262,29 @@
   .reference-ledger > section:first-child, .reference-ledger .ledger-controls, .reference-ledger .ledger-pagination { display: none !important; }
   .reference-admin { padding: 0; }
   .reference-admin .admin-content { margin: 0; width: 100%; }
+}
+
+/* Live reference corrections: 4 October 2026. */
+.reference-admin.reference-standalone { padding-top: 0; }
+.reference-admin .reference-ledger .admin-page-current { background: #00b181; border-color: #00b181; }
+.reference-admin .ledger-desktop-cell { display: none; }
+@media (min-width: 992px) {
+  .reference-admin .reference-ledger .ledger-filter { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .reference-admin .reference-ledger input[type="datetime-local"] { width: 260px; }
+  .reference-admin .reference-ledger .ledger-filter > div { margin: 0; }
+  .reference-admin .reference-ledger .ledger-controls { flex-direction: row; justify-content: space-between; }
+  .reference-admin .reference-ledger .ledger-exports { width: auto; }
+  .reference-admin .reference-ledger .ledger-exports button { padding: 6px 12px; }
+  .reference-admin .ledger-desktop-cell { display: table-cell; }
+  .reference-admin .ledger-mobile-row { display: none; }
+  .reference-admin .reference-ledger .ledger-pagination { justify-content: flex-end; }
+  .reference-admin .reference-cash .cash-form-body { width: 75%; padding: 20px; }
+  .reference-admin .cash-form-body > div:not(.cash-form-footer) { display: grid; grid-template-columns: 25% minmax(0, 1fr); align-items: center; }
+  .reference-admin .cash-form-footer { justify-content: flex-start; }
+}
+@media (max-width: 991.98px) {
+  .reference-admin .reference-search-body { min-height: 138px; }
+  .reference-admin .reference-search-form { width: 218px; }
+  .reference-admin .report-buttons-wrapper { justify-content: center; gap: 2px; max-width: 300px; margin: auto; }
+  .reference-admin .report-buttons-wrapper .btn { padding: 6px 10px; font-size: 12px; }
 }

@@ -78,7 +78,7 @@ export default function LedgerPage() {
     <div className="reference-ledger">
       <section className="card">
         <div className="card-header"><Filter size={16} /> Report Filter</div>
-        <form className="card-body" onSubmit={event => {
+        <form className="card-body ledger-filter" onSubmit={event => {
           event.preventDefault();
           if (!fromDate || !toDate || new Date(fromDate) > new Date(toDate)) { setFilterError("Choose a valid start and end date."); return; }
           setFilterError(""); setRange({ from: fromDate, to: toDate }); setPage(1);
@@ -94,14 +94,14 @@ export default function LedgerPage() {
         <div className="card-header">{username} - Account Ledger</div>
         <div className="card-body">
           <div className="ledger-controls">
-            <label><select aria-label="Entries per page" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[10,25,50,100].map(size => <option key={size}>{size}</option>)}</select> entries per page</label>
+            <label><select aria-label="Entries per page" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[100,250,500,1000].map(size => <option key={size}>{size}</option>)}</select> entries per page</label>
             <div className="ledger-exports"><button onClick={() => window.print()}>Print</button><button disabled={!entries.length} onClick={() => void exportFile("excel")}>Excel</button><button disabled={!entries.length} onClick={() => void exportFile("pdf")}>PDF</button></div>
             <label className="text-center">Search:<input type="search" className="block border px-2 py-1" value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} /></label>
           </div>
           {exportError && <p role="alert">{exportError}</p>}
           {isError ? <p role="alert">Unable to load ledger. Please try again.</p> : authorized !== true || isLoading ? <p role="status">Loading ledger…</p> : <table className="table table-bordered table-sm mb-0">
-            <thead><tr><th>#</th><th>Date</th><th>Description</th></tr></thead>
-            <tbody>{visible.map((row, index) => <Fragment key={row.id}><tr><td>{offset + index + 1}</td><td className="whitespace-normal">{row.date}</td><td className="whitespace-normal text-[#00b181]">{row.description}</td></tr><tr><td colSpan={3}><div className="ledger-meta"><div><strong>Amount</strong>{row.amount.toLocaleString()}</div><div><strong>Balance</strong>{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</div></div></td></tr></Fragment>)}{!visible.length && <tr><td colSpan={3}>No transactions found</td></tr>}</tbody>
+            <thead><tr><th>#</th><th>Date</th><th>Description</th><th className="ledger-desktop-cell">Amount</th><th className="ledger-desktop-cell">Balance</th></tr></thead>
+            <tbody>{visible.map((row, index) => <Fragment key={row.id}><tr><td>{offset + index + 1}</td><td className="whitespace-normal">{row.date}</td><td className="whitespace-normal text-[#00b181]">{row.description}</td><td className="ledger-desktop-cell">{row.amount.toLocaleString()}</td><td className="ledger-desktop-cell">{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</td></tr><tr className="ledger-mobile-row"><td colSpan={3}><div className="ledger-meta"><div><strong>Amount</strong>{row.amount.toLocaleString()}</div><div><strong>Balance</strong>{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</div></div></td></tr></Fragment>)}{!visible.length && <tr><td colSpan={5}>No transactions found</td></tr>}</tbody>
           </table>}
           <p className="text-center mt-3">Showing {entries.length ? offset + 1 : 0} to {Math.min(offset + pageSize, entries.length)} of {entries.length} entries</p>
           <div className="ledger-pagination"><button aria-label="First page" className="admin-page-button" disabled={currentPage === 1} onClick={() => setPage(1)}>«</button><button aria-label="Previous page" className="admin-page-button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>‹</button><span className="admin-page-button admin-page-current">{currentPage}</span><button aria-label="Next page" className="admin-page-button" disabled={currentPage === pages} onClick={() => setPage(currentPage + 1)}>›</button><button aria-label="Last page" className="admin-page-button" disabled={currentPage === pages} onClick={() => setPage(pages)}>»</button></div>

@@ -15,7 +15,7 @@ export default function CashCreditPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
-  
+
   const [operatorPassword, setOperatorPassword] = useState("");
   const inFlight = useRef(false);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
@@ -24,7 +24,7 @@ export default function CashCreditPage() {
   const [depositAmount, setDepositAmount] = useState('0');
   const [withdrawDesc, setWithdrawDesc] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('0');
-  
+
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
   const [isSubmittingWithdraw, setIsSubmittingWithdraw] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
@@ -165,20 +165,20 @@ export default function CashCreditPage() {
   return (
     <div className="reference-cash min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <div className="max-w-md mx-auto px-2 py-3">
-        
+
           <div className="bg-white border border-gray-300 rounded p-3 mb-3">
             <label className="block text-sm font-semibold mb-1" htmlFor="wallet-operator-password">Your administrator password</label>
             <input id="wallet-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Confirm your identity" />
           </div>
         {/* Top 2 Flat Action Buttons: Cash & Credit */}
         <div className="flex gap-2.5 mb-3">
-          <button 
+          <button
             type="button"
             onClick={() => setActiveTab('cash')}
             className={cn(
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
-              activeTab === 'cash' 
-                ? "bg-[#0088cc] text-white border-[#0088cc]" 
+              activeTab === 'cash'
+                ? "bg-[#007bff] text-white border-[#007bff]"
                 : "bg-white text-[#009678] border-[#009678] hover:bg-gray-50"
             )}
           >
@@ -189,21 +189,21 @@ export default function CashCreditPage() {
             onClick={() => setActiveTab('credit')}
             className={cn(
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
-              activeTab === 'credit' 
-                ? "bg-[#0088cc] text-white border-[#0088cc]" 
+              activeTab === 'credit'
+                ? "bg-[#007bff] text-white border-[#007bff]"
                 : "bg-white text-[#009678] border-[#009678] hover:bg-gray-50"
             )}
           >
             Credit
           </button>
         </div>
-        
+
         {/* Username Header & 3-Column Info Table Box */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-3 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="font-bold text-[1.1rem] text-[#00B496] mb-2.5">
+          <div className="font-bold text-[1.1rem] text-[#23282c] mb-2.5">
             {client.username}
           </div>
-          
+
           {activeTab === 'cash' ? (
             /* Cash Tab Header Table: Credit | Balance | Max Withdraw */
             <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
@@ -254,16 +254,16 @@ export default function CashCreditPage() {
             </table>
           )}
         </div>
-        
+
         {/* DEPOSIT FORM BOX (Dark Teal Header #009678) */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#009678] px-3.5 py-2 text-[0.875rem] text-white font-bold">
-            {activeTab === 'cash' 
-              ? `Deposit Cash in ${client.username} account` 
+            {activeTab === 'cash'
+              ? `Deposit Cash in ${client.username} account`
               : `Deposit Credit in ${client.username} Account`}
           </div>
-          
-          <div className="p-3.5">
+
+          <div className="cash-form-body p-3.5">
             {/* Description */}
             <div className="mb-3">
               <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
@@ -276,7 +276,7 @@ export default function CashCreditPage() {
                 className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] text-[rgb(35,40,44)] outline-none focus:border-[#009678]"
               />
             </div>
-            
+
             {/* Amount */}
             <div className="mb-3.5">
               <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
@@ -295,9 +295,9 @@ export default function CashCreditPage() {
                 />
               </div>
             </div>
-            
+
             {/* Submit */}
-            <div className="flex justify-end">
+            <div className="cash-form-footer flex justify-end">
               <button
                 type="button"
                 onClick={handleDeposit}
@@ -313,12 +313,12 @@ export default function CashCreditPage() {
         {/* WITHDRAW FORM BOX (Red Header) */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#dc3545] px-3.5 py-2 text-[0.875rem] text-white font-bold">
-            {activeTab === 'cash' 
-              ? `Withdraw cash from ${client.username} account` 
+            {activeTab === 'cash'
+              ? `Withdraw cash from ${client.username} account`
               : `Withdraw Credit from ${client.username}`}
           </div>
-          
-          <div className="p-3.5">
+
+          <div className="cash-form-body p-3.5">
             {/* Description */}
             <div className="mb-3">
               <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
@@ -331,7 +331,7 @@ export default function CashCreditPage() {
                 className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] text-[rgb(35,40,44)] outline-none focus:border-[#00b98a]"
               />
             </div>
-            
+
             {/* Amount */}
             <div className="mb-3.5">
               <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
@@ -350,9 +350,9 @@ export default function CashCreditPage() {
                 />
               </div>
             </div>
-            
+
             {/* Submit */}
-            <div className="flex justify-end">
+            <div className="cash-form-footer flex justify-end">
               <button
                 type="button"
                 onClick={handleWithdraw}

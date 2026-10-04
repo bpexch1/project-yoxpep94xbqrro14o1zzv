@@ -57,7 +57,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  
+  const standalone = /^\/accounts\/(cash-credit|ledger)(\/|$)/.test(location.pathname);
+  if (standalone) return (
+    <div className="reference-admin reference-standalone min-h-screen">
+      <main className="main"><div className="container-fluid">{children}</div></main>
+    </div>
+  );
+
   return (
     <div className="app app-dashboard app-root reference-admin min-h-screen bg-[#E4E5E6] text-[#23282C] overflow-x-hidden" data-panel-role={session.role.toLowerCase()} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       {/* Header: fixed at top 55px */}

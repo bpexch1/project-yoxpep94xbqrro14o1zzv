@@ -36,9 +36,9 @@ export function ClientSummaryCard({
   const columnCount = isDesktop ? 9 : 3;
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [balancesLoaded, setBalancesLoaded] = useState(true);
+  const [balancesLoaded, setBalancesLoaded] = useState(false);
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
-  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // DataTable states
   const [pageSize, setPageSize] = useState(25);
@@ -47,16 +47,19 @@ export function ClientSummaryCard({
 
   const handleLoadBalance = async () => {
     setIsLoadingBalances(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setBalancesLoaded(true);
-    setIsLoadingBalances(false);
-
-    // Auto-expand all client rows on load balance
-    setCollapsedIds(new Set());
+    try {
+      await onRefresh?.();
+      setBalancesLoaded(true);
+      setExpandedIds(new Set(clients.map(client => client.id)));
+    } catch {
+      toast({ title: "Unable to load balances", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setIsLoadingBalances(false);
+    }
   };
 
   const toggleExpand = (id: string) => {
-    setCollapsedIds((prev) => {
+    setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -481,7 +484,8 @@ export function ClientSummaryCard({
               ) : (
                 paginatedClients.map((client) => {
                   const display = getClientDisplay(client);
-                  const isExpanded = !collapsedIds.has(client.id);
+                  const isExpanded = expandedIds.has(client.id);
+                  const isBettor = ["client", "user", "bettor"].includes(client.role?.toLowerCase());
 
                   return (
                     <React.Fragment key={client.id}>
@@ -492,15 +496,11 @@ export function ClientSummaryCard({
                       >
                         <td className="px-3.5 py-2.5 border-r border-[#DCDCDC]">
                           <div className="flex items-center gap-1.5">
-                            <span
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/accounts/view/${client.username}`);
-                              }}
-                              className="username-text text-[#00B496] hover:text-[#009678] font-bold text-[14px] hover:underline cursor-pointer"
-                            >
-                              {client.username}
-                            </span>
+                            {isBettor ? <span className="username-text username-bettor">{client.username}</span> : <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/accounts/view/${client.username}`); }}
+                              className="username-text username-staff hover:underline"
+                            >{client.username}</button>}
                             {!balancesLoaded && !isDesktop && (
                               <button
                                 onClick={(e) => {

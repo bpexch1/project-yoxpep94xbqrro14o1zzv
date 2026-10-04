@@ -74,10 +74,6 @@ export default function Accounts() {
   });
   const adminRecord = adminOwnData?.[0];
 
-  const clientsKey = Array.isArray(clients)
-    ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join("|")
-    : "empty";
-
   const suggestions = (Array.isArray(clients) ? clients : [])
     .filter(
       (c) =>
@@ -152,6 +148,7 @@ export default function Accounts() {
       }}
     >
       <main className="w-full max-w-full px-2 sm:px-3 py-2 sm:py-3">
+        <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
         <div className="card" id="Usersearchcustom">
@@ -253,12 +250,11 @@ export default function Accounts() {
 
         {/* 3. Clients table/list */}
         <ClientSummaryCard
-          key={clientsKey}
           clients={clients || []}
           isLoading={isLoading}
           username={session?.username || "Admin"}
           searchFilter={searchQuery}
-          onRefresh={refetch}
+          onRefresh={async () => { await refetch({ throwOnError: true }); }}
           adminRecord={adminRecord}
         />
 
