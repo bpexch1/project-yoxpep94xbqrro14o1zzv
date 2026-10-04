@@ -74,10 +74,6 @@ export default function Accounts() {
   });
   const adminRecord = adminOwnData?.[0];
 
-  const clientsKey = Array.isArray(clients)
-    ? clients.map((c: any) => `${c.id}:${c.updated_at}`).join("|")
-    : "empty";
-
   const suggestions = (Array.isArray(clients) ? clients : [])
     .filter(
       (c) =>
@@ -146,13 +142,12 @@ export default function Accounts() {
 
   return (
     <div
-      className="min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]"
+      className="reference-users min-h-screen bg-[rgb(228,229,230)] text-[rgb(35,40,44)]"
       style={{
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
       <main className="w-full max-w-full px-2 sm:px-3 py-2 sm:py-3">
-        {/* 1. Report Type Card */}
         <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 2. Search-Users Card */}
@@ -255,12 +250,11 @@ export default function Accounts() {
 
         {/* 3. Clients table/list */}
         <ClientSummaryCard
-          key={clientsKey}
           clients={clients || []}
           isLoading={isLoading}
           username={session?.username || "Admin"}
           searchFilter={searchQuery}
-          onRefresh={refetch}
+          onRefresh={async () => { await refetch({ throwOnError: true }); }}
           adminRecord={adminRecord}
         />
 

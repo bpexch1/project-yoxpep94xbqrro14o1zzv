@@ -320,14 +320,15 @@ export default function UserDashboard() {
       await Client.update(clientData.id, {
         cash: updatedCash,
       });
+      return { stake: numericStake, selection: activeBet.selection };
     },
-    onSuccess: () => {
+    onSuccess: (receipt) => {
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ["client-data", session?.username] });
       queryClient.invalidateQueries({ queryKey: ["bets"] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Stake: ₹${activeBet?.stake || ""} on ${activeBet?.selection || ""}`,
+        description: `Stake: ₹${receipt.stake} on ${receipt.selection}`,
       });
     },
     onError: (error: any) => {

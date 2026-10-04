@@ -186,7 +186,7 @@ export default function EditClientPage() {
   const numericId = client.id?.replace?.(/\D/g, "")?.slice?.(0, 7) || "8703594";
 
   return (
-    <div style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529", paddingBottom: 40 }}>
+    <div className="reference-edit" style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529", paddingBottom: 40 }}>
       <div style={{ maxWidth: 500, margin: "0 auto", padding: "8px 8px" }}>
         
         {/* Top Tab Bar & Large Username on Right */}
@@ -211,8 +211,8 @@ export default function EditClientPage() {
               type="button"
               onClick={() => navigate(`/accounts/ledger/${username}`)}
               style={{
-                background: "#ffffff",
-                color: "#00b181",
+                background: "#00b181",
+                color: "#ffffff",
                 border: "1px solid #00b181",
                 borderRadius: 3,
                 padding: "5px 12px",
@@ -227,8 +227,8 @@ export default function EditClientPage() {
               type="button"
               onClick={() => navigate(`/reports/book-detail`)}
               style={{
-                background: "#ffffff",
-                color: "#00b181",
+                background: "#00b181",
+                color: "#ffffff",
                 border: "1px solid #00b181",
                 borderRadius: 3,
                 padding: "5px 12px",
@@ -243,8 +243,8 @@ export default function EditClientPage() {
               type="button"
               onClick={() => navigate(`/reports/daily-pl`)}
               style={{
-                background: "#ffffff",
-                color: "#00b181",
+                background: "#00b181",
+                color: "#ffffff",
                 border: "1px solid #00b181",
                 borderRadius: 3,
                 padding: "5px 12px",
@@ -262,8 +262,8 @@ export default function EditClientPage() {
               type="button"
               onClick={() => navigate(`/current-position`)}
               style={{
-                background: "#ffffff",
-                color: "#00b181",
+                background: "#00b181",
+                color: "#ffffff",
                 border: "1px solid #00b181",
                 borderRadius: 3,
                 padding: "5px 12px",
@@ -283,8 +283,8 @@ export default function EditClientPage() {
 
         {/* 1. EDIT CLIENT FORM CARD */}
         <div style={{ background: "#ffffff", border: "1px solid #dee2e6", borderRadius: 4, overflow: "hidden", marginBottom: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ background: "#254465", borderBottom: "1px solid #1e3650", padding: "8px 14px", fontSize: 13.5, color: "#ffffff", fontWeight: 700 }}>
-            Edit Client - <strong style={{ color: "#ffffff" }}>{client.username}</strong>
+          <div style={{ background: "#f0f3f5", borderBottom: "1px solid #c8ced3", padding: "4.8px 20px", fontSize: 14, color: "#23282c", fontWeight: 700 }}>
+            Edit Client - <strong>{client.username}</strong>
           </div>
 
           <form onSubmit={handleSubmit} style={{ padding: "14px 16px" }}>

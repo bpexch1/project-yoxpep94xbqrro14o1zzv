@@ -47,13 +47,15 @@ export function ClientSummaryCard({
 
   const handleLoadBalance = async () => {
     setIsLoadingBalances(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setBalancesLoaded(true);
-    setIsLoadingBalances(false);
-
-    // Auto-expand all client rows on load balance
-    const allIds = new Set((filteredClients || []).map((c: any) => c.id));
-    setExpandedIds(allIds);
+    try {
+      await onRefresh?.();
+      setBalancesLoaded(true);
+      setExpandedIds(new Set(clients.map(client => client.id)));
+    } catch {
+      toast({ title: "Unable to load balances", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setIsLoadingBalances(false);
+    }
   };
 
   const toggleExpand = (id: string) => {
@@ -82,7 +84,7 @@ export function ClientSummaryCard({
       case "dealer":
         return "Dealer";
       case "client":
-        return "Client";
+        return "Bettor";
       default:
         return role ? role.charAt(0).toUpperCase() + role.slice(1) : "Client";
     }
@@ -278,16 +280,16 @@ export function ClientSummaryCard({
               <tbody>
                 <tr className="bg-white font-bold">
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.credit_remaining || 750000).toLocaleString()}
+                    {(summaryData.credit_remaining ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.cash || 1000000).toLocaleString()}
+                    {(summaryData.cash ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
                     {(summaryData.pl_downline || 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
-                    {filteredClients.length || 4}
+                    {filteredClients.length}
                   </td>
                 </tr>
               </tbody>
@@ -334,7 +336,7 @@ export function ClientSummaryCard({
                     0
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
-                    {filteredClients.length || 4}
+                    {filteredClients.length}
                   </td>
                 </tr>
               </tbody>
@@ -483,6 +485,7 @@ export function ClientSummaryCard({
                 paginatedClients.map((client) => {
                   const display = getClientDisplay(client);
                   const isExpanded = expandedIds.has(client.id);
+                  const isBettor = ["client", "user", "bettor"].includes(client.role?.toLowerCase());
 
                   return (
                     <React.Fragment key={client.id}>
@@ -493,15 +496,11 @@ export function ClientSummaryCard({
                       >
                         <td className="px-3.5 py-2.5 border-r border-[#DCDCDC]">
                           <div className="flex items-center gap-1.5">
-                            <span
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/accounts/view/${client.username}`);
-                              }}
-                              className="username-text text-[#00B496] hover:text-[#009678] font-bold text-[14px] hover:underline cursor-pointer"
-                            >
-                              {client.username}
-                            </span>
+                            {isBettor ? <span className="username-text username-bettor">{client.username}</span> : <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/accounts/view/${client.username}`); }}
+                              className="username-text username-staff hover:underline"
+                            >{client.username}</button>}
                             {!balancesLoaded && !isDesktop && (
                               <button
                                 onClick={(e) => {
@@ -540,7 +539,7 @@ export function ClientSummaryCard({
                       {isExpanded && !isDesktop && (
                         <tr className="detail-row bg-[#FAFAFA] border-b border-[#DCDCDC]">
                           <td colSpan={columnCount} className="px-4 py-3">
-                            <ul className="space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
+                            <ul className="reference-client-details space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
                               <li>
                                 • Balance{" "}
                                 <span className="font-bold">

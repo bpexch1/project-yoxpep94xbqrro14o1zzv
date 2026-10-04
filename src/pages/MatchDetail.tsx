@@ -281,7 +281,7 @@ export default function MatchDetail() {
       if (!activeBet || !session || !clientData) return;
       if (stake > clientBalance) throw new Error("Insufficient balance");
 
-      // Validate odds against MongoDB live engine
+      // Require explicit odds validation; an acknowledgement is not validation.
       const side = activeBet.selection === match.team1 
         ? (activeBet.betType === 'back' ? 'teamA_back' : 'teamA_lay')
         : (activeBet.betType === 'back' ? 'teamB_back' : 'teamB_lay');
@@ -293,8 +293,11 @@ export default function MatchDetail() {
         side,
       });
 
-      if (validation?.valid === false) {
-        throw new Error(validation.reason || 'Odds have changed. Please refresh.');
+      if (!validation || !("valid" in validation) || validation.valid !== true) {
+        const reason = validation && "reason" in validation && typeof validation.reason === "string"
+          ? validation.reason
+          : 'Odds could not be verified. Please refresh and try again.';
+        throw new Error(reason);
       }
 
       const potentialWin = (stake * activeBet.odds) - stake;

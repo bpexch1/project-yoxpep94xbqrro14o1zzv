@@ -1,4 +1,5 @@
 import React from "react";
+import { Filter } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface ReportTypeTabsProps {
@@ -31,7 +32,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <div className="card">
       {/* Inspected Card Header */}
       <div className="card-header">
-        <i className="fa fa-filter text-[13px]"></i>
+        <Filter size={16} aria-hidden="true" />
         <strong>Report Type</strong>
       </div>
 

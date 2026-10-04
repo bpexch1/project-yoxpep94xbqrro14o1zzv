@@ -1,342 +1,112 @@
-import { useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Fragment, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Transaction, Client } from "@/entities";
-import { Loader2, Calendar, FileText, Printer } from "lucide-react";
+import { Transaction } from "@/entities";
+import { Filter } from "lucide-react";
 import { getClientSession } from "@/hooks/useClientAuth";
+import { verifyInHierarchy } from "@/lib/hierarchyCheck";
+
+function todayAt(time: string) {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${time}`;
+}
+const columns = ["Date", "Description", "Amount", "Balance"];
 
 export default function LedgerPage() {
-  const { username } = useParams();
-  const navigate = useNavigate();
+  const params = useParams();
   const session = getClientSession();
-
-  const [fromDate, setFromDate] = useState("09/23/2026 12:00 AM");
-  const [toDate, setToDate] = useState("09/23/2026 11:59 PM");
-  const [filterType, setFilterType] = useState<"all" | "parent" | "settlements">("all");
+  const username = params.username || session?.username;
+  const [fromDate, setFromDate] = useState(() => todayAt("00:00"));
+  const [toDate, setToDate] = useState(() => todayAt("23:59"));
+  const [range, setRange] = useState(() => ({ from: todayAt("00:00"), to: todayAt("23:59") }));
+  const [filterError, setFilterError] = useState("");
+  const [exportError, setExportError] = useState("");
   const [pageSize, setPageSize] = useState(100);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const { data: clients } = useQuery({
-    queryKey: ["client", username],
-    queryFn: () => Client.filter({ username }),
-    enabled: !!username,
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const { data: authorized, isError: authorizationError } = useQuery({
+    queryKey: ["ledger-access", username, session?.username, session?.role],
+    queryFn: () => verifyInHierarchy(username!, session!.username, session!.role),
+    enabled: !!username && !!session,
   });
-  const client = clients?.[0];
-
-  const { data: transactions = [], isLoading } = useQuery({
+  const { data: transactions, isLoading, isError } = useQuery({
     queryKey: ["transactions", username],
-    queryFn: () => Transaction.filter({ client_username: username }, "created_at", 200),
-    enabled: !!username,
-    refetchInterval: 3000,
+    queryFn: () => Transaction.filter({ client_username: username }, "created_at"),
+    enabled: authorized === true,
+    refetchInterval: 15000,
   });
-
-  // Synthesize transactions list starting with Opening Balance
-  const ledgerEntries = useMemo(() => {
-    let runningBalance = 0;
-    const entries: any[] = [];
-
-    // 1. Initial Opening Balance entry
-    entries.push({
-      id: "opening",
-      date: new Date(Date.now() - 3600 * 1000 * 24),
-      dateStr: "9/23/2026 12:00:00 am",
-      description: "Opening Balance",
-      amount: 0,
-      balance: 0,
-    });
-
-    // 2. Transactions in chronological order
-    const sortedTx = [...transactions].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-
-    sortedTx.forEach((tx) => {
-      const amt = Number(tx.amount) || 0;
-      runningBalance += amt;
-      const d = new Date(tx.created_at);
-      const hours = d.getHours();
-      const minutes = d.getMinutes().toString().padStart(2, "0");
-      const seconds = d.getSeconds().toString().padStart(2, "0");
-      const ampm = hours >= 12 ? "pm" : "am";
-      const h12 = hours % 12 || 12;
-      const dateFormatted = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()} ${h12}:${minutes}:${seconds} ${ampm}`;
-
-      const desc = tx.description || (tx.type === "credit" ? `Credit Issued to ${username} (Credit)` : `Cash deposit in ${username} (Cash)`);
-
-      entries.push({
-        id: tx.id,
-        date: d,
-        dateStr: dateFormatted,
-        description: desc,
-        amount: amt,
-        balance: tx.after_balance !== undefined ? tx.after_balance : runningBalance,
-      });
-    });
-
-    return entries;
-  }, [transactions, username]);
-
-  const filteredEntries = useMemo(() => {
-    if (!searchQuery.trim()) return ledgerEntries;
-    const q = searchQuery.toLowerCase();
-    return ledgerEntries.filter(
-      (e) =>
-        e.description.toLowerCase().includes(q) ||
-        e.dateStr.toLowerCase().includes(q) ||
-        String(e.amount).includes(q) ||
-        String(e.balance).includes(q)
-    );
-  }, [ledgerEntries, searchQuery]);
-
-  const totalPages = Math.ceil(filteredEntries.length / pageSize) || 1;
-  const paginatedEntries = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredEntries.slice(start, start + pageSize);
-  }, [filteredEntries, currentPage, pageSize]);
-
+  const entries = useMemo(() => {
+    const start = new Date(range.from).getTime();
+    const end = new Date(range.to).getTime() + 59999;
+    return (transactions || []).filter(tx => {
+      const date = new Date(tx.created_at).getTime();
+      return date >= start && date <= end;
+    }).map(tx => ({
+      id: tx.id,
+      date: new Date(tx.created_at).toLocaleString(),
+      description: tx.description || tx.type || "Transaction",
+      amount: Number(tx.amount) || 0,
+      // Only display the recorded balance; never synthesize financial history.
+      balance: tx.after_balance == null ? "—" : Number(tx.after_balance),
+    })).filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
+  }, [transactions, range, search]);
+  const pages = Math.max(1, Math.ceil(entries.length / pageSize));
+  const currentPage = Math.min(page, pages);
+  const offset = (currentPage - 1) * pageSize;
+  const visible = entries.slice(offset, offset + pageSize);
+  const exportRows = entries.map(row => [row.date, row.description, row.amount, row.balance]);
+  const exportFile = async (kind: "excel" | "pdf") => {
+    setExportError("");
+    try {
+      const filename = `${username}-ledger`;
+      if (kind === "excel") {
+        const XLSX = await import("xlsx");
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([columns, ...exportRows]), "Ledger");
+        XLSX.writeFile(workbook, `${filename}.xlsx`);
+      } else {
+        const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
+        const doc = new jsPDF();
+        doc.text(`${username} - Account Ledger`, 14, 16);
+        autoTable(doc, { startY: 24, head: [columns], body: exportRows });
+        doc.save(`${filename}.pdf`);
+      }
+    } catch { setExportError("Export failed. Please try again."); }
+  };
+  if (authorizationError || authorized === false) return <div role="alert" className="card card-body">This ledger is not available to your account.</div>;
   return (
-    <div style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', paddingBottom: 40, fontSize: "1rem", color: "#212529" }}>
-      <div style={{ maxWidth: 460, margin: "0 auto", padding: "8px 8px" }}>
-        
-        {/* 1. REPORT FILTER CARD */}
-        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, marginBottom: 14, overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          <div style={{ background: "#f8f9fa", borderBottom: "1px solid #e5e7eb", padding: "7px 12px", display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#1f2937" }}>
-              ≡ Report Filter
-            </span>
+    <div className="reference-ledger">
+      <section className="card">
+        <div className="card-header"><Filter size={16} /> Report Filter</div>
+        <form className="card-body ledger-filter" onSubmit={event => {
+          event.preventDefault();
+          if (!fromDate || !toDate || new Date(fromDate) > new Date(toDate)) { setFilterError("Choose a valid start and end date."); return; }
+          setFilterError(""); setRange({ from: fromDate, to: toDate }); setPage(1);
+        }}>
+          <input aria-label="From date" type="datetime-local" required value={fromDate} onChange={event => setFromDate(event.target.value)} />
+          <div className="text-center my-2">-</div>
+          <input aria-label="To date" type="datetime-local" required value={toDate} onChange={event => setToDate(event.target.value)} />
+          {filterError && <p role="alert" className="text-red-700">{filterError}</p>}
+          <div className="text-right mt-3"><button className="btn btn-primary" type="submit">Submit</button></div>
+        </form>
+      </section>
+      <section className="card">
+        <div className="card-header">{username} - Account Ledger</div>
+        <div className="card-body">
+          <div className="ledger-controls">
+            <label><select aria-label="Entries per page" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[100,250,500,1000].map(size => <option key={size}>{size}</option>)}</select> entries per page</label>
+            <div className="ledger-exports"><button onClick={() => window.print()}>Print</button><button disabled={!entries.length} onClick={() => void exportFile("excel")}>Excel</button><button disabled={!entries.length} onClick={() => void exportFile("pdf")}>PDF</button></div>
+            <label className="text-center">Search:<input type="search" className="block border px-2 py-1" value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} /></label>
           </div>
-
-          <div style={{ padding: "12px 14px" }}>
-            {/* From Date */}
-            <div style={{ display: "flex", alignItems: "center", border: "1px solid #cbd5e1", borderRadius: 3, marginBottom: 8, overflow: "hidden" }}>
-              <input
-                type="text"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                style={{ flex: 1, border: "none", padding: "6px 10px", fontSize: 13, color: "#1f2937", outline: "none" }}
-              />
-              <span style={{ padding: "6px 10px", background: "#f3f4f6", borderLeft: "1px solid #cbd5e1", color: "#6b7280" }}>
-                <Calendar style={{ width: 14, height: 14 }} />
-              </span>
-            </div>
-
-            <div style={{ textAlign: "center", fontWeight: 700, color: "#6b7280", margin: "2px 0 6px 0" }}>-</div>
-
-            {/* To Date */}
-            <div style={{ display: "flex", alignItems: "center", border: "1px solid #cbd5e1", borderRadius: 3, marginBottom: 12, overflow: "hidden" }}>
-              <input
-                type="text"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                style={{ flex: 1, border: "none", padding: "6px 10px", fontSize: 13, color: "#1f2937", outline: "none" }}
-              />
-              <span style={{ padding: "6px 10px", background: "#f3f4f6", borderLeft: "1px solid #cbd5e1", color: "#6b7280" }}>
-                <Calendar style={{ width: 14, height: 14 }} />
-              </span>
-            </div>
-
-            {/* Submit Button */}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button
-                type="button"
-                style={{
-                  background: "#00a65a",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: 3,
-                  padding: "7px 22px",
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                Submit
-              </button>
-            </div>
-          </div>
+          {exportError && <p role="alert">{exportError}</p>}
+          {isError ? <p role="alert">Unable to load ledger. Please try again.</p> : authorized !== true || isLoading ? <p role="status">Loading ledger…</p> : <table className="table table-bordered table-sm mb-0">
+            <thead><tr><th>#</th><th>Date</th><th>Description</th><th className="ledger-desktop-cell">Amount</th><th className="ledger-desktop-cell">Balance</th></tr></thead>
+            <tbody>{visible.map((row, index) => <Fragment key={row.id}><tr><td>{offset + index + 1}</td><td className="whitespace-normal">{row.date}</td><td className="whitespace-normal text-[#00b181]">{row.description}</td><td className="ledger-desktop-cell">{row.amount.toLocaleString()}</td><td className="ledger-desktop-cell">{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</td></tr><tr className="ledger-mobile-row"><td colSpan={3}><div className="ledger-meta"><div><strong>Amount</strong>{row.amount.toLocaleString()}</div><div><strong>Balance</strong>{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</div></div></td></tr></Fragment>)}{!visible.length && <tr><td colSpan={5}>No transactions found</td></tr>}</tbody>
+          </table>}
+          <p className="text-center mt-3">Showing {entries.length ? offset + 1 : 0} to {Math.min(offset + pageSize, entries.length)} of {entries.length} entries</p>
+          <div className="ledger-pagination"><button aria-label="First page" className="admin-page-button" disabled={currentPage === 1} onClick={() => setPage(1)}>«</button><button aria-label="Previous page" className="admin-page-button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>‹</button><span className="admin-page-button admin-page-current">{currentPage}</span><button aria-label="Next page" className="admin-page-button" disabled={currentPage === pages} onClick={() => setPage(currentPage + 1)}>›</button><button aria-label="Last page" className="admin-page-button" disabled={currentPage === pages} onClick={() => setPage(pages)}>»</button></div>
         </div>
-
-        {/* 2. LEDGER TITLE */}
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#1f2937", marginBottom: 10, paddingLeft: 2 }}>
-          {username ? `${username} - Account Ledger` : "Account Ledger"}
-        </div>
-
-        {/* 3. CONTROLS: Entries Dropdown & Print/Excel/PDF Buttons & Search */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 6 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              style={{
-                border: "1px solid #cbd5e1",
-                borderRadius: 3,
-                padding: "4px 6px",
-                fontSize: 12.5,
-                background: "#ffffff",
-                color: "#1f2937",
-                outline: "none"
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span style={{ fontSize: 12, color: "#374151" }}>entries per page</span>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", gap: 2 }}>
-            <button
-              type="button"
-              onClick={() => window.print()}
-              style={{ background: "#6c757d", color: "#ffffff", border: "none", padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, cursor: "pointer" }}
-            >
-              Print
-            </button>
-            <button
-              type="button"
-              style={{ background: "#6c757d", color: "#ffffff", border: "none", padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, cursor: "pointer" }}
-            >
-              Excel
-            </button>
-            <button
-              type="button"
-              style={{ background: "#6c757d", color: "#ffffff", border: "none", padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, cursor: "pointer" }}
-            >
-              PDF
-            </button>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <label style={{ fontSize: 12.5, color: "#374151" }}>Search:</label>
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              style={{ border: "1px solid #cbd5e1", borderRadius: 3, padding: "3px 6px", fontSize: 12, outline: "none", width: 110, background: "#ffffff" }}
-            />
-          </div>
-        </div>
-
-        {/* 4. TABLE / ROWS */}
-        <div style={{ background: "#ffffff", border: "1px solid #d5d8dc", borderRadius: 4, overflow: "hidden", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-          
-          {/* Column Header */}
-          <div style={{ display: "grid", gridTemplateColumns: "36px 1fr 1fr", background: "#f8f9fa", borderBottom: "1px solid #dee2e6", padding: "7px 8px", fontSize: 12, fontWeight: 700, color: "#374151" }}>
-            <div># ⬍</div>
-            <div>Date ⬍</div>
-            <div>Description ⬍</div>
-          </div>
-
-          {isLoading ? (
-            <div style={{ padding: 24, textAlign: "center", color: "#6b7280" }}>
-              <Loader2 style={{ width: 20, height: 20, animation: "spin 1s linear infinite", margin: "0 auto 6px" }} />
-              Loading ledger...
-            </div>
-          ) : paginatedEntries.length === 0 ? (
-            <div style={{ padding: 16, textAlign: "center", color: "#6b7280", fontSize: 13 }}>
-              No transactions found
-            </div>
-          ) : (
-            paginatedEntries.map((entry, idx) => {
-              const rowNum = (currentPage - 1) * pageSize + idx + 1;
-              const isNegative = entry.amount < 0;
-
-              return (
-                <div key={entry.id || idx} style={{ borderBottom: "1px solid #e5e7eb", padding: "10px 8px", fontSize: 12.5 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "36px 1fr 1fr", alignItems: "flex-start", gap: 6 }}>
-                    
-                    {/* # with red circular icon */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <span style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid #e53935", display: "inline-block", position: "relative" }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#e53935", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#111827", fontSize: 12 }}>{rowNum}</span>
-                    </div>
-
-                    {/* Date */}
-                    <div style={{ color: "#374151", fontSize: 12, lineHeight: 1.3 }}>
-                      {entry.dateStr}
-                    </div>
-
-                    {/* Description (Green Bold) */}
-                    <div style={{ color: "#00a65a", fontWeight: 700, fontSize: 12.5, lineHeight: 1.3 }}>
-                      {entry.description}
-                    </div>
-                  </div>
-
-                  {/* Sub-row: Amount & Balance */}
-                  <div style={{ marginTop: 8, paddingLeft: 42, display: "flex", flexDirection: "column", gap: 3, fontSize: 12.5, color: "#1f2937" }}>
-                    <div>
-                      <span style={{ color: "#4b5563" }}>Amount</span>{" "}
-                      <span style={{ fontWeight: 700, color: isNegative ? "#e53935" : "#111827" }}>
-                        {isNegative ? `-${Math.abs(entry.amount).toLocaleString()}` : entry.amount.toLocaleString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span style={{ color: "#4b5563" }}>Balance</span>{" "}
-                      <span style={{ fontWeight: 700 }}>
-                        {entry.balance.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* 5. FOOTER & PAGINATION */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, fontSize: 12, color: "#4b5563" }}>
-          <div>
-            Showing 1 to {filteredEntries.length} of {filteredEntries.length} entries
-          </div>
-
-          <div style={{ display: "flex", gap: 3 }}>
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-              style={{ padding: "3px 8px", border: "1px solid #cbd5e1", background: "#fff", borderRadius: 3, cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
-            >
-              «
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              style={{ padding: "3px 8px", border: "1px solid #cbd5e1", background: "#fff", borderRadius: 3, cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
-            >
-              ‹
-            </button>
-            <button
-              style={{ padding: "3px 8px", border: "1px solid #00a65a", background: "#00a65a", color: "#fff", borderRadius: 3, fontWeight: 700 }}
-            >
-              {currentPage}
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage >= totalPages}
-              style={{ padding: "3px 8px", border: "1px solid #cbd5e1", background: "#fff", borderRadius: 3, cursor: currentPage >= totalPages ? "not-allowed" : "pointer" }}
-            >
-              ›
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage >= totalPages}
-              style={{ padding: "3px 8px", border: "1px solid #cbd5e1", background: "#fff", borderRadius: 3, cursor: currentPage >= totalPages ? "not-allowed" : "pointer" }}
-            >
-              »
-            </button>
-          </div>
-        </div>
-
-      </div>
+      </section>
     </div>
   );
 }
