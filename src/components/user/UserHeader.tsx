@@ -203,7 +203,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
               fontWeight: 700,
             }}
           >
-            Welcome to BPEXCH
+            Welcome to Exchange.
           </div>
         </div>
 

@@ -1324,3 +1324,11 @@ body.sidebar-open, body.sidebar-show {
   .reference-user-dashboard .reference-user-header > div:first-child > div:nth-child(2) { display: none !important; }
   .reference-user-dashboard .reference-user-header > div:last-child { gap: 12px; flex-wrap: wrap; font-size: 12px !important; }
 }
+
+/* User dashboard palette and drawer behavior measured from the supplied mobile video. */
+.reference-user-sidebar { background-color: #28486a !important; box-shadow: none !important; }
+.reference-user-sidebar > div:first-child { background-color: #28486a !important; }
+.reference-user-sidebar > div:first-child button { border-color: transparent !important; }
+.reference-user-menu-overlay { background: transparent !important; backdrop-filter: none !important; }
+.reference-user-dashboard .reference-user-header { background-color: #28486a !important; }
+.reference-user-dashboard .reference-user-header > div:last-child { background-color: #28486a !important; }

@@ -111,7 +111,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/20 z-[100] backdrop-blur-[0.5px]"
+            className="reference-user-menu-overlay fixed inset-0 bg-black/20 z-[100] backdrop-blur-[0.5px]"
           />
 
           {/* Main Sidebar Drawer - exact match to screenshot */}
@@ -120,7 +120,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "tween", duration: 0.22 }}
-            className="fixed top-0 left-0 bottom-0 w-[170px] bg-[#1a3556] z-[101] flex flex-col shadow-2xl border-r border-white/10 select-none text-white text-[12.5px]"
+            className="reference-user-sidebar fixed top-0 left-0 bottom-0 w-[170px] bg-[#1a3556] z-[101] flex flex-col shadow-2xl border-r border-white/10 select-none text-white text-[12.5px]"
             style={{
               fontFamily:
                 '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
