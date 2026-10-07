@@ -434,7 +434,7 @@ export default function UserDashboard() {
 
   return (
     <div
-      className="min-h-screen text-[#212529] relative"
+      className="reference-user-dashboard min-h-screen text-[#212529] relative"
       style={{
         fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
         backgroundColor: "#e8eff5",
@@ -454,7 +454,7 @@ export default function UserDashboard() {
         }}
       />
 
-      <main className="max-w-4xl mx-auto pb-20">
+      <main className="w-full pb-20">
         {/* Game Banners Row */}
         <GameBanners onFilterChange={(filter) => setActiveFilter(filter)} />
 

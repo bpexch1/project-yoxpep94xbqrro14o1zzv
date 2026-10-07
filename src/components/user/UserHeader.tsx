@@ -112,8 +112,9 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
 
   return (
     <header
+      className="reference-user-header"
       style={{
-        backgroundColor: "#173456",
+        backgroundColor: "#244363",
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -134,6 +135,8 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <button
             onClick={onMenuToggle}
+            aria-label="Toggle menu"
+            aria-expanded={!!sidebarOpen}
             style={{
               width: 34,
               height: 30,
@@ -200,7 +203,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
               fontWeight: 700,
             }}
           >
-            Welcome to Exchange. - null
+            Welcome to BPEXCH
           </div>
         </div>
 
@@ -303,7 +306,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
       {/* Sub-bar: Credit, Balance, Liable, Active Bets */}
       <div
         style={{
-          backgroundColor: "#1a395e",
+          backgroundColor: "#244363",
           padding: "5px 12px",
           display: "flex",
           alignItems: "center",

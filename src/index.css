@@ -1312,3 +1312,15 @@ body.sidebar-open, body.sidebar-show {
 .bpexch-login-button:disabled { opacity: .7; cursor: wait; }
 @media (max-width: 575.98px) { .bpexch-login-card { padding: 55px 15px 47px; } }
 @media (min-width: 576px) { .bpexch-login { align-items: center; } .bpexch-login-container { margin-bottom: 10%; } }
+
+/* Shared user dashboard shell; account values retain their existing source. */
+.reference-user-dashboard > main { padding: 5px; }
+.reference-user-dashboard .reference-user-header { box-shadow: none !important; }
+.reference-user-dashboard .reference-user-header > div:first-child { min-height: 50px !important; }
+.reference-user-dashboard .reference-user-header > div:first-child > div:last-child > div { flex-direction: row !important; align-items: center !important; gap: 6px; }
+.reference-user-dashboard .reference-user-header > div:first-child > div:last-child button { margin-top: 0 !important; font-weight: 400 !important; font-size: 14px !important; }
+.reference-user-dashboard .reference-user-header > div:last-child { justify-content: flex-start !important; gap: 24px; font-size: 14px !important; font-weight: 400 !important; min-height: 40px; }
+@media (max-width: 575.98px) {
+  .reference-user-dashboard .reference-user-header > div:first-child > div:nth-child(2) { display: none !important; }
+  .reference-user-dashboard .reference-user-header > div:last-child { gap: 12px; flex-wrap: wrap; font-size: 12px !important; }
+}
