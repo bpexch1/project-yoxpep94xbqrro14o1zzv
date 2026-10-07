@@ -4,7 +4,6 @@ import { User, Lock, Loader2, Key, Eye, EyeOff } from "lucide-react";
 import { Client } from "@/entities";
 import { supabase } from "@/integrations/supabase";
 import { setClientSession } from "@/hooks/useClientAuth";
-import { BPLogo } from "@/components/icons/BPLogo";
 import bcrypt from "bcryptjs";
 
 export default function Login() {
@@ -170,36 +169,36 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] min-h-screen w-full flex flex-col items-center justify-start pt-6 sm:pt-14 p-4 overflow-x-hidden bg-[#242629]">
+    <div className="bpexch-login">
       {/* Background: Geometric Triangle Facets Pattern matching Screenshot_20260928-161801.jpg */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0"
+        className="bpexch-login-background"
         style={{
-          backgroundColor: "#27292d",
-          backgroundImage: "url('/bg-triangles.svg')",
-          backgroundSize: "460px 287.5px",
+          backgroundColor: "#333333",
+          backgroundImage: "url('/login-background.png')",
+          backgroundSize: "auto",
           backgroundRepeat: "repeat",
         }}
       />
 
       {/* Main Login Card: Exact match to original bpexch screenshot */}
-      <div className="relative z-10 w-full max-w-[360px] sm:max-w-[380px] mx-auto animate-in fade-in zoom-in-95 duration-200 font-poppins">
+      <div className="bpexch-login-container">
         <div 
-          className="w-full rounded-[14px] px-6 py-8 sm:px-7 sm:py-9 overflow-hidden transition-all duration-200"
+          className="bpexch-login-card"
           style={{
-            background: "linear-gradient(180deg, #34638d 0%, #204970 35%, #102d4e 70%, #08182b 100%)",
-            boxShadow: "0 15px 35px rgba(0, 0, 0, 0.55)",
+            background: "linear-gradient(180deg, #3e6d8d, #121d30)",
+            boxShadow: "none",
           }}
         >
           {/* Top Logo: Aqua-Mint Circle with BP Letters */}
-          <div className="flex justify-center mb-8">
-            <BPLogo size={130} />
+          <div className="bpexch-login-logo">
+            <img src="/login-bp.jpg" alt="BP" width={120} height={120} />
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="bpexch-login-form">
             {/* Username Field: Icon on left, thin underline border */}
             <div className="group">
-              <div className="flex items-center gap-3.5 pb-2 border-b border-white/35 transition-colors group-focus-within:border-white">
+              <div className="bpexch-login-field">
                 <User 
                   size={19} 
                   className="text-white shrink-0 fill-white" 
@@ -209,6 +208,7 @@ export default function Login() {
                 <input
                   type="text"
                   placeholder="Username"
+                  aria-label="Username"
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
@@ -223,7 +223,7 @@ export default function Login() {
 
             {/* Password Field: Padlock icon on left, thin underline border */}
             <div className="group">
-              <div className="flex items-center gap-3.5 pb-2 border-b border-white/35 transition-colors group-focus-within:border-white">
+              <div className="bpexch-login-field">
                 <Lock 
                   size={19} 
                   className="text-white shrink-0 fill-white" 
@@ -233,6 +233,7 @@ export default function Login() {
                 <input
                   type="password"
                   placeholder="Password"
+                  aria-label="Password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -253,13 +254,13 @@ export default function Login() {
             )}
 
             {/* Login Button: Centered Pill Shaped Blue Gradient Button */}
-            <div className="pt-6 pb-1 flex justify-center">
+            <div className="bpexch-login-submit">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-[145px] h-[46px] rounded-full flex items-center justify-center gap-2 text-white text-[15.5px] font-medium tracking-wide transition-all duration-200 cursor-pointer select-none active:scale-[0.97] hover:brightness-105"
+                className="bpexch-login-button"
                 style={{
-                  background: "linear-gradient(180deg, #5891ce 0%, #316eb2 50%, #17457a 100%)",
+                  background: "linear-gradient(180deg, #8dbed7, #15364a)",
                   boxShadow: "0 10px 22px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.35)",
                 }}
               >

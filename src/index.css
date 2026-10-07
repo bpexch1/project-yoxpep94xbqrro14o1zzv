@@ -1294,3 +1294,21 @@ body.sidebar-open, body.sidebar-show {
 
 
 
+
+/* Login reference: scoped to avoid dashboard input/button rules. */
+.bpexch-login { min-height: 100vh; min-height: 100dvh; width: 100%; display: flex; justify-content: center; align-items: flex-start; padding: 14px 15px; position: relative; overflow-x: hidden; font-family: 'Poppins', sans-serif; }
+.bpexch-login-background { position: fixed; inset: 0; pointer-events: none; }
+.bpexch-login-container { position: relative; z-index: 1; width: 400px; max-width: 100%; }
+.bpexch-login-card { width: 100%; border-radius: 10px; padding: 55px 55px 37px; overflow: hidden; }
+.bpexch-login-logo { display: flex; justify-content: center; margin: -20px 0 20px; }
+.bpexch-login-logo img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
+.bpexch-login-field { display: flex; align-items: center; position: relative; height: 47px; border-bottom: 2px solid rgba(255,255,255,.24); margin-bottom: 30px; }
+.bpexch-login-field svg { width: 19px; height: 19px; flex-shrink: 0; margin-left: 5px; }
+.bpexch-login-field input { width: 100%; min-width: 0; height: 45px; padding: 0 5px 0 14px; border: none; outline: none; background: transparent; color: white; font: 400 16px/1.2 'Poppins', sans-serif; }
+.bpexch-login-field input::placeholder { color: white; opacity: .95; }
+.bpexch-login-field:focus-within { border-bottom-color: white; }
+.bpexch-login-submit { display: flex; justify-content: center; padding-top: 0; }
+.bpexch-login-button { width: 120px; height: 50px; border: 0; border-radius: 25px; display: flex; align-items: center; justify-content: center; gap: 6px; color: white; font: 500 16px/1.2 'Poppins', sans-serif; cursor: pointer; }
+.bpexch-login-button:disabled { opacity: .7; cursor: wait; }
+@media (max-width: 575.98px) { .bpexch-login-card { padding: 55px 15px 47px; } }
+@media (min-width: 576px) { .bpexch-login { align-items: center; } .bpexch-login-container { margin-bottom: 10%; } }

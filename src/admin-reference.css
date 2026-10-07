@@ -406,3 +406,9 @@
   .reference-admin .reference-edit form > div:last-child { margin-top: 36px !important; padding: 0 15px; }
   .reference-admin .reference-edit > div > div:last-child form > div:first-child > div { grid-template-columns: 36% minmax(0, 1fr); padding: 0; }
 }
+
+/* Keep Report Type controls identical across report routes. */
+@media (max-width: 991.98px) {
+  .reference-admin .report-buttons-wrapper { max-width: 320px; gap: 0 4px; }
+  .reference-admin .report-buttons-wrapper .btn { padding: 6px 12px; font-size: 14px; }
+}
