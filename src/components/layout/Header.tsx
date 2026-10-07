@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, ChevronDown, LogOut, User } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession, ClientSession } from "@/hooks/useClientAuth";
-import { Bet, Client } from "@/entities";
+import { Bet } from "@/entities";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDownlineUsernames } from "@/hooks/useDownlineUsernames";
@@ -77,26 +77,6 @@ export function Header({ onToggleMobileSidebar, onToggleDesktopSidebar }: Header
     },
     enabled: !!session && downlineUsernames !== undefined,
   });
-
-  const { data: liveBalance = 0, refetch: refetchHeaderBalance } = useQuery({
-    queryKey: ["header-balance", session?.username],
-    queryFn: async () => {
-      if (!session?.username) return 0;
-      const clients = await Client.filter({ username: session.username }, "-created_at", 1);
-      return Number((clients as any)?.[0]?.cash ?? 0);
-    },
-    enabled: !!session?.username,
-    refetchInterval: 3000,
-    staleTime: 0,
-  });
-
-  useEffect(() => {
-    const handleBalanceUpdate = () => {
-      refetchHeaderBalance();
-    };
-    window.addEventListener("balance-updated", handleBalanceUpdate);
-    return () => window.removeEventListener("balance-updated", handleBalanceUpdate);
-  }, [refetchHeaderBalance]);
 
   const handleLogout = () => {
     clearClientSession();
@@ -209,7 +189,7 @@ export function Header({ onToggleMobileSidebar, onToggleDesktopSidebar }: Header
 
             <div className="flex items-center gap-2 whitespace-nowrap text-xs lg:text-sm shrink-0">
               <span className="text-[#23282C] font-normal whitespace-nowrap">
-                <strong>B:</strong> <span className="font-normal text-[#23282C]">{liveBalance.toLocaleString("en-IN")}</span>
+                <strong>B:</strong> <span className="font-normal text-[#23282C]">0</span>
               </span>
               <span className="text-[#23282C] font-normal whitespace-nowrap">
                 <strong>Exp:</strong> <span className="font-normal text-[#23282C]">{totalExposure > 0 ? `-${totalExposure.toLocaleString('en-IN')}` : totalExposure.toLocaleString('en-IN')}</span>
