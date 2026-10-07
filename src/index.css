@@ -1332,3 +1332,6 @@ body.sidebar-open, body.sidebar-show {
 .reference-user-menu-overlay { background: transparent !important; backdrop-filter: none !important; }
 .reference-user-dashboard .reference-user-header { background-color: #28486a !important; }
 .reference-user-dashboard .reference-user-header > div:last-child { background-color: #28486a !important; }
+@media (min-width: 768px) {
+  .reference-user-dashboard > main > div:first-child > div { flex: 0 0 220px !important; max-width: 220px; }
+}
