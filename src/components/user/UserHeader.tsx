@@ -206,7 +206,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
               fontWeight: 700,
             }}
           >
-            Welcome to Exchange.
+            Welcome to Exchange. - null
           </div>
         </div>
 
