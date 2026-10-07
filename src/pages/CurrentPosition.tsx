@@ -63,7 +63,7 @@ export default function CurrentPosition() {
   });
 
   // Fetch pending bets
-  const { data: bets = [], isLoading, isFetching, refetch: refetchBets } = useQuery({
+  const { data: bets = [], isLoading, isFetching, isError, refetch: refetchBets } = useQuery({
     queryKey: ["current-position-bets", session?.username, downlineUsernames, selectedUserFilter],
     queryFn: async () => {
       if (!session) return [];
@@ -262,122 +262,22 @@ export default function CurrentPosition() {
     );
   }
 
-  // Company & Admin Management Portal View
+  // Staff Market Position card measured against /Markets/Liables.
   return (
-    <div
-      className="min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]"
-      style={{
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      }}
-    >
-      <div className="w-full px-2.5 pt-2.5 pb-10">
-
-        {/* 1. Report Type Quick Navigation Header */}
-        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
-            <Filter size={14} className="text-[rgb(35,40,44)]" strokeWidth={2.5} />
-            <span className="font-bold text-[14px] text-[rgb(35,40,44)]">Report Type</span>
-          </div>
-
-          <div className="p-3 flex flex-wrap gap-2">
-            {[
-              { label: "Book Detail", path: "/reports/book-detail" },
-              { label: "Book Detail 2", path: "/reports/book-detail-2" },
-              { label: "Daily PL", path: "/reports/daily-pl" },
-              { label: "Daily Report", path: "/reports/daily" },
-              { label: "Final Sheet", path: "/reports/final-sheet" },
-              { label: "Accounts", path: "/accounts" },
-              { label: "Current Position", path: "/current-position", active: true },
-            ].map((btn) => (
-              <button
-                key={btn.label}
-                type="button"
-                onClick={() => navigate(btn.path)}
-                className={`rounded-[0.25rem] px-3 py-1.5 text-[12px] font-bold transition-all border ${
-                  btn.active
-                    ? "bg-[#00b98a] text-white border-[#00b98a]"
-                    : "bg-white text-[#138a72] border-[#138a72] hover:bg-[#138a72] hover:text-white"
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
-          </div>
+    <div className="reference-position">
+      <div className="card">
+        <div className="card-header flex items-center gap-1">
+          <strong>Market Position</strong>
+          <button type="button" onClick={handleRefreshAll} disabled={isFetching}
+            className="btn btn-sm btn-primary"><strong>Refresh</strong></button>
         </div>
-
-        {/* 2. Search-Users Filter Box */}
-        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
-            <Filter size={14} className="text-[rgb(35,40,44)]" strokeWidth={2.5} />
-            <span className="font-bold text-[14px] text-[rgb(35,40,44)]">Search-Users</span>
-          </div>
-
-          <div className="p-3">
-            <form onSubmit={handleSearchSubmit} className="flex gap-2 max-w-[420px]">
-              <input
-                type="text"
-                placeholder="Username (optional)"
-                value={searchUsername}
-                onChange={(e) => setSearchUsername(e.target.value)}
-                className="flex-1 px-2.5 py-1.5 text-[13px] border border-[rgb(200,206,211)] rounded-[0.25rem] bg-white outline-none focus:border-[#00b98a]"
-              />
-              <button
-                type="submit"
-                className="bg-[#00b98a] hover:bg-[#138a72] text-white rounded-[0.25rem] px-4 py-1.5 text-[13px] font-bold flex items-center gap-1.5 transition-colors"
-              >
-                <Search size={14} /> Search
-              </button>
-              {selectedUserFilter && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedUserFilter("");
-                    setSearchUsername("");
-                  }}
-                  className="bg-[#e4e5e6] hover:bg-[#c8ced3] text-[#23282c] rounded-[0.25rem] px-3 py-1.5 text-[12px] font-bold transition-colors"
-                >
-                  Clear
-                </button>
-              )}
-            </form>
-            {selectedUserFilter && (
-              <div className="mt-2 text-[12px] text-[#00b98a] font-bold">
-                Showing active positions for user: <u>{selectedUserFilter}</u>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 3. Sport Highlights / Current Position Tables */}
-        <div className="bg-white rounded-[0.25rem] border border-[rgb(200,206,211)] mb-4 overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          {/* Header Bar with Refresh */}
-          <div className="flex justify-between items-center px-3 py-2 bg-[#f0f3f5] border-b border-[rgb(200,206,211)]">
-            <span className="font-bold text-[14px] text-[rgb(35,40,44)]">
-              Sport Highlights / Current Position
-            </span>
-            <button
-              onClick={handleRefreshAll}
-              className="bg-[#00b98a] hover:bg-[#138a72] text-white rounded-[0.25rem] px-3 py-1 text-[12px] font-bold flex items-center gap-1.5 transition-colors"
-            >
-              <RefreshCw size={12} className={cn(isFetching && "animate-spin")} /> Refresh
-            </button>
-          </div>
-
+        <div className="card-body">
           {/* Tables Grouped by Sport */}
-          {isLoading ? (
-            <div className="p-8 text-center text-[#73818f] text-[13px]">
-              Loading active market positions...
-            </div>
-          ) : totalActiveMarkets === 0 ? (
-            <div className="p-8 text-center text-[#73818f]">
-              <div className="text-[14px] font-semibold text-[rgb(35,40,44)] mb-1.5">
-                No active betting positions found
-              </div>
-              <div className="text-[12px] text-[#73818f]">
-                {selectedUserFilter ? `No pending bets found for ${selectedUserFilter}.` : "There are currently no active pending bets in any sport market."}
-              </div>
-            </div>
-          ) : (
+          {isError ? (
+            <p role="alert">Unable to load market positions. Please refresh.</p>
+          ) : isLoading ? (
+            <p role="status">Loading market positions…</p>
+          ) : totalActiveMarkets === 0 ? null : (
             <div className="flex flex-col">
               {Object.entries(marketsBySport).map(([sport, markets]) => (
                 <div key={sport} className="border-b border-[rgb(200,206,211)]">
@@ -426,6 +326,8 @@ export default function CurrentPosition() {
             </div>
           )}
         </div>
+
+      </div>
 
         {/* 4. Interactive Market Book & Bets Modal */}
         {selectedMarketModal && (
@@ -546,8 +448,6 @@ export default function CurrentPosition() {
             </div>
           </div>
         )}
-
-      </div>
     </div>
   );
 }

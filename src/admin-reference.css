@@ -327,3 +327,7 @@
   flex-shrink: 0;
 }
 .reference-admin .reference-accounts .accounts-legend .btn svg { width: 12.25px; height: 12.25px; flex-shrink: 0; }
+
+.reference-admin .reference-position .card-body { min-height: 40px; }
+.reference-admin .reference-position .card-header .btn { flex-shrink: 0; }
+.reference-admin .reference-position .card-header .btn:disabled { opacity: .65; }
