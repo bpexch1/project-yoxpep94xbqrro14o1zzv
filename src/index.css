@@ -1332,6 +1332,19 @@ body.sidebar-open, body.sidebar-show {
 .reference-user-menu-overlay { background: transparent !important; backdrop-filter: none !important; }
 .reference-user-dashboard .reference-user-header { background-color: #28486a !important; }
 .reference-user-dashboard .reference-user-header > div:last-child { background-color: #28486a !important; }
+@media (max-width: 575.98px) {
+  .reference-user-sidebar .reference-user-sidebar-header {
+    height: 108px !important;
+    align-items: flex-start !important;
+  }
+  .reference-user-sidebar .reference-user-sidebar-menu {
+    padding-top: 14px !important;
+  }
+  .reference-user-sidebar .reference-user-sidebar-menu > button {
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+}
 @media (min-width: 768px) {
   .reference-user-dashboard > main > div:first-child > div { flex: 0 0 220px !important; max-width: 220px; }
 }

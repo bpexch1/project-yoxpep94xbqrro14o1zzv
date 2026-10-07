@@ -119,7 +119,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "tween", duration: 0.22 }}
+            transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="reference-user-sidebar fixed top-0 left-0 bottom-0 w-[170px] bg-[#1a3556] z-[101] flex flex-col shadow-2xl border-r border-white/10 select-none text-white text-[12.5px]"
             style={{
               fontFamily:
@@ -127,7 +127,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             }}
           >
             {/* Top Header: Square [X] button + Dashboard text */}
-            <div className="flex items-center gap-2.5 px-2.5 py-2 bg-[#142a45] border-b border-white/10 h-[44px] flex-shrink-0">
+            <div className="reference-user-sidebar-header flex items-center gap-2.5 px-2.5 py-2 bg-[#142a45] border-b border-white/10 h-[44px] flex-shrink-0">
               <button
                 onClick={onClose}
                 className="w-8 h-8 flex items-center justify-center rounded-none border border-white/70 bg-transparent hover:bg-white/10 text-white transition-colors"
@@ -152,12 +152,11 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             </div>
 
             {/* Menu List */}
-            <div className="flex-1 overflow-y-auto no-scrollbar py-1 space-y-[1px]">
+            <div className="reference-user-sidebar-menu flex-1 overflow-y-auto no-scrollbar py-1 space-y-[1px]">
               {/* 1. Soccer */}
               <button
                 onClick={() => {
                   toggleSection("Soccer");
-                  handleFilter("Soccer");
                 }}
                 className={`flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium ${
                   expandedSection === "Soccer" ? "bg-white/15" : ""
@@ -173,7 +172,6 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
               <button
                 onClick={() => {
                   toggleSection("Tennis");
-                  handleFilter("Tennis");
                 }}
                 className={`flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium ${
                   expandedSection === "Tennis" ? "bg-white/15" : ""
@@ -189,7 +187,6 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
               <button
                 onClick={() => {
                   toggleSection("Cricket");
-                  handleFilter("Cricket");
                 }}
                 className={`flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium ${
                   expandedSection === "Cricket" ? "bg-white/15" : ""
@@ -205,7 +202,6 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
               <button
                 onClick={() => {
                   toggleSection("Horse Race");
-                  handleFilter("Horse Race");
                 }}
                 className={`flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium ${
                   expandedSection === "Horse Race" ? "bg-white/15" : ""
@@ -221,7 +217,6 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
               <button
                 onClick={() => {
                   toggleSection("Greyhound");
-                  handleFilter("Greyhound");
                 }}
                 className={`flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium ${
                   expandedSection === "Greyhound" ? "bg-white/15" : ""
@@ -395,7 +390,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 initial={{ x: "-100%", opacity: 0 }}
                 animate={{ x: 170, opacity: 1 }}
                 exit={{ x: "-100%", opacity: 0 }}
-                transition={{ type: "tween", duration: 0.2 }}
+                transition={{ type: "tween", duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 className="fixed top-0 left-0 bottom-0 w-[200px] max-w-[55vw] bg-[#223d60] z-[100] flex flex-col shadow-2xl border-r border-white/10 select-none text-white"
                 style={{
                   fontFamily:
