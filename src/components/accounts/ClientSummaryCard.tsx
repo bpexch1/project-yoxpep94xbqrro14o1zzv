@@ -33,10 +33,11 @@ export function ClientSummaryCard({
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
-  const columnCount = isDesktop ? 9 : 3;
   const navigate = useNavigate();
   const { toast } = useToast();
   const [balancesLoaded, setBalancesLoaded] = useState(false);
+  const showFullColumns = isDesktop || balancesLoaded;
+  const columnCount = showFullColumns ? 9 : 3;
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -50,7 +51,7 @@ export function ClientSummaryCard({
     try {
       await onRefresh?.();
       setBalancesLoaded(true);
-      setExpandedIds(new Set(clients.map(client => client.id)));
+      setExpandedIds(new Set());
     } catch {
       toast({ title: "Unable to load balances", description: "Please try again.", variant: "destructive" });
     } finally {
@@ -246,7 +247,7 @@ export function ClientSummaryCard({
   );
 
   return (
-    <div className="card reference-accounts">
+    <div className={cn("card reference-accounts", balancesLoaded && "balances-loaded")}>
       {/* 1. Header Bar (Inspected card-header) */}
       {!hideHeader && (
         <div className="card-header">
@@ -324,14 +325,14 @@ export function ClientSummaryCard({
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
                     {(summaryData.credit_remaining ?? 0).toLocaleString()}
                   </td>
-                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#dc3545]">
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5" style={{ color: getAmountColor(summaryData.cash ?? 0) }}>
                     {(summaryData.cash ?? 0).toLocaleString()}
                   </td>
-                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    0
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5" style={{ color: getAmountColor(summaryData.pl_downline ?? 0) }}>
+                    {(summaryData.pl_downline ?? 0).toLocaleString()}
                   </td>
-                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    0
+                  <td className="border border-[rgb(200,206,211)] px-3 py-1.5" style={{ color: getAmountColor(summaryData.balance_upline ?? 0) }}>
+                    {(summaryData.balance_upline ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
                     {filteredClients.length}
@@ -438,7 +439,7 @@ export function ClientSummaryCard({
                     <td className="px-3.5 py-2.5 font-bold text-left text-[15px] sm:text-[16px] text-black">
                       {totalCreditSum.toLocaleString()}
                     </td>
-                    {isDesktop && (
+                    {showFullColumns && (
                       <>
                         <td>{filteredClients.reduce((sum, client) => sum + getClientDisplay(client).balance, 0).toLocaleString()}</td>
                         <td>{filteredClients.reduce((sum, client) => sum + Number(getClientDisplay(client).clientPL), 0).toLocaleString()}</td>
@@ -460,7 +461,7 @@ export function ClientSummaryCard({
                 <th className="px-3.5 py-2 text-left font-bold">
                   Credit
                 </th>
-                {isDesktop && ["Balance", "Client (P/L)", "Share", "Exposure", "Available Balance", "Options"].map(label => (
+                {showFullColumns && ["Balance", "Client (P/L)", "Share", "Exposure", "Available Balance", "Options"].map(label => (
                   <th key={label} className="text-left font-bold">{label}</th>
                 ))}
               </tr>
@@ -489,7 +490,7 @@ export function ClientSummaryCard({
                     <React.Fragment key={client.id}>
                       {/* Main user row */}
                       <tr
-                        onClick={() => { if (!isDesktop) toggleExpand(client.id); }}
+                        onClick={() => { if (!showFullColumns) toggleExpand(client.id); }}
                         className="data-row border-b border-[#DCDCDC] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
                       >
                         <td className="px-3.5 py-2.5 border-r border-[#DCDCDC]">
@@ -521,7 +522,7 @@ export function ClientSummaryCard({
                         <td className="px-3.5 py-2.5 text-[rgb(35,40,44)] font-medium">
                           {balancesLoaded ? display.credit.toLocaleString() : "-"}
                         </td>
-                        {isDesktop && (
+                        {showFullColumns && (
                           <>
                             <td>{balancesLoaded ? display.balance.toLocaleString() : "-"}</td>
                             <td style={{ color: display.clientPL < 0 ? "#f86c6b" : undefined }}>{balancesLoaded ? Number(display.clientPL).toLocaleString() : "-"}</td>
@@ -534,7 +535,7 @@ export function ClientSummaryCard({
                       </tr>
 
                       {/* Expanded Sub-Details Row */}
-                      {isExpanded && !isDesktop && (
+                      {isExpanded && !showFullColumns && (
                         <tr className="detail-row bg-[#FAFAFA] border-b border-[#DCDCDC]">
                           <td colSpan={columnCount} className="px-4 py-3">
                             <ul className="reference-client-details space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
