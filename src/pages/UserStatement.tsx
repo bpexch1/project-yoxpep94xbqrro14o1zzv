@@ -37,7 +37,7 @@ export default function UserStatement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTx, setSelectedTx] = useState<any | null>(null);
 
-  const { data: transactions, isLoading: transLoading } = useQuery({
+  const { data: transactions } = useQuery({
     queryKey: ["user-transactions", session?.username],
     queryFn: async () => {
       if (!session?.username) return [];
@@ -65,46 +65,6 @@ export default function UserStatement() {
   const username = session.username || "TariqH4778";
   const userCash = clients?.cash ?? 2;
 
-  // Fallback matching video ledger entries if DB has 0
-  const defaultEntries = [
-    {
-      id: "tx-1",
-      num: 1,
-      date: "8/19/2026 12:00:00 am",
-      description: "Opening Balance",
-      isLink: false,
-      amount: 0,
-      balance: 0,
-    },
-    {
-      id: "tx-2",
-      num: 2,
-      date: "8/19/2026 12:30:00 pm",
-      description: `Cash deposit in ${username}. Az (Cash)`,
-      isLink: true,
-      amount: 13000,
-      balance: 13000,
-    },
-    {
-      id: "tx-3",
-      num: 3,
-      date: "8/19/2026 12:31:00 pm",
-      description: "TeenPatti Studio / 32 Cards 9010.6A855B77",
-      isLink: true,
-      amount: -500,
-      balance: 12500,
-    },
-    {
-      id: "tx-4",
-      num: 4,
-      date: "8/19/2026 12:31:00 pm",
-      description: "TeenPatti Studio / 32 Cards 9010.6A855BA2",
-      isLink: true,
-      amount: -1500,
-      balance: 11000,
-    },
-  ];
-
   // Map database transactions into format
   const mappedDbEntries = (transactions || []).map((t, idx) => {
     let formattedDate = "8/19/2026 12:00:00 am";
@@ -131,7 +91,7 @@ export default function UserStatement() {
     };
   });
 
-  const displayList = mappedDbEntries.length > 0 ? mappedDbEntries : defaultEntries;
+  const displayList = mappedDbEntries;
 
   const filteredEntries = displayList.filter((item) => {
     if (!searchTerm) return true;
@@ -155,7 +115,7 @@ export default function UserStatement() {
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="max-w-4xl mx-auto p-2 sm:p-4 pb-20">
+      <main className="w-full max-w-none mx-0 p-2 sm:p-4 pb-20">
         {/* 1. Report Filter Card */}
         <div className="bg-white rounded-none border border-[#c8d4e2] shadow-sm mb-4">
           {/* Card Header */}
@@ -307,81 +267,37 @@ export default function UserStatement() {
 
           {/* Table View */}
           <div className="overflow-x-auto">
-            {/* Mobile / Card Friendly Layout matching Video Screenshot exactly */}
-            <div className="divide-y divide-[#e2e8f0]">
-              {/* Header Columns */}
-              <div className="hidden md:grid md:grid-cols-12 bg-[#eaeff5] px-3 py-2 text-[11.5px] font-bold text-[#142a45] border-b border-[#cbd7e6]">
-                <div className="col-span-1 flex items-center gap-1"># <span>▲▼</span></div>
-                <div className="col-span-3 flex items-center gap-1">Date <span>▲▼</span></div>
-                <div className="col-span-4 flex items-center gap-1">Description <span>▲▼</span></div>
-                <div className="col-span-2 text-right">Amount</div>
-                <div className="col-span-2 text-right">Balance</div>
-              </div>
-
-              {/* Rows */}
-              {filteredEntries.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-3 hover:bg-[#f6f9fc] transition-colors flex flex-col md:grid md:grid-cols-12 md:items-center text-xs gap-1.5 md:gap-0"
-                >
-                  {/* Top mobile row with red number badge + Date */}
-                  <div className="col-span-4 flex items-center gap-2">
-                    {/* Red circular radio number badge */}
-                    <div className="w-5 h-5 rounded-full border-2 border-[#e51c23] flex items-center justify-center flex-shrink-0">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#e51c23]" />
-                    </div>
-                    <span className="font-bold text-[#142a45] mr-2 text-xs">{item.num}</span>
-
-                    <span className="text-gray-700 font-medium text-[11.5px] md:hidden">
-                      {item.date}
-                    </span>
-                  </div>
-
-                  {/* Desktop Date */}
-                  <div className="hidden md:block md:col-span-3 text-gray-700 font-medium text-[11.5px]">
-                    {item.date}
-                  </div>
-
-                  {/* Description */}
-                  <div className="md:col-span-4 pl-7 md:pl-0">
-                    {item.isLink ? (
-                      <button
-                        onClick={() => setSelectedTx(item)}
-                        className="text-[#00a676] hover:underline font-bold text-left text-xs"
-                      >
-                        {item.description}
-                      </button>
-                    ) : (
-                      <span className="text-[#00a676] font-bold text-xs">{item.description}</span>
-                    )}
-                  </div>
-
-                  {/* Mobile Amount & Balance Rows */}
-                  <div className="flex md:hidden justify-between pl-7 text-xs border-t border-dashed border-gray-200 pt-1 mt-0.5">
-                    <span className="text-gray-600 font-semibold">Amount</span>
-                    <span className="font-bold text-[#142a45]">
-                      {item.amount.toLocaleString("en-IN")}
-                    </span>
-                  </div>
-                  <div className="flex md:hidden justify-between pl-7 text-xs">
-                    <span className="text-gray-600 font-semibold">Balance</span>
-                    <span className="font-bold text-[#142a45]">
-                      {item.balance.toLocaleString("en-IN")}
-                    </span>
-                  </div>
-
-                  {/* Desktop Amount */}
-                  <div className="hidden md:block md:col-span-2 text-right font-bold text-[#142a45]">
-                    {item.amount.toLocaleString("en-IN")}
-                  </div>
-
-                  {/* Desktop Balance */}
-                  <div className="hidden md:block md:col-span-2 text-right font-bold text-[#142a45]">
-                    {item.balance.toLocaleString("en-IN")}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <table className="w-full min-w-[700px] text-xs text-left border-collapse">
+              <thead>
+                <tr className="bg-[#f8f9fa] text-[#142a45] border-b border-[#dee2e6]">
+                  <th className="px-2 py-2 font-bold border-r border-[#dee2e6]">#</th>
+                  <th className="px-2 py-2 font-bold border-r border-[#dee2e6]">Date</th>
+                  <th className="px-2 py-2 font-bold border-r border-[#dee2e6]">Description</th>
+                  <th className="px-2 py-2 font-bold border-r border-[#dee2e6] text-right">Amount</th>
+                  <th className="px-2 py-2 font-bold text-right">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEntries.map((item) => (
+                  <tr key={item.id} className="border-b border-[#dee2e6] hover:bg-[#f6f9fc]">
+                    <td className="px-2 py-2 border-r border-[#dee2e6]">{item.num}</td>
+                    <td className="px-2 py-2 border-r border-[#dee2e6] whitespace-nowrap">{item.date}</td>
+                    <td className="px-2 py-2 border-r border-[#dee2e6] min-w-[230px]">
+                      {item.isLink ? (
+                        <button onClick={() => setSelectedTx(item)} className="text-[#00a676] hover:underline font-semibold text-left">
+                          {item.description}
+                        </button>
+                      ) : <span className="text-[#00a676] font-semibold">{item.description}</span>}
+                    </td>
+                    <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-medium">{item.amount.toLocaleString("en-IN")}</td>
+                    <td className="px-2 py-2 text-right font-medium">{item.balance.toLocaleString("en-IN")}</td>
+                  </tr>
+                ))}
+                {filteredEntries.length === 0 && (
+                  <tr><td colSpan={5} className="h-10 px-3 text-center text-gray-500">{searchTerm ? "No matching records found." : "No records found."}</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
 
           {/* Footer Pagination */}

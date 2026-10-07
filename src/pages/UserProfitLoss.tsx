@@ -61,7 +61,7 @@ export default function UserProfitLoss() {
       <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="max-w-4xl mx-auto p-2 sm:p-4 pb-20">
+      <main className="w-full max-w-none mx-0 p-2 sm:p-4 pb-20">
         {/* 1. Report Filter Card */}
         <div className="bg-white rounded-none border border-[#c8d4e2] shadow-sm mb-4">
           <div className="flex items-center gap-2 px-3 py-2 bg-[#eaeff5] border-b border-[#cbd7e6]">
@@ -149,7 +149,9 @@ export default function UserProfitLoss() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left border-collapse">
+            {settledBets.length === 0 ? (
+              <div className="min-h-10" aria-label="No profit/loss records" />
+            ) : <table className="w-full min-w-[560px] text-xs text-left border-collapse">
               <thead>
                 <tr className="bg-[#f8f9fa] border-b border-[#dee2e6] text-[#142a45]">
                   <th className="p-2.5 font-bold border-r border-[#dee2e6]">#</th>
@@ -159,14 +161,7 @@ export default function UserProfitLoss() {
                 </tr>
               </thead>
               <tbody>
-                {settledBets.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="p-6 text-center text-gray-500 italic">
-                      No profit/loss records found for selected period.
-                    </td>
-                  </tr>
-                ) : (
-                  settledBets.map((b, i) => (
+                {settledBets.map((b, i) => (
                     <tr key={b.id} className="border-b border-[#dee2e6] hover:bg-gray-50">
                       <td className="p-2.5 border-r border-[#dee2e6] text-gray-600">{i + 1}</td>
                       <td className="p-2.5 border-r border-[#dee2e6] font-bold text-[#142a45]">{b.match_title}</td>
@@ -175,10 +170,9 @@ export default function UserProfitLoss() {
                         {b.status === "won" ? `+${b.potential_win - b.stake}` : `-${b.stake}`}
                       </td>
                     </tr>
-                  ))
-                )}
+                  ))}
               </tbody>
-            </table>
+            </table>}
           </div>
         </div>
       </main>
