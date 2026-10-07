@@ -1325,6 +1325,91 @@ body.sidebar-open, body.sidebar-show {
   .reference-user-dashboard .reference-user-header > div:last-child { gap: 12px; flex-wrap: wrap; font-size: 12px !important; }
 }
 
+/* Match the compact two-line mobile account header in the supplied dashboard reference. */
+@media (max-width: 575.98px) {
+  .reference-user-dashboard .reference-user-header .reference-user-header-main {
+    display: grid !important;
+    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-rows: 36px 30px;
+    column-gap: 8px;
+    row-gap: 0;
+    align-items: center;
+    min-height: 72px !important;
+    padding: 5px 10px 4px !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-brand {
+    grid-column: 1;
+    grid-row: 1;
+    gap: 9px !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-menu-button {
+    width: 34px !important;
+    height: 34px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 3px 0 !important;
+    gap: 4px !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-menu-button span {
+    width: 24px !important;
+    height: 2px !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-marquee {
+    display: flex !important;
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    margin: 0 !important;
+    justify-content: center;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-marquee > div {
+    font-size: 13px !important;
+    animation-duration: 18s !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-account {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    margin: 0 !important;
+    text-align: right !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-account > div:first-child {
+    width: 100%;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-account > div:first-child > div {
+    font-size: 16px !important;
+    white-space: nowrap;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-account > div:first-child button {
+    font-size: 16px !important;
+    white-space: nowrap;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-header-status {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 2px 8px !important;
+    flex-wrap: wrap !important;
+    min-height: 59px !important;
+    margin: 5px 5px 8px !important;
+    padding: 8px 10px !important;
+    border: 0 !important;
+    font-size: 15px !important;
+    line-height: 1.35;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-status-item {
+    white-space: nowrap;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-status-bets {
+    width: 58px;
+    white-space: normal;
+  }
+}
+
 /* User dashboard palette and drawer behavior measured from the supplied mobile video. */
 .reference-user-sidebar { background-color: #28486a !important; box-shadow: none !important; }
 .reference-user-sidebar > div:first-child { background-color: #28486a !important; }

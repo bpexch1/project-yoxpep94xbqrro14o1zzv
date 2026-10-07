@@ -123,6 +123,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
     >
       {/* Top Header Row */}
       <div
+        className="reference-user-header-main"
         style={{
           display: "flex",
           alignItems: "center",
@@ -131,12 +132,13 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           minHeight: 46,
         }}
       >
-        {/* Left: Hamburger button in square box + Dashboard */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        {/* Left: plain hamburger + Dashboard */}
+        <div className="reference-user-header-brand" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <button
             onClick={onMenuToggle}
             aria-label="Toggle menu"
             aria-expanded={!!sidebarOpen}
+            className="reference-user-menu-button"
             style={{
               width: 34,
               height: 30,
@@ -186,6 +188,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
 
         {/* Center: Marquee Ticker */}
         <div
+          className="reference-user-header-marquee"
           style={{
             flex: 1,
             overflow: "hidden",
@@ -209,6 +212,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
 
         {/* Right: Balance & Username with dropdown */}
         <div
+          className="reference-user-header-account"
           ref={dropdownRef}
           style={{
             marginLeft: "auto",
@@ -305,6 +309,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
 
       {/* Sub-bar: Credit, Balance, Liable, Active Bets */}
       <div
+        className="reference-user-header-status"
         style={{
           backgroundColor: "#244363",
           padding: "5px 12px",
@@ -317,12 +322,12 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           borderTop: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <div>Credit: 0</div>
-        <div>Balance: {balance.toLocaleString("en-IN")}</div>
-        <div style={{ color: totalLiability > 0 ? "#ff8a80" : "white" }}>
+        <div className="reference-user-status-item">Credit: 0</div>
+        <div className="reference-user-status-item">Balance: {balance.toLocaleString("en-IN")}</div>
+        <div className="reference-user-status-item" style={{ color: totalLiability > 0 ? "#ff8a80" : "white" }}>
           Liable: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
         </div>
-        <div>Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
+        <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
       </div>
     </header>
   );
