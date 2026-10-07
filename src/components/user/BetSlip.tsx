@@ -36,10 +36,10 @@ export function BetSlip({
   if (!currentBet) return null;
 
   const isBack = currentBet.betType === "back";
-  // Screenshot 1: Back bet is soft light blue (#f0f6fb)
-  // Screenshot 2: Lay bet is soft pink/peach (#fceeee)
-  const panelBg = isBack ? "#eaf2f8" : "#fceeee";
-  const borderColor = isBack ? "#c8dbea" : "#fad2d2";
+  // Match the reference slip's direction colors: blue for Back, pink for Lay.
+  const panelBg = isBack ? "#e9f6fc" : "#fce4e4";
+  const borderColor = "#c6cbd0";
+  const oddsControlBg = isBack ? "#e8f5fb" : "#fbe3e3";
 
   const amountNum = parseFloat(amount) || 0;
   const currentOdds = typeof odds === "number" ? odds : parseFloat(String(odds)) || 1;
@@ -146,7 +146,8 @@ export function BetSlip({
                 <button
                   type="button"
                   onClick={handleOddsDecrease}
-                  className="w-10 bg-[#eaeff5] hover:bg-[#d8e2ee] active:bg-[#c9d7e7] text-[#142a45] font-bold text-base flex items-center justify-center transition-colors border-r border-[#c8d4e2]"
+                  className="w-10 text-[#142a45] font-bold text-base flex items-center justify-center transition-colors border-r"
+                  style={{ backgroundColor: oddsControlBg, borderColor }}
                 >
                   -
                 </button>
@@ -164,7 +165,8 @@ export function BetSlip({
                 <button
                   type="button"
                   onClick={handleOddsIncrease}
-                  className="w-10 bg-[#eaeff5] hover:bg-[#d8e2ee] active:bg-[#c9d7e7] text-[#142a45] font-bold text-base flex items-center justify-center transition-colors border-l border-[#c8d4e2]"
+                  className="w-10 text-[#142a45] font-bold text-base flex items-center justify-center transition-colors border-l"
+                  style={{ backgroundColor: oddsControlBg, borderColor }}
                 >
                   +
                 </button>
@@ -183,7 +185,7 @@ export function BetSlip({
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder=""
                   autoFocus
-                  className="w-full h-[34px] px-2.5 bg-white border-2 border-[#5c9bd5] focus:border-[#2b6cb0] rounded-[4px] font-bold text-[15px] text-[#142a45] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-inner"
+                  className="w-full h-[34px] px-2.5 bg-white border border-[#ced4da] focus:border-[#7a9db5] rounded-[4px] font-medium text-[15px] text-[#343a40] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             </div>
