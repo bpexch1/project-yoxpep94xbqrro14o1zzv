@@ -118,16 +118,16 @@ export function ClientSummaryCard({
           pl_downline: acc.pl_downline + (Number(c.pl_downline) || 0),
           balance_upline: acc.balance_upline + (Number(c.balance_upline) || 0),
         }),
-        { credit_received: 1000000, credit_remaining: 300000, cash: -50000, pl_downline: 0, balance_upline: 0 }
+        { credit_received: 0, credit_remaining: 0, cash: 0, pl_downline: 0, balance_upline: 0 }
       ),
     [filteredClients]
   );
 
   const summaryData = adminRecord
     ? {
-        credit_received: adminRecord.credit_received ?? 1000000,
-        credit_remaining: adminRecord.credit_remaining ?? 300000,
-        cash: adminRecord.cash ?? -50000,
+        credit_received: adminRecord.credit_received ?? 0,
+        credit_remaining: adminRecord.credit_remaining ?? 0,
+        cash: adminRecord.cash ?? 0,
         pl_downline: adminRecord.pl_downline ?? 0,
         balance_upline: adminRecord.balance_upline ?? 0,
       }
@@ -183,7 +183,7 @@ export function ClientSummaryCard({
   };
 
   const totalCreditSum = useMemo(() => {
-    return filteredClients.reduce((sum, c) => sum + (Number(c.credit_remaining) || 0), 0) || 700000;
+    return filteredClients.reduce((sum, c) => sum + (Number(c.credit_remaining) || 0), 0);
   }, [filteredClients]);
 
   const renderOptions = (client: any) => (
@@ -280,13 +280,13 @@ export function ClientSummaryCard({
               <tbody>
                 <tr className="bg-white font-bold">
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.credit_remaining ?? 0).toLocaleString()}
+                    0
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.cash ?? 0).toLocaleString()}
+                    0
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.pl_downline || 0).toLocaleString()}
+                    0
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[rgb(35,40,44)]">
                     {filteredClients.length}
@@ -321,13 +321,13 @@ export function ClientSummaryCard({
               <tbody>
                 <tr className="bg-white font-bold">
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.credit_received || 1000000).toLocaleString()}
+                    {(summaryData.credit_received ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
-                    {(summaryData.credit_remaining || 300000).toLocaleString()}
+                    {(summaryData.credit_remaining ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#dc3545]">
-                    {summaryData.cash < 0 ? summaryData.cash.toLocaleString() : `-${Math.abs(summaryData.cash).toLocaleString()}`}
+                    {(summaryData.cash ?? 0).toLocaleString()}
                   </td>
                   <td className="border border-[rgb(200,206,211)] px-3 py-1.5 text-[#00a65a]">
                     0
@@ -351,16 +351,16 @@ export function ClientSummaryCard({
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
-                className="btn btn-sm btn-primary inline-flex items-center gap-1"
+                className="btn btn-sm btn-primary inline-flex items-center gap-1 whitespace-nowrap shrink-0"
               >
                 <span>New User</span>
               </button>
             )}
             <button
-              onClick={() => navigate("/reports/daily")}
-              className="btn btn-sm btn-primary inline-flex items-center gap-1"
+              onClick={() => navigate("/accounts/ledger")}
+              className="btn btn-sm btn-primary inline-flex items-center gap-1 whitespace-nowrap shrink-0"
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileText className="w-3.5 h-3.5 shrink-0" />
               <span>Account Ledger</span>
             </button>
           </div>
