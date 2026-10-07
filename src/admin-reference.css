@@ -331,3 +331,41 @@
 .reference-admin .reference-position .card-body { min-height: 40px; }
 .reference-admin .reference-position .card-header .btn { flex-shrink: 0; }
 .reference-admin .reference-position .card-header .btn:disabled { opacity: .65; }
+
+/* Mobile Users comparison: original 322704/322705 and current 322706/322707. */
+.reference-admin .reference-accounts .card-header { font-weight: 400; }
+.reference-admin .reference-accounts .card-header strong { font-weight: 700; }
+.reference-admin .reference-accounts .accounts-action-buttons .btn { font-weight: 700; }
+.reference-admin .reference-accounts .card-body > div:first-child th { vertical-align: top; line-height: 24px; }
+.reference-admin .client-info-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 35px; padding: 6px 12px; margin-left: 4px;
+  border: 1px solid transparent; border-radius: 4px; background: #f0f0f0;
+  vertical-align: middle; cursor: pointer;
+}
+.reference-admin .client-info-glyph {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%; background: #000;
+  color: white; font: bold 10px/14px Georgia, serif;
+}
+@media (max-width: 991.98px) {
+  .reference-admin .reference-users .report-buttons-wrapper { max-width: 320px; gap: 0 4px; }
+  .reference-admin .reference-users .report-buttons-wrapper .btn { padding: 6px 12px; font-size: 14px; }
+  .reference-admin .reference-users #Usersearchcustom .card-body { padding: 20px 5px; min-height: 100px; }
+  .reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child { width: 318px; }
+  .reference-admin .reference-users #Usersearchcustom .card-body button { background: #00b181; border-color: #00b181; border-radius: 0; font-weight: 400; }
+  .reference-admin .reference-accounts .card-body > div:first-child table { width: 92%; }
+  .reference-admin .reference-accounts .accounts-actions { gap: 0; }
+  .reference-admin .reference-accounts .accounts-legend { display: block; line-height: 28px; }
+  .reference-admin .reference-accounts .accounts-legend > div { display: contents; }
+  .reference-admin .reference-accounts .accounts-legend > div > span { margin-right: 4px; }
+  .reference-admin .reference-accounts .admin-datatable-controls { justify-content: center; }
+  .reference-admin .reference-accounts .accounts-table { table-layout: fixed; width: 100%; }
+  .reference-admin .reference-accounts .accounts-table tr > :first-child { width: 42%; }
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(2) { width: 34%; }
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(3) { width: 24%; }
+  .reference-admin .reference-accounts .accounts-table tr > [colspan] { width: auto; }
+  .reference-admin .reference-accounts .data-row > td:first-child > div { display: block; white-space: normal; overflow-wrap: anywhere; }
+  .reference-admin .reference-accounts .data-row { background: #f9f9f9 !important; }
+  .reference-admin .reference-accounts .admin-datatable-footer { justify-content: center; text-align: center; }
+}

@@ -505,10 +505,10 @@ export function ClientSummaryCard({
                                   e.stopPropagation();
                                   toggleExpand(client.id);
                                 }}
-                                className="w-4 h-4 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-serif shrink-0 opacity-80 hover:opacity-100"
+                                className="client-info-button"
                                 title="View details"
                               >
-                                i
+                                <span aria-hidden="true" className="client-info-glyph">i</span>
                               </button>
                             )}
                           </div>
@@ -601,11 +601,11 @@ export function ClientSummaryCard({
 
         <div className="admin-datatable-footer flex flex-wrap justify-between items-center gap-3 mt-3">
           <span>Showing {tableFilteredClients.length ? (currentPage - 1) * pageSize + 1 : 0} to {Math.min(currentPage * pageSize, tableFilteredClients.length)} of {tableFilteredClients.length} entries</span>
-          <div className="inline-flex" aria-label="User table pagination">
+          {totalPages > 1 && <div className="inline-flex" aria-label="User table pagination">
             <button type="button" className="admin-page-button" onClick={() => setCurrentPage(page => Math.max(1, page - 1))} disabled={currentPage <= 1}>Previous</button>
             <span className="admin-page-button admin-page-current" aria-current="page">{currentPage}</span>
             <button type="button" className="admin-page-button" onClick={() => setCurrentPage(page => Math.min(totalPages, page + 1))} disabled={currentPage >= totalPages}>Next</button>
-          </div>
+          </div>}
         </div>
       </div>
     </div>
