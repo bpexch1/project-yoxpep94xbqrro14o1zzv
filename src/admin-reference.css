@@ -288,3 +288,22 @@
   .reference-admin .report-buttons-wrapper { justify-content: center; gap: 2px; max-width: 300px; margin: auto; }
   .reference-admin .report-buttons-wrapper .btn { padding: 6px 10px; font-size: 12px; }
 }
+
+/* Users controls measured against the live reference page. */
+.reference-admin .accounts-action-buttons .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.reference-admin .accounts-action-buttons .btn svg { display: inline-block; flex-shrink: 0; }
+.reference-admin .reference-accounts .accounts-legend .font-medium { font-weight: 400; }
+.reference-admin .reference-accounts .admin-datatable-controls > label:first-child { display: none; }
+.reference-admin .reference-accounts .admin-datatable-controls { justify-content: flex-end; }
+@media (min-width: 992px) {
+  .reference-admin .reference-accounts .accounts-actions { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+  .reference-admin .reference-accounts .accounts-legend { justify-content: flex-end; }
+  .reference-admin .reference-accounts .card-body > div:first-child th br { display: none; }
+}

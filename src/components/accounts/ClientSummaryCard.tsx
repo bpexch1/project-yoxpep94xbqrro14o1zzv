@@ -250,9 +250,7 @@ export function ClientSummaryCard({
       {/* 1. Header Bar (Inspected card-header) */}
       {!hideHeader && (
         <div className="card-header">
-          <strong>
-            {username} - Clients List{!balancesLoaded ? " | Default" : ""}
-          </strong>
+          <span><strong>{username}</strong> - Clients List{!balancesLoaded ? " | Default" : ""}</span>
         </div>
       )}
 
@@ -264,13 +262,13 @@ export function ClientSummaryCard({
               <thead>
                 <tr className="bg-white">
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
-                    Credit<br />Remaining
+                    Credit <br />Remaining
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Cash
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
-                    P/L<br />Downline
+                    P/L <br />Downline
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Users
@@ -299,19 +297,19 @@ export function ClientSummaryCard({
               <thead>
                 <tr className="bg-white">
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
-                    Credit<br />Received
+                    Credit <br />Received
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
-                    Credit<br />Remaining
+                    Credit <br />Remaining
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Cash
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
-                    P/L<br />Downline
+                    P/L <br />Downline
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
-                    Balance<br />UpLine
+                    Balance <br />UpLine
                   </th>
                   <th className="border border-[rgb(200,206,211)] px-3 py-1.5 text-left font-bold text-[rgb(35,40,44)] whitespace-nowrap leading-tight">
                     Users
@@ -345,9 +343,9 @@ export function ClientSummaryCard({
         </div>
 
         {/* 3. Action Buttons & Badges Legend */}
-        <div className="flex flex-col gap-2.5 mb-3">
+        <div className="accounts-actions flex flex-col gap-2.5 mb-3">
           {/* Top buttons */}
-          <div className="flex items-center gap-1.5">
+          <div className="accounts-action-buttons flex items-center gap-1.5">
             {!hideCreateButton && (
               <button
                 onClick={() => navigate("/accounts/create")}
@@ -366,7 +364,7 @@ export function ClientSummaryCard({
           </div>
 
           {/* Legend Badges Row */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[16px] text-[rgb(35,40,44)]">
+          <div className="accounts-legend flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[16px] text-[rgb(35,40,44)]">
             <div className="flex items-center gap-1.5">
               <span className="btn btn-sm btn-warning">
                 C
