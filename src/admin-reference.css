@@ -195,7 +195,7 @@
 .reference-admin .main .container-fluid > div > main { padding: 0; max-width: none; margin: 0; }
 
 .reference-admin .reference-users #Usersearchcustom .card-body { min-height: 0; }
-.reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child { flex: 0 1 290px; }
+.reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child { flex: 0 1 auto; width: 360px; max-width: 100%; }
 .reference-admin .reference-dashboard > div { margin-bottom: 24px; }
 .reference-admin .reference-dashboard > div > div:first-child { padding: 4.8px 20px; }
 .reference-admin .reference-search-body { padding: 20px; min-height: 86px; }

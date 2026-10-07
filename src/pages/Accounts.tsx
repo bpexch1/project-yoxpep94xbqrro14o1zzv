@@ -248,12 +248,6 @@ export default function Accounts() {
           adminRecord={adminRecord}
         />
 
-        {/* Footer Text */}
-        <div className="text-center py-4">
-          <p className="font-bold text-[0.875rem] text-[rgb(35,40,44)]">
-            Welcome to Exchange.
-          </p>
-        </div>
       </main>
     </div>
   );
