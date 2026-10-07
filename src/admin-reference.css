@@ -380,3 +380,29 @@
   .reference-admin .reference-accounts.balances-loaded .accounts-table tr > :nth-child(n+4) { min-width: 100px; }
   .reference-admin .reference-accounts.balances-loaded .accounts-table tr > [colspan] { width: auto; }
 }
+
+/* Edit User mobile measurements from 322717–322719. */
+.reference-admin .reference-edit > div > div { border-color: #c8ced3 !important; }
+.reference-admin .reference-edit > div > div:first-child { padding: 20px !important; margin-bottom: 40px !important; }
+.reference-admin .reference-edit > div > div:first-child button { font-size: 14px !important; font-weight: 400 !important; padding: 6px 12px !important; border-radius: 4px !important; }
+.reference-admin .reference-edit > div > div:first-child > div:first-child { gap: 4px !important; margin-bottom: 0 !important; }
+.reference-admin .reference-edit > div > div:first-child button:first-child:not([onclick]) { color: inherit; }
+.reference-admin .reference-edit > div > div:not(:first-child) > div:first-child { padding: 4.8px 20px !important; font-size: 16px !important; line-height: 24px !important; background: #f0f3f5 !important; font-weight: 400 !important; }
+.reference-admin .reference-edit > div > div:last-child > div:first-child { font-weight: 700 !important; }
+.reference-admin .reference-edit form > div:first-child { font-size: 16px !important; }
+.reference-admin .reference-edit form > div:first-child > div { min-height: 35px; }
+.reference-admin .reference-edit form > div:first-child > div > div { font-size: 16px !important; font-weight: 400 !important; color: #23282c !important; line-height: 24px !important; }
+.reference-admin .reference-edit form label { font-size: 16px !important; font-weight: 400 !important; color: #23282c !important; }
+.reference-admin .reference-edit form input:not([type="checkbox"]),
+.reference-admin .reference-edit form textarea { max-width: none !important; width: 100% !important; font-size: 16px !important; padding: 6px 12px !important; border: 1px solid #e4e7ea !important; border-radius: 4px !important; color: #5c6873 !important; }
+.reference-admin .reference-edit form textarea { min-height: 62px; resize: vertical !important; }
+.reference-admin .reference-edit form input[type="checkbox"] { accent-color: #007bff; }
+.reference-admin .reference-edit form > div:first-child > div > div > div { font-size: 16px !important; color: #23282c !important; line-height: 24px !important; }
+.reference-admin .reference-edit form button[type="submit"] { background: #00b181 !important; font-size: 14px !important; padding: 6px 12px !important; border-radius: 4px !important; }
+@media (max-width: 991.98px) {
+  .reference-admin .reference-edit form > div:first-child > div { display: grid !important; grid-template-columns: 37% minmax(0, 1fr); align-items: start !important; padding: 0 15px; }
+  .reference-admin .reference-edit form > div:first-child > div > div:first-child { width: auto !important; padding-top: 6px !important; overflow-wrap: anywhere; }
+  .reference-admin .reference-edit form > div:first-child > div > div:nth-child(2) { min-width: 0; }
+  .reference-admin .reference-edit form > div:last-child { margin-top: 36px !important; padding: 0 15px; }
+  .reference-admin .reference-edit > div > div:last-child form > div:first-child > div { grid-template-columns: 36% minmax(0, 1fr); padding: 0; }
+}
