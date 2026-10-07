@@ -5,26 +5,8 @@ import { Header } from "./Header";
 import { cn } from "@/lib/utils";
 import { getClientSession } from "@/hooks/useClientAuth";
 
-export const ADMIN_ROLES = [
-  "company",
-  "superadmin",
-  "admin",
-  "supermaster",
-  "master",
-  "dealer",
-  "agent",
-  "superagent",
-  "subdealer",
-  "subagent",
-  "distributor",
-  "minidistributor",
-];
-
-export const isStaffOrAdmin = (role?: string) => {
-  if (!role) return false;
-  const r = role.toLowerCase().trim();
-  return ADMIN_ROLES.includes(r) || (r !== "client" && r !== "user" && r !== "bettor");
-};
+import { isStaffOrAdmin } from "@/lib/adminUiPolicy";
+export { ADMIN_ROLES, isStaffOrAdmin } from "@/lib/adminUiPolicy";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();

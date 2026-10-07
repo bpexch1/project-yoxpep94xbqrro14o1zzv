@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Filter, AlertTriangle } from "lucide-react";
 import { Match } from "@/entities";
+import { marketAmount } from "@/lib/adminUiPolicy";
 
 interface DisplayMatchItem {
   id: string;
@@ -12,21 +13,6 @@ interface DisplayMatchItem {
   isLive: boolean;
   matchTime?: string;
 }
-
-const DEFAULT_DASHBOARD_MATCHES = [
-  // Soccer
-  { id: "fb-1", title: "Roma V Inter / Match Odds", sport: "Soccer", amount: "1,40,29,346", isLive: true },
-  { id: "fb-2", title: "Nottm Forest V Coventry / Match Odds", sport: "Soccer", amount: "1,40,40,110", isLive: true },
-  { id: "fb-3", title: "Stuttgart V Dortmund / Match Odds", sport: "Soccer", amount: "88,35,988", isLive: true },
-  { id: "fb-4", title: "Trabzonspor V Galatasaray / Match Odds", sport: "Soccer", amount: "8,22,308", isLive: true },
-  // Cricket
-  { id: "cr-1", title: "Afghanistan v India / Match Odds", sport: "Cricket", amount: "2,41,98,340", isLive: true },
-  { id: "cr-2", title: "England v Sri Lanka / Match Odds", sport: "Cricket", amount: "1,83,40,120", isLive: true },
-  { id: "cr-3", title: "Zimbabwe v Australia / Match Odds", sport: "Cricket", amount: "1,12,00,900", isLive: true },
-  // Tennis
-  { id: "tn-1", title: "Bucsa v Bejlek / Match Odds", sport: "Tennis", amount: "34,20,100", isLive: true },
-  { id: "tn-2", title: "Frech v I Jovic / Match Odds", sport: "Tennis", amount: "28,90,450", isLive: true },
-];
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -50,18 +36,6 @@ export default function Dashboard() {
     refetch();
   };
 
-  const formatAmount = (n: number) => n.toLocaleString("en-IN");
-  const getAmountForMatch = (m: any, idx: number): string => {
-    const seed = String(m.id || m.title || idx)
-      .split("")
-      .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-    const amounts = [
-      1255214, 2982530, 79187, 3070274, 328942, 1590250, 74459, 109282, 68805, 744726,
-      36622, 50155, 135773, 1441515, 219418937, 30555, 4709, 1311,
-    ];
-    return formatAmount(amounts[seed % amounts.length] + (idx % 7) * 113);
-  };
-
   // Build Soccer Matches
   const soccerMatches: DisplayMatchItem[] = useMemo(() => {
     const list: DisplayMatchItem[] = [];
@@ -72,7 +46,7 @@ export default function Dashboard() {
     );
 
     if (dbSoccer.length === 0) {
-      return DEFAULT_DASHBOARD_MATCHES.filter((m) => m.sport === "Soccer");
+      return [];
     }
 
     dbSoccer.forEach((m: any, idx: number) => {
@@ -87,7 +61,7 @@ export default function Dashboard() {
           id: m.id || `live-fb-${idx}`,
           title,
           sport: "Soccer",
-          amount: getAmountForMatch(m, idx),
+          amount: marketAmount(m.total_matched),
           isLive,
         });
       }
@@ -106,7 +80,7 @@ export default function Dashboard() {
     );
 
     if (dbCricket.length === 0) {
-      return DEFAULT_DASHBOARD_MATCHES.filter((m) => m.sport === "Cricket");
+      return [];
     }
 
     dbCricket.forEach((m: any, idx: number) => {
@@ -121,7 +95,7 @@ export default function Dashboard() {
           id: m.id || `live-ck-${idx}`,
           title,
           sport: "Cricket",
-          amount: getAmountForMatch(m, idx + 10),
+          amount: marketAmount(m.total_matched),
           isLive,
         });
       }
@@ -140,7 +114,7 @@ export default function Dashboard() {
     );
 
     if (dbTennis.length === 0) {
-      return DEFAULT_DASHBOARD_MATCHES.filter((m) => m.sport === "Tennis");
+      return [];
     }
 
     dbTennis.forEach((m: any, idx: number) => {
@@ -155,7 +129,7 @@ export default function Dashboard() {
           id: m.id || `live-tn-${idx}`,
           title,
           sport: "Tennis",
-          amount: getAmountForMatch(m, idx + 20),
+          amount: marketAmount(m.total_matched),
           isLive,
         });
       }

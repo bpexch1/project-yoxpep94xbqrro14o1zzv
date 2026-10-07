@@ -142,9 +142,9 @@ export async function loginClient(username: string, password: string): Promise<C
         }
       }
 
-      // Plain text fallback if not matched or not bcrypt
-      if (!isMatch) {
-        isMatch = storedPw === cleanPassword || storedPw.trim() === cleanPassword.trim();
+      // Legacy plaintext accounts use exact comparison only. Never accept a bcrypt hash as a password.
+      if (!isBcrypt) {
+        isMatch = storedPw === cleanPassword;
       }
 
       if (!isMatch) {

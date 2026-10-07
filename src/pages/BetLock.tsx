@@ -3,10 +3,10 @@ import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
 
 const MARKET_TYPES = [
-  { id: 'casino', label: 'All Casino', items: ['SuperBets Studio', 'Royal Casino', 'BetFair Games', 'Star Casino', 'Galaxy Casino', 'Sports Book', 'Super Nova'] },
-  { id: 'cricket', label: 'Cricket', items: ['Square', 'Fancy', 'Match Odds', 'Even / Odd', 'Toss', 'Cup Winner'] },
+  { id: 'casino', label: 'All Casino', items: ['TeenPatti Studio', 'Royal Casino', 'BetFair Games', 'Star Casino', 'Galaxy Casino', 'Sports Book', 'Super Nowa'] },
+  { id: 'cricket', label: 'Cricket', items: ['Figure', 'Fancy', 'Match Odds', 'Even / Odd', 'Toss', 'Cup Winner'] },
   { id: 'greyhound', label: 'Greyhound', items: ['Australia', 'British', 'New Zealand'] },
-  { id: 'horserace', label: 'Horse Race', items: ['Dubai', 'Australia', 'Bahrain', 'France', 'Zealand', 'England', 'England (PLACE)', 'Ireland', 'Ireland (PLACE)', 'New Zealand', 'Sundries', 'Singapore', 'America', 'Africa'] },
+  { id: 'horserace', label: 'Horse Race', items: ['Dubai', 'Australia', 'Bahrain', 'France', 'England', 'England (PLACE)', 'Ireland', 'Ireland (PLACE)', 'New Zealand', 'Sweden', 'Singapore', 'America', 'Africa'] },
   { id: 'soccer', label: 'Soccer', items: ['Match Odds', 'Over/Under Goals'] },
   { id: 'tennis', label: 'Tennis', items: ['Match Odds'] },
 ];
@@ -14,18 +14,16 @@ const MARKET_TYPES = [
 export default function BetLock() {
   const { toast } = useToast();
   const session = getClientSession();
-  const username = session?.username || 'Book7801';
+  const username = session?.username || '';
   
   const [settings, setSettings] = useState<Record<string, Record<string, boolean>>>(() => {
-    const saved = localStorage.getItem('betlock_settings');
-    if (saved) return JSON.parse(saved);
     
-    // Default: All checked
+    // Server state is unavailable; do not display local preferences as enforced locks.
     const defaults: Record<string, Record<string, boolean>> = {};
     MARKET_TYPES.forEach(cat => {
       defaults[cat.id] = {};
       cat.items.forEach(item => {
-        defaults[cat.id][item] = true;
+        defaults[cat.id][item] = false;
       });
     });
     return defaults;
@@ -54,7 +52,7 @@ export default function BetLock() {
   };
 
   const handleSave = () => {
-    localStorage.setItem('betlock_settings', JSON.stringify(settings));
+    toast({ title: 'Market controls unavailable', description: 'Server-enforced market permissions are not connected.', variant: 'destructive' });
   };
 
   return (
@@ -64,6 +62,7 @@ export default function BetLock() {
           Allowed Market Types ({username})
         </p>
         
+        <p role="status" className="mb-3 text-amber-800">Market permissions are unavailable. These controls cannot currently change betting access.</p>
         <div style={{ 
           background: "#fff", 
           border: "1px solid #c8c8c8", 
@@ -82,6 +81,7 @@ export default function BetLock() {
                   <div style={{ background: "#f8f9fa", padding: "10px 16px", borderBottom: "1px solid #dee2e6" }}>
                     <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: 700, fontSize: "14px", color: "#212529" }}>
                       <input
+                          disabled
                         type="checkbox"
                         checked={catChecked}
                         ref={el => el && (el.indeterminate = someChecked)}
@@ -96,6 +96,7 @@ export default function BetLock() {
                     {cat.items.map(item => (
                       <label key={item} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#212529" }}>
                         <input
+                          disabled
                           type="checkbox"
                           checked={settings[cat.id]?.[item] || false}
                           onChange={() => handleItemToggle(cat.id, item)}
@@ -112,6 +113,7 @@ export default function BetLock() {
           
           <div style={{ padding: "16px", borderTop: "1px solid #eee" }}>
             <button
+              disabled
               onClick={handleSave}
               style={{
                 backgroundColor: "#00b181",

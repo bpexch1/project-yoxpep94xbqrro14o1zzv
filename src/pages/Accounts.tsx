@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { Search, X } from "lucide-react";
 import { Client as ClientEntity } from "@/entities";
@@ -9,7 +9,9 @@ import { getClientSession } from "@/hooks/useClientAuth";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") || "");
+  useEffect(() => { setSearchQuery(searchParams.get("search") || ""); }, [searchParams]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [selectedClient, setSelectedClient] = useState<any>(null);
@@ -21,20 +23,6 @@ export default function Accounts() {
 
   useEffect(() => {
     if (!session) navigate("/login");
-    async function fixBookRole() {
-      try {
-        const results = await ClientEntity.filter({ username: "Book" }, "-created_at", 1);
-        if (results && results.length > 0) {
-          const book = results[0];
-          if (book.role === "superadmin") {
-            await ClientEntity.update(book.id, { role: "company" });
-          }
-        }
-      } catch (e) {
-        console.error("Book role fix error:", e);
-      }
-    }
-    fixBookRole();
   }, [session, navigate]);
 
   useEffect(() => {
