@@ -1,5 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
+import sportsBookBanner from "@/assets/images/banner_sportsbook_1789663894265.jpg";
+import aviatorXBanner from "@/assets/images/banner_aviator_x_1789663874611.jpg";
 
 interface GameBannersProps {
   onFilterChange?: (filter: string) => void;
@@ -8,46 +10,22 @@ interface GameBannersProps {
 export function GameBanners({ onFilterChange }: GameBannersProps) {
   const banners = [
     {
-      id: "world-roulette",
-      title: "WORLD CASINO ROULETTE",
-      image: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80",
-      filter: "Casino",
-      tag: "LIVE",
+      id: "sports-book",
+      title: "SPORTS BOOK",
+      image: sportsBookBanner,
+      filter: "Inplay",
     },
     {
-      id: "american-roullet",
-      title: "AMERICAN ROULLET",
+      id: "aviator-x",
+      title: "AVIATOR X",
+      image: aviatorXBanner,
+      filter: "Casino",
+    },
+    {
+      id: "european-roulette",
+      title: "EUROPEAN ROULETTE",
       image: "https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&w=600&q=80",
       filter: "Casino",
-      tag: "HOT",
-    },
-    {
-      id: "star-up-down",
-      title: "STAR CASINO UP DOWN",
-      image: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=600&q=80",
-      filter: "Casino",
-      tag: "NEW",
-    },
-    {
-      id: "world-virtual",
-      title: "WORLD CASINO VIRTUAL GAMES",
-      image: "https://images.unsplash.com/photo-1541278107931-e006523892df?auto=format&fit=crop&w=600&q=80",
-      filter: "Casino",
-      tag: "LIVE",
-    },
-    {
-      id: "star-teenpatti",
-      title: "STAR CASINO TEENPATTI",
-      image: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80",
-      filter: "Casino",
-      tag: "LIVE",
-    },
-    {
-      id: "world-teenpatti",
-      title: "WORLD CASINO TEENPATTI",
-      image: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&w=600&q=80",
-      filter: "Casino",
-      tag: "LIVE",
     },
   ];
 
