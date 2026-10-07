@@ -27,7 +27,7 @@ export default function BookDetail() {
     }
   }, [session, navigate]);
 
-  const { data: transactions, isLoading } = useQuery({
+  const { data: transactions, isLoading, isError } = useQuery({
     queryKey: ["transactions", session?.username, fromDate, toDate, searchTrigger, usernameFilter, downlineUsernames],
     queryFn: async () => {
       if (!session || searchTrigger === 0) return [];
@@ -126,6 +126,8 @@ export default function BookDetail() {
   }));
 
   const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
+
+  if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
     <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>

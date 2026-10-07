@@ -17,7 +17,7 @@ export default function CommissionReport() {
     if (!session) navigate("/login");
   }, [session, navigate]);
 
-  const { data: clients = [], isLoading } = useQuery({
+  const { data: clients = [], isLoading, isError } = useQuery({
     queryKey: ["commission-report-clients", session?.username],
     queryFn: async () => {
       if (!session) return [];
@@ -47,6 +47,8 @@ export default function CommissionReport() {
   }, [sortedClients]);
 
   const toggleSort = () => setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+
+  if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
     <div className="bg-[rgb(228,229,230)] pb-16 min-h-screen text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>

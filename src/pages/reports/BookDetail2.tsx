@@ -26,7 +26,7 @@ export default function BookDetail2() {
     }
   }, [session, navigate]);
 
-  const { data: bets, isLoading } = useQuery({
+  const { data: bets, isLoading, isError } = useQuery({
     queryKey: ["bets-detail-2", session?.username, fromDate, toDate, searchTrigger, downlineUsernames],
     queryFn: async () => {
       if (!session || downlineUsernames === undefined) return [];
@@ -97,6 +97,8 @@ export default function BookDetail2() {
     pl: getPL(b).toFixed(2),
     status: b?.status || "",
   }));
+
+  if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
     <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>

@@ -35,7 +35,7 @@ export default function Accounts() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { data: clients, isLoading, refetch } = useQuery({
+  const { data: clients, isLoading, isError, refetch } = useQuery({
     queryKey: ["clients", session?.username],
     queryFn: async () => {
       if (!session) return [];
@@ -127,6 +127,8 @@ export default function Accounts() {
       }
     }
   };
+
+  if (isError) return <div role="alert" className="card card-body">Unable to load users. <button className="btn btn-primary" onClick={() => void refetch()}>Retry</button></div>;
 
   return (
     <div

@@ -26,7 +26,7 @@ export default function Dashboard() {
   };
 
   // Fetch DB matches
-  const { data: dbMatches = [], refetch, isFetching } = useQuery({
+  const { data: dbMatches = [], refetch, isFetching, isError } = useQuery({
     queryKey: ["admin-matches"],
     queryFn: () => Match.list("-created_at", 50),
     staleTime: 10000,
@@ -143,6 +143,8 @@ export default function Dashboard() {
   };
 
   const totalHighlightsCount = soccerMatches.length + cricketMatches.length + tennisMatches.length;
+
+  if (isError) return <div role="alert" className="card card-body">Unable to load markets. <button className="btn btn-primary" onClick={() => void refetch()}>Retry</button></div>;
 
   return (
     <div

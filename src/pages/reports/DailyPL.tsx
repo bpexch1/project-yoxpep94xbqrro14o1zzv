@@ -26,7 +26,7 @@ export default function DailyPL() {
     }
   }, [session, navigate]);
 
-  const { data: dailyData, isLoading } = useQuery({
+  const { data: dailyData, isLoading, isError } = useQuery({
     queryKey: ["daily-pl", session?.username, fromDate, toDate, searchTrigger, downlineUsernames],
     queryFn: async () => {
       if (!session) return [];
@@ -124,6 +124,8 @@ export default function DailyPL() {
     netPL: (day?.netPL || 0).toFixed(2),
     commission: (day?.commission || 0).toFixed(2),
   }));
+
+  if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
     <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>

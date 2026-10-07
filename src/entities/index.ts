@@ -126,16 +126,10 @@ class QueryBuilder {
       query = (query as any).limit(this._limitVal);
 
       const { data, error } = await query;
-      if (error) {
-        const msg = String(error?.message || "");
-        if (!msg.includes("fetch")) {
-          console.warn(`[${targetTable}] query notice:`, msg);
-        }
-        return [];
-      }
+      if (error) throw new Error(error.message || "Unable to load records.");
       return (data || []).map(transformRow);
     } catch (err: any) {
-      return [];
+      throw err;
     }
   }
 }
@@ -219,16 +213,10 @@ function createEntity(entityName: string) {
         else q = (q as any).limit(500);
 
         const { data, error } = await q;
-        if (error) {
-          const msg = String(error?.message || "");
-          if (!msg.includes("fetch")) {
-            console.warn(`[${readTable}] list notice:`, msg);
-          }
-          return [];
-        }
+        if (error) throw new Error(error.message || "Unable to load records.");
         return (data || []).map(transformRow);
-      } catch {
-        return [];
+      } catch (err) {
+        throw err;
       }
     },
 
@@ -254,16 +242,10 @@ function createEntity(entityName: string) {
         q = (q as any).limit(limitN ?? 500);
 
         const { data, error } = await q;
-        if (error) {
-          const msg = String(error?.message || "");
-          if (!msg.includes("fetch")) {
-            console.warn(`[${readTable}] filter notice:`, msg);
-          }
-          return [];
-        }
+        if (error) throw new Error(error.message || "Unable to load records.");
         return (data || []).map(transformRow);
-      } catch {
-        return [];
+      } catch (err) {
+        throw err;
       }
     },
 

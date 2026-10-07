@@ -19,7 +19,7 @@ export default function FinalSheet() {
     if (!session) navigate("/login");
   }, [session, navigate]);
 
-  const { data: clients, isLoading: isLoadingClients } = useQuery({
+  const { data: clients, isLoading: isLoadingClients, isError: clientsError } = useQuery({
     queryKey: ["final-sheet-v2", session?.username],
     queryFn: async () => {
       if (!session) return [];
@@ -32,7 +32,7 @@ export default function FinalSheet() {
     enabled: !!session,
   });
 
-  const { data: selfClient, isLoading: isLoadingSelf } = useQuery({
+  const { data: selfClient, isLoading: isLoadingSelf, isError: selfError } = useQuery({
     queryKey: ["self-client", session?.username],
     queryFn: async () => {
       if (!session) return null;
@@ -97,6 +97,8 @@ export default function FinalSheet() {
   const negativeTotal = negativeClients.reduce((s, c) => s + (c.balance_upline || 0), 0);
 
   const toggleSort = () => setSortDir((d) => d === "asc" ? "desc" : "asc");
+
+  if (clientsError || selfError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
     <div className="bg-[rgb(228,229,230)] pb-16 min-h-screen text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
