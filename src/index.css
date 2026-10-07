@@ -1433,3 +1433,46 @@ body.sidebar-open, body.sidebar-show {
 @media (min-width: 768px) {
   .reference-user-dashboard > main > div:first-child > div { flex: 0 0 220px !important; max-width: 220px; }
 }
+
+/* Mobile proportions from the two supplied recordings (720px capture / 405px viewport). */
+.reference-game-banners { width:100%; overflow:hidden; margin:0 0 0; background:#e5f3fc; }
+.reference-game-banner-track { display:flex; gap:12px; width:100%; }
+.reference-game-banner-track > button { flex:0 0 calc((100% - 24px) / 3); min-width:0; aspect-ratio:1; padding:0; border:0; border-radius:0; overflow:hidden; background:#000; }
+.reference-game-banner-track img { display:block; width:100%; height:100%; object-fit:cover; }
+.reference-user-sidebar { width:168px !important; background:#254465 !important; }
+.reference-user-sidebar > div:first-child { background:#254465 !important; }
+.reference-user-submenu { background:rgba(43,46,51,.92) !important; max-width:calc(100vw - 168px) !important; padding-top:76px; box-shadow:none !important; }
+.reference-user-submenu > div:first-child { background:transparent !important; }
+.reference-user-submenu button { font-weight:400 !important; }
+.reference-user-header { background:#254465 !important; }
+.reference-bet-slip > [role="dialog"] { margin:0 auto; }
+.reference-bet-slip input { min-width:0; }
+.reference-bet-slip button:focus-visible { outline:3px solid #aeb6bb; outline-offset:1px; }
+@media (max-width:575.98px) {
+  .reference-user-header.reference-user-header { background:#e5f3fc !important; box-shadow:none !important; padding-bottom:3px; }
+  .reference-user-header .reference-user-header-main { background:#254465; }
+  .reference-user-dashboard .reference-user-header .reference-user-header-status {
+    min-height:39px !important; margin:5px !important; padding:7px 10px !important;
+    flex-wrap:nowrap !important; gap:6px !important; background:#254465 !important;
+    font-size:15px !important;
+  }
+  .reference-user-dashboard .reference-user-header .reference-user-status-bets { width:auto; white-space:nowrap; }
+  .reference-user-dashboard .reference-user-header-brand > button:last-child { font-weight:400 !important; }
+  .reference-user-sidebar .reference-user-sidebar-header { height:108px !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu { padding-top:0 !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button { height:42px !important; font-weight:400 !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button > span { font-weight:400 !important; }
+  .reference-bet-slip > [role="dialog"] { padding:18px 16px !important; }
+}
+@media (max-width:359px) {
+  .reference-user-dashboard .reference-user-header .reference-user-header-status { flex-wrap:wrap !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .animate-teen-patti,.animate-galaxy-casino { animation:none; }
+  .reference-user-header-marquee > div { animation:none !important; }
+}
+
+@keyframes reference-menu-red { 0%,100% { background-color:rgba(255,0,0,0); } 50% { background-color:#e00019; } }
+.animate-teen-patti { animation:reference-menu-red 8s linear infinite; }
+.animate-teen-patti > div { animation:arcRotateClockwise 3s linear infinite; }
+@media (prefers-reduced-motion:reduce) { .animate-teen-patti,.animate-teen-patti > div { animation:none; } }

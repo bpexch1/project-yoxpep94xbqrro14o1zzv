@@ -102,23 +102,24 @@ export function BetSlip({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4 select-none">
+      <div className="fixed inset-0 z-[110] reference-bet-slip fixed-slip flex items-start justify-center p-2 sm:p-4 overflow-y-auto select-none">
         {/* Dim backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/50 backdrop-blur-[1.5px]"
+          className="absolute inset-0 bg-black/50"
           onClick={onClose}
         />
 
         {/* Bet Slip Card Dialog */}
         <motion.div
-          initial={{ scale: 0.95, opacity: 0, y: 15 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
           transition={{ type: "spring", damping: 26, stiffness: 380 }}
-          className="relative w-full max-w-[340px] shadow-2xl z-10 border"
+          role="dialog" aria-modal="true" aria-label="Selection slip"
+          className="relative w-full max-w-[500px] shadow-2xl z-10 border"
           style={{
             backgroundColor: panelBg,
             borderColor: borderColor,
@@ -138,7 +139,7 @@ export function BetSlip({
           <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
             {/* Row 1: ODDS */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[13px] font-bold text-[#142a45] w-16">
+              <span className="text-[16px] font-normal text-[#292d30] w-20">
                 ODDS
               </span>
               <div className="flex-1 flex items-stretch h-[34px] bg-white border border-[#c8d4e2] rounded-[4px] overflow-hidden">
@@ -155,6 +156,7 @@ export function BetSlip({
                 {/* Odds Value / Input */}
                 <input
                   type="number"
+                  aria-label="Odds"
                   step="0.01"
                   value={odds}
                   onChange={(e) => setOdds(parseFloat(e.target.value) || 0)}
@@ -175,7 +177,7 @@ export function BetSlip({
 
             {/* Row 2: Amount */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[13px] font-bold text-[#142a45] w-16">
+              <span className="text-[16px] font-normal text-[#292d30] w-20">
                 Amount
               </span>
               <div className="flex-1">
@@ -184,7 +186,7 @@ export function BetSlip({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder=""
-                  autoFocus
+                  aria-label="Amount"
                   className="w-full h-[34px] px-2.5 bg-white border border-[#ced4da] focus:border-[#7a9db5] rounded-[4px] font-medium text-[15px] text-[#343a40] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
@@ -197,7 +199,7 @@ export function BetSlip({
                   key={val}
                   type="button"
                   onClick={() => handleAbsoluteStake(val)}
-                  className="h-[32px] bg-[#5c738e] hover:bg-[#4f647d] active:bg-[#43566d] text-white font-bold text-[12.5px] rounded-[4px] transition-colors shadow-sm"
+                  className="h-[36px] bg-[#6c757d] hover:bg-[#4f647d] active:bg-[#43566d] text-white font-bold text-[16px] rounded-[4px] transition-colors shadow-sm"
                 >
                   {val.toLocaleString("en-IN")}
                 </button>
@@ -211,7 +213,7 @@ export function BetSlip({
                   key={val}
                   type="button"
                   onClick={() => handleAddStake(val)}
-                  className="h-[32px] bg-[#5c738e] hover:bg-[#4f647d] active:bg-[#43566d] text-white font-bold text-[12.5px] rounded-[4px] transition-colors shadow-sm"
+                  className="h-[36px] bg-[#6c757d] hover:bg-[#4f647d] active:bg-[#43566d] text-white font-bold text-[16px] rounded-[4px] transition-colors shadow-sm"
                 >
                   +{val.toLocaleString("en-IN")}
                 </button>

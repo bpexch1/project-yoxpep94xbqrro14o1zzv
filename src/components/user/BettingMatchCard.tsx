@@ -22,8 +22,8 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
 
   // Format matched volume number
   const matchedAmount = match.matched_amount 
-    ? Number(match.matched_amount).toLocaleString('en-IN') 
-    : (match.id ? (Number(String(match.id).replace(/\D/g, '').substring(0, 8)) || 14029346).toLocaleString('en-IN') : '14,029,346');
+    ? Number(match.matched_amount).toLocaleString('en-US') 
+    : (match.id ? (Number(String(match.id).replace(/\D/g, '').substring(0, 8)) || 14029346).toLocaleString('en-US') : '14,029,346');
   
   // Time display
   const mt = match.match_time != null ? String(match.match_time) : '';
@@ -47,7 +47,7 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
   return (
     <div
       style={{
-        backgroundColor: "#ffffff",
+        backgroundColor: "#e5f3fc",
         borderBottom: "1px solid #dce4ed",
         display: "flex",
         alignItems: "stretch",
@@ -55,9 +55,12 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
         cursor: "pointer",
         transition: "background-color 0.15s",
       }}
+      role="link"
+      tabIndex={0}
+      onKeyDown={event => { if (event.key === "Enter") navigate(`/play/match/${match.id}`, { state: { match } }); }}
       onClick={() => navigate(`/play/match/${match.id}`, { state: { match } })}
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f6f9fc")}
-      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ffffff")}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#e5f3fc")}
     >
       {/* Left Column: InPlay + Time in Solid Green */}
       <div
@@ -67,27 +70,27 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#00a676",
-          color: "#ffffff",
+          backgroundColor: isLive ? "#00b181" : "#e7edf4",
+          color: isLive ? "#ffffff" : "#292f33",
           flexShrink: 0,
           padding: "4px 2px",
         }}
       >
         <span
           style={{
-            fontSize: 10.5,
-            fontWeight: 800,
+            fontSize: 14,
+            fontWeight: 400,
             textTransform: "none",
             letterSpacing: "0.2px",
             lineHeight: 1.1,
           }}
         >
-          InPlay
+          {isLive ? "InPlay" : match.day_label || "Today"}
         </span>
         <span
           style={{
-            fontSize: 11,
-            fontWeight: 800,
+            fontSize: 14,
+            fontWeight: 400,
             marginTop: 2,
             lineHeight: 1.1,
           }}
@@ -109,7 +112,7 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
         <span
           style={{
             fontWeight: 800,
-            fontSize: 13.5,
+            fontSize: 16,
             color: "#182638",
             lineHeight: 1.25,
             whiteSpace: "nowrap",
@@ -159,8 +162,8 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
         {/* Matched Volume */}
         <span
           style={{
-            fontSize: 11,
-            fontWeight: 700,
+            fontSize: 14,
+            fontWeight: 400,
             color: "#334155",
             letterSpacing: "0.2px",
           }}

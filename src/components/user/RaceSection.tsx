@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { HorseRaceIcon, GreyhoundIcon } from "@/components/icons/CustomIcons";
 
 export interface RaceSlot {
   time: string;
@@ -59,35 +60,36 @@ export function SingleRaceRow({
       {/* Section Header */}
       <div
         style={{
-          backgroundColor: "#eaeff5",
+          backgroundColor: "#e5f3fc",
           borderBottom: "1px solid #d4deea",
-          padding: "5px 12px",
+          padding: "7px 0",
           display: "flex",
           alignItems: "center",
           gap: 6,
         }}
       >
-        <span style={{ fontSize: 16 }}>{iconType === "horse" ? "🐎" : "🐕"}</span>
-        <span style={{ color: "#142c4c", fontWeight: 800, fontSize: 13 }}>{title}</span>
+        {iconType === "horse" ? <HorseRaceIcon className="w-6 h-6" color="#343a40" /> : <GreyhoundIcon className="w-6 h-6" color="#343a40" />}
+        <span style={{ color: "#292f33", fontWeight: 700, fontSize: 18 }}>{title}</span>
       </div>
 
       {/* Time Slots Row */}
       <div
         style={{
-          backgroundColor: "#2e5781",
+          backgroundColor: "#406e88",
           display: "flex",
           alignItems: "center",
-          height: 48,
+          minHeight: 62,
           borderBottom: "1px solid #1f3f61",
         }}
       >
         {/* Left Arrow Button */}
         <button
+          aria-label={`Previous ${title} fixtures`}
           onClick={handlePrev}
           disabled={startIndex === 0}
           style={{
-            width: 28,
-            height: 28,
+            width: 20,
+            height: 20,
             borderRadius: "50%",
             backgroundColor: startIndex === 0 ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.35)",
             border: "none",
@@ -107,7 +109,8 @@ export function SingleRaceRow({
         {/* 3 Slots */}
         <div style={{ flex: 1, display: "flex", height: "100%", alignItems: "stretch" }}>
           {visibleSlots.map((slot, idx) => (
-            <div
+            <button
+              type="button"
               key={`${slot.venue}-${idx}`}
               onClick={() => onSelectRace?.(slot)}
               style={{
@@ -116,23 +119,25 @@ export function SingleRaceRow({
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRight: idx < visibleSlots.length - 1 ? "1px solid rgba(255,255,255,0.2)" : "none",
+                borderRight: idx < visibleSlots.length - 1 ? "1px solid rgba(255,255,255,0.65)" : "none",
                 cursor: "pointer",
-                padding: "2px 2px",
+                padding: "8px 3px",
                 transition: "background-color 0.15s",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.08)")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
             >
-              <span style={{ fontWeight: 800, fontSize: 12, color: "#ffffff", lineHeight: 1.1 }}>
+              <span style={{ fontWeight: 700, fontSize: 16, color: "#ffffff", lineHeight: 1.1 }}>
                 {slot.time}
               </span>
               <span
                 style={{
-                  fontSize: 10,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  lineHeight: 1.25,
                   color: "rgba(255,255,255,0.9)",
                   marginTop: 2,
-                  whiteSpace: "nowrap",
+                  whiteSpace: "normal",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   maxWidth: "92%",
@@ -141,17 +146,18 @@ export function SingleRaceRow({
               >
                 {slot.venue}
               </span>
-            </div>
+            </button>
           ))}
         </div>
 
         {/* Right Arrow Button */}
         <button
+          aria-label={`Next ${title} fixtures`}
           onClick={handleNext}
           disabled={startIndex >= Math.max(0, safeSlots.length - visibleCount)}
           style={{
-            width: 28,
-            height: 28,
+            width: 20,
+            height: 20,
             borderRadius: "50%",
             backgroundColor: startIndex >= Math.max(0, safeSlots.length - visibleCount) ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.35)",
             border: "none",

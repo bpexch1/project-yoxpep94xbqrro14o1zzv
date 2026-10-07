@@ -437,7 +437,7 @@ export default function UserDashboard() {
       className="reference-user-dashboard min-h-screen text-[#212529] relative"
       style={{
         fontFamily: '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
-        backgroundColor: "#e8eff5",
+        backgroundColor: "#e5f3fc",
       }}
     >
       {/* Fullscreen Multi-Arc Radar Loader when Dashboard is refreshed */}
@@ -471,7 +471,7 @@ export default function UserDashboard() {
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
             width: "100%",
-            backgroundColor: "#173456",
+            backgroundColor: "#264561",
             borderBottom: "1px solid rgba(255,255,255,0.15)",
           }}
         >
@@ -488,22 +488,22 @@ export default function UserDashboard() {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "4px 4px 6px 4px",
-                  backgroundColor: isGreen ? "#00a676" : "#173456",
+                  backgroundColor: isGreen ? "#00a676" : "#264561",
                   border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.15)",
                   cursor: "pointer",
-                  height: 64,
+                  height: 76,
                   position: "relative",
                   transition: "background-color 0.15s ease",
                 }}
               >
                 {/* Top right count */}
-                <div style={{ width: "100%", textAlign: "right", paddingRight: 4 }}>
+                <div style={{ width: "100%", textAlign: "center", paddingRight: 0 }}>
                   <span
                     style={{
                       color: "#ffffff",
-                      fontSize: 13,
-                      fontWeight: 900,
+                      fontSize: 18,
+                      fontWeight: 400,
                       fontStyle: "italic",
                       lineHeight: 1,
                     }}
@@ -514,15 +514,15 @@ export default function UserDashboard() {
 
                 {/* Center icon */}
                 <div style={{ margin: "auto 0" }}>
-                  <SportIcon sport={cat.id} color="#ffffff" size={22} />
+                  <SportIcon sport={cat.id} color="#ffffff" size={28} />
                 </div>
 
                 {/* Bottom label */}
                 <span
                   style={{
                     color: "#ffffff",
-                    fontSize: 12,
-                    fontWeight: 700,
+                    fontSize: 18,
+                    fontWeight: 400,
                     lineHeight: 1,
                   }}
                 >

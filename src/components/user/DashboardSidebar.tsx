@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -74,6 +74,10 @@ const GREYHOUND_RACES = [
 export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardSidebarProps) {
   const navigate = useNavigate();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) setExpandedSection(null);
+  }, [isOpen]);
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -387,11 +391,11 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
           <AnimatePresence>
             {expandedSection && (
               <motion.div
-                initial={{ x: "-100%", opacity: 0 }}
-                animate={{ x: 170, opacity: 1 }}
-                exit={{ x: "-100%", opacity: 0 }}
+                initial={{ x: 168, opacity: 0 }}
+                animate={{ x: 168, opacity: 1 }}
+                exit={{ x: 158, opacity: 0 }}
                 transition={{ type: "tween", duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="fixed top-0 left-0 bottom-0 w-[200px] max-w-[55vw] bg-[#223d60] z-[100] flex flex-col shadow-2xl border-r border-white/10 select-none text-white"
+                className="reference-user-submenu fixed top-0 left-0 bottom-0 w-[200px] max-w-[55vw] bg-[#223d60] z-[100] flex flex-col shadow-2xl border-r border-white/10 select-none text-white"
                 style={{
                   fontFamily:
                     '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
