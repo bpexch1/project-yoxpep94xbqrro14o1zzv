@@ -86,6 +86,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
   });
 
   const balance = Number(clientData?.cash ?? 0);
+  const credit = Number(clientData?.credit_remaining ?? 0);
   const totalLiability = calculateTotalLiability(userPendingBets as any);
   const activeBetsCount = (userPendingBets as any[])?.length || 0;
 
@@ -223,7 +224,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <div style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
-              <span>B: 0</span>
+              <span>B: {balance.toLocaleString("en-IN")}</span>
               <span style={{ opacity: 0.95, color: "white" }}>
                 {" "}| L: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
               </span>
@@ -322,12 +323,12 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           borderTop: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <div className="reference-user-status-item">Credit: 0</div>
+        <div className="reference-user-status-item">Credit: {credit.toLocaleString("en-IN")}</div>
         <div className="reference-user-status-item">Balance: {balance.toLocaleString("en-IN")}</div>
         <div className="reference-user-status-item" style={{ color: "white" }}>
           Liable: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
         </div>
-        <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
+        <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount}</div>
       </div>
     </header>
   );
