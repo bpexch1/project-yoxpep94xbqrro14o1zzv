@@ -1589,3 +1589,19 @@ body.sidebar-open, body.sidebar-show {
   .reference-desktop-sportsbook { display:flex !important; }
   .reference-race-greyhound > div:last-child { min-height:48px !important; }
 }
+
+/* Final mobile alignment measured at the reference phone viewport. */
+@media (max-width:767.98px) {
+  html { scrollbar-width:none; }
+  html::-webkit-scrollbar,body::-webkit-scrollbar { display:none; }
+  .reference-user-dashboard > main { padding-top:3px; }
+  .reference-user-header.reference-user-header { padding-bottom:0; }
+  .reference-race-section > div:first-child { padding:6.5px 0 !important; }
+  .reference-user-sidebar { width:41.4vw !important; min-width:155px; max-width:180px; }
+  .reference-user-sidebar .reference-user-sidebar-header { height:106px !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button { gap:13px; }
+}
+@media (max-width:767.98px) {
+  .reference-user-header-account > div:nth-child(2) { margin-top:0 !important; padding:6px 0 !important; box-shadow:none !important; }
+  .reference-user-header-account > div:nth-child(2) > div { padding:4px 23px !important; }
+}
