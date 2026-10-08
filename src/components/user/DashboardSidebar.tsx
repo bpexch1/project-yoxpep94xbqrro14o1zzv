@@ -5,7 +5,7 @@ import {
   X,
   Globe,
   Gem,
-  Trash2,
+  BriefcaseBusiness,
   FileText,
   Star,
   BookOpen,
@@ -327,7 +327,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <span className="reference-position-icon" aria-hidden="true">C</span>
+                  <BriefcaseBusiness className="w-4 h-4 text-white" aria-hidden="true" />
                 </div>
                 <span className="text-white text-[12.5px] truncate">Current Position</span>
               </button>
@@ -338,7 +338,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <SoccerIcon className="w-4 h-4 text-white" color="#ffffff" />
+                  <Globe className="w-4 h-4 text-white" aria-hidden="true" />
                 </div>
                 <span className="text-white text-[12.5px] truncate">All Sports</span>
               </button>
