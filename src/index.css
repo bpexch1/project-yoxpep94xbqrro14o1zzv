@@ -1605,3 +1605,230 @@ body.sidebar-open, body.sidebar-show {
   .reference-user-header-account > div:nth-child(2) { margin-top:0 !important; padding:6px 0 !important; box-shadow:none !important; }
   .reference-user-header-account > div:nth-child(2) > div { padding:4px 23px !important; }
 }
+
+
+/* Oct 8 client reference corrections. Screenshot widths are capture pixels,
+   not CSS pixels; preserve the ~170px drawer rather than forcing 285 CSS px. */
+.reference-user-sidebar .reference-user-sidebar-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding: 5px 2px 0 2px !important;
+  gap: 5px !important;
+  box-sizing: border-box;
+}
+.reference-user-sidebar .reference-user-sidebar-header > button:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px !important;
+  height: 35px !important;
+  border: 1px solid rgba(255,255,255,.95) !important;
+  outline: 1px solid rgba(255,255,255,.35) !important;
+  border-radius: 2px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.reference-user-sidebar .reference-user-sidebar-header > button:first-child svg {
+  width: 27px !important;
+  height: 27px !important;
+  stroke-width: 1.7 !important;
+}
+.reference-user-sidebar .reference-user-sidebar-header > button:last-child {
+  height: 35px !important;
+  margin: 0 !important;
+  padding: 0 1px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+.reference-user-sidebar .reference-user-sidebar-menu > button > div:first-child {
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 26px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.reference-user-sidebar .reference-user-sidebar-menu > button > div:first-child svg,
+.reference-user-sidebar .reference-user-sidebar-menu > button > div:first-child img {
+  max-width: 24px;
+  max-height: 26px;
+  object-fit: contain;
+}
+.reference-user-sidebar .animate-teen-patti,
+.reference-user-sidebar .animate-galaxy-casino {
+  position: relative;
+  isolation: isolate;
+  animation: none !important;
+}
+.reference-user-sidebar .animate-teen-patti {
+  background: linear-gradient(90deg,#f62b32 0%,#ba0915 100%) !important;
+}
+.reference-user-sidebar .animate-galaxy-casino {
+  background: linear-gradient(90deg,#ac49ef 0%,#53119f 100%) !important;
+}
+.reference-user-sidebar .animate-teen-patti::before,
+.reference-user-sidebar .animate-galaxy-casino::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  opacity:0;
+  pointer-events:none;
+  animation: clientMenuHighlight 3.8s ease-in-out infinite;
+}
+.reference-user-sidebar .animate-teen-patti::before {
+  background:linear-gradient(90deg,#ff5550 0%,#e01d29 100%);
+}
+.reference-user-sidebar .animate-galaxy-casino::before {
+  background:linear-gradient(90deg,#bd6aff 0%,#791dcc 100%);
+}
+@keyframes clientMenuHighlight {
+  0%,100% { opacity:0; }
+  50% { opacity:.8; }
+}
+.reference-user-dashboard .reference-user-header > .reference-user-header-status {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:center !important;
+  justify-items:center;
+  width:auto;
+  min-height:41px !important;
+  gap:0 !important;
+  padding:8px 3px !important;
+  margin:4px 5px !important;
+  line-height:1.25 !important;
+}
+.reference-user-dashboard .reference-user-header > .reference-user-header-status > .reference-user-status-item {
+  width:100%;
+  min-width:0;
+  text-align:center;
+  white-space:nowrap !important;
+  font-size:clamp(12px,3.55vw,16px) !important;
+  line-height:1.25 !important;
+  font-weight:500 !important;
+}
+.reference-race-section.reference-race-horse > div:last-child {
+  min-height:48px !important;
+}
+.reference-race-section.reference-race-greyhound > div:last-child {
+  min-height:60px !important;
+}
+.reference-race-section > div:first-child > svg {
+  width:28px !important;
+  height:23px !important;
+}
+.reference-sport-tabs > button {
+  justify-content:space-between !important;
+  align-items:center !important;
+}
+.reference-sport-tabs > button > div:first-child {
+  text-align:right !important;
+  padding-right:7px !important;
+}
+.reference-sport-tabs > button > div:nth-child(2) {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:37px !important;
+  height:34px !important;
+  margin:auto 0 !important;
+}
+.reference-sport-tabs > button > div:nth-child(2) > span {
+  width:37px !important;
+  height:34px !important;
+}
+.reference-sport-tabs > button > div:nth-child(2) svg {
+  width:100% !important;
+  height:100% !important;
+}
+.reference-sport-tabs > button > span:last-child {
+  display:block;
+  width:100%;
+  text-align:center;
+  font-size:clamp(14px,3.8vw,18px) !important;
+  line-height:1.1 !important;
+}
+.reference-match-row > div:first-child {
+  width:43px !important;
+  flex:0 0 43px !important;
+  padding:4px 0 !important;
+}
+.reference-match-row > div:first-child > span {
+  max-width:100%;
+  white-space:nowrap;
+  font-size:13px !important;
+  line-height:1.15 !important;
+}
+.reference-match-row > div:nth-child(2) {
+  padding:6px 7px !important;
+  min-width:0;
+}
+.reference-match-volume {
+  width:94px !important;
+  padding:3px 6px !important;
+  gap:2px !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.reference-match-volume > div {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px !important;
+  width:auto !important;
+}
+.reference-match-volume > div > div:last-child {
+  position:static !important;
+  transform:none !important;
+}
+.reference-match-volume > span {
+  font-size:13px !important;
+  font-variant-numeric:tabular-nums;
+}
+@media (max-width:767.98px) {
+  .reference-user-sidebar {
+    width:clamp(155px,41.9vw,180px) !important;
+  }
+  .reference-user-sidebar .reference-user-sidebar-header {
+    height:106px !important;
+  }
+  .reference-user-dashboard .reference-user-header > .reference-user-header-status {
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    flex-wrap:nowrap !important;
+    min-height:40px !important;
+    margin:4px 5px !important;
+    padding:7px 1px !important;
+  }
+  .reference-sport-tabs > button {
+    height:82px !important;
+    min-width:0;
+  }
+}
+@media (max-width:350px) {
+  .reference-user-dashboard .reference-user-header > .reference-user-header-status {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    row-gap:5px !important;
+  }
+}
+@media (min-width:768px) {
+  .reference-user-dashboard .reference-user-header > .reference-user-header-status {
+    margin:4px !important;
+    min-height:42px !important;
+  }
+  .reference-match-volume {
+    width:110px !important;
+    flex-direction:row !important;
+    gap:6px !important;
+  }
+  .reference-match-volume > span { font-size:13px !important; }
+  .reference-race-section.reference-race-greyhound > div:last-child { min-height:56px !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .reference-user-sidebar .animate-teen-patti::before,
+  .reference-user-sidebar .animate-galaxy-casino::before { animation:none !important; }
+}
