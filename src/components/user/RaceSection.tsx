@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { HorseRaceIcon, GreyhoundIcon } from "@/components/icons/CustomIcons";
+import { HorseRaceIcon, GreyhoundIcon } from "@/components/icons/ReferenceSportsIcons";
 
 export interface RaceSlot {
   time: string;
@@ -56,7 +56,7 @@ export function SingleRaceRow({
   const visibleSlots = safeSlots.slice(startIndex, startIndex + visibleCount);
 
   return (
-    <div className="reference-race-section" style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+    <div className={`reference-race-section reference-race-${iconType}`} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
       {/* Section Header */}
       <div
         style={{

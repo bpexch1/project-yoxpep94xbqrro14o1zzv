@@ -12,7 +12,8 @@ import { RaceSection } from "@/components/user/RaceSection";
 import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trophy } from "lucide-react";
-import { TennisIcon, CricketIcon, SoccerIcon } from "@/components/icons/CustomIcons";
+import { TennisIcon, CricketIcon, SoccerIcon } from "@/components/icons/ReferenceSportsIcons";
+import { SportsBookIcon } from "@/components/icons/CustomIcons";
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
 
 // Crisp SVG Icons matching the screenshots
@@ -39,6 +40,7 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string; color
     );
   }
 
+  if (s.includes("sportsbook")) return <SportsBookIcon className="w-full h-full" color={color} />;
   const Icon = s.includes("cricket") ? CricketIcon : s.includes("tennis") ? TennisIcon : SoccerIcon;
   if (/cricket|tennis|soccer|football/.test(s)) return <span style={{ display: "block", width: size, height: size }}><Icon className="w-full h-full" color={color} /></span>;
 
@@ -366,6 +368,7 @@ export default function UserDashboard() {
     { id: "Cricket", label: "Cricket", count: cricketCount },
     { id: "Tennis", label: "Tennis", count: tennisCount },
     { id: "Soccer", label: "Soccer", count: soccerCount },
+    { id: "SportsBook", label: "SportsBook", count: matchesList.length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
@@ -441,7 +444,8 @@ export default function UserDashboard() {
             return (
               <button
                 key={cat.id}
-                onClick={() => setActiveFilter(cat.id)}
+                className={cat.id === "SportsBook" ? "reference-desktop-sportsbook" : undefined}
+                onClick={() => setActiveFilter(cat.id === "SportsBook" ? "Inplay" : cat.id)}
                 style={{
                   display: "flex",
                   flexDirection: "column",

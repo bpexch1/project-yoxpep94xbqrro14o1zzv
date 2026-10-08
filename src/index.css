@@ -1573,3 +1573,19 @@ body.sidebar-open, body.sidebar-show {
   .reference-price.back { background:#8dd2e9; }
   .reference-price.lay { background:#faa9ba; }
 }
+
+/* Keep the reference icons proportional in both menu and category tiles. */
+.reference-user-dashboard .reference-user-header > .reference-user-header-status > .reference-user-status-item { font-size:16px !important; line-height:1.5; font-weight:400 !important; }
+.reference-user-sidebar .reference-user-sidebar-menu > button > div:first-child { width:24px; height:26px; }
+.reference-user-sidebar .reference-user-sidebar-menu > button svg { width:24px; height:26px; }
+.reference-race-section > div:first-child > svg { width:25px; height:21px; }
+.reference-race-greyhound > div:last-child { min-height:64px !important; }
+.reference-desktop-sportsbook { display:none !important; }
+.reference-sport-tabs > button > div:nth-child(2) { width:32px; height:34px; }
+.reference-sport-tabs > button > div:nth-child(2) > span { width:32px !important; height:34px !important; }
+.reference-sport-tabs > button > div:nth-child(2) svg { width:100%; height:100%; }
+.reference-game-banners { margin-bottom:0; }
+@media (min-width:768px) {
+  .reference-desktop-sportsbook { display:flex !important; }
+  .reference-race-greyhound > div:last-child { min-height:48px !important; }
+}

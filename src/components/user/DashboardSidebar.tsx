@@ -13,15 +13,12 @@ import {
 } from "lucide-react";
 import {
   BLogoIcon,
-  SoccerIcon,
-  TennisIcon,
-  CricketIcon,
-  HorseRaceIcon,
-  GreyhoundIcon,
   SportsBookIcon,
   TeenPattiCardsIcon,
   GalaxyCasinoIcon,
 } from "@/components/icons/CustomIcons";
+
+import { SoccerIcon, TennisIcon, CricketIcon, HorseRaceIcon, GreyhoundIcon } from "@/components/icons/ReferenceSportsIcons";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
