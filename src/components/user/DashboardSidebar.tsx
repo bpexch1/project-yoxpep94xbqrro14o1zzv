@@ -260,7 +260,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <Star className="w-4 h-4 text-white" />
+                  <img src="/reference/star.png" alt="" />
                 </div>
                 <span className="text-white text-[12.5px] truncate">Star Casino</span>
               </button>
@@ -271,7 +271,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <Globe className="w-4 h-4 text-white" />
+                  <img src="/reference/world.png" className="reference-dark-icon" alt="" />
                 </div>
                 <span className="text-white text-[12.5px] truncate">World Casino</span>
               </button>
@@ -293,7 +293,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <BLogoIcon className="w-4 h-4 text-white" color="#ffffff" />
+                  <img src="/reference/betfair.png" className="reference-dark-icon" alt="" />
                 </div>
                 <span className="text-white text-[12.5px] truncate">BetFairGames</span>
               </button>
@@ -304,7 +304,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[38px] animate-teen-patti text-white font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <TeenPattiCardsIcon className="w-4 h-4 text-white" color="#ffffff" />
+                  <img src="/reference/teenpatti.png" className="reference-dark-icon" alt="" />
                 </div>
                 <span className="text-white text-[12.5px] truncate font-medium">
                   TeenPatti Studio
@@ -317,7 +317,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[38px] animate-galaxy-casino text-white font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <GalaxyCasinoIcon className="w-4 h-4 text-white" color="#ffffff" />
+                  <img src="/reference/galaxy.png" alt="" />
                 </div>
                 <span className="text-white text-[12.5px] truncate font-medium">
                   Galaxy Casino
@@ -330,7 +330,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <Trash2 className="w-4 h-4 text-white" />
+                  <span className="reference-position-icon" aria-hidden="true">C</span>
                 </div>
                 <span className="text-white text-[12.5px] truncate">Current Position</span>
               </button>

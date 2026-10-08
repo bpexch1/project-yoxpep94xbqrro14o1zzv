@@ -1430,9 +1430,6 @@ body.sidebar-open, body.sidebar-show {
     min-height: 42px !important;
   }
 }
-@media (min-width: 768px) {
-  .reference-user-dashboard > main > div:first-child > div { flex: 0 0 220px !important; max-width: 220px; }
-}
 
 /* Mobile proportions from the two supplied recordings (720px capture / 405px viewport). */
 .reference-game-banners { width:100%; overflow:hidden; margin:0 0 0; background:#e5f3fc; }
@@ -1519,3 +1516,60 @@ body.sidebar-open, body.sidebar-show {
 .reference-user-sidebar .animate-galaxy-casino { animation:reference-galaxy-pulse 8s linear infinite; }
 .reference-user-header-marquee > div { animation-delay:-4s !important; }
 @media (prefers-reduced-motion:reduce) { .reference-user-sidebar .animate-galaxy-casino { animation:none; background:#514b91; } }
+
+/* Desktop and mobile geometry from the October 8 screen recordings. */
+.reference-user-dashboard { background-image:url('/reference/diamonds.png'); background-repeat:repeat; }
+.reference-user-sidebar { width:170px !important; border-right:0 !important; }
+.reference-user-sidebar .reference-user-sidebar-header { padding:8px 0 0 !important; gap:0 !important; align-items:flex-start !important; height:108px !important; }
+.reference-user-sidebar .reference-user-sidebar-header > button:first-child { width:42px !important; height:30px !important; flex-shrink:0; border:1px solid white !important; border-radius:4px !important; outline:1px solid #999; }
+.reference-user-sidebar .reference-user-sidebar-header > button:first-child svg { width:25px; height:25px; stroke-width:1.6; }
+.reference-user-sidebar .reference-user-sidebar-header > button:last-child { height:30px; font-size:13px; font-weight:400; letter-spacing:0; }
+.reference-user-sidebar .reference-user-sidebar-menu { padding-top:7px !important; }
+.reference-user-sidebar .reference-user-sidebar-menu > button { height:43px !important; min-height:43px !important; }
+.reference-user-sidebar .reference-user-sidebar-menu img { width:24px; height:26px; object-fit:contain; }
+.reference-dark-icon { filter:brightness(0) invert(1); }
+.reference-position-icon { display:block; border:1px solid white; border-radius:0 0 3px 3px; box-shadow:inset 2px 0 #254465,inset 3px 0 white; font-size:16px; line-height:19px; height:21px; width:12px; text-align:center; }
+.reference-user-dashboard .reference-user-header > .reference-user-header-status { font-size:16px !important; background:#254465 !important; justify-content:space-between !important; gap:4px 12px !important; }
+.reference-user-header-account > div:nth-child(2) { min-width:158px !important; padding:8px 0 !important; }
+.reference-user-header-account > div:nth-child(2) > div { font-size:16px !important; padding:7px 23px !important; border:0 !important; color:#303030 !important; font-weight:400 !important; }
+.reference-match-row { position:relative; min-height:49px !important; }
+.reference-match-row.is-live > div:first-child { width:37px !important; padding:4px 0 !important; }
+.reference-match-row > div:nth-child(2) { padding:6px 9px !important; }
+.reference-match-row > div:nth-child(2) > span { color:#30353a !important; }
+.reference-match-volume { width:104px; padding:2px 31px 2px 0 !important; justify-content:space-between !important; }
+.reference-match-volume > div { justify-content:center; width:100%; }
+.reference-match-volume > div > div:last-child { position:absolute; right:10px; top:50%; transform:translateY(-50%); }
+.reference-match-volume > span { white-space:nowrap; font-size:15px !important; color:#30353a !important; }
+.reference-match-odds,.reference-odds-heading { display:none; }
+@media (max-width:767.98px) {
+  .reference-sport-tabs > button { height:78px !important; }
+}
+@media (min-width:768px) {
+  .reference-user-dashboard .reference-user-header > .reference-user-header-main { min-height:42px !important; padding:4px 5px !important; }
+  .reference-user-dashboard .reference-user-header > .reference-user-header-status { margin:4px !important; min-height:40px !important; padding:7px 10px !important; justify-content:flex-start !important; gap:28px !important; }
+  .reference-game-banner-track > button { flex-basis:calc((100% - 36px) / 4); aspect-ratio:1; }
+  .reference-game-banners { max-width:900px; }
+  .reference-user-sidebar .reference-user-sidebar-header { height:64px !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu { padding-top:0 !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button { height:34px !important; min-height:34px !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button > span { font-size:13px !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button svg,.reference-user-sidebar .reference-user-sidebar-menu img { width:20px !important; height:20px !important; }
+  .reference-sport-tabs { display:flex !important; background:transparent !important; }
+  .reference-sport-tabs > button { width:85px; height:80px !important; }
+  .reference-race-section > div:first-child { padding:4px 0 !important; }
+  .reference-race-section > div:first-child > span { font-size:15px !important; }
+  .reference-sport-heading { display:grid !important; grid-template-columns:minmax(0,1fr) 110px 54%; gap:0; padding:4px 7px !important; }
+  .reference-sport-heading > span { padding:0; text-align:center; }
+  .reference-odds-heading { display:grid; grid-template-columns:repeat(3,1fr); text-align:center; }
+  .reference-odds-heading span { font-size:14px !important; font-weight:400; }
+  .reference-match-row > div:nth-child(2) > span { font-size:14px !important; }
+  .reference-match-volume { width:110px; padding:4px 8px !important; flex-direction:row !important; align-items:center !important; gap:4px !important; }
+  .reference-match-volume > div { width:auto; }
+  .reference-match-volume > span { font-size:13px !important; }
+  .reference-match-volume > div > div:last-child { right:8px; }
+  .reference-match-odds { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:54%; flex-shrink:0; padding-right:32px; gap:10px; }
+  .reference-odds-pair { display:grid; grid-template-columns:1fr 1fr; gap:3px; }
+  .reference-price { display:flex; justify-content:center; align-items:center; font-size:17px; font-weight:700; }
+  .reference-price.back { background:#8dd2e9; }
+  .reference-price.lay { background:#faa9ba; }
+}

@@ -46,6 +46,7 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
 
   return (
     <div
+      className={`reference-match-row ${isLive ? "is-live" : "is-upcoming"}`}
       style={{
         backgroundColor: "#e5f3fc",
         borderBottom: "1px solid #dce4ed",
@@ -126,6 +127,7 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
 
       {/* Right Column: TV Icon, Info Icon, Matched Volume */}
       <div
+        className="reference-match-volume"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -170,6 +172,19 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
         >
           {matchedAmount}
         </span>
+      </div>
+      <div className="reference-match-odds" aria-label="Market prices">
+        {[match.team1 || match.title, "Draw", match.team2].map((selection, index) => (
+          <div className="reference-odds-pair" key={index}>
+            {["back", "lay"].map(type => {
+              const raw = index === 0 && type === "back" ? match.odds : match[`${type}_${index + 1}`];
+              const value = Number(raw);
+              return <span key={type} className={`reference-price ${type}`}>
+                {Number.isFinite(value) && value > 1 ? value : "–"}
+              </span>;
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

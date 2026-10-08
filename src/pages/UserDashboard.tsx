@@ -523,6 +523,7 @@ export default function UserDashboard() {
                     <span style={{ fontSize: 12, fontWeight: 800, color: "#142a45" }}>
                       Matched
                     </span>
+                    <div className="reference-odds-heading"><span>1</span><span>X</span><span>2</span></div>
                   </div>
 
                   {/* Matches List */}
