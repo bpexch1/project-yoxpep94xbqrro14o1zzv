@@ -56,7 +56,7 @@ export function SingleRaceRow({
   const visibleSlots = safeSlots.slice(startIndex, startIndex + visibleCount);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+    <div className="reference-race-section" style={{ display: "flex", flexDirection: "column", width: "100%" }}>
       {/* Section Header */}
       <div
         style={{

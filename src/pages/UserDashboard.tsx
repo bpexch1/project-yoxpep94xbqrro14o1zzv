@@ -12,6 +12,7 @@ import { RaceSection } from "@/components/user/RaceSection";
 import { CasinoSection } from "@/components/user/CasinoSection";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trophy } from "lucide-react";
+import { TennisIcon, CricketIcon, SoccerIcon } from "@/components/icons/CustomIcons";
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
 
 // Crisp SVG Icons matching the screenshots
@@ -32,55 +33,14 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string; color
   if (s.includes("inplay") || s.includes("live")) {
     return (
       <svg {...props}>
-        <circle cx="12" cy="12" r="8.5" />
-        <polyline points="12,7 12,12 15,14" />
+        <path d="M9 1h6M12 1v3M18 4l2 2" /><circle cx="12" cy="14" r="8" />
+        <path d="M12 8v6" />
       </svg>
     );
   }
 
-  if (s.includes("cricket")) {
-    return (
-      <svg {...props}>
-        <line x1="14" y1="9" x2="14" y2="22" />
-        <line x1="17" y1="8" x2="17" y2="21" />
-        <line x1="20" y1="9" x2="20" y2="22" />
-        <line x1="13.5" y1="9.5" x2="17.5" y2="8.5" />
-        <line x1="16.5" y1="8.5" x2="20.5" y2="9.5" />
-        <path d="M2 22L14 6" strokeWidth="3" />
-        <circle cx="4" cy="18" r="2" fill={color} />
-      </svg>
-    );
-  }
-
-  if (s.includes("tennis")) {
-    return (
-      <svg {...props}>
-        <ellipse cx="12" cy="9" rx="5.5" ry="7" />
-        <line x1="6.5" y1="7" x2="17.5" y2="7" />
-        <line x1="6" y1="10.5" x2="18" y2="10.5" />
-        <line x1="10" y1="2.2" x2="10" y2="15.8" />
-        <line x1="14" y1="2.2" x2="14" y2="15.8" />
-        <line x1="12" y1="16" x2="12" y2="22" />
-        <line x1="10" y1="20" x2="14" y2="20" />
-      </svg>
-    );
-  }
-
-  if (s.includes("soccer") || s.includes("football")) {
-    return (
-      <svg {...props}>
-        <circle cx="12" cy="12" r="9.5" />
-        <polygon points="12,5.5 14.5,8 13.5,11 10.5,11 9.5,8" fill={color} stroke={color} strokeWidth="0.5" />
-        <line x1="12" y1="2.5" x2="12" y2="5.5" />
-        <line x1="19" y1="7.5" x2="14.5" y2="8" />
-        <line x1="17" y1="20" x2="13.5" y2="17.5" />
-        <line x1="7" y1="20" x2="10.5" y2="17.5" />
-        <line x1="5" y1="7.5" x2="9.5" y2="8" />
-        <line x1="10.5" y1="11" x2="7" y2="20" />
-        <line x1="13.5" y1="11" x2="17" y2="20" />
-      </svg>
-    );
-  }
+  const Icon = s.includes("cricket") ? CricketIcon : s.includes("tennis") ? TennisIcon : SoccerIcon;
+  if (/cricket|tennis|soccer|football/.test(s)) return <span style={{ display: "block", width: size, height: size }}><Icon className="w-full h-full" color={color} /></span>;
 
   return (
     <svg {...props}>
@@ -466,7 +426,7 @@ export default function UserDashboard() {
         />
 
         {/* 4 Sports Navigation Blocks */}
-        <div
+        <div className="reference-sport-tabs"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
@@ -477,7 +437,7 @@ export default function UserDashboard() {
         >
           {categories.map((cat) => {
             const isActive = activeFilter === cat.id;
-            const isGreen = isActive || (activeFilter === "Inplay" && cat.id === "Inplay");
+            const isGreen = cat.id === "Inplay";
             return (
               <button
                 key={cat.id}
@@ -488,7 +448,7 @@ export default function UserDashboard() {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "4px 4px 6px 4px",
-                  backgroundColor: isGreen ? "#00a676" : "#264561",
+                  backgroundColor: isGreen ? "#00af87" : isActive ? "#000000" : "#254465",
                   border: "none",
                   borderRight: "1px solid rgba(255,255,255,0.15)",
                   cursor: "pointer",
@@ -544,7 +504,7 @@ export default function UserDashboard() {
               return (
                 <div key={sport} className="flex flex-col">
                   {/* Sport Accordion Header */}
-                  <div
+                  <div className="reference-sport-heading"
                     style={{
                       backgroundColor: "#e2e8f0",
                       borderBottom: "1px solid #cbd5e1",

@@ -1321,7 +1321,7 @@ body.sidebar-open, body.sidebar-show {
 .reference-user-dashboard .reference-user-header > div:first-child > div:last-child button { margin-top: 0 !important; font-weight: 400 !important; font-size: 14px !important; }
 .reference-user-dashboard .reference-user-header > div:last-child { justify-content: flex-start !important; gap: 24px; font-size: 14px !important; font-weight: 400 !important; min-height: 40px; }
 @media (max-width: 575.98px) {
-  .reference-user-dashboard .reference-user-header > div:first-child > div:nth-child(2) { display: none !important; }
+  .reference-user-dashboard .reference-user-header > div:first-child > div:nth-child(2) { display: flex !important; }
   .reference-user-dashboard .reference-user-header > div:last-child { gap: 12px; flex-wrap: wrap; font-size: 12px !important; }
 }
 
@@ -1476,3 +1476,46 @@ body.sidebar-open, body.sidebar-show {
 .animate-teen-patti { animation:reference-menu-red 8s linear infinite; }
 .animate-teen-patti > div { animation:arcRotateClockwise 3s linear infinite; }
 @media (prefers-reduced-motion:reduce) { .animate-teen-patti,.animate-teen-patti > div { animation:none; } }
+
+/* Screenshot-aligned client dashboard. Keep these rules scoped to the client shell. */
+.reference-user-dashboard .reference-user-header-brand > button:last-child > span { font-weight:400 !important; font-size:13px !important; }
+.reference-user-dashboard .reference-user-header .reference-user-header-status {
+  font-size:16px !important; font-weight:400 !important; gap:0 24px !important;
+  justify-content:flex-start !important; flex-wrap:wrap !important; line-height:1.5;
+}
+.reference-user-dashboard .reference-user-header .reference-user-status-item { white-space:normal; }
+.reference-user-dashboard .reference-user-header .reference-user-status-bets { white-space:normal; width:auto; }
+.reference-user-dashboard .reference-user-header-main { background:#254465; }
+.reference-user-dashboard .reference-user-header .reference-user-header-marquee { min-width:0; }
+.reference-user-dashboard .reference-user-header .reference-user-header-marquee > div { font-family:Arial,sans-serif; font-weight:900; }
+.reference-user-sidebar .reference-user-sidebar-header { border-bottom:0; position:relative; }
+.reference-user-sidebar .reference-user-sidebar-header::after { content:""; position:absolute; bottom:3px; left:18px; right:18px; border-bottom:1px solid #8293a4; }
+.reference-user-sidebar .reference-user-sidebar-menu > button { padding-left:18px; gap:16px; }
+.reference-user-sidebar .reference-user-sidebar-menu > button > div:first-child { width:23px; height:23px; }
+.reference-user-sidebar .reference-user-sidebar-menu > button svg { width:23px; height:23px; }
+.reference-user-sidebar .reference-user-sidebar-menu > button > span { font-size:14px !important; }
+.reference-user-sidebar .reference-user-sidebar-menu > button:nth-of-type(14) { margin-top:10px; position:relative; }
+.reference-user-sidebar .reference-user-sidebar-menu > button:nth-of-type(14)::before { content:""; position:absolute; top:-5px; left:18px; right:18px; border-top:1px solid #8293a4; }
+.reference-user-sidebar .animate-teen-patti,.reference-user-sidebar .animate-galaxy-casino { margin-left:18px; width:calc(100% - 18px); padding-left:0 !important; }
+.reference-race-section > div:first-child { border:0 !important; padding:8px 0 !important; }
+.reference-race-section > div:first-child > span { font-size:17px !important; }
+.reference-race-section > div:last-child { background:#406e8b !important; min-height:48px !important; }
+.reference-race-section > div:last-child > div > button { flex:1 1 0 !important; min-width:0; justify-content:flex-start !important; padding:6px 3px !important; }
+.reference-race-section > div:last-child > div > button > span:first-child { font-size:14px !important; }
+.reference-race-section > div:last-child > div > button > span:last-child { font-size:12px !important; line-height:1.3 !important; }
+.reference-race-section > div:last-child > button { width:17px !important; height:17px !important; background:#102a39 !important; }
+.reference-sport-tabs > button { border:1px solid #e5f3fc !important; }
+.reference-sport-tabs > button > div:first-child { text-align:right !important; padding-right:25% !important; }
+.reference-sport-heading { background:#ddd !important; padding:7px !important; }
+.reference-sport-heading span { font-size:16px !important; color:#30353a !important; }
+.reference-sport-heading > span { padding-right:34px; }
+@media (max-width:575.98px) {
+  .reference-user-dashboard .reference-user-header .reference-user-header-main { min-height:77px !important; padding-left:5px !important; }
+  .reference-user-dashboard .reference-user-header .reference-user-header-brand { gap:3px !important; }
+  .reference-user-dashboard .reference-user-header .reference-user-header-status { padding:7px 10px 10px !important; min-height:39px !important; }
+  .reference-user-sidebar .reference-user-sidebar-menu > button { height:43px !important; min-height:43px !important; }
+}
+@keyframes reference-galaxy-pulse { 0%,100% { background-color:transparent; } 50% { background-color:#514b91; } }
+.reference-user-sidebar .animate-galaxy-casino { animation:reference-galaxy-pulse 8s linear infinite; }
+.reference-user-header-marquee > div { animation-delay:-4s !important; }
+@media (prefers-reduced-motion:reduce) { .reference-user-sidebar .animate-galaxy-casino { animation:none; background:#514b91; } }
