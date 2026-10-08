@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getClientSession, clearClientSession } from "@/hooks/useClientAuth";
 import { Client, Bet } from "@/entities";
@@ -11,9 +11,10 @@ interface UserHeaderProps {
   sidebarOpen?: boolean;
   onMenuToggle?: () => void;
   onLoadBalance?: () => void;
+  showStatus?: boolean;
 }
 
-export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHeaderProps) {
+export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatus = true }: UserHeaderProps) {
   const [session, setSession] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -112,7 +113,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
 
   return (
     <header
-      className="reference-user-header"
+      className={`reference-user-header ${showStatus ? "has-status" : ""}`}
       style={{
         backgroundColor: "#244363",
         position: "sticky",
@@ -223,7 +224,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <div style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
-              <span>B: 0</span>
+              <span>B: {balance.toLocaleString("en-IN")}</span>
               <span style={{ opacity: 0.95, color: "white" }}>
                 {" "}| L: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
               </span>
@@ -308,7 +309,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
       </div>
 
       {/* Sub-bar: Credit, Balance, Liable, Active Bets */}
-      <div
+      {showStatus && <div
         className="reference-user-header-status"
         style={{
           backgroundColor: "#244363",
@@ -328,7 +329,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance }: UserHea
           Liable: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
         </div>
         <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
-      </div>
+      </div>}
     </header>
   );
 }

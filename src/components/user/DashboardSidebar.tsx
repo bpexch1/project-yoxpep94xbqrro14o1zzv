@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   X,
@@ -70,11 +70,15 @@ const GREYHOUND_RACES = [
 
 export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardSidebarProps) {
   const navigate = useNavigate();
+  const reducedMotion = useReducedMotion();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) setExpandedSection(null);
-  }, [isOpen]);
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    if (isOpen) window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen, onClose]);
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -120,7 +124,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "tween", duration: reducedMotion ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="reference-user-sidebar fixed top-0 left-0 bottom-0 w-[170px] bg-[#1a3556] z-[101] flex flex-col shadow-2xl border-r border-white/10 select-none text-white text-[12.5px]"
             style={{
               fontFamily:
@@ -133,11 +137,13 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                 onClick={onClose}
                 className="w-8 h-8 flex items-center justify-center rounded-none border border-white/70 bg-transparent hover:bg-white/10 text-white transition-colors"
                 title="Close"
+                aria-label="Close menu"
               >
                 <X className="w-5 h-5 stroke-[2.5]" />
               </button>
               <button
                 onClick={() => {
+                  onClose();
                   if (window.location.pathname === "/play" || window.location.pathname === "/play/") {
                     window.dispatchEvent(new CustomEvent("refresh-dashboard"));
                   } else {

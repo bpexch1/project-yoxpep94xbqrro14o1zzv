@@ -11,7 +11,7 @@ export function MatchedAndOpenBets({ openBets = [], matchedBets = [] }: MatchedA
   const effectiveOpen = matchedBets.length > 0 ? openBets : [];
 
   return (
-    <div 
+    <div className="reference-market-bets"
       style={{
         marginTop: 14,
         marginBottom: 14,

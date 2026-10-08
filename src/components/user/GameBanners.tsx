@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 const banners = [
-  { title: "SPORTS BOOK", image: "https://bpexch.org/img/casino/sportsbook.png", filter: "Inplay" },
-  { title: "AVIATOR X", image: "https://bpexch.org/img/casino/AviatorNew.png", filter: "Casino" },
-  { title: "EUROPEAN ROULETTE", image: "https://bpexch.org/img/casino/casino1.jpeg", filter: "Casino" },
-  { title: "CASINO TEENPATTI", image: "https://bpexch.org/img/casino/casino2.jpeg", filter: "Casino" },
-  { title: "STAR CASINO TEENPATTI", image: "https://bpexch.org/img/casino/casino3.jpeg", filter: "Casino" },
-  { title: "WORLD CASINO TEENPATTI", image: "https://bpexch.org/img/casino/casino4.jpeg", filter: "Casino" },
-  { title: "AVIATOR", image: "https://bpexch.org/img/casino/Aviator.png", filter: "Casino" },
+  { title: "SPORTS BOOK", image: "/reference/casino/sportsbook.png", filter: "Inplay" },
+  { title: "AVIATOR X", image: "/reference/casino/AviatorNew.png", filter: "Casino" },
+  { title: "EUROPEAN ROULETTE", image: "/reference/casino/casino1.jpeg", filter: "Casino" },
+  { title: "CASINO TEENPATTI", image: "/reference/casino/casino2.jpeg", filter: "Casino" },
+  { title: "STAR CASINO TEENPATTI", image: "/reference/casino/casino3.jpeg", filter: "Casino" },
+  { title: "WORLD CASINO TEENPATTI", image: "/reference/casino/casino4.jpeg", filter: "Casino" },
+  { title: "AVIATOR", image: "/reference/casino/Aviator.png", filter: "Casino" },
 ];
 
 export function GameBanners({ onFilterChange }: { onFilterChange?: (filter: string) => void }) {

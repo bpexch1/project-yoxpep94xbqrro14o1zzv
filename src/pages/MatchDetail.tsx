@@ -334,7 +334,7 @@ export default function MatchDetail() {
   if (matchLoading || clientLoading) {
     return (
       <div className="min-h-screen bg-[#e8eff5] relative">
-        <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <UserHeader showStatus={false} sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
         <CircularArcsLoader fullScreen size={110} />
       </div>
     );
@@ -394,13 +394,13 @@ export default function MatchDetail() {
   const fancyPositions = calculateMarketPositions(fancy2Items.map(f => f.title), openBets as any);
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column", position: "relative" }}>
+    <div className="reference-market-page" style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column", position: "relative" }}>
       {isEntering && <CircularArcsLoader fullScreen size={110} />}
-      <UserHeader sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <UserHeader showStatus={false} sidebarOpen={sidebarOpen} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* === MATCH INFO CARD (dark navy) === */}
-      <div style={{ backgroundColor: "#1e3a5f", paddingBottom: 0 }}>
+      <div className="reference-market-info" style={{ backgroundColor: "#1e3a5f", paddingBottom: 0 }}>
         <div style={{ padding: "12px 14px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -424,10 +424,11 @@ export default function MatchDetail() {
         </div>
 
         {/* Category Tabs */}
-        <div style={{ padding: "8px 10px", display: "flex", gap: 6, overflowX: "auto", backgroundColor: "rgba(0,0,0,0.25)" }} className="no-scrollbar">
+        <div style={{ padding: "8px 10px", display: "flex", gap: 6, overflowX: "auto", backgroundColor: "rgba(0,0,0,0.25)" }} className="reference-market-tabs no-scrollbar">
           {tabs.map((tab) => (
             <button
               key={tab}
+              aria-pressed={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               style={{
                 borderRadius: 20,
@@ -449,7 +450,7 @@ export default function MatchDetail() {
       </div>
 
       {/* SCORE SECTION */}
-      <div style={{
+      <div className="reference-market-score" style={{
         backgroundColor: "#1e3a5f",
         padding: "10px 12px",
         borderTop: "1px solid rgba(255,255,255,0.1)",
@@ -498,7 +499,7 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      <main style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+      <main className="reference-market-main" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
         {/* 1. MATCH ODDS */}
         {(activeTab === "ALL" || activeTab === "Bookmaker") && (
           <div style={{ marginTop: 0 }}>
@@ -681,7 +682,7 @@ export default function MatchDetail() {
         {/* === LIVE GRAPHIC / SCORECARD & TV TABS === */}
         <div style={{ marginTop: 14 }}>
           {/* Media tab switcher */}
-          <div style={{ display: "flex", padding: "0 10px", gap: 6 }}>
+          <div className="reference-market-media-tabs" style={{ display: "flex", padding: "0 10px", gap: 6 }}>
             <button
               onClick={() => setActiveMediaTab('tv')}
               style={{
@@ -805,7 +806,7 @@ export default function MatchDetail() {
 
 function CombinedSectionHeader({ title }: { title: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#1e3a5f" }}>
+    <div className="reference-market-heading" style={{ display: "flex", alignItems: "stretch", backgroundColor: "#1e3a5f" }}>
       <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 6, padding: "5px 10px" }}>
         <div style={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: "#00b894", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <span style={{ color: "white", fontSize: 10, fontWeight: 900 }}>⏰</span>
@@ -847,7 +848,7 @@ function TeamRow2({
   const hasPos = position !== undefined && position !== 0;
 
   return (
-    <div style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 46 }}>
+    <div className="reference-market-runner" style={{ display: "flex", alignItems: "stretch", backgroundColor: "#edf4fc", borderBottom: "1px solid #c4d9ea", minHeight: 46 }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "4px 10px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontWeight: 700, fontSize: 13.5, color: "#1e293b", lineHeight: 1.2 }}>{name}</span>
@@ -870,12 +871,12 @@ function TeamRow2({
         )}
       </div>
       {suspended ? (
-        <div style={{ width: 124, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#fce8e6", borderLeft: "1px solid #c4d9ea" }}>
+        <div className="reference-market-suspended" style={{ width: 124, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#fce8e6", borderLeft: "1px solid #c4d9ea" }}>
           <span style={{ color: "#e53935", fontWeight: 900, fontSize: 11, letterSpacing: 0.5 }}>SUSPENDED</span>
         </div>
       ) : (
         <>
-          <div
+          <button type="button" className="reference-market-price back" disabled={!odds || loading} aria-label={`Back ${name} at ${odds}`}
             onClick={() => odds && onBet('back', odds)}
             style={{
               width: 62,
@@ -894,8 +895,8 @@ function TeamRow2({
           >
             <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000" }}>{odds ? odds : '-'}</span>
             <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600 }}>{displayBackSize}</span>
-          </div>
-          <div
+          </button>
+          <button type="button" className="reference-market-price lay" disabled={!layOdds || loading} aria-label={`Lay ${name} at ${layOdds}`}
             onClick={() => layOdds && onBet('lay', layOdds)}
             style={{
               width: 62,
@@ -914,7 +915,7 @@ function TeamRow2({
           >
             <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000" }}>{layOdds ? layOdds : '-'}</span>
             <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600 }}>{displayLaySize}</span>
-          </div>
+          </button>
         </>
       )}
     </div>
