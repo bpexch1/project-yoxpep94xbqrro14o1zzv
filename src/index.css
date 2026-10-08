@@ -1832,3 +1832,9 @@ body.sidebar-open, body.sidebar-show {
   .reference-user-sidebar .animate-teen-patti::before,
   .reference-user-sidebar .animate-galaxy-casino::before { animation:none !important; }
 }
+
+/* Keep the casino gradients and icons in the intended paint order. */
+.reference-user-sidebar .animate-teen-patti::before,
+.reference-user-sidebar .animate-galaxy-casino::before { z-index:0; }
+.reference-user-sidebar .animate-teen-patti > *,
+.reference-user-sidebar .animate-galaxy-casino > * { position:relative; z-index:1; animation:none !important; }
