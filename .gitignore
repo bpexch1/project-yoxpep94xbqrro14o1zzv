@@ -25,3 +25,7 @@ dist-ssr
 
 # Supabase CLI cache
 supabase/.temp/
+
+# Local environment files and API keys
+.env.local
+.env.*.local
