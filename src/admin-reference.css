@@ -370,15 +370,17 @@
   .reference-admin .reference-accounts .admin-datatable-footer { justify-content: center; text-align: center; }
 }
 
-/* Loaded mobile accounts expose all balance columns in a scrolling table. */
+/* Loaded mobile accounts retain three columns and show details below each user. */
 @media (max-width: 991.98px) {
   .reference-admin .reference-accounts.balances-loaded .card-body > div:first-child table { width: auto; min-width: 100%; }
-  .reference-admin .reference-accounts.balances-loaded .accounts-table { table-layout: auto; min-width: 1000px; }
-  .reference-admin .reference-accounts.balances-loaded .accounts-table tr > :first-child { width: 142px; min-width: 142px; }
-  .reference-admin .reference-accounts.balances-loaded .accounts-table tr > :nth-child(2) { width: 115px; min-width: 115px; }
-  .reference-admin .reference-accounts.balances-loaded .accounts-table tr > :nth-child(3) { width: 94px; min-width: 94px; }
-  .reference-admin .reference-accounts.balances-loaded .accounts-table tr > :nth-child(n+4) { min-width: 100px; }
-  .reference-admin .reference-accounts.balances-loaded .accounts-table tr > [colspan] { width: auto; }
+  .reference-admin .reference-accounts .accounts-table { min-width: 0; }
+  .reference-admin .reference-accounts .data-row > td { height: auto; vertical-align: top; }
+  .reference-admin .reference-accounts .detail-row { background: #fff; }
+  .reference-admin .reference-accounts .detail-row > td { padding: 10px 20px 24px 35px; white-space: normal; }
+  .reference-admin .reference-accounts .reference-client-details { list-style: disc outside; padding-left: 16px; margin: 0; font-size: 16px; line-height: 24px; }
+  .reference-admin .reference-accounts .client-detail-options { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+  .reference-admin .reference-accounts .client-row-options { display: inline-flex; flex-wrap: nowrap; gap: 4px; padding: 0; }
+  .reference-admin .reference-accounts .client-row-options .btn-action { flex-shrink: 0; }
 }
 
 /* Edit User mobile measurements from 322717–322719. */

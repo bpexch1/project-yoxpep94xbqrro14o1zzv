@@ -36,7 +36,8 @@ export function ClientSummaryCard({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [balancesLoaded, setBalancesLoaded] = useState(false);
-  const showFullColumns = isDesktop || balancesLoaded;
+  // Mobile keeps financial details below each user, including after loading balances.
+  const showFullColumns = isDesktop;
   const columnCount = showFullColumns ? 9 : 3;
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -188,7 +189,7 @@ export function ClientSummaryCard({
   }, [filteredClients]);
 
   const renderOptions = (client: any) => (
-    <div className="flex items-center gap-1.5 pt-1">
+    <div className="client-row-options flex items-center gap-1.5">
 
 
       {/* Yellow (C) Button */}
@@ -483,14 +484,14 @@ export function ClientSummaryCard({
               ) : (
                 paginatedClients.map((client) => {
                   const display = getClientDisplay(client);
-                  const isExpanded = expandedIds.has(client.id);
+                  const isExpanded = balancesLoaded || expandedIds.has(client.id);
                   const isBettor = ["client", "user", "bettor"].includes(client.role?.toLowerCase());
 
                   return (
                     <React.Fragment key={client.id}>
                       {/* Main user row */}
                       <tr
-                        onClick={() => { if (!showFullColumns) toggleExpand(client.id); }}
+                        onClick={() => { if (!isDesktop && !balancesLoaded) toggleExpand(client.id); }}
                         className="data-row border-b border-[#DCDCDC] hover:bg-[#f8f9fa] cursor-pointer transition-colors"
                       >
                         <td className="px-3.5 py-2.5 border-r border-[#DCDCDC]">
@@ -508,6 +509,8 @@ export function ClientSummaryCard({
                                 }}
                                 className="client-info-button"
                                 title="View details"
+                                aria-label={`View details for ${client.username}`}
+                                aria-expanded={isExpanded}
                               >
                                 <span aria-hidden="true" className="client-info-glyph">i</span>
                               </button>
@@ -538,57 +541,19 @@ export function ClientSummaryCard({
                       {isExpanded && !showFullColumns && (
                         <tr className="detail-row bg-[#FAFAFA] border-b border-[#DCDCDC]">
                           <td colSpan={columnCount} className="px-4 py-3">
-                            <ul className="reference-client-details space-y-1 text-[0.875rem] text-[rgb(35,40,44)] mb-3">
+                            <ul className="reference-client-details">
+                              <li>Balance {balancesLoaded ? display.balance.toLocaleString() : "0"}</li>
+                              <li>Client (P/L) {balancesLoaded ? Number(display.clientPL).toLocaleString() : "0"}</li>
+                              <li>Share {display.share}</li>
+                              <li>Exposure {display.exposure}</li>
+                              <li>Available Balance {balancesLoaded ? display.available.toLocaleString() : "0"}</li>
                               <li>
-                                • Balance{" "}
-                                <span className="font-bold">
-                                  {balancesLoaded ? display.balance.toLocaleString() : "0"}
-                                </span>
-                              </li>
-                              <li>
-                                • Client (P/L){" "}
-                                <span
-                                  className="font-bold"
-                                  style={{
-                                    color:
-                                      balancesLoaded && display.clientPL < 0
-                                        ? "#dc3545"
-                                        : "rgb(35,40,44)",
-                                  }}
-                                >
-                                  {balancesLoaded
-                                    ? display.clientPL > 0
-                                      ? display.clientPL.toLocaleString()
-                                      : display.clientPL < 0
-                                      ? display.clientPL.toLocaleString()
-                                      : "0"
-                                    : "0"}
-                                </span>
-                              </li>
-                              <li>
-                                • Share{" "}
-                                <span className="font-bold">
-                                  {display.share}
-                                </span>
-                              </li>
-                              <li>
-                                • Exposure{" "}
-                                <span className="font-bold">
-                                  {display.exposure}
-                                </span>
-                              </li>
-                              <li>
-                                • Available Balance{" "}
-                                <span className="font-bold">
-                                  {balancesLoaded ? display.available.toLocaleString() : "0"}
-                                </span>
+                                <div className="client-detail-options">
+                                  <span>Options</span>
+                                  {renderOptions(client)}
+                                </div>
                               </li>
                             </ul>
-
-                            <div className="flex items-center gap-2">
-                              <span>• Options</span>
-                              {renderOptions(client)}
-                            </div>
                           </td>
                         </tr>
                       )}
