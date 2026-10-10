@@ -316,7 +316,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
 
               {/* 15. All Sports */}
               <button
-                onClick={() => handleFilter("Inplay")}
+                onClick={() => handleFilter("SportsBook")}
                 className="flex items-center gap-2.5 w-full px-3 h-[36px] hover:bg-white/10 transition-colors font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
@@ -401,7 +401,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                     ) : matchesError ? (
                       <div className="p-3 text-xs text-white/70" role="alert">Live event list is unavailable.</div>
                     ) : visibleFixtures.length === 0 ? (
-                      <div className="p-3 text-xs text-white/70">No verified fixtures are available right now.</div>
+                      <div className="p-3 text-xs text-white/70">No events are available from the configured feed.</div>
                     ) : visibleFixtures.map((event: any) => (
                       <button
                         key={String(event.id)}
@@ -417,11 +417,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
                     ))
                   ) : (
                     <div className="p-3">
-                      <div className="text-xs text-white/70 mb-3">Verified race schedule is not connected.</div>
-                      <button type="button" className="w-full px-3 py-2 text-xs text-left bg-white/10 hover:bg-white/20"
-                        onClick={() => { handleFilter(expandedSection || "Horse Race"); setExpandedSection(null); }}>
-                        View {expandedSection} section
-                      </button>
+                      <div className="text-xs text-white/70">Race data feed is not connected. Live racing events will appear here only after their provider is configured.</div>
                     </div>
                   )}
                 </div>
