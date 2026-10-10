@@ -1,5 +1,7 @@
 -- STAGED ONLY. APPLY AFTER LOGIN AND ACCOUNT CREATION CUTOVER, NOT DURING LEGACY SITE USE.
 -- Non-destructive: preserves client UUIDs, passwords, balances and transaction history.
+-- New hierarchy: Company > SuperAdmin > Admin > SuperMaster > Master > Bettor.
+-- Existing 'client' rows remain valid legacy bettors, but new child accounts use 'bettor'.
 begin;
 alter table public.clients add column if not exists auth_user_id uuid unique references auth.users(id) on delete set null;
 create or replace function public.enforce_bpexch_account_hierarchy()
@@ -35,8 +37,7 @@ begin
     when 'superadmin' then 'admin'
     when 'admin' then 'supermaster'
     when 'supermaster' then 'master'
-    when 'master' then 'dealer'
-    when 'dealer' then 'client'
+    when 'master' then 'bettor'
     else null
   end;
   if expected_child is null or normalized <> expected_child then
