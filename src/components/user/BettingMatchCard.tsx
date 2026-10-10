@@ -19,7 +19,9 @@ export function BettingMatchCard({ match, onSelectBet, onSelectOdds, setActiveBe
 
   const matchTitle = match.title || `${match.team1} V ${match.team2}`;
   const isLive = match.status === 'live' || String(match.status || '').toLowerCase() === 'inplay';
-  const isMarketOpen = isLive && (match.odds_status === "OPEN" || import.meta.env.DEV);
+  // Scheduled markets can open before kickoff. Only verified, fresh server prices are actionable.
+  const isMarketOpen = match.marketPriceVerified === true
+    && String(match.odds_status || "").toUpperCase() === "OPEN";
   const sport = String(match.sport || "").toLowerCase();
   const hasDraw = sport === "soccer" || sport === "football";
   const runnerNames = [match.team1 || match.title, hasDraw ? "The Draw" : "", match.team2];
