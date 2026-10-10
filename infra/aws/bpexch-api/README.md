@@ -20,3 +20,16 @@ This is an AWS SAM Node.js 22 Lambda + HTTP API project. It does not create an E
 9. Live bets, exposures, order matching and settlement require independent transactional database, idempotency, RLS, compliance review, and integration testing. None is represented as complete here.
 
 The SAM API is currently **read-only** and must not be advertised as an active exchange backend.
+
+## Staging deployment — 2026-10-10 (Sydney)
+- AWS CloudFormation stack: `BPEXCH-ReadOnly-API-Staging` — `CREATE_COMPLETE`.
+- Health URL: `https://r5vz6m7uhl.execute-api.ap-southeast-2.amazonaws.com/health`.
+- REST root: `https://r5vz6m7uhl.execute-api.ap-southeast-2.amazonaws.com`.
+- Actual deployed template: `infra/aws/bpexch-api/cloudformation-staging.json` (CloudFormation inline Lambda), with Lambda source duplicated from `src/handler.js`. Update BOTH in future releases, or move to SAM/S3 artifact deploys.
+- Vercel preview branch variable `VITE_AWS_API_BASE_URL` is configured only for `fix/live-data-financial-safety-20261010`.
+- The admin page `/api-settings` exposes an on-demand **Check AWS Connection** action; there is no continuous polling.
+- HTTP API throttles: 2 requests/second, burst 5. The account's Lambda unreserved-concurrency floor prevented per-function reserved concurrency; no reserved concurrency is configured.
+- Lambda 128 MB, 8-second timeout; log retention 7 days. No database, server credentials or wager writes.
+- AWS Budgets monthly COST threshold: `BPEXCH-Account-Monthly-USD10`. Budgets are *soft alerts*, not hard caps. Email subscribers have not been configured because account primary-email retrieval was denied; request explicit notification email if needed.
+- Verified direct Lambda responses: `GET /health -> 200`, unauthenticated `GET /v1/session -> 401`, `GET /v1/markets -> 503`, `POST /v1/bets -> 405`. Public DNS/browser reachability should still be tested externally.
+- Prior EC2 Openclaw-King was terminated at the user's explicit direction; do not re-use or revive it.
