@@ -6,6 +6,7 @@ import { Client as ClientEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { ClientSummaryCard } from "@/components/accounts/ClientSummaryCard";
 import { getClientSession } from "@/hooks/useClientAuth";
+import { roleLabel } from "@/lib/accountHierarchy";
 
 export default function Accounts() {
   const [activeTab, setActiveTab] = useState("Accounts");
@@ -205,7 +206,7 @@ export default function Accounts() {
                         }`}
                       >
                         <span className="font-bold text-[#00B496]">{client.username}</span>
-                        <span className="text-[11px] text-gray-500">{client.role || client.full_name}</span>
+                        <span className="text-[11px] text-gray-500">{roleLabel(client.role)}</span>
                       </div>
                     ))}
                   </div>
