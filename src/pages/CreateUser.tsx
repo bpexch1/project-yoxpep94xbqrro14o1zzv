@@ -84,8 +84,8 @@ export default function CreateUser() {
 
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 4) {
-      newErrors.password = "Min 4 characters";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Min 8 characters";
     }
 
     if (!session?.username || !parentRecord || parentRecord.role?.toLowerCase() !== session.role?.toLowerCase()) newErrors.parent = "Unable to verify your account role. Reload and try again.";
