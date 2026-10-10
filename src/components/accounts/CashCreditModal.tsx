@@ -20,7 +20,6 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   const { toast } = useToast();
   const session = getClientSession();
 
-  const [operatorPassword, setOperatorPassword] = useState("");
   const inFlight = useRef(false);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"cash" | "credit">("cash");
@@ -78,12 +77,10 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     setSubmitting(true);
     try {
       await manualWalletTransfer({
-        operatorUsername: session.username, operatorPassword,
         clientId: client.id, wallet: activeTab, direction, amount, description,
         requestId: pendingRequest.current!.id,
       });
       pendingRequest.current = null;
-      setOperatorPassword("");
       if (direction === "deposit") setDepositAmount("0");
       else setWithdrawAmount("0");
       toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
@@ -229,10 +226,6 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
             </p>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded p-3 mb-3">
-            <label className="block text-sm font-semibold mb-1" htmlFor="wallet-operator-password">Your administrator password</label>
-            <input id="wallet-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Confirm your identity" />
-          </div>
           {/* DEPOSIT SECTION (Green Header) */}
           <div className="rounded-[4px] overflow-hidden border border-[#dee2e6] bg-white shadow-sm">
             <div className="bg-[#00a676] px-3 py-2 text-white font-bold text-[13px]">
@@ -268,7 +261,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               <div className="flex justify-end pt-1">
                 <button
                   onClick={handleDeposit}
-                  disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                  disabled={isSubmittingDeposit || isSubmittingWithdraw}
                   className="bg-[#00a676] hover:bg-[#008f65] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
                 >
                   {isSubmittingDeposit && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -325,7 +318,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               <div className="flex justify-end pt-1">
                 <button
                   onClick={handleWithdraw}
-                  disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                  disabled={isSubmittingDeposit || isSubmittingWithdraw}
                   className="bg-[#dc3545] hover:bg-[#c82333] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
                 >
                   {isSubmittingWithdraw && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
