@@ -5,6 +5,9 @@ import { Transaction } from "@/entities";
 import { Filter } from "lucide-react";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { verifyInHierarchy } from "@/lib/hierarchyCheck";
+import { LedgerDateTimeField } from "@/components/accounts/LedgerDateTimeField";
+import { ledgerLocalToUtc } from "@/lib/ledgerDateTime";
+import "./ledgerReference.css";
 
 function todayAt(time: string) {
   const now = new Date();
@@ -21,7 +24,10 @@ export default function LedgerPage() {
   const username = params.username || session?.username;
   const [fromDate, setFromDate] = useState(() => todayAt("00:00"));
   const [toDate, setToDate] = useState(() => todayAt("23:59"));
-  const [range, setRange] = useState(() => ({ from: todayAt("00:00"), to: todayAt("23:59") }));
+  const [range, setRange] = useState(() => ({
+    from: ledgerLocalToUtc(todayAt("00:00")) || new Date().toISOString(),
+    to: ledgerLocalToUtc(todayAt("23:59")) || new Date().toISOString(),
+  }));
   const [filterError, setFilterError] = useState("");
   const [exportError, setExportError] = useState("");
   const [pageSize, setPageSize] = useState(100);
@@ -40,8 +46,8 @@ export default function LedgerPage() {
     refetchInterval: 15000,
   });
   const entries = useMemo(() => {
-    const start = new Date(range.from).getTime();
-    const end = new Date(range.to).getTime() + 59999;
+    const start = Date.parse(range.from);
+    const end = Date.parse(range.to) + 59999;
     return (transactions || []).filter(tx => {
       const date = new Date(tx.created_at).getTime();
       const type = String(tx.type || "").toLowerCase();
@@ -88,15 +94,20 @@ export default function LedgerPage() {
         <div className="card-header"><Filter size={16} /> Report Filter</div>
         <form className="card-body ledger-filter" onSubmit={event => {
           event.preventDefault();
-          if (!fromDate || !toDate || new Date(fromDate) > new Date(toDate)) { setFilterError("Choose a valid start and end date."); return; }
-          setFilterError(""); setRange({ from: fromDate, to: toDate }); setPage(1);
+          const fromUtc = ledgerLocalToUtc(fromDate);
+          const toUtc = ledgerLocalToUtc(toDate);
+          if (!fromUtc || !toUtc || Date.parse(fromUtc) > Date.parse(toUtc)) {
+            setFilterError("Choose a valid start and end date on or after 01/01/2026.");
+            return;
+          }
+          setFilterError(""); setRange({ from: fromUtc, to: toUtc }); setPage(1);
         }}>
-          <input aria-label="From date" type="datetime-local" required value={fromDate} onChange={event => setFromDate(event.target.value)} />
-          <div className="text-center my-2">-</div>
-          <input aria-label="To date" type="datetime-local" required value={toDate} onChange={event => setToDate(event.target.value)} />
+          <LedgerDateTimeField label="From" value={fromDate} onChange={setFromDate} />
+          <div className="ledger-date-separator">-</div>
+          <LedgerDateTimeField label="To" value={toDate} onChange={setToDate} />
           {filterError && <p role="alert" className="text-red-700">{filterError}</p>}
-          <div className="text-right mt-3"><button className="btn btn-primary" type="submit">Submit</button></div>
-          <fieldset className="mt-3 flex flex-col gap-1 text-xs">
+          <div className="ledger-filter-submit"><button className="btn btn-primary" type="submit">Submit</button></div>
+          <fieldset className="ledger-kind-options">
             <legend className="sr-only">Ledger category</legend>
             {(["all", "parent", "settlements"] as const).map(kind => (
               <label key={kind} className="flex items-center gap-1.5">
