@@ -310,7 +310,14 @@ export default function UserDashboard() {
     const t2 = m.team2 || (m.title ? m.title.split(/ vs | v /i)[1] : "Team 2");
     const title = m.title || `${t1} V ${t2}`;
 
-    const oddsVal = m.odds != null ? Number(m.odds) : null;
+    const verifiedAt = Date.parse(String(m.odds_verified_at || ""));
+    const verifiedMarket = m.odds_status === "OPEN" && Number.isFinite(verifiedAt)
+      && Date.now() - verifiedAt <= 15000 && verifiedAt <= Date.now() + 5000;
+    const verifiedPrice = (raw: any): number | null => {
+      const price = raw == null ? NaN : Number(raw);
+      return verifiedMarket && Number.isFinite(price) && price > 1 ? price : null;
+    };
+    const oddsVal = verifiedPrice(m.back_odds);
 
     return {
       ...m,
@@ -320,7 +327,13 @@ export default function UserDashboard() {
       team2: t2,
       sport: sport || "Soccer",
       status: isLive ? "live" : ["completed", "closed"].includes(status) ? "completed" : "upcoming",
-      odds: oddsVal != null && Number.isFinite(oddsVal) && oddsVal > 1 ? oddsVal : null,
+      odds: oddsVal,
+      back_1: oddsVal,
+      lay_1: verifiedPrice(m.lay_odds),
+      back_2: null, // Draw price unavailable without a verified third runner
+      lay_2: null,
+      back_3: verifiedPrice(m.back_odds2),
+      lay_3: verifiedPrice(m.lay_odds2),
       matched_amount: m.matched_amount ?? null,
       match_time: m.match_time ?? null,
     };
