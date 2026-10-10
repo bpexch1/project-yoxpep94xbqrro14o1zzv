@@ -221,7 +221,7 @@ export default function UserDashboard() {
   }, [session, navigate]);
 
   // Fetch matches directly from local/persistent DB
-  const { data: matches, isLoading: matchesLoading } = useQuery({
+  const { data: matches, isLoading: matchesLoading, isError: matchesError } = useQuery({
     queryKey: ["matches"],
     queryFn: () => Match.list(),
     refetchInterval: 10000,
@@ -328,6 +328,7 @@ export default function UserDashboard() {
       sport: sport || "Soccer",
       status: isLive ? "live" : ["completed", "closed"].includes(status) ? "completed" : "upcoming",
       odds: oddsVal,
+      marketPriceVerified: verifiedMarket,
       back_1: oddsVal,
       lay_1: verifiedPrice(m.lay_odds),
       back_2: null, // Draw price unavailable without a verified third runner
@@ -375,7 +376,8 @@ export default function UserDashboard() {
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
-    if (activeFilter === "Inplay") return true;
+    if (activeFilter === "Inplay") return m.status === "live";
+    if (activeFilter === "SportsBook") return m.status !== "completed";
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === "soccer") return sport === "football" || sport === "soccer";
@@ -391,7 +393,7 @@ export default function UserDashboard() {
 
   // Ensure fixed order: Cricket, Soccer/Football, Tennis
   const orderedSports = ["Cricket", "Soccer", "Tennis"].filter(
-    (s) => activeFilter === "Inplay" || activeFilter.toLowerCase() === s.toLowerCase()
+    (s) => activeFilter === "Inplay" || activeFilter === "SportsBook" || activeFilter.toLowerCase() === s.toLowerCase()
   );
 
   const handleSelectBet = (match: any, selection: string, betType: "back" | "lay", odds: number) => {
@@ -424,12 +426,8 @@ export default function UserDashboard() {
         {/* Game Banners Row */}
         <GameBanners onFilterChange={(filter) => setActiveFilter(filter)} />
 
-        {/* Horse Race & Greyhound Section */}
-        <RaceSection
-          onSelectRace={(race) => {
-            console.log("Selected race:", race);
-          }}
-        />
+        {/* Race section retains reference card geometry, but never shows fabricated production fixtures. */}
+        <RaceSection />
 
         {/* 4 Sports Navigation Blocks */}
         <div className="reference-sport-tabs"
@@ -448,7 +446,7 @@ export default function UserDashboard() {
               <button
                 key={cat.id}
                 className={cat.id === "SportsBook" ? "reference-desktop-sportsbook" : undefined}
-                onClick={() => setActiveFilter(cat.id === "SportsBook" ? "Inplay" : cat.id)}
+                onClick={() => setActiveFilter(cat.id)}
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -499,6 +497,12 @@ export default function UserDashboard() {
             );
           })}
         </div>
+
+        {matchesError && (
+          <div role="alert" className="mx-1 my-2 border border-amber-300 bg-amber-50 p-3 text-xs font-semibold text-amber-900">
+            Match service is temporarily unavailable. Displayed markets may be incomplete; no example odds are being shown as live data.
+          </div>
+        )}
 
         {/* Content Area */}
         {activeFilter === "Casino" || activeFilter === "Horse Race" || activeFilter === "Greyhound" ? (
@@ -554,7 +558,7 @@ export default function UserDashboard() {
                   {activeFilter} Matches
                 </p>
                 <p className="text-xs text-gray-600 mt-1 font-semibold">
-                  No {activeFilter} matches scheduled right now.
+                  {matchesError ? "Market service is unavailable right now." : "No matching events are currently available."}
                 </p>
               </div>
             )}
