@@ -24,7 +24,7 @@ assert.equal(partially.orders.at(-1).matched,350);
 assert.equal(reserved(partially,"client"),500);
 const cancelled=cancel(partially,partially.orders.at(-1).id);
 assert.equal(reserved(cancelled,"client"),350);
-mustReject(()=>cancel(cancelled,partially.orders.at(-1).id),"cannot be cancelled");
+mustReject(()=>cancel(cancelled,partially.orders.at(-1).id),"No cancellable");
 
 const suspended=marketStatus(seed,"SUSPENDED");
 mustReject(()=>place(suspended,"client","back","Falcons",2.16,100),"suspended");
