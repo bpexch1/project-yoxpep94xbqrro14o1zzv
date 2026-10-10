@@ -10,7 +10,7 @@
     "lint": "eslint . --max-warnings=999",
     "preview": "vite preview",
     "test:hierarchy": "node --experimental-strip-types --test tests/account-hierarchy.mjs",
-    "test:wallet-session": "node --test tests/wallet-session-review.mjs"
+    "test:wallet-session": "node --experimental-strip-types --test tests/wallet-session-review.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
