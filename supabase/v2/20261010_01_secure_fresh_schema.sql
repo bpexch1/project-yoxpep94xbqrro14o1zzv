@@ -111,6 +111,7 @@ declare actor public.v2_profiles%rowtype;
         movement numeric(18,2);
 begin
   if p_actor is null or p_target is null or p_actor = p_target or p_request_id is null
+     or p_wallet is null or p_direction is null
      or p_wallet not in ('cash','credit') or p_direction not in ('deposit','withdraw')
      or p_amount is null or p_amount <= 0 or p_amount > 1000000000
      or p_amount <> round(p_amount,2)
