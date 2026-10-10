@@ -26,7 +26,7 @@ test("legacy client accounts are treated as Bettor without rewriting stored role
   assert.equal(normalizeAccountRole("user"), "bettor");
   assert.equal(roleLabel("client"), "Bettor");
   assert.equal(roleLabel("bettor"), "Bettor");
-  assert.equal(canCreateChild("master", "client"), true);
+  assert.equal(canCreateChild("master", "client"), false);
 });
 test("Dealer is not supported as a parent, a child or an admin role", () => {
   assert.equal(normalizeAccountRole("dealer"), null);
