@@ -35,6 +35,9 @@ Deno.serve(async (request: Request): Promise<Response> => {
     !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(String(payload.match_id || "")) ||
     typeof payload.provider_event_id !== "string" || !payload.provider_event_id.trim() ||
     typeof payload.source !== "string" || !payload.source.trim() ||
+    typeof payload.emitted_at !== "string" ||
+    !Number.isFinite(Date.parse(payload.emitted_at)) ||
+    Math.abs(Date.now() - Date.parse(payload.emitted_at)) > 20000 ||
     !["OPEN", "SUSPENDED", "CLOSED"].includes(payload.market_status) ||
     !Array.isArray(payload.markets) ||
     payload.markets.length > 100) {
@@ -60,6 +63,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
   const { error } = await database.rpc("ingest_verified_market_snapshot", {
     p_match_id: payload.match_id,
     p_provider_event_id: payload.provider_event_id,
+    p_emitted_at: payload.emitted_at,
     p_source: payload.source,
     p_market_status: payload.market_status,
     p_markets: payload.markets,
