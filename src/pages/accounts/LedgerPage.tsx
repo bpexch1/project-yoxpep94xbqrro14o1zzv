@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Transaction } from "@/entities";
+import { Client, Transaction } from "@/entities";
 import { Filter } from "lucide-react";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { verifyInHierarchy } from "@/lib/hierarchyCheck";
@@ -46,6 +46,11 @@ export default function LedgerPage() {
     queryFn: () => verifyInHierarchy(username!, session!.username, session!.role),
     enabled: !!username && !!session,
   });
+  const { data: ledgerAccount } = useQuery({
+    queryKey: ["ledger-target-parent", username],
+    queryFn: async () => (await Client.filter({ username }))[0] || null,
+    enabled: authorized === true,
+  });
   const { data: transactions, isLoading, isError } = useQuery({
     queryKey: ["transactions", username],
     queryFn: () => Transaction.filter({ client_username: username }, "created_at"),
@@ -59,8 +64,9 @@ export default function LedgerPage() {
       const date = new Date(tx.created_at).getTime();
       const type = String(tx.type || "").toLowerCase();
       if (walletFilter && type !== walletFilter && type !== "opening_balance") return false;
-      if (ledgerKind === "parent" && !tx.operator_username) return false;
-      if (ledgerKind === "settlements" && !/settle|pl[ _-]/i.test(type)) return false;
+      if (ledgerKind === "parent" && (!ledgerAccount?.parent_username ||
+        String(tx.operator_username || "").toLowerCase() !== String(ledgerAccount.parent_username).toLowerCase())) return false;
+      if (ledgerKind === "settlements" && !/settle|pl[ _-]/i.test(type + " " + String(tx.description || ""))) return false;
       return date >= start && date <= end;
     }).map(tx => ({
       id: tx.id,
@@ -80,7 +86,7 @@ export default function LedgerPage() {
         : String(left).localeCompare(String(right), undefined, { numeric: true });
       return sortAscending ? comparison : -comparison;
     });
-  }, [transactions, range, search, walletFilter, ledgerKind, sortColumn, sortAscending]);
+  }, [transactions, range, search, walletFilter, ledgerKind, sortColumn, sortAscending, ledgerAccount?.parent_username]);
   const pages = Math.max(1, Math.ceil(entries.length / pageSize));
   const currentPage = Math.min(page, pages);
   const offset = (currentPage - 1) * pageSize;
