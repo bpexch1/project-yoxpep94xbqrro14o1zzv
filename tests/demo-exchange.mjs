@@ -29,7 +29,7 @@ mustReject(()=>cancel(cancelled,partially.orders.at(-1).id),"No cancellable");
 const suspended=marketStatus(seed,"SUSPENDED");
 mustReject(()=>place(suspended,"client","back","Falcons",2.16,100),"suspended");
 const denied=permit(seed,false);
-mustReject(()=>place(denied,"client","back","Falcons",2.16,100),"permission");
+mustReject(()=>place(denied,"client","back","Falcons",2.16,100),"betting is disabled");
 
 const won=settle(matched,"Falcons");
 assert.equal(won.status,"SETTLED");
