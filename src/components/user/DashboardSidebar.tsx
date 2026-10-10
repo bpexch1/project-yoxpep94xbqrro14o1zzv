@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Match } from "@/entities";
 import {
   X,
   Globe,
@@ -26,52 +28,26 @@ interface DashboardSidebarProps {
   onFilterChange?: (filter: string) => void;
 }
 
-const SOCCER_MATCHES = [
-  { id: "fb-1", title: "Angers v ESTAC Troyes" },
-  { id: "fb-2", title: "Celta Vigo v Racing Santander" },
-  { id: "fb-3", title: "New England Revolution v Orlando City" },
-  { id: "fb-4", title: "Nottm Forest v Coventry" },
-  { id: "fb-5", title: "Sevilla v Barcelona" },
-  { id: "fb-6", title: "Sporting Lisbon v Arouca" },
-  { id: "fb-7", title: "Trabzonspor v Galatasaray" },
-  { id: "fb-8", title: "Venezia v Lazio" },
-];
-
-const TENNIS_MATCHES = [
-  { id: "tn-1", title: "Pe Stearns v I Jovic" },
-  { id: "tn-2", title: "Bucsa v Bejlek" },
-  { id: "tn-3", title: "Frech v I Jovic" },
-];
-
-const CRICKET_MATCHES = [
-  { id: "cr-1", title: "Antigua & Barbuda Falcs v Jamaica Kings" },
-  { id: "cr-2", title: "South Africa v Australia" },
-  { id: "cr-3", title: "Zimbabwe v Australia" },
-  { id: "cr-4", title: "Afghanistan v India" },
-  { id: "cr-5", title: "England v Sri Lanka" },
-];
-
-const HORSE_RACES = [
-  { time: "10:04 PM", venue: "Laurel Park (US)" },
-  { time: "10:06 PM", venue: "Delaware Park (US)" },
-  { time: "10:15 PM", venue: "Belmont Park (US)" },
-  { time: "11:25 PM", venue: "Belmont Park (US)" },
-  { time: "11:30 PM", venue: "Newcastle (GB)" },
-  { time: "11:34 PM", venue: "Gulfstream Park (US)" },
-];
-
-const GREYHOUND_RACES = [
-  { time: "10:20 PM", venue: "Dunstall Park (GB)" },
-  { time: "10:21 PM", venue: "Star Pelaw (GB)" },
-  { time: "10:26 PM", venue: "Hove (GB)" },
-  { time: "11:22 PM", venue: "Romford (GB)" },
-  { time: "11:30 PM", venue: "Central Park (GB)" },
-];
-
 export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardSidebarProps) {
   const navigate = useNavigate();
   const reducedMotion = useReducedMotion();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const sportsSections = ["Soccer", "Tennis", "Cricket"];
+  const { data: matches = [], isLoading: matchesLoading, isError: matchesError } = useQuery({
+    queryKey: ["sidebar-sports-events"],
+    queryFn: () => Match.list("-match_time", 500),
+    enabled: isOpen && sportsSections.includes(expandedSection || ""),
+    staleTime: 15_000,
+    refetchInterval: isOpen && sportsSections.includes(expandedSection || "") ? 15_000 : false,
+  });
+  const visibleFixtures = (Array.isArray(matches) ? matches : []).filter((event: any) => {
+    const wanted = String(expandedSection || "").toLowerCase();
+    const sport = String(event.sport || "").toLowerCase();
+    const normalized = sport === "football" ? "soccer" : sport;
+    return normalized === wanted && !["completed", "closed", "cancelled"].includes(String(event.status || "").toLowerCase())
+      && event.id && (event.title || (event.team1 && event.team2));
+  }).slice(0, 35);
+
 
   useEffect(() => {
     if (!isOpen) setExpandedSection(null);
@@ -394,11 +370,11 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
           <AnimatePresence>
             {expandedSection && (
               <motion.div
-                initial={{ x: 168, opacity: 0 }}
-                animate={{ x: 168, opacity: 1 }}
-                exit={{ x: 158, opacity: 0 }}
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -10, opacity: 0 }}
                 transition={{ type: "tween", duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="reference-user-submenu fixed top-0 left-0 bottom-0 w-[200px] max-w-[55vw] bg-[#223d60] z-[100] flex flex-col shadow-2xl border-r border-white/10 select-none text-white"
+                className="reference-user-submenu fixed top-0 bottom-0 w-[200px] max-w-[55vw] bg-[#223d60] z-[100] flex flex-col shadow-2xl border-r border-white/10 select-none text-white"
                 style={{
                   fontFamily:
                     '"Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
@@ -419,73 +395,35 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
 
                 {/* Sub-items List */}
                 <div className="flex-1 overflow-y-auto no-scrollbar py-1">
-                  {/* Soccer */}
-                  {expandedSection === "Soccer" &&
-                    SOCCER_MATCHES.map((m) => (
+                  {sportsSections.includes(expandedSection || "") ? (
+                    matchesLoading ? (
+                      <div className="p-3 text-xs text-white/70" role="status">Loading events…</div>
+                    ) : matchesError ? (
+                      <div className="p-3 text-xs text-white/70" role="alert">Live event list is unavailable.</div>
+                    ) : visibleFixtures.length === 0 ? (
+                      <div className="p-3 text-xs text-white/70">No verified fixtures are available right now.</div>
+                    ) : visibleFixtures.map((event: any) => (
                       <button
-                        key={m.id}
-                        onClick={() => handleMatchClick(m, "Soccer")}
-                        className="w-full text-left px-3 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white border-b border-white/5 transition-colors font-semibold leading-tight line-clamp-1"
+                        key={String(event.id)}
+                        type="button"
+                        onClick={() => handleMatchClick(event, expandedSection || "")}
+                        className="reference-sidebar-event w-full text-left px-3 py-2 text-[12px] text-white/90 hover:bg-white/10 focus-visible:bg-white/15 border-b border-white/10 transition-colors leading-tight"
                       >
-                        {m.title}
+                        {event.title || `${event.team1} v ${event.team2}`}
+                        <span className="block text-[10px] text-white/50 mt-0.5">
+                          {String(event.status || "upcoming").toUpperCase()}
+                        </span>
                       </button>
-                    ))}
-
-                  {/* Tennis */}
-                  {expandedSection === "Tennis" &&
-                    TENNIS_MATCHES.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => handleMatchClick(m, "Tennis")}
-                        className="w-full text-left px-3 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white border-b border-white/5 transition-colors font-semibold leading-tight"
-                      >
-                        {m.title}
+                    ))
+                  ) : (
+                    <div className="p-3">
+                      <div className="text-xs text-white/70 mb-3">Verified race schedule is not connected.</div>
+                      <button type="button" className="w-full px-3 py-2 text-xs text-left bg-white/10 hover:bg-white/20"
+                        onClick={() => { handleFilter(expandedSection || "Horse Race"); setExpandedSection(null); }}>
+                        View {expandedSection} section
                       </button>
-                    ))}
-
-                  {/* Cricket */}
-                  {expandedSection === "Cricket" &&
-                    CRICKET_MATCHES.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => handleMatchClick(m, "Cricket")}
-                        className="w-full text-left px-3 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white border-b border-white/5 transition-colors font-semibold leading-tight"
-                      >
-                        {m.title}
-                      </button>
-                    ))}
-
-                  {/* Horse Race */}
-                  {expandedSection === "Horse Race" &&
-                    HORSE_RACES.map((slot, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          handleFilter("Horse Race");
-                          setExpandedSection(null);
-                        }}
-                        className="w-full text-left px-3 py-1.5 text-[11.5px] text-white/90 hover:bg-white/10 hover:text-white border-b border-white/5 transition-colors leading-tight"
-                      >
-                        <span className="font-bold text-white mr-1.5">{slot.time}</span>
-                        <span className="text-white/80">{slot.venue}</span>
-                      </button>
-                    ))}
-
-                  {/* Greyhound */}
-                  {expandedSection === "Greyhound" &&
-                    GREYHOUND_RACES.map((slot, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          handleFilter("Greyhound");
-                          setExpandedSection(null);
-                        }}
-                        className="w-full text-left px-3 py-1.5 text-[11.5px] text-white/90 hover:bg-white/10 hover:text-white border-b border-white/5 transition-colors leading-tight"
-                      >
-                        <span className="font-bold text-white mr-1.5">{slot.time}</span>
-                        <span className="text-white/80">{slot.venue}</span>
-                      </button>
-                    ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
