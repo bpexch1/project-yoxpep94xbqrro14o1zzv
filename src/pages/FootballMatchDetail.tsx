@@ -185,8 +185,8 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
               <FootballTeamRow 
                 name={match.team1} 
                 position={matchOddsPositions[match.team1]}
-                odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? 2.1) : (match.back_odds ?? 2.1)} 
-                layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? 2.12) : (match.lay_odds ?? 2.12)} 
+                odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? null) : null} 
+                layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? null) : null} 
                 backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
                 onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} 
@@ -194,8 +194,8 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
               <FootballTeamRow 
                 name={match.team2} 
                 position={matchOddsPositions[match.team2]}
-                odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? 3.4) : (match.back_odds2 ?? 3.4)} 
-                layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? 3.45) : (match.lay_odds2 ?? 3.45)} 
+                odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? null) : null} 
+                layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? null) : null} 
                 backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
                 onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
@@ -203,8 +203,8 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
               <FootballTeamRow 
                 name="The Draw" 
                 position={matchOddsPositions["The Draw"]}
-                odds={hasLiveOdds ? (runnerDraw?.backPrice ?? 3.85) : 3.85} 
-                layOdds={hasLiveOdds ? (runnerDraw?.layPrice ?? 3.9) : 3.9} 
+                odds={hasLiveOdds ? (runnerDraw?.backPrice ?? null) : null} 
+                layOdds={hasLiveOdds ? (runnerDraw?.layPrice ?? null) : null} 
                 backSize={hasLiveOdds ? formatSize(runnerDraw?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runnerDraw?.laySize) : undefined}
                 onBet={(t, o) => setActiveBet({ match, selection: "The Draw", betType: t, odds: o })} 
@@ -213,40 +213,16 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
           );
         })()}
 
-        {/* LIVE VIDEO AVAILABLE Banner */}
+        {/* LIVE VIDEO NOT CONNECTED Banner */}
         <div style={{ backgroundColor: "#e8eff5", padding: "6px 10px", borderBottom: "1px solid #cbd5e1", display: "flex", alignItems: "center" }}>
           <span style={{ color: "#e53935", fontWeight: 900, fontSize: 12, letterSpacing: "0.5px" }}>
-            LIVE VIDEO AVAILABLE
+            LIVE VIDEO NOT CONNECTED
           </span>
         </div>
 
-        <GoalsSection 
-          title="OVER/UNDER 2.5 GOALS (MaxBet: 250K)" 
-          underOdds={3.75} 
-          underLay={3.8} 
-          overOdds={1.35} 
-          overLay={1.37} 
-          positions={underOver25Positions}
-          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })} 
-        />
-        <GoalsSection 
-          title="OVER/UNDER 3.5 GOALS (MaxBet: 250K)" 
-          underOdds={1.58} 
-          underLay={1.59} 
-          overOdds={2.68} 
-          overLay={2.72} 
-          positions={underOver15Positions}
-          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })} 
-        />
-        <GoalsSection 
-          title="OVER/UNDER 4.5 GOALS (MaxBet: 250K)" 
-          underOdds={1.13} 
-          underLay={1.14} 
-          overOdds={8.0} 
-          overLay={8.2} 
-          positions={underOver05Positions}
-          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })} 
-        />
+        <div className="p-3 text-xs text-slate-600 bg-slate-100">
+          Additional goal markets are unavailable until verified provider odds are connected.
+        </div>
 
         {/* TV / SCORE CARD */}
         <div style={{ marginTop: 10 }}>
@@ -370,16 +346,16 @@ function FootballTeamRow({
   onBet 
 }: { 
   name: string; 
-  odds: number; 
-  layOdds: number; 
+  odds: number | null; 
+  layOdds: number | null; 
   backSize?: string; 
   laySize?: string; 
   position?: number;
   onBet: (type: 'back' | 'lay', odds: number) => void 
 }) {
   const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-  const displayBackSize = backSize || `${((hash % 20) / 10 + 0.5).toFixed(1)}M`;
-  const displayLaySize = laySize || `${((hash % 15) / 10 + 0.2).toFixed(1)}M`;
+  const displayBackSize = backSize || "";
+  const displayLaySize = laySize || "";
   const hasPos = position !== undefined && position !== 0;
 
   return (
@@ -401,7 +377,7 @@ function FootballTeamRow({
         )}
       </div>
       <div 
-        onClick={() => onBet('back', odds)} 
+        onClick={() => { if (odds != null && Number.isFinite(odds) && odds > 1) onBet('back', odds); }} 
         style={{ 
           width: 62, 
           backgroundColor: "#7ec8f8", 
@@ -418,11 +394,11 @@ function FootballTeamRow({
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5bb5f5")}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#7ec8f8")}
       >
-        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{odds.toFixed(2)}</span>
+        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{odds != null && Number.isFinite(odds) ? odds.toFixed(2) : "—"}</span>
         <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600, lineHeight: 1 }}>{displayBackSize}</span>
       </div>
       <div 
-        onClick={() => onBet('lay', layOdds)} 
+        onClick={() => { if (layOdds != null && Number.isFinite(layOdds) && layOdds > 1) onBet('lay', layOdds); }} 
         style={{ 
           width: 62, 
           backgroundColor: "#fca5a5", 
@@ -439,7 +415,7 @@ function FootballTeamRow({
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f87171")}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fca5a5")}
       >
-        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{layOdds.toFixed(2)}</span>
+        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{layOdds != null && Number.isFinite(layOdds) ? layOdds.toFixed(2) : "—"}</span>
         <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600, lineHeight: 1 }}>{displayLaySize}</span>
       </div>
     </div>
