@@ -1,21 +1,21 @@
-// Pure hierarchy rules shared with account workflows. Server must independently enforce.
-export const ACCOUNT_ROLES = ["company", "superadmin", "admin", "supermaster", "master", "dealer", "client"] as const;
+// Pure hierarchy rules shared with account workflows. Database must enforce independently.
+// "client" is a legacy persisted role; the product now calls this role "Bettor".
+export const ACCOUNT_ROLES = ["company", "superadmin", "admin", "supermaster", "master", "bettor"] as const;
 export type AccountRole = (typeof ACCOUNT_ROLES)[number];
 const CHILD_ROLE: Record<AccountRole, AccountRole | null> = {
   company: "superadmin",
   superadmin: "admin",
   admin: "supermaster",
   supermaster: "master",
-  master: "dealer",
-  dealer: "client",
-  client: null,
+  master: "bettor",
+  bettor: null,
 };
 export function normalizeAccountRole(input: unknown): AccountRole | null {
   const role = String(input ?? "").trim().toLowerCase().replace(/[\s_-]+/g, "");
   const lookup: Record<string, AccountRole> = {
-    company:"company", superadmin:"superadmin", admin:"admin",
-    supermaster:"supermaster", master:"master", dealer:"dealer",
-    client:"client", bettor:"client", user:"client"
+    company: "company", superadmin: "superadmin", admin: "admin",
+    supermaster: "supermaster", master: "master", bettor: "bettor",
+    client: "bettor", user: "bettor",
   };
   return lookup[role] || null;
 }
@@ -29,6 +29,9 @@ export function canCreateChild(parentRole: unknown, childRole: unknown): boolean
 }
 export function roleLabel(role: unknown): string {
   const normalized = normalizeAccountRole(role);
-  return ({company:"Company",superadmin:"SuperAdmin",admin:"Admin",
-    supermaster:"SuperMaster",master:"Master",dealer:"Dealer",client:"Client"} as Record<AccountRole,string>)[normalized as AccountRole] || "Unknown";
+  const labels: Record<AccountRole, string> = {
+    company: "Company", superadmin: "SuperAdmin", admin: "Admin",
+    supermaster: "SuperMaster", master: "Master", bettor: "Bettor",
+  };
+  return normalized ? labels[normalized] : "Unknown";
 }
