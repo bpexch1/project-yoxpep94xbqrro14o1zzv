@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Transaction } from "@/entities";
 import { Filter } from "lucide-react";
@@ -14,6 +14,9 @@ const columns = ["Date", "Description", "Amount", "Balance"];
 
 export default function LedgerPage() {
   const params = useParams();
+  const [searchParams] = useSearchParams();
+  const walletFilter = ["cash", "credit"].includes(searchParams.get("wallet") || "") ? searchParams.get("wallet") : null;
+  const [ledgerKind, setLedgerKind] = useState<"all" | "parent" | "settlements">("all");
   const session = getClientSession();
   const username = params.username || session?.username;
   const [fromDate, setFromDate] = useState(() => todayAt("00:00"));
@@ -41,6 +44,10 @@ export default function LedgerPage() {
     const end = new Date(range.to).getTime() + 59999;
     return (transactions || []).filter(tx => {
       const date = new Date(tx.created_at).getTime();
+      const type = String(tx.type || "").toLowerCase();
+      if (walletFilter && type !== walletFilter && type !== "opening_balance") return false;
+      if (ledgerKind === "parent" && !tx.operator_username) return false;
+      if (ledgerKind === "settlements" && !/settle|pl[ _-]/i.test(type)) return false;
       return date >= start && date <= end;
     }).map(tx => ({
       id: tx.id,
@@ -50,7 +57,7 @@ export default function LedgerPage() {
       // Only display the recorded balance; never synthesize financial history.
       balance: tx.after_balance == null ? "—" : Number(tx.after_balance),
     })).filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
-  }, [transactions, range, search]);
+  }, [transactions, range, search, walletFilter, ledgerKind]);
   const pages = Math.max(1, Math.ceil(entries.length / pageSize));
   const currentPage = Math.min(page, pages);
   const offset = (currentPage - 1) * pageSize;
@@ -89,10 +96,22 @@ export default function LedgerPage() {
           <input aria-label="To date" type="datetime-local" required value={toDate} onChange={event => setToDate(event.target.value)} />
           {filterError && <p role="alert" className="text-red-700">{filterError}</p>}
           <div className="text-right mt-3"><button className="btn btn-primary" type="submit">Submit</button></div>
+          <fieldset className="mt-3 flex flex-col gap-1 text-xs">
+            <legend className="sr-only">Ledger category</legend>
+            {(["all", "parent", "settlements"] as const).map(kind => (
+              <label key={kind} className="flex items-center gap-1.5">
+                <input type="radio" name="ledger-category" checked={ledgerKind === kind}
+                  onChange={() => { setLedgerKind(kind); setPage(1); }} />
+                {kind === "all" ? "All" : kind === "parent" ? "Parent" : "Settlements"}
+              </label>
+            ))}
+          </fieldset>
         </form>
       </section>
       <section className="card">
-        <div className="card-header">{username} - Account Ledger</div>
+        <div className="card-header">
+          {walletFilter ? (walletFilter === "cash" ? "Cash" : "Credit") : username} - Account Ledger
+        </div>
         <div className="card-body">
           <div className="ledger-controls">
             <label><select aria-label="Entries per page" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[100,250,500,1000].map(size => <option key={size}>{size}</option>)}</select> entries per page</label>
