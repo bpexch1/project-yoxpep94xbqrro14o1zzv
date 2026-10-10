@@ -58,15 +58,15 @@
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
-        "Policies": [
-          {
-            "PolicyName": "SecretsAccessOnlyWhenConfigured",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Fn::If": [
-                    "HasSecret",
+        "Policies": {
+          "Fn::If": [
+            "HasSecret",
+            [
+              {
+                "PolicyName": "ReadV2SupabaseConfigOnly",
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
                     {
                       "Effect": "Allow",
                       "Action": [
@@ -75,16 +75,16 @@
                       "Resource": {
                         "Ref": "ConfigSecretArn"
                       }
-                    },
-                    {
-                      "Ref": "AWS::NoValue"
                     }
                   ]
                 }
-              ]
+              }
+            ],
+            {
+              "Ref": "AWS::NoValue"
             }
-          }
-        ]
+          ]
+        }
       }
     },
     "BackendFunction": {
