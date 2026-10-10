@@ -37,6 +37,7 @@ import NotFound from "@/pages/NotFound";
 import { BrandingBadge } from "@/components/BrandingBadge";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GlobalRouteLoader } from "@/components/ui/GlobalRouteLoader";
+import { MarketRealtimeBootstrap } from "@/components/MarketRealtimeBootstrap";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <MarketRealtimeBootstrap />
           <GlobalRouteLoader />
           <Routes>
             <Route path="/" element={<Index />} />
