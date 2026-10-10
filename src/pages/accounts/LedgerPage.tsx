@@ -33,6 +33,13 @@ export default function LedgerPage() {
   const [pageSize, setPageSize] = useState(100);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState<"date" | "description" | "amount" | "balance">("date");
+  const [sortAscending, setSortAscending] = useState(true);
+  const toggleSort = (column: "date" | "description" | "amount" | "balance") => {
+    if (column === sortColumn) setSortAscending(previous => !previous);
+    else { setSortColumn(column); setSortAscending(true); }
+    setPage(1);
+  };
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(new Set());
   const { data: authorized, isError: authorizationError } = useQuery({
     queryKey: ["ledger-access", username, session?.username, session?.role],
@@ -48,7 +55,7 @@ export default function LedgerPage() {
   const entries = useMemo(() => {
     const start = Date.parse(range.from);
     const end = Date.parse(range.to) + 59999;
-    return (transactions || []).filter(tx => {
+    const rows = (transactions || []).filter(tx => {
       const date = new Date(tx.created_at).getTime();
       const type = String(tx.type || "").toLowerCase();
       if (walletFilter && type !== walletFilter && type !== "opening_balance") return false;
@@ -57,13 +64,23 @@ export default function LedgerPage() {
       return date >= start && date <= end;
     }).map(tx => ({
       id: tx.id,
+      timestamp: new Date(tx.created_at).getTime(),
       date: new Date(tx.created_at).toLocaleString(),
       description: tx.description || tx.type || "Transaction",
       amount: Number(tx.amount) || 0,
       // Only display the recorded balance; never synthesize financial history.
       balance: tx.after_balance == null ? "—" : Number(tx.after_balance),
-    })).filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
-  }, [transactions, range, search, walletFilter, ledgerKind]);
+    })).filter(row => [row.date, row.description, row.amount, row.balance]
+      .some(value => String(value).toLowerCase().includes(search.toLowerCase())));
+    return rows.sort((a, b) => {
+      const left = sortColumn === "date" ? a.timestamp : a[sortColumn];
+      const right = sortColumn === "date" ? b.timestamp : b[sortColumn];
+      const comparison = typeof left === "number" && typeof right === "number"
+        ? left - right
+        : String(left).localeCompare(String(right), undefined, { numeric: true });
+      return sortAscending ? comparison : -comparison;
+    });
+  }, [transactions, range, search, walletFilter, ledgerKind, sortColumn, sortAscending]);
   const pages = Math.max(1, Math.ceil(entries.length / pageSize));
   const currentPage = Math.min(page, pages);
   const offset = (currentPage - 1) * pageSize;
@@ -131,7 +148,18 @@ export default function LedgerPage() {
           </div>
           {exportError && <p role="alert">{exportError}</p>}
           {isError ? <p role="alert">Unable to load ledger. Please try again.</p> : authorized !== true || isLoading ? <p role="status">Loading ledger…</p> : <table className="table table-bordered table-sm mb-0">
-            <thead><tr><th>#</th><th>Date</th><th>Description</th><th className="ledger-desktop-cell">Amount</th><th className="ledger-desktop-cell">Balance</th></tr></thead>
+            <thead><tr><th>#</th>
+              {(["date", "description", "amount", "balance"] as const).map(column => (
+                <th key={column}
+                  className={column === "amount" || column === "balance" ? "ledger-desktop-cell" : ""}
+                  aria-sort={sortColumn === column ? (sortAscending ? "ascending" : "descending") : "none"}>
+                  <button type="button" className="ledger-sort-button" onClick={() => toggleSort(column)}>
+                    {column.charAt(0).toUpperCase() + column.slice(1)}
+                    <span aria-hidden="true">{sortColumn === column ? (sortAscending ? " ▲" : " ▼") : " ↕"}</span>
+                  </button>
+                </th>
+              ))}
+            </tr></thead>
             <tbody>{visible.map((row, index) => <Fragment key={row.id}><tr><td><button type="button" className="ledger-expand-button" aria-label={`Toggle details for entry ${offset + index + 1}`} aria-expanded={!collapsedRows.has(row.id)} onClick={() => setCollapsedRows(previous => { const next = new Set(previous); next.has(row.id) ? next.delete(row.id) : next.add(row.id); return next; })}>{collapsedRows.has(row.id) ? "+" : "−"}</button>{offset + index + 1}</td><td className="whitespace-normal">{row.date}</td><td className="whitespace-normal text-[#00b181]">{row.description}</td><td className="ledger-desktop-cell">{row.amount.toLocaleString()}</td><td className="ledger-desktop-cell">{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</td></tr><tr className="ledger-mobile-row" hidden={collapsedRows.has(row.id)}><td colSpan={3}><div className="ledger-meta"><div><strong>Amount</strong>{row.amount.toLocaleString()}</div><div><strong>Balance</strong>{typeof row.balance === "number" ? row.balance.toLocaleString() : row.balance}</div></div></td></tr></Fragment>)}{!visible.length && <tr><td colSpan={5}>No transactions found</td></tr>}</tbody>
           </table>}
           <p className="text-center mt-3">Showing {entries.length ? offset + 1 : 0} to {Math.min(offset + pageSize, entries.length)} of {entries.length} entries</p>
