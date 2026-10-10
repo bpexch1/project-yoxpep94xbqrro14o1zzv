@@ -211,13 +211,13 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {(client?.credit_remaining || 0).toLocaleString()} Rs.
+                          {(Number(client?.credit_received ?? 0)).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
+                          {(Number(client?.credit_remaining ?? 0)).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
@@ -238,13 +238,13 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {(client?.credit_remaining || 0).toLocaleString()} Rs.
+                          {(Number(client?.credit_received ?? 0)).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
+                          {(Number(client?.credit_remaining ?? 0)).toLocaleString()} Rs.
                         </td>
                       </>
                     )}
