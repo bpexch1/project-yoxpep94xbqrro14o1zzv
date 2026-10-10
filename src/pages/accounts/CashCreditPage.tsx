@@ -115,7 +115,7 @@ export default function CashCreditPage() {
       : (session.role?.toLowerCase() === "company" ? null
         : (adminClient ? Math.max(0, Number(adminClient.credit_remaining ?? 0)) : null));
     const allowedWithdraw = Math.max(0, Number(activeTab === "cash" ? client.cash : client.credit_remaining) || 0);
-    if (!/^\\d+(\\.\\d{1,2})?$/.test(amount) || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+    if (!/^[0-9]+([.][0-9]{1,2})?$/.test(amount) || !Number.isFinite(numericAmount) || numericAmount <= 0) {
       setTransferWarning("Enter a valid amount greater than zero.");
       return;
     }
