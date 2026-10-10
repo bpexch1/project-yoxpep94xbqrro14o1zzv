@@ -48,7 +48,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   // Original reference pages are standalone for all legacy Cash/Credit/Cr and Ledger aliases.
   const standalone = /^\/accounts\/(?:cash-credit|cashcredit|cash|credit|cr|ledger)(?:\/|$)/i.test(location.pathname);
   if (standalone) return (
-    <div className="reference-admin reference-standalone min-h-screen">
+    <div className="reference-admin reference-standalone reference-page-fade min-h-screen">
       <AdminLoadingOverlay />
       <main className="main"><div className="container-fluid">{children}</div></main>
     </div>
