@@ -10,6 +10,7 @@ import { FootballShotmap } from "@/components/football/FootballShotmap";
 import { useToast } from "@/hooks/use-toast";
 import { Clock } from "lucide-react";
 import { calculateMarketPositions } from "@/utils/bettingPositions";
+import { useEventClock } from "@/hooks/useEventClock";
 
 interface FootballMatchDetailProps {
   match: any;
@@ -29,6 +30,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
   const [keepDisplayOn, setKeepDisplayOn] = useState(true);
 
   const clientBalance = clientData?.cash ?? 0;
+  const eventClock = useEventClock(match?.status, match?.match_time, match?.actual_start_time || match?.inplay_start_time || match?.started_at);
 
   // Fetch real-time open bets for this match and user
   const { data: openBets = [] } = useQuery({
@@ -162,7 +164,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
         </div>
         <h1 className="font-black text-xl leading-tight my-1.5">{matchTitle}</h1>
         <div className="flex items-center justify-between mt-1">
-          <span className="font-bold text-[13px]">Remaining : 00:42:15</span>
+          <span className="font-bold text-[13px]">{eventClock}</span>
         </div>
         <div className="flex items-center gap-2 mt-1.5">
           <input type="checkbox" checked={keepDisplayOn} onChange={(e) => setKeepDisplayOn(e.target.checked)} className="w-4 h-4 accent-blue-500" />
