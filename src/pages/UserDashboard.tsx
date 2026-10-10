@@ -244,7 +244,7 @@ export default function UserDashboard() {
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
-    mutationFn: async (stake: number) => {
+    mutationFn: async ({ stake, requestedOdds }: { stake: number; requestedOdds?: number }) => {
       if (!activeBet) {
         throw new Error("No active bet selected. Please select odds first.");
       }
@@ -264,7 +264,10 @@ export default function UserDashboard() {
         throw new Error(`Insufficient balance. Current balance is ${clientBalance.toLocaleString("en-IN")}`);
       }
 
-      const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
+      const oddsVal = requestedOdds ?? Number(activeBet.odds);
+      if (!Number.isFinite(oddsVal) || oddsVal <= 1 || oddsVal > 1000) {
+        throw new Error("Please select a valid market price.");
+      }
       await placeBetSecure({
         matchId: String(activeBet.match?.id || ""),
         selection: activeBet.selection,
@@ -571,7 +574,7 @@ export default function UserDashboard() {
         <BetSlip
           activeBet={activeBet}
           onClose={() => setActiveBet(null)}
-          onSubmit={(stake) => placeBet(stake)}
+          onSubmit={(stake, odds) => placeBet({ stake, requestedOdds: odds })}
           isSubmitting={isSubmitting}
           balance={clientBalance}
         />
