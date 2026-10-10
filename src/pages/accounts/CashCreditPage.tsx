@@ -180,10 +180,11 @@ export default function CashCreditPage() {
     );
   }
 
-  const clientCredit = Number(client.credit_remaining ?? 0);
+  // Reference cash/credit summary separates issued credit, available credit and cash inventory.
+  // Cash deposits affect max withdrawal, not the displayed available credit balance.
+  const clientCredit = Number(client.credit_received ?? 0);
+  const clientAvailableBalance = Number(client.credit_remaining ?? 0);
   const clientCash = Number(client.cash ?? 0);
-  const clientPL = Number(client.pl_downline ?? 0);
-  const clientTotalBalance = clientCredit + clientCash + clientPL;
   const maxWithdraw = Math.max(0, clientCash);
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
 
@@ -245,7 +246,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientTotalBalance.toLocaleString()} Rs.
+                    {clientAvailableBalance.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
                     {maxWithdraw.toLocaleString()} Rs.
@@ -272,7 +273,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientTotalBalance.toLocaleString()} Rs.
+                    {clientAvailableBalance.toLocaleString()} Rs.
                   </td>
                 </tr>
               </tbody>
