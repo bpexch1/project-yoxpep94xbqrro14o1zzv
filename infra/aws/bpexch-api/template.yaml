@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: BPEXCH read-only API foundation, no wager or balance mutations
+Parameters:
+  AllowedOrigin:
+    Type: String
+    Description: Exact HTTPS frontend origin, e.g. https://bpexch1.com
+    AllowedPattern: '^https://[a-zA-Z0-9.-]+$'
+  SupabaseUrl:
+    Type: String
+    Default: ''
+    Description: Existing Supabase project URL (not service-role credentials)
+  SupabaseAnonKey:
+    Type: String
+    Default: ''
+    NoEcho: true
+    Description: Existing public anon key; stored in Lambda environment, not a service-role key
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures: [arm64]
+    MemorySize: 128
+    Timeout: 8
+Resources:
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowMethods: [GET, OPTIONS]
+        AllowHeaders: [authorization, content-type]
+        AllowOrigins: [!Ref AllowedOrigin]
+        MaxAge: 600
+  ApiHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler.handler
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+          SUPABASE_URL: !Ref SupabaseUrl
+          SUPABASE_ANON_KEY: !Ref SupabaseAnonKey
+      Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /{proxy+}
+            Method: ANY
+        Health:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /health
+            Method: GET
+Outputs:
+  ApiEndpoint:
+    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com'
+    Description: HTTP API base URL; not deployed automatically
