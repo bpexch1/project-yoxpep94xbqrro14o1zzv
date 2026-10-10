@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "npm run test:hierarchy && vite build",
+    "build": "npm run test:hierarchy && npm run test:wallet-session && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint . --max-warnings=999",
     "preview": "vite preview",
-    "test:hierarchy": "node --experimental-strip-types --test tests/account-hierarchy.mjs"
+    "test:hierarchy": "node --experimental-strip-types --test tests/account-hierarchy.mjs",
+    "test:wallet-session": "node --test tests/wallet-session-review.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
