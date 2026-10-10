@@ -52,60 +52,14 @@ begin
   end if;
   -- Serializes financial transfers and hierarchy edits. No stale browser balances are used.
   lock table public.clients in share row exclusive mode;
-  if p_token_hash !~ '^[0-9a-f]{64}
-  if lower(actor.role) not in ('company','superadmin','admin','supermaster','master') then
-    raise exception 'Administrator permission required';
+  if p_token_hash is null or p_token_hash !~ '^[0-9a-f]{64}$' then
+    raise exception 'Session expired. Log in again';
   end if;
-  select * into target from public.clients where id = p_client_id;
-  if target.id is null or target.id = actor.id then raise exception 'Select a downline account'; end if;
-  if target.status <> 'active' then raise exception 'Target account is disabled'; end if;
-  -- UNION deduplicates nodes, so malformed hierarchy cycles terminate.
-  with recursive ancestors(username,parent_username) as (
-    select c.username,c.parent_username from public.clients c where c.id = target.id
-    union
-    select c.username,c.parent_username from public.clients c join ancestors a on c.username = a.parent_username
-  ) select exists(select 1 from ancestors where username = actor.username) into permitted;
-  if not permitted then raise exception 'Account is outside your downline'; end if;
-
-  select * into prior from public.transactions where operator_username = actor.username and request_id = p_request_id;
-  signed_amount := case when p_direction = 'deposit' then p_amount else -p_amount end;
-  if prior.id is not null then
-    if prior.client_username <> target.username or prior.type <> p_wallet or prior.amount <> signed_amount
-       or coalesce(prior.description,'') <> coalesce(p_description,'') then
-      raise exception 'Request ID was already used for a different transfer';
-    end if;
-    return jsonb_build_object('success',true,'transactionId',prior.id,'afterBalance',prior.after_balance,'replayed',true);
-  end if;
-
-  before_amount := case when p_wallet = 'cash' then target.cash else target.credit_remaining end;
-  after_amount := before_amount + signed_amount;
-  if after_amount < 0 then raise exception 'Insufficient % balance', p_wallet; end if;
-  -- Preserve the existing dealer funding model: both cash and credit issuance consume credit pool.
-  -- The top-level company may issue funds; other staff must have remaining credit.
-  if p_direction = 'deposit' and lower(actor.role) <> 'company' and actor.credit_remaining < p_amount then
-    raise exception 'Insufficient operator credit limit';
-  end if;
-  if p_wallet = 'cash' then
-    update public.clients set cash = after_amount,
-      balance_upline = greatest(0,balance_upline + signed_amount) where id = target.id;
-    update public.clients set cash = cash - signed_amount,
-      credit_remaining = credit_remaining - signed_amount where id = actor.id;
-  else
-    update public.clients set credit_remaining = after_amount,
-      credit_received = greatest(0,credit_received + signed_amount) where id = target.id;
-    update public.clients set credit_remaining = credit_remaining - signed_amount where id = actor.id;
-  end if;
-  insert into public.transactions(client_username,type,amount,description,before_balance,after_balance,
-    operator_username,request_id,counterparty_username)
-  values(target.username,p_wallet,signed_amount,coalesce(p_description,''),before_amount,after_amount,
-    actor.username,p_request_id,actor.username) returning id into ledger_id;
-  return jsonb_build_object('success',true,'transactionId',ledger_id,'afterBalance',after_amount,'replayed',false);
-end;
-$$;
- then raise exception 'Session expired. Log in again'; end if;
-  select c.* into actor from public.bpexch_login_sessions s join public.clients c on c.id=s.operator_id
-  where s.token_hash=p_token_hash and s.revoked_at is null and s.expires_at>now()
-    and s.credential_digest=extensions.digest(c.password,'sha256') and c.status='active' for update of s;
+  select c.* into actor from public.bpexch_login_sessions s
+   join public.clients c on c.id=s.operator_id
+   where s.token_hash=p_token_hash and s.revoked_at is null and s.expires_at>now()
+   and s.credential_digest=extensions.digest(c.password,'sha256') and c.status='active'
+   for update of s;
   if actor.id is null then raise exception 'Session expired. Log in again'; end if;
   if lower(actor.role) not in ('company','superadmin','admin','supermaster','master') then
     raise exception 'Administrator permission required';
@@ -134,16 +88,19 @@ $$;
   before_amount := case when p_wallet = 'cash' then target.cash else target.credit_remaining end;
   after_amount := before_amount + signed_amount;
   if after_amount < 0 then raise exception 'Insufficient % balance', p_wallet; end if;
-  -- Preserve the existing dealer funding model: both cash and credit issuance consume credit pool.
-  -- The top-level company may issue funds; other staff must have remaining credit.
-  if p_direction = 'deposit' and lower(actor.role) <> 'company' and actor.credit_remaining < p_amount then
+  -- Video reference: cash is transferred from available operator cash; credit uses credit limit.
+  -- Never combine cash and credit debits into a silent double deduction.
+  if p_direction = 'deposit' and p_wallet = 'cash' and actor.cash < p_amount then
+    raise exception 'Insufficient operator cash balance';
+  end if;
+  if p_direction = 'deposit' and p_wallet = 'credit' and lower(actor.role) <> 'company'
+     and actor.credit_remaining < p_amount then
     raise exception 'Insufficient operator credit limit';
   end if;
   if p_wallet = 'cash' then
     update public.clients set cash = after_amount,
       balance_upline = greatest(0,balance_upline + signed_amount) where id = target.id;
-    update public.clients set cash = cash - signed_amount,
-      credit_remaining = credit_remaining - signed_amount where id = actor.id;
+    update public.clients set cash = cash - signed_amount where id = actor.id;
   else
     update public.clients set credit_remaining = after_amount,
       credit_received = greatest(0,credit_received + signed_amount) where id = target.id;
@@ -156,7 +113,6 @@ $$;
   return jsonb_build_object('success',true,'transactionId',ledger_id,'afterBalance',after_amount,'replayed',false);
 end;
 $$;
-
 
 revoke all on function public.manual_wallet_transfer_session(text,uuid,text,text,numeric,text,uuid) from public,anon,authenticated;
 grant execute on function public.manual_wallet_transfer_session(text,uuid,text,text,numeric,text,uuid) to service_role;
