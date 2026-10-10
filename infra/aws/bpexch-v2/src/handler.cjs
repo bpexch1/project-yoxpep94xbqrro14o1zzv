@@ -121,7 +121,7 @@ async function route(event){
     if(!reserve.ok)return response(503,{error:"Authentication service unavailable"},origin);
     if(reserve.data!==true)return response(429,{error:"Too many login attempts. Retry later"},origin);
     const profile=await serviceRead(cfg,"v2_profiles",
-      "select=email,status&username=ilike."+encodeURIComponent(body.username)+"&limit=1");
+      "select=email,status&username=eq."+encodeURIComponent(body.username.toLowerCase())+"&limit=1");
     if(!profile.ok||!Array.isArray(profile.data)||profile.data.length!==1||profile.data[0].status!=="active"){
       return genericAuthError(origin);
     }
@@ -157,14 +157,14 @@ async function route(event){
       ||typeof data.displayName!=="string"||data.displayName.length>120)return response(400,{error:"Invalid account fields"},origin);
     // Role and parent are ALWAYS derived from authenticated operator, never request body.
     const created=await supabaseFetch(cfg,"/auth/v1/admin/users",{
-      method:"POST",body:JSON.stringify({email:data.email,password:data.password,
-        email_confirm:false,user_metadata:{display_name:data.displayName}})
+      method:"POST",body:JSON.stringify({email:data.email.toLowerCase(),password:data.password,
+        email_confirm:true,user_metadata:{display_name:data.displayName}})
     },true);
     if(!created.ok||!checkUuid(created.data?.id))return response(409,{error:"Account could not be provisioned"},origin);
     const uid=created.data.id;
     const inserted=await supabaseFetch(cfg,"/rest/v1/v2_profiles",{
       method:"POST",headers:{"Prefer":"return=representation"},
-      body:JSON.stringify({id:uid,username:data.username,email:data.email,
+      body:JSON.stringify({id:uid,username:data.username.toLowerCase(),email:data.email.toLowerCase(),
         display_name:data.displayName,role:desiredRole,parent_id:actor.id})
     },true);
     if(!inserted.ok){
@@ -172,7 +172,7 @@ async function route(event){
       if(!rollback.ok)return response(503,{error:"Partial account provisioning; administrator review required"},origin);
       return response(409,{error:"Account could not be created"},origin);
     }
-    return response(201,{account:inserted.data?.[0]||{id:uid,username:data.username,role:desiredRole}},origin);
+    return response(201,{account:inserted.data?.[0]||{id:uid,username:data.username.toLowerCase(),role:desiredRole}},origin);
   }
   if(path==="/v2/wallet/transfer"&&method==="POST"){
     if(!ROLES[actor.role])return response(403,{error:"Permission denied"},origin);
