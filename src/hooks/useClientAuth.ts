@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase";
 import bcrypt from "bcryptjs";
+import { logoutWalletSession } from "@/lib/walletSession";
 
 const SESSION_KEY = "clientSession";
 
@@ -35,6 +36,7 @@ export const getClientSession = (): ClientSession | null => {
 };
 
 export const clearClientSession = () => {
+  logoutWalletSession();
   localStorage.removeItem(SESSION_KEY);
 };
 
