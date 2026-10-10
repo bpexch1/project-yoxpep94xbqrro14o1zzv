@@ -156,3 +156,19 @@
     background-color: #cd2049;
   }
 }
+
+/* Match standalone reference body without altering normal Admin/User dashboard styles. */
+.reference-admin.reference-standalone .reference-cash {
+  background: rgb(236, 236, 237) !important;
+  color: rgb(33, 37, 41);
+  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+.reference-admin.reference-standalone .reference-cash > .wallet-reference-shell {
+  max-width: none !important;
+  padding: 0 14px 24px !important;
+  margin: 0 auto !important;
+}
+.reference-admin.reference-standalone .reference-cash .wallet-reference-account,
+.reference-admin.reference-standalone .reference-cash .wallet-reference-action {
+  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
