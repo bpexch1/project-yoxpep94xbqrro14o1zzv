@@ -71,3 +71,11 @@ aws cloudformation deploy --region ap-southeast-2 \
    AllowedOrigins=https://bpexch1.com
 ```
 No credentials are stored in source code. Do not paste real keys in chat.
+
+## Company bootstrap identity selected (not yet provisioned)
+- User-requested Company username: `Book`.
+- User-requested Company contact/recovery email: `bpexch1@gmail.com`.
+- No account is present in Auth or `v2_profiles` yet; do **not** label the bootstrap complete.
+- `scripts/v2-invite-book-company.mjs` is a one-time trusted admin helper. It requires service-role credentials supplied only through an operator-controlled terminal/secret store. It uses `supabase.auth.admin.inviteUserByEmail` so Book's owner chooses a **new private password** through their verified inbox; prior password shared in chat is not written to GitHub or a migration.
+- Before running, configure the Supabase Auth Site URL, redirect allowlist, SMTP/email sending and invite route, confirm ownership of this email, then execute once. Confirm `auth.users=1`, `v2_profiles=1`, `v2_wallets=1` and both wallet values are 0.
+- Child-role email optionality is **not implemented** yet: the current V2 API still requires email when creating SuperAdmin. Solve with a trusted server-only username credential mapping before claiming username-only account creation.
