@@ -227,7 +227,8 @@ export default function UserDashboard() {
     retry: 2,
   });
 
-  const safeMatches = Array.isArray(matches) && matches.length > 0 ? matches : DEFAULT_SCREENSHOT_MATCHES;
+  // No fabricated sports catalogue on production read failures or empty responses.
+  const safeMatches = Array.isArray(matches) ? matches : (import.meta.env.DEV ? DEFAULT_SCREENSHOT_MATCHES : []);
 
   // Fetch real-time client data for balance
   const { data: clients } = useQuery({
@@ -320,7 +321,7 @@ export default function UserDashboard() {
     const t2 = m.team2 || (m.title ? m.title.split(/ vs | v /i)[1] : "Team 2");
     const title = m.title || `${t1} V ${t2}`;
 
-    const oddsVal = typeof m.odds === "number" ? m.odds : parseFloat(String(m.odds || 1.95)) || 1.95;
+    const oddsVal = m.odds != null ? Number(m.odds) : null;
 
     return {
       ...m,
@@ -329,10 +330,10 @@ export default function UserDashboard() {
       team1: t1,
       team2: t2,
       sport: sport || "Soccer",
-      status: isLive ? "live" : "upcoming",
-      odds: oddsVal,
-      matched_amount: m.matched_amount || "14,029,346",
-      match_time: m.match_time || "21:00",
+      status: isLive ? "live" : ["completed", "closed"].includes(status) ? "completed" : "upcoming",
+      odds: oddsVal != null && Number.isFinite(oddsVal) && oddsVal > 1 ? oddsVal : null,
+      matched_amount: m.matched_amount ?? null,
+      match_time: m.match_time ?? null,
     };
   };
 
@@ -343,10 +344,10 @@ export default function UserDashboard() {
       return sport === "cricket" || sport === "soccer" || sport === "tennis";
     });
 
-  const inplayCount = 5;
-  const cricketCount = 3;
-  const tennisCount = 2;
-  const soccerCount = 9;
+  const inplayCount = matchesList.filter((m: any) => m.status === "live").length;
+  const cricketCount = matchesList.filter((m: any) => m.sport.toLowerCase() === "cricket").length;
+  const tennisCount = matchesList.filter((m: any) => m.sport.toLowerCase() === "tennis").length;
+  const soccerCount = matchesList.filter((m: any) => m.sport.toLowerCase() === "soccer").length;
 
   if (!session) return null;
 
