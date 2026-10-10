@@ -1,3 +1,4 @@
+import { placeBetSecure } from "@/lib/bettingService";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -264,24 +265,12 @@ export default function UserDashboard() {
       }
 
       const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
-      const potentialWin = numericStake * oddsVal - numericStake;
-
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match?.id || "unknown-match",
-        match_title:
-          activeBet.match?.title || `${activeBet.match?.team1 || ""} v ${activeBet.match?.team2 || ""}`.trim() || "Match Event",
+      await placeBetSecure({
+        matchId: String(activeBet.match?.id || ""),
         selection: activeBet.selection,
-        bet_type: activeBet.betType,
+        betType: activeBet.betType,
         stake: numericStake,
         odds: oddsVal,
-        potential_win: potentialWin > 0 ? potentialWin : 0,
-        status: "pending",
-      });
-
-      const updatedCash = Math.max(0, clientBalance - numericStake);
-      await Client.update(clientData.id, {
-        cash: updatedCash,
       });
       return { stake: numericStake, selection: activeBet.selection };
     },
