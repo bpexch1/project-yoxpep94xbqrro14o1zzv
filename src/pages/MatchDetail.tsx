@@ -159,10 +159,10 @@ export default function MatchDetail() {
 
   // Fetch real-time cricket score every 5 seconds (Cricbuzz or ATD)
   const { data: cricketScoreData } = useQuery({
-    queryKey: ['cricket-score', match?.cricbuzz_match_id || match?.betfair_event_id || match?.atd_match_id || match?.id],
+    queryKey: ['cricket-score', match?.betfair_event_id || match?.cricbuzz_match_id || match?.atd_match_id || match?.id],
     queryFn: async () => {
       const result = await getCricketScore({ 
-        matchId: match.cricbuzz_match_id || match.betfair_event_id || match.atd_match_id || match.id,
+        matchId: match.betfair_event_id || match.cricbuzz_match_id || match.atd_match_id || match.id,
         cricbuzzMatchId: match.cricbuzz_match_id || match.betfair_event_id,
         atdMatchId: match.atd_match_id 
       });
