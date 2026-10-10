@@ -83,9 +83,8 @@ export function ClientSummaryCard({
         return "Master";
       case "agent":
         return "Agent";
-      case "dealer":
-        return "Dealer";
       case "client":
+      case "bettor":
         return "Bettor";
       default:
         return role ? role.charAt(0).toUpperCase() + role.slice(1) : "Client";
