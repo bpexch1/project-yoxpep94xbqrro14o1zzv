@@ -17,6 +17,7 @@ import { getLiveOdds, getCricketScore, oddsEngine, fetchBetfairEvents } from "@/
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
 import { calculateMarketPositions } from "@/utils/bettingPositions";
 import { findMatchByIdOrTitle } from "@/utils/matchCatalog";
+import { useEventClock } from "@/hooks/useEventClock";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -79,14 +80,15 @@ export default function MatchDetail() {
       }
 
       // Catalog & synthesized fallback
-      return findMatchByIdOrTitle(matchId || "");
+      return import.meta.env.DEV ? findMatchByIdOrTitle(matchId || "") : null;
     },
     enabled: !!matchId && !stateMatch,
     refetchInterval: stateMatch ? false : 8000
   });
 
   // Use state match (Betfair event) OR DB match OR Catalog fallback
-  const match = stateMatch || matchFromDB || (matchId ? findMatchByIdOrTitle(matchId) : null);
+  const match = stateMatch || matchFromDB || (matchId && import.meta.env.DEV ? findMatchByIdOrTitle(matchId) : null);
+  const eventClock = useEventClock(match?.status, match?.match_time, match?.actual_start_time || match?.inplay_start_time || match?.started_at);
   const matchLoading = stateMatch ? false : (matchLoading_raw && !match);
 
   // Fetch real-time client data
@@ -415,7 +417,7 @@ export default function MatchDetail() {
           </div>
           <h1 style={{ color: "white", fontWeight: 900, fontSize: 19, lineHeight: 1.3, margin: "4px 0" }}>{matchTitle}</h1>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-            <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600, fontSize: 12 }}>Elapsed : 03:23:10</span>
+            <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600, fontSize: 12 }}>{eventClock}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
             <input type="checkbox" id="keepDisplay" checked={keepDisplayOn} onChange={(e) => setKeepDisplayOn(e.target.checked)} style={{ width: 15, height: 15, accentColor: "#00b894" }} />
