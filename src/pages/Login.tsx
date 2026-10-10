@@ -5,6 +5,7 @@ import { Client } from "@/entities";
 import { supabase } from "@/integrations/supabase";
 import { setClientSession } from "@/hooks/useClientAuth";
 import bcrypt from "bcryptjs";
+import { normalizeAccountRole } from "@/lib/accountHierarchy";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -129,7 +130,7 @@ export default function Login() {
       });
 
       // 6. Route Redirection
-      if (client.role === "client") {
+      if (normalizeAccountRole(client.role) === "bettor") {
         navigate("/play");
       } else {
         navigate("/dashboard");
