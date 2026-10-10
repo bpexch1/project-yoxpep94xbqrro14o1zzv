@@ -25,12 +25,11 @@ function formatRole(role: string): string {
   const roleMap: Record<string, string> = {
     superadmin: "SuperAdmin",
     admin: "Admin",
-    dealer: "Dealer",
     agent: "Agent",
     superagent: "SuperAgent",
-    subdealer: "SubDealer",
     subagent: "SubAgent",
-    client: "Client",
+    client: "Bettor",
+    bettor: "Bettor",
     company: "Company",
     supermaster: "SuperMaster",
     master: "Master",
@@ -64,7 +63,7 @@ export function Header({ isMobileSidebarOpen, onToggleMobileSidebar, onToggleDes
         return pendingBets.reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
       }
 
-      if (role === 'client') {
+      if (role === 'client' || role === 'bettor') {
         return pendingBets
           .filter((b: any) => b.user_email === session.username)
           .reduce((sum: number, b: any) => sum + (Number(b.stake) || 0), 0);
