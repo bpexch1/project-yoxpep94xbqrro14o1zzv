@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "npm run test:exchange && npm run test:aws-api && vite build",
+    "build": "npm run test:exchange && npm run test:aws-api && npm run test:hierarchy && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint . --max-warnings=999",
     "preview": "vite preview",
     "test:exchange": "node --experimental-strip-types tests/demo-exchange.mjs",
-    "test:aws-api": "node --test infra/aws/bpexch-api/test/handler.test.cjs"
+    "test:aws-api": "node --test infra/aws/bpexch-api/test/handler.test.cjs",
+    "test:hierarchy": "node --experimental-strip-types --test tests/account-hierarchy.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
