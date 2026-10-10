@@ -43,7 +43,7 @@ const getSafeEnv = (key: string, fallback: string = ""): string => {
 };
 
 export const DEFAULT_CONFIG: ApiConfig = {
-  rapidApiKey: getSafeEnv("VITE_RAPIDAPI_KEY", getSafeEnv("RAPIDAPI_KEY", "3f6e56db9amsh8bb661e1e33739bp1041cdjsn7f5a3f41abfa")),
+  rapidApiKey: "", // Browser bundles must never ship licensed provider secrets.
   cricbuzzHost: getSafeEnv("VITE_CRICBUZZ_HOST", "cricbuzz-cricket.p.rapidapi.com"),
   sportApi7Host: getSafeEnv("VITE_RAPIDAPI_HOST", "sportapi7.p.rapidapi.com"),
   betfairHost: "betfair-exchange-api2.p.rapidapi.com",
