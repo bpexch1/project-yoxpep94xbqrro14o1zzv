@@ -85,7 +85,7 @@ export default function CreateUser() {
     }
 
     if (!formData.type || !canCreateChild(parentRecord?.role, formData.type)) newErrors.type = "Account type is not permitted for your role";
-    if (childRole !== "client" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
+    if (childRole !== "bettor" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
       newErrors.downlineShare = `Enter a share between 0 and ${maxShare}`;
     }
     setErrors(newErrors);
@@ -123,7 +123,7 @@ export default function CreateUser() {
         status: formData.isActive ? "active" : "inactive",
         parent_username: username,
         phone: formData.phone,
-        downline_share: childRole === "client" ? 0 : Number(formData.downlineShare),
+        downline_share: childRole === "bettor" ? 0 : Number(formData.downlineShare),
         reference: formData.reference,
         notes: formData.notes,
       });
@@ -241,7 +241,7 @@ export default function CreateUser() {
             </div>
 
             {errors.type && <p role="alert" className="text-red-600">{errors.type}</p>}
-            {childRole !== "client" && childRole !== null && (
+            {childRole !== "bettor" && childRole !== null && (
               <div className="create-share-field">
                 <label htmlFor="downline-share">Downline Share</label>
                 <input id="downline-share" type="number" min="0" max={maxShare} step="0.01" required value={formData.downlineShare} onChange={event => setFormData({ ...formData, downlineShare: event.target.value })} />
