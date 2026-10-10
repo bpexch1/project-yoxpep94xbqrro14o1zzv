@@ -7,6 +7,7 @@ create table if not exists public.sports_market_snapshots (
   market_status text not null check (market_status in ('OPEN','SUSPENDED','CLOSED')),
   markets jsonb not null default '[]'::jsonb,
   score jsonb,
+  provider_emitted_at timestamptz not null,
   updated_at timestamptz not null default now()
 );
 create index if not exists sports_market_snapshots_updated_idx
@@ -20,6 +21,7 @@ revoke insert, update, delete on public.sports_market_snapshots from anon, authe
 create or replace function public.ingest_verified_market_snapshot(
   p_match_id uuid,
   p_provider_event_id text,
+  p_emitted_at timestamptz,
   p_source text,
   p_market_status text,
   p_markets jsonb,
@@ -34,12 +36,18 @@ as $$
 declare changed integer;
 begin
   if auth.role() <> 'service_role' then raise exception 'Authorized feed service required'; end if;
-  if p_match_id is null or nullif(btrim(p_provider_event_id),'') is null
+  if p_match_id is null or p_emitted_at is null or p_emitted_at > now() + interval '5 seconds'
+    or p_emitted_at < now() - interval '20 seconds'
+    or nullif(btrim(p_provider_event_id),'') is null
     or nullif(btrim(p_source),'') is null
     or p_market_status not in ('OPEN','SUSPENDED','CLOSED')
     or jsonb_typeof(p_markets) <> 'array' then
     raise exception 'Invalid feed event';
   end if;
+  -- Prevent a replay of an older, even correctly signed, provider update.
+  perform 1 from public.sports_market_snapshots
+    where match_id = p_match_id and provider_emitted_at >= p_emitted_at;
+  if found then raise exception 'Older or duplicate market snapshot rejected'; end if;
   -- Never attach an external score/market to a different match.
   update public.matches set
     back_odds = p_back_odds,
@@ -55,11 +63,12 @@ begin
   if changed <> 1 then raise exception 'Provider event ID does not match internal match'; end if;
 
   insert into public.sports_market_snapshots
-    (match_id,provider_event_id,source,market_status,markets,score,updated_at)
+    (match_id,provider_event_id,provider_emitted_at,source,market_status,markets,score,updated_at)
   values
-    (p_match_id,p_provider_event_id,p_source,p_market_status,p_markets,p_score,now())
+    (p_match_id,p_provider_event_id,p_emitted_at,p_source,p_market_status,p_markets,p_score,now())
   on conflict (match_id) do update set
     provider_event_id=excluded.provider_event_id,
+    provider_emitted_at=excluded.provider_emitted_at,
     source=excluded.source,
     market_status=excluded.market_status,
     markets=excluded.markets,
@@ -68,7 +77,7 @@ begin
   return jsonb_build_object('success',true,'matchId',p_match_id);
 end;
 $$;
-revoke all on function public.ingest_verified_market_snapshot(uuid,text,text,text,jsonb,jsonb,numeric,numeric,numeric,numeric)
+revoke all on function public.ingest_verified_market_snapshot(uuid,text,timestamptz,text,text,jsonb,jsonb,numeric,numeric,numeric,numeric)
   from public, anon, authenticated;
-grant execute on function public.ingest_verified_market_snapshot(uuid,text,text,text,jsonb,jsonb,numeric,numeric,numeric,numeric)
+grant execute on function public.ingest_verified_market_snapshot(uuid,text,timestamptz,text,text,jsonb,jsonb,numeric,numeric,numeric,numeric)
   to service_role;
