@@ -10,7 +10,7 @@ interface BettingMatchCardProps {
   mongoOdds?: any;
 }
 
-export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
+export function BettingMatchCard({ match, onSelectBet, onSelectOdds, setActiveBet }: BettingMatchCardProps) {
   const navigate = useNavigate();
 
   if (!match || (!match.title && !match.team1 && !match.eventName)) {
@@ -19,16 +19,29 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
 
   const matchTitle = match.title || `${match.team1} V ${match.team2}`;
   const isLive = match.status === 'live' || String(match.status || '').toLowerCase() === 'inplay';
+  // Scheduled markets can open before kickoff. Only verified, fresh server prices are actionable.
+  const isMarketOpen = match.marketPriceVerified === true
+    && String(match.odds_status || "").toUpperCase() === "OPEN";
+  const sport = String(match.sport || "").toLowerCase();
+  const hasDraw = sport === "soccer" || sport === "football";
+  const runnerNames = [match.team1 || match.title, hasDraw ? "The Draw" : "", match.team2];
+  const selectOdds = (event: React.MouseEvent<HTMLButtonElement>, selection: string, side: "back" | "lay", odds: number) => {
+    event.stopPropagation();
+    if (!isMarketOpen || !selection || !Number.isFinite(odds) || odds <= 1) return;
+    if (onSelectBet) onSelectBet(match, selection, side, odds);
+    else if (onSelectOdds) onSelectOdds(match, selection, side, odds);
+    else setActiveBet?.({ match, selection, betType: side, odds });
+  };
 
   // Format matched volume number
-  const matchedAmount = match.matched_amount 
-    ? Number(match.matched_amount).toLocaleString('en-US') 
-    : (match.id ? (Number(String(match.id).replace(/\D/g, '').substring(0, 8)) || 14029346).toLocaleString('en-US') : '14,029,346');
+  const matchedValue = Number(match.matched_amount);
+  const matchedAmount = match.matched_amount != null && Number.isFinite(matchedValue)
+    ? matchedValue.toLocaleString('en-US') : '—';
   
   // Time display
   const mt = match.match_time != null ? String(match.match_time) : '';
   const timeDisplay = (() => {
-    if (!mt) return "21:00";
+    if (!mt) return "—";
     try {
       if (mt.includes('T') || mt.includes('Z') || /^\d{10,}$/.test(mt)) {
         const d = /^\d{10,}$/.test(mt) ? new Date(parseInt(mt)) : new Date(mt);
@@ -173,15 +186,24 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
           {matchedAmount}
         </span>
       </div>
-      <div className="reference-match-odds" aria-label="Market prices">
-        {[match.team1 || match.title, "Draw", match.team2].map((selection, index) => (
+      <div className="reference-match-odds" aria-label="Available market prices">
+        {runnerNames.map((selection, index) => (
           <div className="reference-odds-pair" key={index}>
-            {["back", "lay"].map(type => {
-              const raw = index === 0 && type === "back" ? match.odds : match[`${type}_${index + 1}`];
-              const value = Number(raw);
-              return <span key={type} className={`reference-price ${type}`}>
-                {Number.isFinite(value) && value > 1 ? value : "–"}
-              </span>;
+            {(["back", "lay"] as const).map(side => {
+              const raw = index === 0 && side === "back" ? match.odds : match[`${side}_${index + 1}`];
+              const value = raw == null ? NaN : Number(raw);
+              const enabled = isMarketOpen && !!selection && Number.isFinite(value) && value > 1;
+              return <button
+                type="button"
+                key={side}
+                className={`reference-price ${side}`}
+                disabled={!enabled}
+                aria-label={enabled ? `${side.toUpperCase()} ${selection} at ${value.toFixed(2)}` : `${side} price unavailable`}
+                title={enabled ? `${side.toUpperCase()} ${selection}` : "Market unavailable"}
+                onClick={event => selectOdds(event, selection, side, value)}
+              >
+                {enabled ? value.toFixed(2) : "–"}
+              </button>;
             })}
           </div>
         ))}

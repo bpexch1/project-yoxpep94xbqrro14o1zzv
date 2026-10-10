@@ -1,4 +1,5 @@
 import { ApiHealthDiagnostics } from "@/components/admin/ApiHealthDiagnostics";
+import { AwsBackendHealth } from "@/components/admin/AwsBackendHealth";
 
 export default function ApiSettings() {
   return (
@@ -13,6 +14,7 @@ export default function ApiSettings() {
           </div>
         </div>
 
+        <AwsBackendHealth />
         <ApiHealthDiagnostics />
       </main>
     </div>

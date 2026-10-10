@@ -5,6 +5,7 @@ import { Client } from "@/entities";
 import { supabase } from "@/integrations/supabase";
 import { setClientSession } from "@/hooks/useClientAuth";
 import bcrypt from "bcryptjs";
+import { normalizeAccountRole } from "@/lib/accountHierarchy";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -33,13 +34,15 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Fetch user credentials directly and securely from clients table
+      // Legacy compatibility only: this browser-side password lookup must be replaced by a trusted backend before production financial actions.
       let client: any = null;
 
       const res1 = await supabase
         .from("clients")
         .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
         .ilike("username", cleanUser);
+
+      if (res1.error) throw new Error("LOGIN_DATABASE_UNAVAILABLE");
 
       if (res1.data && Array.isArray(res1.data) && res1.data.length > 0) {
         client = res1.data.find(
@@ -56,6 +59,8 @@ export default function Login() {
           .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
           .eq("username", cleanUser);
 
+        if (res2.error) throw new Error("LOGIN_DATABASE_UNAVAILABLE");
+
         if (res2.data && Array.isArray(res2.data) && res2.data.length > 0) {
           client = res2.data[0];
         } else if (res2.data && !Array.isArray(res2.data)) {
@@ -68,7 +73,7 @@ export default function Login() {
         return;
       }
 
-      // 2. Verify Password (BCrypt $2a$/$2b$/$2y$ with seamless plain-text fallback)
+      // 2. Legacy BCrypt verification. Hash strings must never be accepted as plaintext passwords.
       const storedPw = String(client.password ?? "");
       const isBcrypt =
         storedPw.startsWith("$2a$") ||
@@ -84,9 +89,9 @@ export default function Login() {
         }
       }
 
-      // Plain-text fallback if not verified via bcrypt or non-bcrypt
-      if (!isMatch) {
-        isMatch = storedPw === cleanPw || storedPw.trim() === cleanPw.trim();
+      // Migration compatibility for legacy plaintext accounts only; never trim, and never accept a stored BCrypt hash verbatim.
+      if (!isBcrypt) {
+        isMatch = storedPw === cleanPw;
       }
 
       // Immediately scrub password from client object
@@ -125,13 +130,16 @@ export default function Login() {
       });
 
       // 6. Route Redirection
-      if (client.role === "client") {
+      if (normalizeAccountRole(client.role) === "bettor") {
         navigate("/play");
       } else {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      setLoginError("Username/Password Incorrect.");
+      setLoginError(err?.message === "LOGIN_DATABASE_UNAVAILABLE" ||
+        String(err?.message || "").includes("Database service is not configured")
+        ? "Authentication service is currently unavailable. Please try again later."
+        : "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -80,13 +80,18 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
     queryKey: ["user-header-bets", session?.username],
     queryFn: async () => {
       if (!session?.username) return [];
-      return Bet.filter({ user_email: session.username, status: "pending" });
+      const allBets = await Bet.filter({ user_email: session.username });
+      return (Array.isArray(allBets) ? allBets : []).filter((bet: any) =>
+        ["pending", "unmatched", "partially_matched", "matched"].includes(String(bet.status || "").toLowerCase())
+      );
     },
     enabled: !!session?.username,
     refetchInterval: 3000,
   });
 
   const balance = Number(clientData?.cash ?? 0);
+  const credit = Number(clientData?.credit_remaining ?? clientData?.credit_received ?? 0);
+  const accountLoaded = clientData != null;
   const totalLiability = calculateTotalLiability(userPendingBets as any);
   const activeBetsCount = (userPendingBets as any[])?.length || 0;
 
@@ -137,7 +142,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
         <div className="reference-user-header-brand" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <button
             onClick={onMenuToggle}
-            aria-label="Toggle menu"
+            aria-label={sidebarOpen ? "Close menu" : "Open menu"}
             aria-expanded={!!sidebarOpen}
             className="reference-user-menu-button"
             style={{
@@ -189,6 +194,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
 
         {/* Center: Marquee Ticker */}
         <div
+          aria-label="Exchange news"
           className="reference-user-header-marquee"
           style={{
             flex: 1,
@@ -207,7 +213,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
               fontWeight: 700,
             }}
           >
-            Welcome to Exchange. - null
+            Welcome to BPEXCH Exchange
           </div>
         </div>
 
@@ -224,7 +230,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <div style={{ color: "white", fontSize: 13, fontWeight: 700 }}>
-              <span>B: {balance.toLocaleString("en-IN")}</span>
+              <span>B: {accountLoaded ? balance.toLocaleString("en-IN") : "—"}</span>
               <span style={{ opacity: 0.95, color: "white" }}>
                 {" "}| L: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
               </span>
@@ -323,12 +329,12 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
           borderTop: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <div className="reference-user-status-item">Credit: 0</div>
-        <div className="reference-user-status-item">Balance: {balance.toLocaleString("en-IN")}</div>
+        <div className="reference-user-status-item">Credit: {accountLoaded ? credit.toLocaleString("en-IN") : "—"}</div>
+        <div className="reference-user-status-item">Balance: {accountLoaded ? balance.toLocaleString("en-IN") : "—"}</div>
         <div className="reference-user-status-item" style={{ color: "white" }}>
           Liable: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}
         </div>
-        <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
+        <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount}</div>
       </div>}
     </header>
   );

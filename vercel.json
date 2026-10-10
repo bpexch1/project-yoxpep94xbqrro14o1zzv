@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/aws-health",
+      "destination": "https://r5vz6m7uhl.execute-api.ap-southeast-2.amazonaws.com/health"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

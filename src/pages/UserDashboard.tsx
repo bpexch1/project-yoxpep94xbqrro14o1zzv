@@ -1,3 +1,4 @@
+import { placeBetSecure } from "@/lib/bettingService";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -220,14 +221,15 @@ export default function UserDashboard() {
   }, [session, navigate]);
 
   // Fetch matches directly from local/persistent DB
-  const { data: matches, isLoading: matchesLoading } = useQuery({
+  const { data: matches, isLoading: matchesLoading, isError: matchesError } = useQuery({
     queryKey: ["matches"],
     queryFn: () => Match.list(),
     refetchInterval: 10000,
     retry: 2,
   });
 
-  const safeMatches = Array.isArray(matches) && matches.length > 0 ? matches : DEFAULT_SCREENSHOT_MATCHES;
+  // No fabricated sports catalogue on production read failures or empty responses.
+  const safeMatches = Array.isArray(matches) ? matches : (import.meta.env.DEV ? DEFAULT_SCREENSHOT_MATCHES : []);
 
   // Fetch real-time client data for balance
   const { data: clients } = useQuery({
@@ -242,7 +244,7 @@ export default function UserDashboard() {
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
-    mutationFn: async (stake: number) => {
+    mutationFn: async ({ stake, requestedOdds }: { stake: number; requestedOdds?: number }) => {
       if (!activeBet) {
         throw new Error("No active bet selected. Please select odds first.");
       }
@@ -262,25 +264,16 @@ export default function UserDashboard() {
         throw new Error(`Insufficient balance. Current balance is ${clientBalance.toLocaleString("en-IN")}`);
       }
 
-      const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
-      const potentialWin = numericStake * oddsVal - numericStake;
-
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match?.id || "unknown-match",
-        match_title:
-          activeBet.match?.title || `${activeBet.match?.team1 || ""} v ${activeBet.match?.team2 || ""}`.trim() || "Match Event",
+      const oddsVal = requestedOdds ?? Number(activeBet.odds);
+      if (!Number.isFinite(oddsVal) || oddsVal <= 1 || oddsVal > 1000) {
+        throw new Error("Please select a valid market price.");
+      }
+      await placeBetSecure({
+        matchId: String(activeBet.match?.id || ""),
         selection: activeBet.selection,
-        bet_type: activeBet.betType,
+        betType: activeBet.betType,
         stake: numericStake,
         odds: oddsVal,
-        potential_win: potentialWin > 0 ? potentialWin : 0,
-        status: "pending",
-      });
-
-      const updatedCash = Math.max(0, clientBalance - numericStake);
-      await Client.update(clientData.id, {
-        cash: updatedCash,
       });
       return { stake: numericStake, selection: activeBet.selection };
     },
@@ -320,7 +313,14 @@ export default function UserDashboard() {
     const t2 = m.team2 || (m.title ? m.title.split(/ vs | v /i)[1] : "Team 2");
     const title = m.title || `${t1} V ${t2}`;
 
-    const oddsVal = typeof m.odds === "number" ? m.odds : parseFloat(String(m.odds || 1.95)) || 1.95;
+    const verifiedAt = Date.parse(String(m.odds_verified_at || ""));
+    const verifiedMarket = m.odds_status === "OPEN" && Number.isFinite(verifiedAt)
+      && Date.now() - verifiedAt <= 15000 && verifiedAt <= Date.now() + 5000;
+    const verifiedPrice = (raw: any): number | null => {
+      const price = raw == null ? NaN : Number(raw);
+      return verifiedMarket && Number.isFinite(price) && price > 1 ? price : null;
+    };
+    const oddsVal = verifiedPrice(m.back_odds);
 
     return {
       ...m,
@@ -329,10 +329,17 @@ export default function UserDashboard() {
       team1: t1,
       team2: t2,
       sport: sport || "Soccer",
-      status: isLive ? "live" : "upcoming",
+      status: isLive ? "live" : ["completed", "closed"].includes(status) ? "completed" : "upcoming",
       odds: oddsVal,
-      matched_amount: m.matched_amount || "14,029,346",
-      match_time: m.match_time || "21:00",
+      marketPriceVerified: verifiedMarket,
+      back_1: oddsVal,
+      lay_1: verifiedPrice(m.lay_odds),
+      back_2: null, // Draw price unavailable without a verified third runner
+      lay_2: null,
+      back_3: verifiedPrice(m.back_odds2),
+      lay_3: verifiedPrice(m.lay_odds2),
+      matched_amount: m.matched_amount ?? null,
+      match_time: m.match_time ?? null,
     };
   };
 
@@ -343,10 +350,10 @@ export default function UserDashboard() {
       return sport === "cricket" || sport === "soccer" || sport === "tennis";
     });
 
-  const inplayCount = 5;
-  const cricketCount = 3;
-  const tennisCount = 2;
-  const soccerCount = 9;
+  const inplayCount = matchesList.filter((m: any) => m.status === "live").length;
+  const cricketCount = matchesList.filter((m: any) => m.sport.toLowerCase() === "cricket").length;
+  const tennisCount = matchesList.filter((m: any) => m.sport.toLowerCase() === "tennis").length;
+  const soccerCount = matchesList.filter((m: any) => m.sport.toLowerCase() === "soccer").length;
 
   if (!session) return null;
 
@@ -372,7 +379,8 @@ export default function UserDashboard() {
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
-    if (activeFilter === "Inplay") return true;
+    if (activeFilter === "Inplay") return m.status === "live";
+    if (activeFilter === "SportsBook") return m.status !== "completed";
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === "soccer") return sport === "football" || sport === "soccer";
@@ -388,7 +396,7 @@ export default function UserDashboard() {
 
   // Ensure fixed order: Cricket, Soccer/Football, Tennis
   const orderedSports = ["Cricket", "Soccer", "Tennis"].filter(
-    (s) => activeFilter === "Inplay" || activeFilter.toLowerCase() === s.toLowerCase()
+    (s) => activeFilter === "Inplay" || activeFilter === "SportsBook" || activeFilter.toLowerCase() === s.toLowerCase()
   );
 
   const handleSelectBet = (match: any, selection: string, betType: "back" | "lay", odds: number) => {
@@ -421,12 +429,8 @@ export default function UserDashboard() {
         {/* Game Banners Row */}
         <GameBanners onFilterChange={(filter) => setActiveFilter(filter)} />
 
-        {/* Horse Race & Greyhound Section */}
-        <RaceSection
-          onSelectRace={(race) => {
-            console.log("Selected race:", race);
-          }}
-        />
+        {/* Race section retains reference card geometry, but never shows fabricated production fixtures. */}
+        <RaceSection />
 
         {/* 4 Sports Navigation Blocks */}
         <div className="reference-sport-tabs"
@@ -445,7 +449,7 @@ export default function UserDashboard() {
               <button
                 key={cat.id}
                 className={cat.id === "SportsBook" ? "reference-desktop-sportsbook" : undefined}
-                onClick={() => setActiveFilter(cat.id === "SportsBook" ? "Inplay" : cat.id)}
+                onClick={() => setActiveFilter(cat.id)}
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -496,6 +500,12 @@ export default function UserDashboard() {
             );
           })}
         </div>
+
+        {matchesError && (
+          <div role="alert" className="mx-1 my-2 border border-amber-300 bg-amber-50 p-3 text-xs font-semibold text-amber-900">
+            Match service is temporarily unavailable. Displayed markets may be incomplete; no example odds are being shown as live data.
+          </div>
+        )}
 
         {/* Content Area */}
         {activeFilter === "Casino" || activeFilter === "Horse Race" || activeFilter === "Greyhound" ? (
@@ -551,7 +561,7 @@ export default function UserDashboard() {
                   {activeFilter} Matches
                 </p>
                 <p className="text-xs text-gray-600 mt-1 font-semibold">
-                  No {activeFilter} matches scheduled right now.
+                  {matchesError ? "Market service is unavailable right now." : "No matching events are currently available."}
                 </p>
               </div>
             )}
@@ -564,7 +574,7 @@ export default function UserDashboard() {
         <BetSlip
           activeBet={activeBet}
           onClose={() => setActiveBet(null)}
-          onSubmit={(stake) => placeBet(stake)}
+          onSubmit={(stake, odds) => placeBet({ stake, requestedOdds: odds })}
           isSubmitting={isSubmitting}
           balance={clientBalance}
         />

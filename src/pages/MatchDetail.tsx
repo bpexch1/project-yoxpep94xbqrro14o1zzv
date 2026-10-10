@@ -1,3 +1,4 @@
+import { placeBetSecure } from "@/lib/bettingService";
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -17,6 +18,7 @@ import { getLiveOdds, getCricketScore, oddsEngine, fetchBetfairEvents } from "@/
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
 import { calculateMarketPositions } from "@/utils/bettingPositions";
 import { findMatchByIdOrTitle } from "@/utils/matchCatalog";
+import { useEventClock } from "@/hooks/useEventClock";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -79,14 +81,15 @@ export default function MatchDetail() {
       }
 
       // Catalog & synthesized fallback
-      return findMatchByIdOrTitle(matchId || "");
+      return import.meta.env.DEV ? findMatchByIdOrTitle(matchId || "") : null;
     },
     enabled: !!matchId && !stateMatch,
     refetchInterval: stateMatch ? false : 8000
   });
 
   // Use state match (Betfair event) OR DB match OR Catalog fallback
-  const match = stateMatch || matchFromDB || (matchId ? findMatchByIdOrTitle(matchId) : null);
+  const match = stateMatch || matchFromDB || (matchId && import.meta.env.DEV ? findMatchByIdOrTitle(matchId) : null);
+  const eventClock = useEventClock(match?.status, match?.match_time, match?.actual_start_time || match?.inplay_start_time || match?.started_at);
   const matchLoading = stateMatch ? false : (matchLoading_raw && !match);
 
   // Fetch real-time client data
@@ -156,10 +159,10 @@ export default function MatchDetail() {
 
   // Fetch real-time cricket score every 5 seconds (Cricbuzz or ATD)
   const { data: cricketScoreData } = useQuery({
-    queryKey: ['cricket-score', match?.cricbuzz_match_id || match?.betfair_event_id || match?.atd_match_id || match?.id],
+    queryKey: ['cricket-score', match?.betfair_event_id || match?.cricbuzz_match_id || match?.atd_match_id || match?.id],
     queryFn: async () => {
       const result = await getCricketScore({ 
-        matchId: match.cricbuzz_match_id || match.betfair_event_id || match.atd_match_id || match.id,
+        matchId: match.betfair_event_id || match.cricbuzz_match_id || match.atd_match_id || match.id,
         cricbuzzMatchId: match.cricbuzz_match_id || match.betfair_event_id,
         atdMatchId: match.atd_match_id 
       });
@@ -230,7 +233,7 @@ export default function MatchDetail() {
     );
 
   const crrDisplay = liveScore?.crr || (match?.status === 'live' ? '--' : '--');
-  const thisOverBalls: string[] = liveScore?.thisOver || (match?.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
+  const thisOverBalls: string[] = liveScore?.thisOver || [];
 
   // Last ball label and color
   const lastBall = liveScore?.lastBall || (thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null);
@@ -281,38 +284,13 @@ export default function MatchDetail() {
       if (!activeBet || !session || !clientData) return;
       if (stake > clientBalance) throw new Error("Insufficient balance");
 
-      // Require explicit odds validation; an acknowledgement is not validation.
-      const side = activeBet.selection === match.team1 
-        ? (activeBet.betType === 'back' ? 'teamA_back' : 'teamA_lay')
-        : (activeBet.betType === 'back' ? 'teamB_back' : 'teamB_lay');
-      
-      const validation = await oddsEngine({
-        action: 'validateOdds',
-        matchId: match.id,
-        requestedOdds: activeBet.odds,
-        side,
-      });
-
-      if (!validation || !("valid" in validation) || validation.valid !== true) {
-        const reason = validation && "reason" in validation && typeof validation.reason === "string"
-          ? validation.reason
-          : 'Odds could not be verified. Please refresh and try again.';
-        throw new Error(reason);
-      }
-
-      const potentialWin = (stake * activeBet.odds) - stake;
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
+      await placeBetSecure({
+        matchId: String(activeBet.match?.id || match?.id || ""),
         selection: activeBet.selection,
-        bet_type: activeBet.betType,
+        betType: activeBet.betType,
         stake,
         odds: activeBet.odds,
-        potential_win: potentialWin,
-        status: 'pending'
       });
-      await Client.update(clientData.id, { cash: clientBalance - stake });
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -322,7 +300,7 @@ export default function MatchDetail() {
       queryClient.invalidateQueries({ queryKey: ['open-bets', matchId] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+        description: "Wager accepted as pending; not yet matched or settled.",
       });
     },
     onError: (error: any) => {
@@ -373,20 +351,7 @@ export default function MatchDetail() {
   const safeAllMatches = Array.isArray(allMatches) ? allMatches.filter((m: any) => m.id !== match.id) : [];
 
   // Fancy 2 mock/sample fallback items if live feed doesn't provide them
-  const fancy2Items = [
-    { title: `10 Over Run ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 82, lay: 81, backSize: '100', laySize: '100' },
-    { title: `11 Over Run Only ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, suspended: true },
-    { title: `20 Over Run ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 153, lay: 151, backSize: '100', laySize: '100' },
-    { title: `6th Wkt Lost To ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'} Balls`, suspended: true },
-    { title: `Azmatullah Omarzai Boundaries`, back: 5, lay: 4, backSize: '100', laySize: '100' },
-    { title: `Azmatullah Omarzai Runs`, back: 33, lay: 33, backSize: '90', laySize: '110' },
-    { title: `Fall of 6th Wkt ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 93, lay: 93, backSize: '90', laySize: '110' },
-    { title: `Fall of 7th Wkt ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 118, lay: 118, backSize: '90', laySize: '110' },
-    { title: `How Many Balls Face By Azmatullah O`, back: 19, lay: 19, backSize: '90', laySize: '110' },
-    { title: `How Many Balls Face By Mohammad N`, suspended: true },
-    { title: `Mohammad Nabi Boundaries`, back: 4, lay: 3, backSize: '100', laySize: '100' },
-    { title: `Mohammad Nabi Runs`, back: 21, lay: 21, backSize: '90', laySize: '110' },
-  ];
+  const fancy2Items: any[] = []; // No synthetic betting markets in production.
 
   // Calculate runner positions across cricket markets
   const matchOddsRunners = [match.team1, match.team2].filter(Boolean);
@@ -415,7 +380,7 @@ export default function MatchDetail() {
           </div>
           <h1 style={{ color: "white", fontWeight: 900, fontSize: 19, lineHeight: 1.3, margin: "4px 0" }}>{matchTitle}</h1>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-            <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600, fontSize: 12 }}>Elapsed : 03:23:10</span>
+            <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600, fontSize: 12 }}>{eventClock}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
             <input type="checkbox" id="keepDisplay" checked={keepDisplayOn} onChange={(e) => setKeepDisplayOn(e.target.checked)} style={{ width: 15, height: 15, accentColor: "#00b894" }} />
@@ -715,55 +680,22 @@ export default function MatchDetail() {
             </button>
           </div>
 
-          {/* Scorecard Visual Widget */}
-          <div style={{
-            backgroundColor: "#162b47",
-            padding: "12px",
-            color: "white",
-            borderTop: "2px solid #00b894",
-          }}>
-            {/* Header info */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 8 }}>
-              <span style={{ fontWeight: 800, fontSize: 13 }}>{match.team1}</span>
-              <div style={{ textAlign: "center" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>INN 2 | 9.0/20 OV</span>
-                <div style={{ fontWeight: 900, fontSize: 15, color: "#00e676" }}>74/5 : 221/7</div>
-              </div>
-              <span style={{ fontWeight: 800, fontSize: 13 }}>{match.team2}</span>
-            </div>
-
-            {/* Target calculation */}
-            <div style={{ padding: "6px 0", fontSize: 11, color: "rgba(255,255,255,0.85)", textAlign: "center" }}>
-              {match.team1} (74/5) require 148 runs from 66 balls.
-            </div>
-
-            {/* Graphical Run Rate & Wicket Curve */}
-            <div style={{
-              height: 70,
-              backgroundColor: "rgba(0,0,0,0.2)",
-              borderRadius: 4,
-              marginTop: 4,
-              padding: "6px",
-              display: "flex",
-              alignItems: "flex-end",
-              gap: 4,
-              position: "relative"
-            }}>
-              {[4, 8, 12, 18, 25, 34, 48, 62, 74].map((runs, i) => (
-                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
-                  {i % 2 === 1 && (
-                    <span style={{ backgroundColor: "#ff5252", color: "white", fontSize: 8, fontWeight: 900, borderRadius: "50%", width: 12, height: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 2 }}>W</span>
-                  )}
-                  <div style={{ width: "100%", height: `${(runs / 80) * 100}%`, backgroundColor: "#00b894", borderRadius: "2px 2px 0 0" }} />
-                  <span style={{ fontSize: 8, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{i + 1}</span>
+          {/* Only provider-verified score information is displayed. */}
+          <div className="p-4 text-sm text-white bg-[#162b47] border-t-2 border-[#00b894]">
+            {activeMediaTab === "scorecard" ? (
+              liveScore?.runs != null ? (
+                <div>
+                  <div className="font-bold">{match.team1} v {match.team2}</div>
+                  <div>{scoreDisplay}</div>
+                  {liveScore.status && <div className="text-xs opacity-80">{liveScore.status}</div>}
                 </div>
-              ))}
-            </div>
+              ) : <div>Verified live scorecard is unavailable.</div>
+            ) : <div>Licensed TV stream is not connected for this event.</div>}
           </div>
         </div>
 
         {/* === OPEN & MATCHED BETS COMPONENT === */}
-        <MatchedAndOpenBets openBets={[]} matchedBets={openBets} />
+        <MatchedAndOpenBets openBets={openBets} matchedBets={[]} />
 
         {/* === RELATED EVENTS === */}
         <div style={{ marginTop: 14 }}>

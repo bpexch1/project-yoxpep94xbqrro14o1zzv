@@ -1,5 +1,5 @@
 // UI visibility only. Server authorization must independently enforce roles.
-export const ADMIN_ROLES = ["company", "superadmin", "admin", "supermaster", "master", "dealer", "agent", "superagent", "subdealer", "subagent", "distributor", "minidistributor"];
+export const ADMIN_ROLES = ["company", "superadmin", "admin", "supermaster", "master"];
 export function isStaffOrAdmin(role?: string): boolean {
   return typeof role === "string" && ADMIN_ROLES.includes(role.trim().toLowerCase());
 }

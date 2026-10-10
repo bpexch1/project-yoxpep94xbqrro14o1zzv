@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClientSession } from "@/hooks/useClientSession";
+import { normalizeAccountRole } from "@/lib/accountHierarchy";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ export default function Index() {
 
     if (session) {
       // Client login hai
-      if (session.role === "client") {
+      if (normalizeAccountRole(session.role) === "bettor") {
         navigate("/play", { replace: true });
       } else {
         navigate("/dashboard", { replace: true });
