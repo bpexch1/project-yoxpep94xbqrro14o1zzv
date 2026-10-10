@@ -1,3 +1,4 @@
+import { placeBetSecure } from "@/lib/bettingService";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -59,21 +60,13 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
       if (!activeBet || !session || !clientData) return;
       if (stake > clientBalance) throw new Error("Insufficient balance");
 
-      const potentialWin = (stake * activeBet.odds) - stake;
-
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
+      await placeBetSecure({
+        matchId: String(activeBet.match?.id || match?.id || ""),
         selection: activeBet.selection,
-        bet_type: activeBet.betType,
+        betType: activeBet.betType,
         stake,
         odds: activeBet.odds,
-        potential_win: potentialWin,
-        status: 'pending'
       });
-
-      await Client.update(clientData.id, { cash: clientBalance - stake });
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -83,7 +76,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
       queryClient.invalidateQueries({ queryKey: ['open-bets', match?.id, session?.username] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+        description: "Wager accepted as pending; not yet matched or settled.",
       });
     },
     onError: (error: any) => {
