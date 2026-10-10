@@ -38,6 +38,7 @@ import { BrandingBadge } from "@/components/BrandingBadge";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GlobalRouteLoader } from "@/components/ui/GlobalRouteLoader";
 import { MarketRealtimeBootstrap } from "@/components/MarketRealtimeBootstrap";
+import DemoExchange from "@/pages/DemoExchange";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/demo/exchange" element={<DemoExchange />} />
             <Route path="/Users/Login" element={<Login />} />
             <Route path="/users/login" element={<Login />} />
             
