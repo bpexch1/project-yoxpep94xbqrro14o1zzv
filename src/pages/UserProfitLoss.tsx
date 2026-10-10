@@ -3,10 +3,32 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
-import { Bet } from "@/entities";
+import { supabase } from "@/integrations/supabase";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { Calendar, AlignJustify } from "lucide-react";
+
+function todayInPakistan(): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Karachi", month: "2-digit", day: "2-digit", year: "numeric"
+  }).format(new Date());
+}
+
+function parsePakistanDateTime(date: string, time: string, amPm: string): string {
+  const d = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(date.trim());
+  const t = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
+  if (!d || !t) throw new Error("Enter dates as MM/DD/YYYY and time as HH:MM.");
+  const month = Number(d[1]), day = Number(d[2]), year = Number(d[3]);
+  const hour = Number(t[1]), minute = Number(t[2]);
+  if (month < 1 || month > 12 || day < 1 || day > 31 || hour < 1 || hour > 12 || minute > 59)
+    throw new Error("Invalid report date or time.");
+  const check = new Date(Date.UTC(year, month-1, day));
+  if (check.getUTCFullYear() !== year || check.getUTCMonth() !== month-1 || check.getUTCDate() !== day)
+    throw new Error("Invalid calendar date.");
+  const hour24 = hour % 12 + (amPm === "PM" ? 12 : 0);
+  // PKT is UTC+05:00 (no daylight saving time).
+  return new Date(Date.UTC(year,month-1,day,hour24-5,minute)).toISOString();
+}
 
 export default function UserProfitLoss() {
   const navigate = useNavigate();
@@ -25,29 +47,62 @@ export default function UserProfitLoss() {
     }
   }, [session, navigate]);
 
-  const [fromDate, setFromDate] = useState("09/19/2026");
+  const [fromDate, setFromDate] = useState(todayInPakistan);
   const [fromTime, setFromTime] = useState("12:00");
   const [fromAmPm, setFromAmPm] = useState("AM");
 
-  const [toDate, setToDate] = useState("09/19/2026");
+  const [toDate, setToDate] = useState(todayInPakistan);
   const [toTime, setToTime] = useState("11:59");
   const [toAmPm, setToAmPm] = useState("PM");
 
-  const { data: bets, isLoading } = useQuery({
-    queryKey: ["user-pl-data", session?.username],
+  const [filterError, setFilterError] = useState("");
+  const [range, setRange] = useState(() => ({
+    from: parsePakistanDateTime(todayInPakistan(), "12:00", "AM"),
+    to: parsePakistanDateTime(todayInPakistan(), "11:59", "PM")
+  }));
+  const handleSubmit = () => {
+    try {
+      const from = parsePakistanDateTime(fromDate, fromTime, fromAmPm);
+      const to = parsePakistanDateTime(toDate, toTime, toAmPm);
+      if (new Date(from).getTime() > new Date(to).getTime())
+        throw new Error("From date must not be later than To date.");
+      setFilterError("");
+      setRange({ from, to });
+    } catch (err: any) {
+      setFilterError(err?.message || "Invalid dates");
+    }
+  };
+
+  const { data: bets, isLoading, error: loadError } = useQuery({
+    queryKey: ["user-pl-data", session?.username, range.from, range.to],
     queryFn: async () => {
       if (!session?.username) return [];
-      const res = await Bet.filter({ user_email: session.username });
-      return Array.isArray(res) ? res : [];
+      const pageSize = 500;
+      const all: any[] = [];
+      for (let page = 0; page < 20; page++) {
+        const { data, error } = await supabase
+          .from("bets").select("id, match_title, stake, potential_win, status, created_at")
+          .eq("user_email", session.username)
+          .in("status", ["won", "lost"])
+          .gte("created_at", range.from).lte("created_at", range.to)
+          .order("created_at", { ascending: false })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+        if (error) throw new Error(error.message);
+        all.push(...(data || []));
+        if (!data || data.length < pageSize) return all;
+      }
+      throw new Error("Report exceeds 10,000 rows. Narrow the date range.");
     },
-    enabled: !!session?.username,
+    enabled: !!session?.username
   });
 
   if (!session) {
     return null;
   }
 
-  const settledBets = (bets || []).filter((bet) => bet.status === "won" || bet.status === "lost");
+  const settledBets = bets || [];
+  const netPL = settledBets.reduce((sum: number, bet: any) =>
+    sum + (bet.status === "won" ? Number(bet.potential_win || 0) : -Number(bet.stake || 0)), 0);
 
   return (
     <div
@@ -133,6 +188,7 @@ export default function UserProfitLoss() {
             <div className="flex justify-end">
               <button
                 type="button"
+                onClick={handleSubmit}
                 className="bg-[#00a676] hover:bg-[#008f64] text-white font-bold text-xs px-6 py-2 rounded-none transition-colors"
               >
                 Submit
@@ -140,6 +196,12 @@ export default function UserProfitLoss() {
             </div>
           </div>
         </div>
+
+        {(filterError || loadError) && (
+          <p role="alert" className="text-red-700 bg-red-50 border border-red-200 p-2 mb-3 text-xs">
+            {filterError || (loadError as Error)?.message}
+          </p>
+        )}
 
         {/* 2. Sports ProfitLoss Card */}
         <div className="bg-white rounded-none border border-[#c8d4e2] shadow-sm">
@@ -150,7 +212,9 @@ export default function UserProfitLoss() {
 
           <div className="overflow-x-auto">
             {settledBets.length === 0 ? (
-              <div className="min-h-10" aria-label="No profit/loss records" />
+              <div className="min-h-10 p-3 text-xs text-gray-600" aria-label="No profit/loss records">
+                {isLoading ? "Loading report…" : "No settled bets in the selected date range."}
+              </div>
             ) : <table className="w-full min-w-[560px] text-xs text-left border-collapse">
               <thead>
                 <tr className="bg-[#f8f9fa] border-b border-[#dee2e6] text-[#142a45]">
@@ -167,13 +231,18 @@ export default function UserProfitLoss() {
                       <td className="p-2.5 border-r border-[#dee2e6] font-bold text-[#142a45]">{b.match_title}</td>
                       <td className="p-2.5 border-r border-[#dee2e6] text-right font-medium">{b.stake}</td>
                       <td className={`p-2.5 text-right font-bold ${b.status === "won" ? "text-[#28a745]" : "text-[#dc3545]"}`}>
-                        {b.status === "won" ? `+${b.potential_win - b.stake}` : `-${b.stake}`}
+                        {b.status === "won" ? `+${Number(b.potential_win || 0).toFixed(2)}` : `-${Number(b.stake || 0).toFixed(2)}`}
                       </td>
                     </tr>
                   ))}
               </tbody>
             </table>}
           </div>
+          {!isLoading && !loadError && (
+            <div className="border-t border-[#c8d4e2] p-3 text-right text-sm font-bold">
+              Total Net P/L: {netPL.toFixed(2)}
+            </div>
+          )}
         </div>
       </main>
     </div>
