@@ -1,0 +1,186 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "BPEXCH minimal read-only staging API; throttled 2 requests per second with 7-day logs",
+  "Resources": {
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    },
+    "BackendFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Runtime": "nodejs22.x",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaRole",
+            "Arn"
+          ]
+        },
+        "MemorySize": 128,
+        "Timeout": 8,
+        "Environment": {
+          "Variables": {
+            "ALLOWED_ORIGIN": "https://bpexch1.com"
+          }
+        },
+        "Code": {
+          "ZipFile": "\"use strict\";\nconst allowedOrigin=process.env.ALLOWED_ORIGIN||\"\";\nfunction respond(status,data,origin=\"\"){\n const headers={\"content-type\":\"application/json\",\"cache-control\":\"no-store\",\"x-content-type-options\":\"nosniff\"};\n if(allowedOrigin&&origin===allowedOrigin){headers[\"access-control-allow-origin\"]=allowedOrigin;headers[\"vary\"]=\"Origin\";}\n return {statusCode:status,headers,body:JSON.stringify(data)};\n}\nexports.handler=async function(event){\n const origin=event.headers?.origin||event.headers?.Origin||\"\";\n const method=(event.requestContext?.http?.method||event.httpMethod||\"GET\").toUpperCase();\n const path=event.rawPath||event.path||\"/\";\n if(method===\"OPTIONS\"){\n  if(!allowedOrigin||origin!==allowedOrigin)return respond(403,{error:\"Origin not allowed\"});\n  return {statusCode:204,headers:{\"access-control-allow-origin\":allowedOrigin,\"access-control-allow-methods\":\"GET,OPTIONS\",\"access-control-allow-headers\":\"authorization,content-type\",\"access-control-max-age\":\"600\"},body:\"\"};\n }\n if(![\"GET\"].includes(method))return respond(405,{error:\"Method not allowed\"},origin);\n if(path===\"/health\"||path===\"/v1/health\")return respond(200,{ok:true,service:\"bpexch-api\",status:\"read-only\",region:process.env.AWS_REGION||\"unknown\"},origin);\n if(path===\"/v1/session\"){\n  const auth=event.headers?.authorization||event.headers?.Authorization||\"\";\n  if(!/^Bearer [A-Za-z0-9._~-]+$/.test(auth))return respond(401,{error:\"Authentication required\"},origin);\n  const supabase=process.env.SUPABASE_URL||\"\";\n  const anon=process.env.SUPABASE_ANON_KEY||\"\";\n  if(!/^https:\\/\\/[a-z0-9.-]+$/.test(supabase)||!anon)return respond(503,{error:\"Auth provider not configured\"},origin);\n  try{\n   const controller=new AbortController();\n   const timer=setTimeout(()=>controller.abort(),5000);\n   try{\n    const result=await fetch(supabase+\"/auth/v1/user\",{headers:{\"apikey\":anon,\"Authorization\":auth},signal:controller.signal});\n    if(!result.ok)return respond(401,{error:\"Session invalid\"},origin);\n    const user=await result.json();\n    if(!user?.id)return respond(401,{error:\"Session invalid\"},origin);\n    return respond(200,{authenticated:true,userId:user.id},origin);\n   }finally{clearTimeout(timer);}\n  }catch{return respond(503,{error:\"Authentication verification unavailable\"},origin);}\n }\n if(path===\"/v1/markets\"||path===\"/v1/bets\"||path===\"/v1/settlement\")\n  return respond(503,{error:\"Verified backend market/financial operations not yet enabled\"},origin);\n return respond(404,{error:\"Not found\"},origin);\n};"
+        }
+      }
+    },
+    "HttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "bpexch-readonly-stage",
+        "ProtocolType": "HTTP",
+        "CorsConfiguration": {
+          "AllowMethods": [
+            "GET",
+            "OPTIONS"
+          ],
+          "AllowHeaders": [
+            "authorization",
+            "content-type"
+          ],
+          "AllowOrigins": [
+            "https://bpexch1.com"
+          ],
+          "MaxAge": 600
+        }
+      }
+    },
+    "Integration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "BackendFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 8000
+      }
+    },
+    "HealthRoute": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /health",
+        "Target": {
+          "Fn::Join": [
+            "",
+            [
+              "integrations/",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "ServiceRoute": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /v1/{proxy+}",
+        "Target": {
+          "Fn::Join": [
+            "",
+            [
+              "integrations/",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Stage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "StageName": "$default",
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 5,
+          "ThrottlingRateLimit": 2
+        }
+      }
+    },
+    "InvokePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "BackendFunction"
+        },
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/GET/*"
+        }
+      }
+    },
+    "LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "/aws/lambda/",
+              {
+                "Ref": "BackendFunction"
+              }
+            ]
+          ]
+        },
+        "RetentionInDays": 7
+      }
+    }
+  },
+  "Outputs": {
+    "ApiEndpoint": {
+      "Value": {
+        "Fn::GetAtt": [
+          "HttpApi",
+          "ApiEndpoint"
+        ]
+      }
+    },
+    "LambdaName": {
+      "Value": {
+        "Ref": "BackendFunction"
+      }
+    }
+  }
+}
