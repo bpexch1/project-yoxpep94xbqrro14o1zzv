@@ -41,30 +41,36 @@ export const fetchAtdCricketHome = async (_params?: any) => {
   return { matches: [] };
 };
 
-export const handleTransaction = async (data: any) => {
-  return { success: true, data };
+// Never acknowledge financial mutations without an authoritative server transaction.
+export const handleTransaction = async (_data: any): Promise<any> => {
+  throw new Error("Transaction backend is not connected; balances were not changed.");
 };
 
-export const settleBets = async (data: any) => {
-  return { success: true, count: 1, message: "Bets settled" };
+export const settleBets = async (_data: any): Promise<any> => {
+  throw new Error("Verified settlement backend is unavailable; no bets were settled.");
 };
 
+// Development fixtures are never treated as live licensed data in production.
 export const getLiveOdds = async (params: any) => {
-  const eventId = params?.eventId || params?.matchId;
-  return getMockLiveOdds(eventId);
+  if (import.meta.env.DEV) return getMockLiveOdds(params?.eventId || params?.matchId);
+  return { success: false, markets: [], score: null, source: "unavailable" };
 };
 
 export const getCricketScore = async (params: any) => {
-  const matchId = params?.matchId || params?.atdMatchId;
-  return getMockCricketScore(matchId);
+  if (import.meta.env.DEV) return getMockCricketScore(params?.matchId || params?.atdMatchId);
+  return { success: false, score: null, source: "unavailable" };
 };
 
-export const oddsEngine = async (data: any) => {
-  return getMockOddsEngineResponse(data);
+export const oddsEngine = async (data: any): Promise<any> => {
+  if (data?.action === "validateOdds") {
+    return { valid: false, reason: "Server-side odds verification is not configured." };
+  }
+  if (import.meta.env.DEV) return getMockOddsEngineResponse(data);
+  throw new Error("Authoritative odds and market sync service is not configured.");
 };
 
 export const fetchFootballShotmap = async (eventId: string | number, teamId?: string | number) => {
-  return getMockShotmap(eventId, teamId);
+  return import.meta.env.DEV ? getMockShotmap(eventId, teamId) : [];
 };
 
 export const fetchRapidApiBetfairMatchDetails = async (_eventId: string | number) => {
