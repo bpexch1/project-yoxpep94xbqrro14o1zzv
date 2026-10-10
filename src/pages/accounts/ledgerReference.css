@@ -170,3 +170,22 @@
     font-size: 15px;
   }
 }
+
+.reference-admin .reference-ledger .ledger-sort-button {
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.reference-admin .reference-ledger .ledger-sort-button span {
+  color: #8b959d;
+  font-size: 11px;
+}
+.reference-admin .reference-ledger .ledger-sort-button:focus-visible {
+  outline: 2px solid #087ff5;
+  outline-offset: 2px;
+}
