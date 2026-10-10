@@ -51,7 +51,7 @@ Deno.serve(async (req: Request) => {
     });
     if (error) {
       if (error.message.includes("Session expired")) return json(req, { error: "Session expired. Log in again" }, 401);
-      const allowed = /^(Administrator permission required|Select a downline account|Target account is disabled|Account is outside your downline|Insufficient (cash|credit) balance|Insufficient operator credit limit|Request ID was already used for a different transfer|Invalid transfer parameters)$/;
+      const allowed = /^(Administrator permission required|Select a downline account|Target account is disabled|Account is outside your downline|Insufficient (cash|credit) balance|Insufficient operator credit limit|Insufficient operator cash balance|Request ID was already used for a different transfer|Invalid transfer parameters)$/;
       return json(req, { error: allowed.test(error.message) ? error.message : "Transfer could not be completed" }, 400);
     }
     if (!data?.success) return json(req, { error: "Transfer was not confirmed" }, 503);
