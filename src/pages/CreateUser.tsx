@@ -5,20 +5,23 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { Loader2 } from "lucide-react";
+import { getCreatableChildRoles } from "@/lib/accountRoles";
+import { createDownlineAccount } from "@/lib/adminAccountsApi";
 
 export default function CreateUser() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
-  const username = session?.username || 'QRT005';
+  const username = session?.username || '';
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    type: "" as "" | "SuperMaster" | "Bettor",
+    type: "",
     downlineShare: "0",
-    isActive: false,
+    isActive: true,
+    operatorPassword: "",
     phone: "",
     reference: "",
     notes: ""
@@ -33,7 +36,10 @@ export default function CreateUser() {
     queryFn: async () => (await Client.filter({ username }))?.[0],
     enabled: !!session,
   });
-  const maxShare = Math.max(0, Math.min(100, Number(parentRecord?.downline_share ?? 85)));
+  const maxShare = Math.max(0, Math.min(100, Number(parentRecord?.downline_share ?? 0)));
+  const roleOptions = getCreatableChildRoles(parentRecord?.role || session?.role);
+  const selectedRole = roleOptions.find(role => role.value === formData.type)?.value || roleOptions[0]?.value || "";
+  const isManagementRole = selectedRole !== "" && selectedRole !== "client";
 
   const handleUsernameBlur = async () => {
     const raw = formData.username.trim();
@@ -82,8 +88,11 @@ export default function CreateUser() {
       newErrors.password = "Min 4 characters";
     }
 
-    if (!formData.type) newErrors.type = "Select an account type";
-    if (formData.type === "SuperMaster" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
+    if (!session?.username || !parentRecord || parentRecord.role?.toLowerCase() !== session.role?.toLowerCase()) newErrors.parent = "Unable to verify your account role. Reload and try again.";
+    if (!selectedRole || !roleOptions.some(role => role.value === selectedRole)) newErrors.type = "Select a permitted account type";
+    if (!formData.operatorPassword) newErrors.operatorPassword = "Enter your current account password to authorize creation";
+    if (formData.password.length > 72) newErrors.password = "Password must be at most 72 characters";
+    if (isManagementRole && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
       newErrors.downlineShare = `Enter a share between 0 and ${maxShare}`;
     }
     setErrors(newErrors);
@@ -106,22 +115,19 @@ export default function CreateUser() {
 
     setIsSubmitting(true);
     try {
-      await Client.create({
+      await createDownlineAccount({
+        operatorUsername: username,
+        operatorPassword: formData.operatorPassword,
         username: formData.username.trim(),
-        password: formData.password.trim(),
-        role: formData.type === "SuperMaster" ? "supermaster" : "client",
-        credit_received: 0,
-        credit_remaining: 0,
-        cash: 0,
-        pl_downline: 0,
-        balance_upline: 0,
-        status: formData.isActive ? "active" : "inactive",
-        parent_username: username,
-        phone: formData.phone,
-        downline_share: formData.type === "SuperMaster" ? Number(formData.downlineShare) : 85,
-        reference: formData.reference,
-        notes: formData.notes,
+        password: formData.password,
+        role: selectedRole,
+        downlineShare: isManagementRole ? Number(formData.downlineShare) : 0,
+        isActive: formData.isActive,
+        phone: formData.phone.trim(),
+        reference: formData.reference.trim(),
+        notes: formData.notes.trim(),
       });
+      setFormData(prev => ({ ...prev, password: "", operatorPassword: "" }));
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       navigate("/accounts");
@@ -221,33 +227,25 @@ export default function CreateUser() {
               <label className="block text-[14px] font-medium text-[#212529] mb-1.5">
                 Type
               </label>
-              <div className="flex items-center gap-6 pt-0.5">
-                <label className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
-                  <input
-                    type="radio"
-                    name="account_type"
-                    checked={formData.type === "SuperMaster"}
-                    onChange={() => setFormData({ ...formData, type: "SuperMaster" })}
-                    className="w-4 h-4 text-[#00a65a] accent-[#00a65a] cursor-pointer"
-                  />
-                  <span>SuperMaster</span>
-                </label>
-
-                <label className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
-                  <input
-                    type="radio"
-                    name="account_type"
-                    checked={formData.type === "Bettor"}
-                    onChange={() => setFormData({ ...formData, type: "Bettor" })}
-                    className="w-4 h-4 text-[#00a65a] accent-[#00a65a] cursor-pointer"
-                  />
-                  <span>Bettor</span>
-                </label>
+              <div className="flex flex-wrap items-center gap-6 pt-0.5">
+                {roleOptions.map(role => (
+                  <label key={role.value} className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
+                    <input
+                      type="radio"
+                      name="account_type"
+                      checked={selectedRole === role.value}
+                      onChange={() => setFormData({ ...formData, type: role.value })}
+                      className="w-4 h-4 accent-[#00a65a] cursor-pointer"
+                    />
+                    <span>{role.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
+            {errors.parent && <p role="alert" className="text-red-600">{errors.parent}</p>}
             {errors.type && <p role="alert" className="text-red-600">{errors.type}</p>}
-            {formData.type === "SuperMaster" && (
+            {isManagementRole && (
               <div className="create-share-field">
                 <label htmlFor="downline-share">Downline Share</label>
                 <input id="downline-share" type="number" min="0" max={maxShare} step="0.01" required value={formData.downlineShare} onChange={event => setFormData({ ...formData, downlineShare: event.target.value })} />
@@ -313,6 +311,19 @@ export default function CreateUser() {
               />
             </div>
 
+            <div>
+              <label htmlFor="operator-password" className="block text-[14px] font-medium mb-1">Confirm Your Current Password</label>
+              <input
+                id="operator-password"
+                type="password"
+                autoComplete="current-password"
+                value={formData.operatorPassword}
+                onChange={e => setFormData({ ...formData, operatorPassword: e.target.value })}
+                className="w-full h-[36px] px-3 border border-[#ced4da] rounded-[4px]"
+              />
+              <p className="text-[12px] text-[#6c757d] mt-1">Required for server authorization. Not saved in your browser.</p>
+              {errors.operatorPassword && <p role="alert" className="text-red-600 text-sm">{errors.operatorPassword}</p>}
+            </div>
             {/* Action Buttons */}
             <div className="pt-2">
               <button
