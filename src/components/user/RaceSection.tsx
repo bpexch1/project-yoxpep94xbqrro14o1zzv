@@ -33,7 +33,7 @@ const DEFAULT_GREYHOUND_SLOTS: RaceSlot[] = [
 export function SingleRaceRow({
   title = "Horse Race",
   iconType = "horse",
-  slots = DEFAULT_HORSE_SLOTS,
+  slots,
   onSelectRace,
 }: {
   title?: string;
@@ -41,7 +41,12 @@ export function SingleRaceRow({
   slots?: RaceSlot[];
   onSelectRace?: (race: RaceSlot) => void;
 }) {
-  const safeSlots = Array.isArray(slots) && slots.length > 0 ? slots : (iconType === "horse" ? DEFAULT_HORSE_SLOTS : DEFAULT_GREYHOUND_SLOTS);
+  // Race times are example fixtures in DEV only. Never display invented races as live production.
+  const safeSlots = Array.isArray(slots)
+    ? slots
+    : import.meta.env.DEV
+      ? (iconType === "horse" ? DEFAULT_HORSE_SLOTS : DEFAULT_GREYHOUND_SLOTS)
+      : [];
   const [startIndex, setStartIndex] = useState(0);
   const visibleCount = 3;
 
@@ -108,7 +113,10 @@ export function SingleRaceRow({
 
         {/* 3 Slots */}
         <div style={{ flex: 1, display: "flex", height: "100%", alignItems: "stretch" }}>
-          {visibleSlots.map((slot, idx) => (
+          {visibleSlots.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center px-3 text-center text-xs sm:text-sm font-semibold text-white/85"
+              role="status">Race schedule unavailable — awaiting verified feed</div>
+          ) : visibleSlots.map((slot, idx) => (
             <button
               type="button"
               key={`${slot.venue}-${idx}`}
@@ -200,13 +208,13 @@ export function RaceSection({
       <SingleRaceRow
         title="Horse Race"
         iconType="horse"
-        slots={DEFAULT_HORSE_SLOTS}
+        slots={import.meta.env.DEV ? DEFAULT_HORSE_SLOTS : []}
         onSelectRace={onSelectRace}
       />
       <SingleRaceRow
         title="Grey Hound"
         iconType="greyhound"
-        slots={DEFAULT_GREYHOUND_SLOTS}
+        slots={import.meta.env.DEV ? DEFAULT_GREYHOUND_SLOTS : []}
         onSelectRace={onSelectRace}
       />
     </div>
