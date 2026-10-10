@@ -282,7 +282,7 @@ export default function CashCreditPage() {
 
         </div>
         {/* DEPOSIT FORM BOX (Dark Teal Header #009678) */}
-        <div className="wallet-reference-action bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+        <div className="wallet-reference-action wallet-reference-deposit bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#00b181] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
               ? `Deposit Cash in ${client.username} Account`
@@ -337,7 +337,7 @@ export default function CashCreditPage() {
         </div>
 
         {/* WITHDRAW FORM BOX (Red Header) */}
-        <div className="wallet-reference-action bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+        <div className="wallet-reference-action wallet-reference-withdraw bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#c7254e] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
               ? `Withdraw Cash from ${client.username} Account`
