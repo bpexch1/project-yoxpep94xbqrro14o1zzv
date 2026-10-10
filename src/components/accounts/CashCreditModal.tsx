@@ -44,7 +44,6 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   useEffect(() => {
     if (!client) return;
     setShowHistory(false);
-    setOperatorPassword("");
     if (activeTab === "cash") {
       setDepositDesc(`Cash deposit in ${client.username}`);
       setWithdrawDesc(`Cash withdrawn from ${client.username}`);
