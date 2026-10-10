@@ -228,6 +228,8 @@ export function ClientSummaryCard({
         L
       </button>
 
+      {client.can_settle_pl === true && <button type="button" title="Settle Account" className="btn-action btn-settle" onClick={event => { event.stopPropagation(); navigate(`/accounts/settle-pl/${client.username}`); }}>S</button>}
+
       {/* Medium Green (A) or InActive (D) Button */}
       <button
         onClick={(e) => {

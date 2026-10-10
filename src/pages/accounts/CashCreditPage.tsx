@@ -257,7 +257,7 @@ export default function CashCreditPage() {
 
         {/* DEPOSIT FORM BOX (Dark Teal Header #009678) */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="bg-[#009678] px-3.5 py-2 text-[0.875rem] text-white font-bold">
+          <div className="bg-[#00b181] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
               ? `Deposit Cash in ${client.username} account`
               : `Deposit Credit in ${client.username} Account`}
@@ -302,7 +302,7 @@ export default function CashCreditPage() {
                 type="button"
                 onClick={handleDeposit}
                 disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
-                className="bg-[#009678] hover:bg-[#007a62] text-white border border-[#009678] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
+                className="bg-[#00b181] hover:bg-[#007a62] text-white border border-[#009678] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingDeposit ? "Submitting..." : "Submit"}
               </button>
@@ -312,7 +312,7 @@ export default function CashCreditPage() {
 
         {/* WITHDRAW FORM BOX (Red Header) */}
         <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="bg-[#dc3545] px-3.5 py-2 text-[0.875rem] text-white font-bold">
+          <div className="bg-[#c7254e] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
               ? `Withdraw cash from ${client.username} account`
               : `Withdraw Credit from ${client.username}`}
@@ -357,7 +357,7 @@ export default function CashCreditPage() {
                 type="button"
                 onClick={handleWithdraw}
                 disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
-                className="bg-[#dc3545] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
+                className="bg-[#c7254e] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingWithdraw ? "Submitting..." : "Submit"}
               </button>

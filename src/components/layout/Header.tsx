@@ -39,7 +39,7 @@ function formatRole(role: string): string {
   return roleMap[role?.toLowerCase()] ?? (role ? role.charAt(0).toUpperCase() + role.slice(1) : "");
 }
 
-export function Header({ onToggleMobileSidebar, onToggleDesktopSidebar }: HeaderProps) {
+export function Header({ isMobileSidebarOpen, onToggleMobileSidebar, onToggleDesktopSidebar }: HeaderProps) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -101,6 +101,7 @@ export function Header({ onToggleMobileSidebar, onToggleDesktopSidebar }: Header
           onClick={handleHamburgerClick}
           className="navbar-toggler flex flex-col justify-center items-center min-w-[50px] w-[50px] h-[40px] bg-transparent border-none p-0 cursor-pointer focus:outline-none shrink-0"
           aria-label="Toggle navigation menu"
+          aria-expanded={isMobileSidebarOpen}
           title="Toggle navigation"
         >
           <span className="w-[18px] h-[2px] bg-[#23282c] rounded-full block mb-[3.5px]"></span>

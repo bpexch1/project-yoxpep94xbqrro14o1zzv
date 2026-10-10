@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./admin-reference.css";
+import "./admin-video-reference.css";
 import "./client-reference.css";
 import { initClarity } from "./lib/clarity";
 

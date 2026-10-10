@@ -1,0 +1,123 @@
+/* Mobile admin recording 321552.mp4: native form controls, compact cards and
+   responsive child rows. Scoped so the player interface is unaffected. */
+.reference-admin .reference-create > div > div > div:first-child { background: #f0f3f5; padding: 4.8px 20px; border-color: #c8ced3; }
+.reference-admin .reference-create form { padding: 40px 20px 20px; }
+.reference-admin .reference-create form > div { margin-top: 0; margin-bottom: 24px; }
+.reference-admin .reference-create form label { font-size: 16px; font-weight: 400; line-height: 24px; }
+.reference-admin .reference-create form input:not([type=radio]):not([type=checkbox]),
+.reference-admin .reference-create form textarea { display: block; width: 100%; border: 1px solid #e4e7ea; border-radius: 4px; padding: 6px 12px; font-size: 16px; line-height: 21px; }
+.reference-admin .reference-create form input:not([type=radio]):not([type=checkbox]) { height: 35px; }
+.reference-admin .reference-create form textarea { min-height: 62px; resize: vertical; }
+.reference-admin .reference-create form input[type=radio],
+.reference-admin .reference-create form input[type=checkbox] { width: 13px; height: 13px; accent-color: #007bff; }
+.reference-admin .reference-create form .gap-6 { gap: 6px; }
+.reference-admin .reference-create form label.inline-flex { gap: 3px; }
+.reference-admin .reference-create .create-share-field input { max-width: 115px; }
+.reference-admin .reference-create .create-share-field p { font-size: 14px; margin-top: 4px; }
+.reference-admin .reference-create form > div:last-child { margin-bottom: 0; }
+.reference-admin .reference-create button[type=submit] { background: #00b181; font-size: 14px; padding: 6px 12px; font-weight: 400; }
+.reference-admin .reference-edit { background: transparent !important; font-family: inherit !important; min-height: 0 !important; }
+.reference-admin .reference-edit > div { max-width: none !important; padding: 0 !important; }
+.reference-admin .reference-edit > div > div { box-shadow: none !important; }
+.reference-admin .reference-edit > div > div:first-child > div:last-child > span { font-size: 18px !important; font-weight: 700 !important; }
+.reference-admin .reference-edit form > div:first-child > div { min-width: 0; }
+.reference-admin .reference-edit form > div:first-child > div > div { min-width: 0; }
+.reference-admin .reference-cash { background: transparent !important; font-family: inherit !important; }
+.reference-admin .reference-cash .cash-form-footer button { font-size: 14px; padding: 6px 12px; }
+.reference-admin .reference-report { padding: 0; min-height: 0; }
+.reference-admin .reference-report > main { padding: 0; max-width: none; }
+.reference-admin .reference-report > main > .h-2 { display: none; }
+.reference-admin .reference-report > main > div:has(> .card) { margin: 0; }
+.reference-admin .reference-report-filter .card-body > input { display: block; width: 100%; border: 1px solid #e4e7ea; height: 35px; padding: 6px 12px; }
+.reference-admin .report-date-separator { text-align: center; margin: 8px 0; }
+.reference-admin .report-submit { text-align: right; margin-top: 10px; }
+.reference-admin .report-user-filter { margin-top: 10px; font-size: 14px; }
+.reference-admin .report-user-filter input { width: 100%; border: 1px solid #e4e7ea; padding: 6px 12px; }
+.reference-admin .report-hide-zero { display: block; font-weight: 400; }
+.reference-admin .report-hide-zero input { accent-color: #007bff; }
+.reference-admin .reference-amount-columns, .reference-admin .reference-final-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; background: #fff; padding: 0; }
+.reference-admin .reference-final-columns { padding: 20px; margin-top: -12px; }
+.reference-admin .reference-amount-scroll { min-width: 0; overflow-x: auto; }
+.reference-admin .reference-amount-report table { margin: 0; width: 100%; }
+.reference-admin .reference-amount-report th { background: #fff; text-align: left; }
+.reference-admin .reference-amount-report th button { font-weight: 700; }
+.reference-admin .reference-amount-report tbody td:first-child { color: #00b181; }
+.reference-admin .reference-amount-report .report-empty { white-space: normal; text-align: center; color: #73818f; }
+.reference-admin .amount-negative { color: #f86c6b; }
+.reference-admin .amount-total-positive { background: #00b181; color: white; font-weight: 700; }
+.reference-admin .amount-total-negative { background: #f86c6b; color: white; font-weight: 700; }
+.reference-admin .reference-report-details { margin-bottom: 24px; }
+.reference-admin .reference-report-details > summary { padding: 8px 12px; background: white; border: 1px solid #c8ced3; color: #536c79; cursor: pointer; }
+.reference-admin .reference-ledger .ledger-meta { background: #fff; padding: 4px 0; }
+.reference-admin .reference-ledger .ledger-meta > div + div { margin-top: 16px; }
+.reference-admin .reference-ledger .ledger-exports { border-radius: 3px; overflow: hidden; }
+.reference-admin .reference-ledger .ledger-exports button { background: #73818f; font-style: italic; }
+.reference-admin .ledger-expand-button { border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; height: 14px; width: 14px; background: #f86c6b; border: 2px solid #ddd; color: white; font-size: 12px; line-height: 1; margin-right: 4px; }
+.reference-admin .reference-profile main > div { margin-bottom: 24px; }
+.reference-admin .reference-profile form label { font-size: 16px; font-weight: 400; }
+.reference-admin .reference-betlock { padding: 0; }
+.reference-admin .reference-betlock > div { padding: 0 !important; }
+.reference-admin .reference-betlock > div > p:first-child { padding: 4.8px 20px; background: #f0f3f5; border: 1px solid #c8ced3; font-size: 16px !important; }
+.reference-admin .reference-betlock input { width: 16px !important; height: 16px !important; }
+.reference-admin .reference-betlock label { font-size: 16px !important; }
+.reference-admin .reference-betlock > div > div > div > div > div:nth-child(2) { padding-left: 36px !important; gap: 0 !important; }
+.reference-admin .reference-loading-overlay { position: fixed; inset: 55px 0 0; z-index: 1060; background: rgb(255 255 255 / 65%); display: flex; align-items: flex-start; justify-content: center; padding-top: 64px; pointer-events: none; }
+.reference-admin .reference-loading-overlay img { width: 135px; height: 135px; }
+@media (max-width: 991.98px) {
+  .reference-admin .navbar-toggler[aria-expanded=true] { outline: 1px solid #73818f; outline-offset: -7px; border-radius: 4px; }
+  .reference-admin .reference-accounts .accounts-table .data-row:nth-of-type(4n) { background: #f1f1f1 !important; }
+  .reference-admin .reference-accounts .accounts-table .data-row > td { padding: 8px 10px; }
+  .reference-admin .reference-ledger .card-header { padding: 4.8px 20px; font-weight: 400; }
+  .reference-admin .reference-ledger .ledger-controls label:last-child { display: flex; align-items: center; gap: 8px; }
+  .reference-admin .reference-ledger .ledger-controls input[type=search] { width: 100%; min-width: 0; }
+  .reference-admin .reference-ledger .ledger-controls label:last-child { width: 100%; }
+  .reference-admin .reference-edit > div > div:first-child { margin-bottom: 40px !important; }
+}
+@media (min-width: 992px) {
+  .reference-admin .reference-report-filter .card-body { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .reference-admin .reference-report-filter .card-body > input { width: 260px; }
+  .reference-admin .report-submit, .reference-admin .report-user-filter { margin-top: 0; }
+  .reference-admin .ledger-expand-button { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reference-admin .reference-loading-overlay img { visibility: hidden; }
+  .reference-admin .reference-loading-overlay::after { content: 'Loading…'; }
+}
+.reference-admin .btn-settle { background: #f86c6b; color: white; }
+.reference-admin .admin-market-card { background: #fff; border: 1px solid #c8ced3; border-top: 2px solid #63c2de; margin-bottom: 24px; }
+.reference-admin .admin-market-title { background: #f0f3f5; padding: 4px 8px; font-weight: 700; }
+.reference-admin .admin-market-title > span { color: #d752a5; }
+.reference-admin .admin-market-meta { padding: 2px 8px; background: #f0f3f5; font-size: 12px; font-weight: 700; }
+.reference-admin .admin-odds-table { width: 100%; table-layout: fixed; }
+.reference-admin .admin-odds-table th { text-align: left; padding: 6px 8px; width: 60%; border: 1px solid #c8ced3; }
+.reference-admin .admin-odds-table td { text-align: center; padding: 4px; border: 1px solid #c8ced3; font-weight: 700; }
+.reference-admin .admin-odds-table small { display: block; font-size: 10px; font-weight: 400; }
+.reference-admin .admin-back { background: #e1f7fd; }
+.reference-admin .admin-lay { background: #fac8d0; }
+.reference-admin .admin-market-actions { padding: 6px 20px; display: flex; gap: 6px; }
+.reference-admin .admin-market-actions details { position: relative; }
+.reference-admin .admin-market-actions summary { list-style: none; cursor: pointer; }
+.reference-admin .admin-market-menu { position: absolute; left: 0; z-index: 10; min-width: 160px; background: #fff; box-shadow: 0 4px 8px #0002; }
+.reference-admin .admin-market-menu button { display: block; width: 100%; padding: 8px 16px; text-align: left; }
+.reference-admin .admin-market-menu button:hover { background: #f0f3f5; }
+.reference-admin .admin-media { margin-bottom: 24px; }
+.reference-admin .admin-media-tabs { display: flex; background: #00b181; color: white; border-radius: 4px; overflow: hidden; }
+.reference-admin .admin-media-tabs button { width: 50%; padding: 6px; font-size: 14px; border-right: 1px solid #c8ced3; }
+.reference-admin .admin-media-tabs button[aria-pressed=true] { background: #4dbd74; }
+.reference-admin .admin-media-body { background: white; border: 1px solid #c8ced3; padding: 8px; min-height: 150px; }
+.reference-admin .admin-score-panel { background: #171331; color: white; padding: 12px; min-height: 115px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; }
+.reference-admin .admin-score-panel strong:nth-child(2) { text-align: right; }
+.reference-admin .admin-score-panel p { grid-column: 1 / -1; text-align: center; }
+.reference-admin .admin-market-scroll { overflow-x: auto; }
+.reference-admin .admin-market-scroll table { width: 100%; }
+.reference-admin .admin-market-scroll th, .reference-admin .admin-market-scroll td { text-align: left; font-size: 14px; padding: 3px 6px; }
+.reference-admin .admin-user-book { min-height: calc(100dvh - 85px); background: white; padding: 30px; }
+.reference-admin .book-tabs { display: flex; gap: 4px; margin-top: 20px; }
+.reference-admin .book-tabs button { padding: 6px 12px; font-size: 14px; color: #73818f; }
+.reference-admin .book-tabs .active { border: 1px solid #73818f; }
+.reference-market-locker { width: calc(100% - 16px); max-width: 600px; border-radius: 4px; padding: 16px; max-height: 90dvh; overflow: auto; }
+.reference-admin .reference-amount-report > .card-header { display: block; }
+.reference-admin .reference-amount-report .report-hide-zero { margin-top: 2px; }
+.reference-admin .reference-final-columns > div { align-self: start; }
+.reference-admin .reference-cash .cash-form-body { padding: 20px; }
+.reference-admin .reference-cash > div > div:has(.cash-form-body) { margin-bottom: 24px; }

@@ -84,7 +84,7 @@ function SportDropdown({
   };
 
   const handleMatchClick = (marketId: string) => {
-    navigate(`/play/match/${marketId}`);
+    navigate(`/admin/market/${marketId}`);
     onNavigate();
   };
 

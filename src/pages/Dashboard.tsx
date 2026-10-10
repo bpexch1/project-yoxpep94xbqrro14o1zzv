@@ -139,7 +139,7 @@ export default function Dashboard() {
   }, [dbMatches]);
 
   const handleMatchClick = (match: DisplayMatchItem) => {
-    navigate(`/play/match/${match.id}`);
+    navigate(`/admin/market/${match.id}`);
   };
 
   const totalHighlightsCount = soccerMatches.length + cricketMatches.length + tennisMatches.length;

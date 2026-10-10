@@ -2,11 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { useIsFetching } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { getClientSession } from "@/hooks/useClientAuth";
 
 import { isStaffOrAdmin } from "@/lib/adminUiPolicy";
 export { ADMIN_ROLES, isStaffOrAdmin } from "@/lib/adminUiPolicy";
+
+function AdminLoadingOverlay() {
+  const fetching = useIsFetching({ predicate: query => query.state.data === undefined && query.state.status === "pending" });
+  return fetching ? <div className="reference-loading-overlay" role="status" aria-label="Loading"><img src="/reference/loading.gif" alt="" /></div> : null;
+}
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -39,15 +45,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  const standalone = /^\/accounts\/(cash-credit|ledger)(\/|$)/.test(location.pathname);
+  const standalone = /^\/accounts\/(cash-credit|ledger)(\/|$)/.test(location.pathname.toLowerCase());
   if (standalone) return (
     <div className="reference-admin reference-standalone min-h-screen">
+      <AdminLoadingOverlay />
       <main className="main"><div className="container-fluid">{children}</div></main>
     </div>
   );
 
   return (
     <div className="app app-dashboard app-root reference-admin min-h-screen bg-[#E4E5E6] text-[#23282C] overflow-x-hidden" data-panel-role={session.role.toLowerCase()} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <AdminLoadingOverlay />
       {/* Header: fixed at top 55px */}
       <Header 
         isMobileSidebarOpen={isMobileSidebarOpen}

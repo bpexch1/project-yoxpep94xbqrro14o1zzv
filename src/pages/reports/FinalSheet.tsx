@@ -8,7 +8,7 @@ import { getClientSession } from "@/hooks/useClientAuth";
 
 export default function FinalSheet() {
   const [activeTab, setActiveTab] = useState("Final Sheet");
-  const [hideZero, setHideZero] = useState(true);
+  const [hideZero, setHideZero] = useState(false);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const session = getClientSession();
@@ -101,7 +101,7 @@ export default function FinalSheet() {
   if (clientsError || selfError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
-    <div className="bg-[rgb(228,229,230)] pb-16 min-h-screen text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div className="reference-report reference-final-sheet bg-[rgb(228,229,230)] pb-16 min-h-screen text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <main className="pt-0 pb-8 max-w-5xl mx-auto px-2 sm:px-3">
         <div className="h-2" />
 
@@ -140,9 +140,9 @@ export default function FinalSheet() {
               <Loader2 className="w-7 h-7 animate-spin text-[#00b98a]" />
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="reference-final-columns">
               {/* LEFT TABLE — Positive Amounts */}
-              <div className="flex-1 min-w-0 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+              <div className="flex-1 min-w-0 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-x-auto shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
                 <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
                   <thead>
                     <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
@@ -195,7 +195,7 @@ export default function FinalSheet() {
               </div>
 
               {/* RIGHT TABLE — Negative Amounts */}
-              <div className="flex-1 min-w-0 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+              <div className="flex-1 min-w-0 bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-x-auto shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
                 <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
                   <thead>
                     <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">

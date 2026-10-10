@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Client, checkUsernameExists } from "@/entities";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { Loader2 } from "lucide-react";
@@ -16,8 +16,9 @@ export default function CreateUser() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    type: "SuperMaster" as "SuperMaster" | "Bettor",
-    isActive: true,
+    type: "" as "" | "SuperMaster" | "Bettor",
+    downlineShare: "0",
+    isActive: false,
     phone: "",
     reference: "",
     notes: ""
@@ -26,6 +27,13 @@ export default function CreateUser() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const { data: parentRecord } = useQuery({
+    queryKey: ["create-user-parent", username],
+    queryFn: async () => (await Client.filter({ username }))?.[0],
+    enabled: !!session,
+  });
+  const maxShare = Math.max(0, Math.min(100, Number(parentRecord?.downline_share ?? 85)));
 
   const handleUsernameBlur = async () => {
     const raw = formData.username.trim();
@@ -74,6 +82,10 @@ export default function CreateUser() {
       newErrors.password = "Min 4 characters";
     }
 
+    if (!formData.type) newErrors.type = "Select an account type";
+    if (formData.type === "SuperMaster" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
+      newErrors.downlineShare = `Enter a share between 0 and ${maxShare}`;
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -106,7 +118,7 @@ export default function CreateUser() {
         status: formData.isActive ? "active" : "inactive",
         parent_username: username,
         phone: formData.phone,
-        downline_share: 85,
+        downline_share: formData.type === "SuperMaster" ? Number(formData.downlineShare) : 85,
         reference: formData.reference,
         notes: formData.notes,
       });
@@ -149,6 +161,7 @@ export default function CreateUser() {
               </label>
               <input
                 type="text"
+                aria-label="Username"
                 value={formData.username}
                 onChange={(e) => {
                   setFormData({ ...formData, username: e.target.value });
@@ -182,6 +195,7 @@ export default function CreateUser() {
               </label>
               <input
                 type="password"
+                aria-label="Password"
                 value={formData.password}
                 onChange={(e) => {
                   setFormData({ ...formData, password: e.target.value });
@@ -232,6 +246,16 @@ export default function CreateUser() {
               </div>
             </div>
 
+            {errors.type && <p role="alert" className="text-red-600">{errors.type}</p>}
+            {formData.type === "SuperMaster" && (
+              <div className="create-share-field">
+                <label htmlFor="downline-share">Downline Share</label>
+                <input id="downline-share" type="number" min="0" max={maxShare} step="0.01" required value={formData.downlineShare} onChange={event => setFormData({ ...formData, downlineShare: event.target.value })} />
+                <p>Max allowed downline share is 0 - {maxShare}</p>
+                {errors.downlineShare && <p role="alert" className="text-red-600">{errors.downlineShare}</p>}
+              </div>
+            )}
+
             {/* IsActive Checkbox */}
             <div>
               <label className="block text-[14px] font-medium text-[#212529] mb-1">
@@ -254,6 +278,7 @@ export default function CreateUser() {
               </label>
               <input
                 type="text"
+                aria-label="Phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full h-[36px] px-3 text-[14px] bg-white border border-[#ced4da] rounded-[4px] outline-none focus:border-[#00a65a] transition-colors"
@@ -267,6 +292,7 @@ export default function CreateUser() {
               </label>
               <input
                 type="text"
+                aria-label="Reference"
                 value={formData.reference}
                 onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
                 className="w-full h-[36px] px-3 text-[14px] bg-white border border-[#ced4da] rounded-[4px] outline-none focus:border-[#00a65a] transition-colors"
@@ -280,6 +306,7 @@ export default function CreateUser() {
               </label>
               <textarea
                 rows={3}
+                aria-label="Notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 className="w-full px-3 py-2 text-[14px] bg-white border border-[#ced4da] rounded-[4px] outline-none focus:border-[#00a65a] transition-colors resize-none"

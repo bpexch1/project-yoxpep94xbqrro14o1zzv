@@ -24,6 +24,7 @@ import UserStatement from "@/pages/UserStatement";
 import UserResult from "@/pages/UserResult";
 import UserProfitLoss from "@/pages/UserProfitLoss";
 import UserBetHistory from "@/pages/UserBetHistory";
+import AdminMarketPage from "@/pages/AdminMarketPage";
 import MatchDetail from "@/pages/MatchDetail";
 import EditClientPage from "@/pages/accounts/EditClientPage";
 import CashCreditPage from "@/pages/accounts/CashCreditPage";
@@ -102,6 +103,7 @@ const App = () => (
             <Route path="/api-settings" element={<AppLayout><ApiSettings /></AppLayout>} />
             <Route path="/api-diagnostics" element={<AppLayout><ApiSettings /></AppLayout>} />
             
+            <Route path="/admin/market/:matchId" element={<AppLayout><AdminMarketPage /></AppLayout>} />
             <Route path="/admin/profile" element={<AppLayout><UserProfile /></AppLayout>} />
             {/* User Client Routes */}
             <Route path="/play" element={<UserDashboard />} />

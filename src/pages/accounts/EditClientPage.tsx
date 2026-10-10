@@ -57,6 +57,7 @@ export default function EditClientPage() {
     bettingAllowed: true,
     canSettlePL: false,
     phone: "",
+    reference: "",
     notes: "",
     commission: "2.00",
   });
@@ -81,6 +82,7 @@ export default function EditClientPage() {
         bettingAllowed: client.betting_allowed !== false,
         canSettlePL: client.can_settle_pl === true,
         phone: client.phone || "",
+        reference: client.reference || "",
         notes: client.notes || "",
         commission: (client.commission ?? 2.00).toString(),
       });
@@ -106,6 +108,7 @@ export default function EditClientPage() {
         betting_allowed: formData.bettingAllowed,
         can_settle_pl: formData.canSettlePL,
         phone: formData.phone || "",
+        reference: formData.reference || "",
         notes: formData.notes || "",
       };
 
@@ -399,6 +402,11 @@ export default function EditClientPage() {
                 </div>
               </div>
 
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ width: 110 }}>Reference</div>
+                <div style={{ flex: 1 }}><input aria-label="Reference" type="text" value={formData.reference} onChange={event => setFormData({ ...formData, reference: event.target.value })} /></div>
+              </div>
+
               {/* Notes */}
               <div style={{ display: "flex", alignItems: "flex-start" }}>
                 <div style={{ width: 110, color: "#374151", fontWeight: 500, paddingTop: 4 }}>Notes</div>
@@ -634,10 +642,6 @@ export default function EditClientPage() {
           </form>
         </div>
 
-        {/* Bottom marquee ticker */}
-        <div style={{ marginTop: 20, textAlign: "center", fontSize: 11, fontWeight: 700, color: "#6b7280" }}>
-          Welcome to Exchange.
-        </div>
 
       </div>
     </div>

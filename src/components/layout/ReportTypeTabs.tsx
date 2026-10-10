@@ -32,7 +32,7 @@ export function ReportTypeTabs({ activeTab, onTabChange }: ReportTypeTabsProps) 
     <div className="card">
       {/* Inspected Card Header */}
       <div className="card-header">
-        <i className="fa fa-filter" aria-hidden="true" />
+        <Filter size={16} fill="currentColor" aria-hidden="true" />
         <strong>Report Type</strong>
       </div>
 

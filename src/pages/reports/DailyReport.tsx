@@ -1,3 +1,4 @@
+import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
@@ -98,7 +99,7 @@ export default function DailyReport() {
   if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
-    <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div className="reference-report bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <main className="pt-0 pb-8 max-w-5xl mx-auto px-2 sm:px-3">
         <div className="h-2" />
         
@@ -106,54 +107,7 @@ export default function DailyReport() {
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
-        {/* Filters Card */}
-        <div className="mb-2">
-          <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] shadow-[0_1px_1px_rgba(0,0,0,0.05)] overflow-hidden">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-[rgb(200,206,211)] bg-[#f0f3f5]">
-              <Filter className="w-4 h-4 fill-[rgb(35,40,44)] text-[rgb(35,40,44)]" />
-              <span className="font-bold text-[rgb(35,40,44)] text-[0.875rem]">Filters</span>
-            </div>
-            <div className="p-3 flex flex-col gap-3">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="text-[11px] text-[#6c757d] uppercase font-bold mb-1 block">From Date</label>
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a]"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-[11px] text-[#6c757d] uppercase font-bold mb-1 block">To Date</label>
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a]"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-[11px] text-[#6c757d] uppercase font-bold mb-1 block">Username</label>
-                <input
-                  type="text"
-                  placeholder="Filter by user..."
-                  value={usernameFilter}
-                  onChange={(e) => setUsernameFilter(e.target.value)}
-                  className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a]"
-                />
-              </div>
-              <button 
-                onClick={handleSearch}
-                className="bg-[#00b98a] hover:bg-[#138a72] text-white w-full py-1.5 rounded-[0.2rem] text-[0.875rem] font-medium flex items-center justify-center gap-2 transition-colors border border-[#00b98a]"
-              >
-                <Search className="w-4 h-4 stroke-[2.5]" />
-                Get Report
-              </button>
-            </div>
-          </section>
-        </div>
+        <ReferenceReportFilter fromDate={fromDate} toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} onSubmit={handleSearch} username={usernameFilter} setUsername={setUsernameFilter} />
 
         {/* Report Table */}
         <div>

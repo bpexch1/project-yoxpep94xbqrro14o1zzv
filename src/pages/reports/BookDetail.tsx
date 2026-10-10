@@ -1,3 +1,5 @@
+import { ReferenceAmountTables } from "@/components/reports/ReferenceAmountTables";
+import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
@@ -130,7 +132,7 @@ export default function BookDetail() {
   if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
-    <div className="bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div className="reference-report bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <main className="max-w-5xl mx-auto px-2 sm:px-3">
         <div className="h-2" />
         
@@ -138,66 +140,10 @@ export default function BookDetail() {
           <ReportTypeTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
-        {/* Filters Card */}
-        <div className="mb-3">
-          <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-            <div className="bg-[#f0f3f5] border-b border-[rgb(200,206,211)] px-3 py-2 flex items-center gap-2">
-              <Filter className="w-4 h-4 fill-[rgb(35,40,44)] text-[rgb(35,40,44)]" />
-              <strong className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">Filters</strong>
-            </div>
-            <div className="p-3">
-              {/* Row 1: Username */}
-              <div className="mb-3">
-                <label className="text-[11px] font-bold text-[#6c757d] uppercase mb-1 block">Client Username</label>
-                <input
-                  type="text"
-                  placeholder="Enter username or leave blank for all"
-                  list="downline-users-list"
-                  value={usernameFilter}
-                  onChange={(e) => setUsernameFilter(e.target.value)}
-                  className="w-full h-[34px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a] transition-colors"
-                />
-                <datalist id="downline-users-list">
-                  {safeDownlineUsernames.map((name: string) => (
-                    <option key={name} value={name} />
-                  ))}
-                  <option value={session?.username} />
-                </datalist>
-              </div>
+        <ReferenceReportFilter fromDate={fromDate} toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} onSubmit={handleSearch} username={usernameFilter} setUsername={setUsernameFilter} />
 
-              {/* Row 2: From/To Dates */}
-              <div className="flex gap-3 mb-3">
-                <div className="flex-1">
-                  <label className="text-[11px] font-bold text-[#6c757d] uppercase mb-1 block">From Date</label>
-                  <input 
-                    type="date" 
-                    value={fromDate} 
-                    onChange={(e) => setFromDate(e.target.value)} 
-                    className="w-full h-[34px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a] transition-colors" 
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-[11px] font-bold text-[#6c757d] uppercase mb-1 block">To Date</label>
-                  <input 
-                    type="date" 
-                    value={toDate} 
-                    onChange={(e) => setToDate(e.target.value)} 
-                    className="w-full h-[34px] border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 text-[0.875rem] focus:outline-none focus:border-[#00b98a] transition-colors" 
-                  />
-                </div>
-              </div>
-
-              {/* Get Report button */}
-              <button
-                onClick={handleSearch}
-                className="w-full h-[34px] bg-[#00b98a] hover:bg-[#138a72] text-white text-[0.875rem] font-medium rounded-[0.2rem] flex items-center justify-center gap-2 transition-colors border border-[#00b98a]"
-              >
-                <Search className="w-4 h-4 stroke-[2.5]" /> Get Report
-              </button>
-            </div>
-          </section>
-        </div>
-
+        <ReferenceAmountTables rows={Object.entries(safeProcessedTransactions.reduce((groups: Record<string, number>, row: any) => { const name = row.client_username || row.description || "Account"; groups[name] = (groups[name] || 0) + Number(row.amount || 0); return groups; }, {})).map(([name, amount]) => ({ name, amount: Number(amount) }))} title={`${session?.username || "Admin"} - Account movements`} loading={isLoading} />
+        <details className="reference-report-details"><summary>Detailed report / Export</summary>
         {/* Results Card */}
         <div>
           <section className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
@@ -293,6 +239,7 @@ export default function BookDetail() {
             )}
           </section>
         </div>
+        </details>
       </main>
     </div>
   );
