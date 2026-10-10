@@ -4,6 +4,7 @@ import { Client, checkUsernameExists } from "@/entities";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
+import { canCreateChild, permittedChildRole, roleLabel, type AccountRole } from "@/lib/accountHierarchy";
 import { Loader2 } from "lucide-react";
 
 export default function CreateUser() {
@@ -11,12 +12,13 @@ export default function CreateUser() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
-  const username = session?.username || 'QRT005';
+  const username = session?.username || '';
+  const childRole = permittedChildRole(session?.role);
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    type: "" as "" | "SuperMaster" | "Bettor",
+    type: "" as "" | AccountRole,
     downlineShare: "0",
     isActive: false,
     phone: "",
@@ -82,8 +84,8 @@ export default function CreateUser() {
       newErrors.password = "Min 4 characters";
     }
 
-    if (!formData.type) newErrors.type = "Select an account type";
-    if (formData.type === "SuperMaster" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
+    if (!formData.type || !canCreateChild(parentRecord?.role, formData.type)) newErrors.type = "Account type is not permitted for your role";
+    if (childRole !== "bettor" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
       newErrors.downlineShare = `Enter a share between 0 and ${maxShare}`;
     }
     setErrors(newErrors);
@@ -106,10 +108,13 @@ export default function CreateUser() {
 
     setIsSubmitting(true);
     try {
+      if (!parentRecord || !canCreateChild(parentRecord.role, formData.type)) {
+        throw new Error("Parent account role cannot create the selected child role.");
+      }
       await Client.create({
         username: formData.username.trim(),
         password: formData.password.trim(),
-        role: formData.type === "SuperMaster" ? "supermaster" : "client",
+        role: formData.type,
         credit_received: 0,
         credit_remaining: 0,
         cash: 0,
@@ -118,7 +123,7 @@ export default function CreateUser() {
         status: formData.isActive ? "active" : "inactive",
         parent_username: username,
         phone: formData.phone,
-        downline_share: formData.type === "SuperMaster" ? Number(formData.downlineShare) : 85,
+        downline_share: childRole === "bettor" ? 0 : Number(formData.downlineShare),
         reference: formData.reference,
         notes: formData.notes,
       });
@@ -222,32 +227,21 @@ export default function CreateUser() {
                 Type
               </label>
               <div className="flex items-center gap-6 pt-0.5">
-                <label className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
-                  <input
-                    type="radio"
-                    name="account_type"
-                    checked={formData.type === "SuperMaster"}
-                    onChange={() => setFormData({ ...formData, type: "SuperMaster" })}
-                    className="w-4 h-4 text-[#00a65a] accent-[#00a65a] cursor-pointer"
-                  />
-                  <span>SuperMaster</span>
-                </label>
+                {childRole ? (
+                  <label className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
+                    <input type="radio" name="account_type"
+                      checked={formData.type === childRole}
+                      onChange={() => setFormData({ ...formData, type: childRole })}
+                      className="w-4 h-4 text-[#00a65a] accent-[#00a65a] cursor-pointer" />
+                    <span>{roleLabel(childRole)}</span>
+                  </label>
+                ) : <span className="text-xs text-red-600">Account creation is not permitted for this role.</span>}
 
-                <label className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
-                  <input
-                    type="radio"
-                    name="account_type"
-                    checked={formData.type === "Bettor"}
-                    onChange={() => setFormData({ ...formData, type: "Bettor" })}
-                    className="w-4 h-4 text-[#00a65a] accent-[#00a65a] cursor-pointer"
-                  />
-                  <span>Bettor</span>
-                </label>
               </div>
             </div>
 
             {errors.type && <p role="alert" className="text-red-600">{errors.type}</p>}
-            {formData.type === "SuperMaster" && (
+            {childRole !== "bettor" && childRole !== null && (
               <div className="create-share-field">
                 <label htmlFor="downline-share">Downline Share</label>
                 <input id="downline-share" type="number" min="0" max={maxShare} step="0.01" required value={formData.downlineShare} onChange={event => setFormData({ ...formData, downlineShare: event.target.value })} />
