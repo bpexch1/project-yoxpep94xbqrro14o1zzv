@@ -1,16 +1,25 @@
 # BPEXCH V2 — isolated AWS + Supabase foundation
 
+## Provisioned on 2026-10-10 (confirmed by user)
+- **NEW V2 Supabase project:** `BPEXCH-V2`, ID `xnmzkoczfrnjfdoxvdlz`, region `ap-southeast-2`, status `ACTIVE_HEALTHY`, organization `bpexch1's Org`.
+- Cost was quoted `$0/month` for this project on the organization Free plan; overage or external AWS costs are separate.
+- Applied migration **successfully**: `bpexch_v2_fresh_auth_hierarchy_wallet_ledger` (version `20261010145431`). All 5 `v2_*` tables created, RLS enabled; there are **no grants** to `anon` or `authenticated` for these tables. Service-role-only wallet and login functions confirmed.
+- Validated fresh state: 0 profiles, 0 wallets, 0 transfers, 0 ledger entries, 0 Auth users.
+- OLD project `hbaronayzunrrhzujujy` is unchanged: 6 client accounts, 58 transactions and 1 bet at last audit. The V2 schema must never be reapplied to the old project.
+- Security advisor reports five informational `rls_enabled_no_policy` findings; expected for intentional deny-by-default service-only V2 tables. <https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy>
+- **AWS V2 not yet deployed or connected.** Existing read-only AWS staging stack remains in place. Need controlled AWS Secrets Manager setup and approval of potential pay-as-you-go AWS charges before new AWS resources are provisioned. Don't paste service-role keys in chat.
+
 ## Scope and operational state
-- New feature branch from `main`. **No production domain change. No Supabase migration applied. No AWS V2 CloudFormation stack created.**
+- New feature branch from `main`. **No production domain change. NEW Supabase migration applied to V2 ONLY; no AWS V2 CloudFormation stack created.**
 - Existing BPEXCH Admin/User dashboard routes/components/styles preserved, with only a separate `/v2/status` diagnostic route added.
 - Old production Supabase (`hbaronayzunrrhzujujy`) and its accounts, bets and transaction history **unchanged**. NEVER run these new migrations there.
 - Fresh V2 project starts with **zero identities, zero wallets, zero financial transfers**. All wallets start at 0. Never fabricate or import balances.
 - V2 role chain: `company -> superadmin -> admin -> supermaster -> master -> bettor`. No dealer. Server derives permitted child role from verified Auth identity.
 
 ## Provisioning gates
-1. Ask the user to select Supabase organization and confirm costs through Supabase connector before `create_project`; do not auto-create. The sole currently connected org is `bpexch1's Org` (Free plan), project price quoted $0/month at inspection. **Free Supabase allowance and AWS pay-as-you-go usage are not hard cost ceilings.** AWS Budget had been explicitly deleted at user request; do not restore without permission.
-2. Create a **new** V2 Supabase project preferably Sydney (`ap-southeast-2`) beside existing AWS backend, after user confirmation. Keep the old project untouched and read-only/archived as necessary under legal retention obligations.
-3. Apply `supabase/v2/20261010_01_secure_fresh_schema.sql` using Supabase `apply_migration` ONLY on the new project.
+1. **Completed:** User confirmed organization and $0/month quoted cost, new project `xnmzkoczfrnjfdoxvdlz` created and V2 schema migrated. Do not create another project. **Free Supabase allowance and AWS pay-as-you-go usage are not hard cost ceilings.** AWS Budget had been explicitly deleted at user request; do not restore without permission.
+2. **Completed:** New V2 Supabase is located in Sydney (`ap-southeast-2`) beside existing AWS staging. Old project retained unchanged; do not delete financial records without reviewing retention obligations.
+3. **Completed:** `supabase/v2/20261010_01_secure_fresh_schema.sql` successfully applied using `apply_migration` ONLY on V2 project.
 4. Provision new **Company** identity securely using Supabase Auth admin dashboard/operator-only bootstrap, then insert matching `public.v2_profiles` row with `role='company'`, `parent_id=null` under trusted service-role admin access. Do not create a public bootstrap route or embed an initial password.
 5. For production, require verified recovery email for Auth identities, MFA for privileged staff, server-side login rate limiting/WAF, password reset procedures, audit and access logging, disabled open public signup, and recovery testing.
 
