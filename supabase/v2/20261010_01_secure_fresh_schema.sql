@@ -185,4 +185,31 @@ end;$$;
 create trigger v2_ledger_immutable before update or delete on public.v2_ledger
   for each row execute function public.v2_ledger_immutable();
 revoke all on function public.v2_ledger_immutable() from public,anon,authenticated;
+-- Server-enforced login throttling, persistent across Lambda instances.
+create table public.v2_login_attempts (
+  username_key text primary key,
+  attempt_count integer not null default 0 check(attempt_count>=0),
+  expires_at timestamptz not null
+);
+alter table public.v2_login_attempts enable row level security;
+revoke all on public.v2_login_attempts from public,anon,authenticated;
+create or replace function public.v2_reserve_login_attempt(p_username text)
+returns boolean language plpgsql security definer set search_path='' as $
+declare count_now integer;
+begin
+  if p_username is null or length(p_username)>32 or p_username !~ '^[A-Za-z0-9_]{3,32}
+ then return false; end if;
+  insert into public.v2_login_attempts(username_key,attempt_count,expires_at)
+  values(lower(p_username),1,now()+interval '15 minutes')
+  on conflict(username_key) do update set
+    attempt_count=case when public.v2_login_attempts.expires_at < now()
+      then 1 else public.v2_login_attempts.attempt_count+1 end,
+    expires_at=case when public.v2_login_attempts.expires_at < now()
+      then now()+interval '15 minutes' else public.v2_login_attempts.expires_at end
+  returning attempt_count into count_now;
+  return count_now <= 6;
+end;$;
+revoke all on function public.v2_reserve_login_attempt(text) from public,anon,authenticated;
+grant execute on function public.v2_reserve_login_attempt(text) to service_role;
+
 commit;
