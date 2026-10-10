@@ -1,3 +1,4 @@
+import { placeBetSecure } from "@/lib/bettingService";
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -283,38 +284,13 @@ export default function MatchDetail() {
       if (!activeBet || !session || !clientData) return;
       if (stake > clientBalance) throw new Error("Insufficient balance");
 
-      // Require explicit odds validation; an acknowledgement is not validation.
-      const side = activeBet.selection === match.team1 
-        ? (activeBet.betType === 'back' ? 'teamA_back' : 'teamA_lay')
-        : (activeBet.betType === 'back' ? 'teamB_back' : 'teamB_lay');
-      
-      const validation = await oddsEngine({
-        action: 'validateOdds',
-        matchId: match.id,
-        requestedOdds: activeBet.odds,
-        side,
-      });
-
-      if (!validation || !("valid" in validation) || validation.valid !== true) {
-        const reason = validation && "reason" in validation && typeof validation.reason === "string"
-          ? validation.reason
-          : 'Odds could not be verified. Please refresh and try again.';
-        throw new Error(reason);
-      }
-
-      const potentialWin = (stake * activeBet.odds) - stake;
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
+      await placeBetSecure({
+        matchId: String(activeBet.match?.id || match?.id || ""),
         selection: activeBet.selection,
-        bet_type: activeBet.betType,
+        betType: activeBet.betType,
         stake,
         odds: activeBet.odds,
-        potential_win: potentialWin,
-        status: 'pending'
       });
-      await Client.update(clientData.id, { cash: clientBalance - stake });
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -324,7 +300,7 @@ export default function MatchDetail() {
       queryClient.invalidateQueries({ queryKey: ['open-bets', matchId] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+        description: "Wager accepted as pending; not yet matched or settled.",
       });
     },
     onError: (error: any) => {
