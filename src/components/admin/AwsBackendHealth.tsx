@@ -1,23 +1,18 @@
 import { useState } from "react";
 import { Activity, Server, ShieldAlert } from "lucide-react";
 
-const baseUrl = String(import.meta.env.VITE_AWS_API_BASE_URL || "").replace(/\/+$/, "");
+const healthPath = "/aws-health"; // Same-origin Vercel proxy: avoids cross-origin CORS failures.
 type CheckState = "idle" | "checking" | "ready" | "error";
 
 export function AwsBackendHealth() {
   const [state, setState] = useState<CheckState>("idle");
   const [message, setMessage] = useState("Click Check Connection to query the deployed AWS staging service.");
   const verify = async () => {
-    if (!baseUrl) {
-      setState("error");
-      setMessage("AWS staging endpoint is not configured for this environment.");
-      return;
-    }
     setState("checking");
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 8000);
     try {
-      const response = await fetch(baseUrl + "/health", { method: "GET", cache: "no-store", signal: controller.signal });
+      const response = await fetch(healthPath, { method: "GET", cache: "no-store", signal: controller.signal });
       if (!response.ok) throw new Error("HTTP " + response.status);
       const body = await response.json();
       if (body?.ok !== true || body?.status !== "read-only" || body?.service !== "bpexch-api") {
@@ -27,7 +22,7 @@ export function AwsBackendHealth() {
       setMessage("AWS API is connected in " + String(body.region || "configured region") + ". Read-only staging mode; financial operations are not enabled.");
     } catch (error) {
       setState("error");
-      setMessage("AWS health check failed: " + (error instanceof Error ? error.message : "Unknown error"));
+      setMessage("AWS health check failed: " + (error instanceof Error ? error.message : "Unknown error") + ". Check the Vercel staging rewrite and Lambda status.");
     } finally {
       window.clearTimeout(timer);
     }
