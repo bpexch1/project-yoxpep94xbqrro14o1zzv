@@ -6,9 +6,26 @@ interface MatchedAndOpenBetsProps {
 }
 
 export function MatchedAndOpenBets({ openBets = [], matchedBets = [] }: MatchedAndOpenBetsProps) {
-  // In exchange workflows, placed bets are matched
-  const effectiveMatched = matchedBets.length > 0 ? matchedBets : openBets;
-  const effectiveOpen = matchedBets.length > 0 ? openBets : [];
+  // Accept both lists but never infer that a submitted bet is matched.
+  // An external matching engine must produce matched_stake/execution receipts.
+  const all = Array.from(new Map([...openBets, ...matchedBets].map(
+    (bet, index) => [String(bet?.id ?? `unnamed-${index}`), bet]
+  )).values());
+  const effectiveOpen = all.flatMap((bet) => {
+    const total = Number(bet.stake) || 0;
+    const matched = Math.max(0, Math.min(total, Number(bet.matched_stake ?? 0)));
+    const status = String(bet.status || "unmatched").toLowerCase();
+    if (!["pending", "unmatched", "partially_matched"].includes(status)) return [];
+    const outstanding = status === "partially_matched" ? total - matched : total;
+    return outstanding > 0 ? [{ ...bet, stake: outstanding }] : [];
+  });
+  const effectiveMatched = all.flatMap((bet) => {
+    const total = Number(bet.stake) || 0;
+    const status = String(bet.status || "").toLowerCase();
+    if (!["partially_matched", "matched", "won", "lost"].includes(status)) return [];
+    const matched = Number(bet.matched_stake ?? (status === "matched" || status === "won" || status === "lost" ? total : 0));
+    return matched > 0 ? [{ ...bet, stake: Math.min(total, matched) }] : [];
+  });
 
   return (
     <div className="reference-market-bets"
