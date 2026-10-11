@@ -1,0 +1,218 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "BPEXCH V2 isolated AWS staging HTTP API (read-only until Supabase secret configured)",
+  "Parameters": {
+    "PackageBucket": {
+      "Type": "String",
+      "Description": "S3 artifact bucket in ap-southeast-2 (operator provisioned)"
+    },
+    "PackageKey": {
+      "Type": "String",
+      "Description": "S3 key for handler.cjs zip archive"
+    },
+    "ConfigSecretArn": {
+      "Type": "String",
+      "Default": "",
+      "Description": "Optional AWS Secrets Manager ARN holding only V2 Supabase credentials"
+    },
+    "AllowedOrigins": {
+      "Type": "String",
+      "Default": "https://bpexch1.com",
+      "Description": "Comma separated exact approved origins; do not use wildcard"
+    }
+  },
+  "Conditions": {
+    "HasSecret": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "ConfigSecretArn"
+            },
+            ""
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "ExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": {
+          "Fn::If": [
+            "HasSecret",
+            [
+              {
+                "PolicyName": "ReadV2SupabaseConfigOnly",
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "secretsmanager:GetSecretValue"
+                      ],
+                      "Resource": {
+                        "Ref": "ConfigSecretArn"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        }
+      }
+    },
+    "BackendFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Runtime": "nodejs22.x",
+        "Handler": "handler.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ExecutionRole",
+            "Arn"
+          ]
+        },
+        "Timeout": 12,
+        "MemorySize": 128,
+        "Code": {
+          "S3Bucket": {
+            "Ref": "PackageBucket"
+          },
+          "S3Key": {
+            "Ref": "PackageKey"
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "V2_ALLOWED_ORIGINS": {
+              "Ref": "AllowedOrigins"
+            },
+            "V2_CONFIG_SECRET_ARN": {
+              "Ref": "ConfigSecretArn"
+            }
+          }
+        }
+      }
+    },
+    "LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${BackendFunction}"
+        },
+        "RetentionInDays": 7
+      }
+    },
+    "Api": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "bpexch-v2-staging",
+        "ProtocolType": "HTTP"
+      }
+    },
+    "Integration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "BackendFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0"
+      }
+    },
+    "Route": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api"
+        },
+        "RouteKey": "ANY /v2/{proxy+}",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Stage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api"
+        },
+        "StageName": "$default",
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "ThrottlingRateLimit": 2,
+          "ThrottlingBurstLimit": 5
+        }
+      }
+    },
+    "InvokePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "BackendFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/*"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Endpoint": {
+      "Value": {
+        "Fn::Sub": "https://${Api}.execute-api.${AWS::Region}.amazonaws.com"
+      }
+    },
+    "FunctionName": {
+      "Value": {
+        "Ref": "BackendFunction"
+      }
+    },
+    "StageSafety": {
+      "Value": "Financial writes require verified JWT, service role and V2 secrets; no wildcard CORS"
+    }
+  }
+}
