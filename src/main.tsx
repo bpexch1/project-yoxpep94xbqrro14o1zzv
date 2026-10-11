@@ -4,6 +4,7 @@ import "./index.css";
 import "./admin-reference.css";
 import "./admin-video-reference.css";
 import "./client-reference.css";
+import "./admin-desktop-video-325861.css";
 import { initClarity } from "./lib/clarity";
 
 // Initialize Microsoft Clarity Analytics if Project ID is configured
