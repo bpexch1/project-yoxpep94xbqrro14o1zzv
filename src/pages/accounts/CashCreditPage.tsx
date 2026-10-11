@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
+import "./cashCreditReference.css";
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client } from "@/entities";
 import { manualWalletTransfer } from "@/lib/manualWallet";
@@ -12,14 +13,17 @@ import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 export default function CashCreditPage() {
   const { username } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
 
-  const [operatorPassword, setOperatorPassword] = useState("");
   const inFlight = useRef(false);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'cash' | 'credit'>('cash');
+  const [activeTab, setActiveTab] = useState<'cash' | 'credit'>(() =>
+    /\/(credit|cr)\//i.test(location.pathname) ? "credit" : "cash"
+  );
+  const [transferWarning, setTransferWarning] = useState("");
   const [depositDesc, setDepositDesc] = useState('');
   const [depositAmount, setDepositAmount] = useState('0');
   const [withdrawDesc, setWithdrawDesc] = useState('');
@@ -73,15 +77,16 @@ export default function CashCreditPage() {
   useEffect(() => {
     if (!client) return;
     if (activeTab === 'cash') {
-      setDepositDesc(`Cash deposit in ${client.username}`);
-      setWithdrawDesc(`Cash withdrawn from ${client.username}`);
+      setDepositDesc(`Cash payment to ${session?.username || "Upline"} from ${client.username}`);
+      setWithdrawDesc(`Cash payment to ${client.username} from ${session?.username || "Upline"}`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
     }
     setDepositAmount('0');
     setWithdrawAmount('0');
-  }, [client?.username, activeTab]);
+    setTransferWarning('');
+  }, [client?.username, activeTab, session?.username]);
 
   const refreshAll = async (updatedClientCash?: number) => {
     if (updatedClientCash !== undefined && client && session?.username === client.username) {
@@ -104,6 +109,27 @@ export default function CashCreditPage() {
     if (!client || !session || inFlight.current) return;
     const amount = direction === "deposit" ? depositAmount : withdrawAmount;
     const description = direction === "deposit" ? depositDesc : withdrawDesc;
+    const numericAmount = Number(amount);
+    const allowedDeposit = activeTab === "cash"
+      ? (adminClient ? Math.max(0, Number(adminClient.cash ?? 0)) : null)
+      : (session.role?.toLowerCase() === "company" ? null
+        : (adminClient ? Math.max(0, Number(adminClient.credit_remaining ?? 0)) : null));
+    const allowedWithdraw = Math.max(0, Number(activeTab === "cash" ? client.cash : client.credit_remaining) || 0);
+    if (!/^[0-9]+([.][0-9]{1,2})?$/.test(amount) || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+      setTransferWarning("Enter a valid amount greater than zero.");
+      return;
+    }
+    if (direction === "deposit" && allowedDeposit !== null && numericAmount > allowedDeposit) {
+      setTransferWarning(`Max ${activeTab} deposit is ${allowedDeposit.toLocaleString("en-IN")}`);
+      setDepositAmount("0");
+      return;
+    }
+    if (direction === "withdraw" && numericAmount > allowedWithdraw) {
+      setTransferWarning(`Max ${activeTab} withdrawal is ${allowedWithdraw.toLocaleString("en-IN")}`);
+      setWithdrawAmount("0");
+      return;
+    }
+    setTransferWarning("");
     const fingerprint = JSON.stringify([client.id, activeTab, direction, amount, description]);
     if (pendingRequest.current?.fingerprint !== fingerprint) {
       pendingRequest.current = { fingerprint, id: crypto.randomUUID() };
@@ -113,17 +139,16 @@ export default function CashCreditPage() {
     setSubmitting(true);
     try {
       await manualWalletTransfer({
-        operatorUsername: session.username, operatorPassword,
         clientId: client.id, wallet: activeTab, direction, amount, description,
         requestId: pendingRequest.current!.id,
       });
       pendingRequest.current = null;
-      setOperatorPassword("");
       if (direction === "deposit") setDepositAmount("0");
       else setWithdrawAmount("0");
       toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
       // A refresh failure must not turn a confirmed transfer into a failed transfer.
       await refreshAll().catch(() => undefined);
+      navigate(`/accounts/ledger/${encodeURIComponent(client.username)}?wallet=${activeTab}`);
     } catch (err: unknown) {
       toast({ variant: "destructive", title: "Transfer Failed", description: err instanceof Error ? err.message : "Unable to confirm transfer. Retry with the same details." });
     } finally {
@@ -155,26 +180,24 @@ export default function CashCreditPage() {
     );
   }
 
-  const clientCredit = Number(client.credit_remaining ?? 0);
+  // Reference cash/credit summary separates issued credit, available credit and cash inventory.
+  // Cash deposits affect max withdrawal, not the displayed available credit balance.
+  const clientCredit = Number(client.credit_received ?? 0);
+  const clientAvailableBalance = Number(client.credit_remaining ?? 0);
   const clientCash = Number(client.cash ?? 0);
-  const clientPL = Number(client.pl_downline ?? 0);
-  const clientTotalBalance = clientCredit + clientCash + clientPL;
   const maxWithdraw = Math.max(0, clientCash);
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
 
   return (
     <div className="reference-cash min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-      <div className="max-w-md mx-auto px-2 py-3">
+      <div className="wallet-reference-shell max-w-md mx-auto px-2 py-3">
 
-          <div className="bg-white border border-gray-300 rounded p-3 mb-3">
-            <label className="block text-sm font-semibold mb-1" htmlFor="wallet-operator-password">Your administrator password</label>
-            <input id="wallet-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Confirm your identity" />
-          </div>
+        <div className="wallet-reference-summary">
         {/* Top 2 Flat Action Buttons: Cash & Credit */}
-        <div className="flex gap-2.5 mb-3">
+        <div className="wallet-reference-tabs flex gap-2.5 mb-3">
           <button
             type="button"
-            onClick={() => setActiveTab('cash')}
+            onClick={() => { setActiveTab('cash'); setTransferWarning(''); }}
             className={cn(
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
               activeTab === 'cash'
@@ -186,7 +209,7 @@ export default function CashCreditPage() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('credit')}
+            onClick={() => { setActiveTab('credit'); setTransferWarning(''); }}
             className={cn(
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
               activeTab === 'credit'
@@ -198,15 +221,18 @@ export default function CashCreditPage() {
           </button>
         </div>
 
+        {transferWarning && (
+          <div role="alert" className="wallet-reference-warning">{transferWarning}</div>
+        )}
         {/* Username Header & 3-Column Info Table Box */}
-        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-3 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+        <div className="wallet-reference-account bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-3 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="font-bold text-[1.1rem] text-[#23282c] mb-2.5">
             {client.username}
           </div>
 
           {activeTab === 'cash' ? (
             /* Cash Tab Header Table: Credit | Balance | Max Withdraw */
-            <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
+            <table className="wallet-reference-table table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
                 <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
                   <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Credit</th>
@@ -220,7 +246,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientTotalBalance.toLocaleString()} Rs.
+                    {clientAvailableBalance.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
                     {maxWithdraw.toLocaleString()} Rs.
@@ -230,7 +256,7 @@ export default function CashCreditPage() {
             </table>
           ) : (
             /* Credit Tab Header Table: Credit limit | [Username] Credit | [Username] Available Balance */
-            <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
+            <table className="wallet-reference-table table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
                 <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
                   <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[30%] leading-tight">Credit limit</th>
@@ -247,7 +273,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientTotalBalance.toLocaleString()} Rs.
+                    {clientAvailableBalance.toLocaleString()} Rs.
                   </td>
                 </tr>
               </tbody>
@@ -255,11 +281,12 @@ export default function CashCreditPage() {
           )}
         </div>
 
+        </div>
         {/* DEPOSIT FORM BOX (Dark Teal Header #009678) */}
-        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+        <div className="wallet-reference-action wallet-reference-deposit bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#00b181] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
-              ? `Deposit Cash in ${client.username} account`
+              ? `Deposit Cash in ${client.username} Account`
               : `Deposit Credit in ${client.username} Account`}
           </div>
 
@@ -301,7 +328,7 @@ export default function CashCreditPage() {
               <button
                 type="button"
                 onClick={handleDeposit}
-                disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                disabled={isSubmittingDeposit || isSubmittingWithdraw}
                 className="bg-[#00b181] hover:bg-[#007a62] text-white border border-[#009678] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingDeposit ? "Submitting..." : "Submit"}
@@ -311,10 +338,10 @@ export default function CashCreditPage() {
         </div>
 
         {/* WITHDRAW FORM BOX (Red Header) */}
-        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+        <div className="wallet-reference-action wallet-reference-withdraw bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#c7254e] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
-              ? `Withdraw cash from ${client.username} account`
+              ? `Withdraw Cash from ${client.username} Account`
               : `Withdraw Credit from ${client.username}`}
           </div>
 
@@ -356,7 +383,7 @@ export default function CashCreditPage() {
               <button
                 type="button"
                 onClick={handleWithdraw}
-                disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                disabled={isSubmittingDeposit || isSubmittingWithdraw}
                 className="bg-[#c7254e] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingWithdraw ? "Submitting..." : "Submit"}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -17,13 +18,14 @@ interface CashCreditModalProps {
 
 export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const session = getClientSession();
 
-  const [operatorPassword, setOperatorPassword] = useState("");
   const inFlight = useRef(false);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"cash" | "credit">("cash");
+  const [transferWarning, setTransferWarning] = useState("");
   const [showHistory, setShowHistory] = useState(false);
 
   const [depositDesc, setDepositDesc] = useState("");
@@ -45,17 +47,17 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
   useEffect(() => {
     if (!client) return;
     setShowHistory(false);
-    setOperatorPassword("");
+    setTransferWarning("");
     if (activeTab === "cash") {
-      setDepositDesc(`Cash deposit in ${client.username}`);
-      setWithdrawDesc(`Cash withdrawn from ${client.username}`);
+      setDepositDesc(`Cash payment to ${session?.username || "Upline"} from ${client.username}`);
+      setWithdrawDesc(`Cash payment to ${client.username} from ${session?.username || "Upline"}`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
     }
     setDepositAmount("0");
     setWithdrawAmount("0");
-  }, [client?.username, activeTab, isOpen]);
+  }, [client?.username, activeTab, isOpen, session?.username]);
 
   const refreshAll = async () => {
     await refetchAdmin();
@@ -69,6 +71,27 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     if (!client || !session || inFlight.current) return;
     const amount = direction === "deposit" ? depositAmount : withdrawAmount;
     const description = direction === "deposit" ? depositDesc : withdrawDesc;
+    const numericAmount = Number(amount);
+    const allowedDeposit = activeTab === "cash"
+      ? (adminClient ? Math.max(0, Number(adminClient.cash ?? 0)) : null)
+      : (session.role?.toLowerCase() === "company" ? null
+        : (adminClient ? Math.max(0, Number(adminClient.credit_remaining ?? 0)) : null));
+    const allowedWithdraw = Math.max(0, Number(activeTab === "cash" ? client.cash : client.credit_remaining) || 0);
+    if (!/^[0-9]+([.][0-9]{1,2})?$/.test(amount) || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+      setTransferWarning("Enter a valid amount greater than zero.");
+      return;
+    }
+    if (direction === "deposit" && allowedDeposit !== null && numericAmount > allowedDeposit) {
+      setTransferWarning(`Max ${activeTab} deposit is ${allowedDeposit.toLocaleString("en-IN")}`);
+      setDepositAmount("0");
+      return;
+    }
+    if (direction === "withdraw" && numericAmount > allowedWithdraw) {
+      setTransferWarning(`Max ${activeTab} withdrawal is ${allowedWithdraw.toLocaleString("en-IN")}`);
+      setWithdrawAmount("0");
+      return;
+    }
+    setTransferWarning("");
     const fingerprint = JSON.stringify([client.id, activeTab, direction, amount, description]);
     if (pendingRequest.current?.fingerprint !== fingerprint) {
       pendingRequest.current = { fingerprint, id: crypto.randomUUID() };
@@ -78,17 +101,17 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     setSubmitting(true);
     try {
       await manualWalletTransfer({
-        operatorUsername: session.username, operatorPassword,
         clientId: client.id, wallet: activeTab, direction, amount, description,
         requestId: pendingRequest.current!.id,
       });
       pendingRequest.current = null;
-      setOperatorPassword("");
       if (direction === "deposit") setDepositAmount("0");
       else setWithdrawAmount("0");
       toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
       // A refresh failure must not turn a confirmed transfer into a failed transfer.
       await refreshAll().catch(() => undefined);
+      onClose();
+      navigate(`/accounts/ledger/${encodeURIComponent(client.username)}?wallet=${activeTab}`);
     } catch (err: unknown) {
       toast({ variant: "destructive", title: "Transfer Failed", description: err instanceof Error ? err.message : "Unable to confirm transfer. Retry with the same details." });
     } finally {
@@ -140,6 +163,11 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
 
         {/* CONTENT */}
         <div className="bg-[#f8f9fa] max-h-[85vh] overflow-y-auto p-3 space-y-3">
+          {transferWarning && (
+            <div role="alert" className="rounded-sm border border-[#f5c6cb] bg-[#f8d7da] p-2 text-xs font-semibold text-[#792333]">
+              {transferWarning}
+            </div>
+          )}
           {/* Client summary info box */}
           <div className="bg-white p-3 border border-[#dee2e6] rounded-[4px] shadow-sm">
             <h2 className="text-[16px] font-bold text-[#212529] mb-2">{client?.username}</h2>
@@ -183,13 +211,13 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {(client?.credit_remaining || 0).toLocaleString()} Rs.
+                          {(Number(client?.credit_received ?? 0)).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
+                          {(Number(client?.credit_remaining ?? 0)).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
@@ -210,13 +238,13 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#00a676] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {(client?.credit_remaining || 0).toLocaleString()} Rs.
+                          {(Number(client?.credit_received ?? 0)).toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {((client?.credit_remaining || 0) + (client?.cash || 0) + (client?.pl_downline || 0)).toLocaleString()} Rs.
+                          {(Number(client?.credit_remaining ?? 0)).toLocaleString()} Rs.
                         </td>
                       </>
                     )}
@@ -229,10 +257,6 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
             </p>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded p-3 mb-3">
-            <label className="block text-sm font-semibold mb-1" htmlFor="wallet-operator-password">Your administrator password</label>
-            <input id="wallet-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Confirm your identity" />
-          </div>
           {/* DEPOSIT SECTION (Green Header) */}
           <div className="rounded-[4px] overflow-hidden border border-[#dee2e6] bg-white shadow-sm">
             <div className="bg-[#00a676] px-3 py-2 text-white font-bold text-[13px]">
@@ -268,7 +292,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               <div className="flex justify-end pt-1">
                 <button
                   onClick={handleDeposit}
-                  disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                  disabled={isSubmittingDeposit || isSubmittingWithdraw}
                   className="bg-[#00a676] hover:bg-[#008f65] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
                 >
                   {isSubmittingDeposit && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -325,7 +349,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
               <div className="flex justify-end pt-1">
                 <button
                   onClick={handleWithdraw}
-                  disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                  disabled={isSubmittingDeposit || isSubmittingWithdraw}
                   className="bg-[#dc3545] hover:bg-[#c82333] text-white font-bold px-6 py-1.5 rounded-[3px] text-[13px] shadow-sm flex items-center gap-1.5 transition-colors disabled:opacity-70"
                 >
                   {isSubmittingWithdraw && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

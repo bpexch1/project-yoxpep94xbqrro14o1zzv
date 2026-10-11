@@ -1,0 +1,191 @@
+/* Ledger presentation from the original mobile /Accounts/Ledger reference.
+   Scoped exclusively to the admin Ledger view and its standalone layout. */
+.reference-admin.reference-standalone {
+  background: rgb(236, 236, 237);
+  color: rgb(33, 37, 41);
+  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+}
+.reference-admin.reference-standalone .main > .container-fluid {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.reference-admin .reference-ledger {
+  color: rgb(33, 37, 41);
+  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.reference-admin .reference-ledger > .card {
+  background: white;
+  border: 1px solid #dedfe1;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  overflow: visible;
+  box-shadow: none;
+}
+.reference-admin .reference-ledger .card-header {
+  padding: 7px 14px;
+  border-bottom: 1px solid #dedfe1;
+  background: #f7f7f7;
+  color: #212529;
+  font-size: 16px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 35px;
+}
+.reference-admin .reference-ledger .ledger-filter {
+  display: block;
+  padding: 20px !important;
+}
+.reference-admin .reference-ledger .ledger-date-separator {
+  margin: 13px 0;
+  text-align: center;
+  font-weight: 700;
+  line-height: 21px;
+}
+.reference-admin .reference-ledger .ledger-datetime-wrapper {
+  width: 100%;
+  min-width: 0;
+  position: relative;
+}
+.reference-admin .reference-ledger .ledger-datetime-field {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.35fr) 52px 39px;
+  align-items: stretch;
+  overflow: hidden;
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #d3d8dc;
+  border-radius: 4px;
+  background: #fff;
+}
+.reference-admin .reference-ledger .ledger-datetime-field input,
+.reference-admin .reference-ledger .ledger-datetime-field select {
+  min-width: 0;
+  width: 100%;
+  height: 37px;
+  border: 0;
+  outline-offset: -2px;
+  padding: 7px 6px;
+  background: transparent;
+  color: #42494f;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 400;
+  box-shadow: none;
+}
+.reference-admin .reference-ledger .ledger-datetime-field input:first-child {
+  padding-left: 11px;
+}
+.reference-admin .reference-ledger .ledger-datetime-field select {
+  padding: 6px 0;
+  appearance: none;
+  text-align: center;
+  cursor: pointer;
+}
+.reference-admin .reference-ledger .ledger-calendar-trigger {
+  width: 39px;
+  height: 37px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #d3d8dc;
+  background: #e9ecef;
+  color: #4a535b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.reference-admin .reference-ledger .ledger-calendar-trigger:hover {
+  background: #dce2e6;
+}
+.reference-admin .reference-ledger .ledger-calendar-panel {
+  margin-top: 4px;
+  padding: 8px;
+  border: 1px solid #d3d8dc;
+  background: white;
+  position: relative;
+  z-index: 3;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.reference-admin .reference-ledger .ledger-calendar-panel label {
+  display: block;
+  margin-bottom: 6px;
+}
+.reference-admin .reference-ledger .ledger-calendar-panel input[type="date"] {
+  border: 1px solid #d3d8dc;
+  padding: 4px;
+  width: 100%;
+  max-width: 290px;
+  background: white;
+}
+.reference-admin .reference-ledger .ledger-filter-submit {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.reference-admin .reference-ledger .ledger-kind-options {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+}
+.reference-admin .reference-ledger .ledger-kind-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  cursor: pointer;
+}
+.reference-admin .reference-ledger .ledger-kind-options input {
+  accent-color: #0788f7;
+}
+.reference-admin .reference-ledger .ledger-filter-note {
+  color: #6c757d;
+  font-size: 12px;
+  margin: 7px 0 0;
+}
+@media (min-width: 992px) {
+  .reference-admin .reference-ledger .ledger-filter {
+    display: block;
+    max-width: 680px;
+  }
+  .reference-admin .reference-ledger .ledger-datetime-wrapper {
+    max-width: 560px;
+  }
+}
+@media (max-width: 430px) {
+  .reference-admin .reference-ledger .ledger-filter {
+    padding: 20px !important;
+  }
+  .reference-admin .reference-ledger .ledger-datetime-field {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.25fr) 42px 39px;
+  }
+  .reference-admin .reference-ledger .ledger-datetime-field input,
+  .reference-admin .reference-ledger .ledger-datetime-field select {
+    font-size: 15px;
+  }
+}
+
+.reference-admin .reference-ledger .ledger-sort-button {
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.reference-admin .reference-ledger .ledger-sort-button span {
+  color: #8b959d;
+  font-size: 11px;
+}
+.reference-admin .reference-ledger .ledger-sort-button:focus-visible {
+  outline: 2px solid #087ff5;
+  outline-offset: 2px;
+}

@@ -1,0 +1,174 @@
+/* Original video 325341.mp4: compact Cash/Credit mobile reference.
+   Scoped to the wallet page only. Does not alter other admin or user panels. */
+@media (max-width: 640px) {
+  .reference-cash .wallet-reference-shell {
+    width: 100%;
+    max-width: none;
+    padding: 0 14px 24px;
+  }
+  .reference-cash .wallet-reference-summary {
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 0;
+    margin: 0 0 15px;
+    padding: 17px 17px 30px;
+  }
+  .reference-cash .wallet-reference-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .reference-cash .wallet-reference-tabs button {
+    min-height: 22px;
+    height: 23px;
+    padding: 0 5px;
+    font-size: 14px;
+    line-height: 22px;
+    border: 0;
+    border-radius: 3px;
+    box-shadow: none;
+  }
+  .reference-cash .wallet-reference-tabs button.bg-white {
+    color: #00ab75;
+  }
+  .reference-cash .wallet-reference-account {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .reference-cash .wallet-reference-account > .font-bold {
+    margin: 13px 0 8px;
+    font-size: 17px;
+    line-height: 1.25;
+  }
+  .reference-cash .wallet-reference-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .reference-cash .wallet-reference-table thead tr,
+  .reference-cash .wallet-reference-table tbody tr {
+    background: #fff !important;
+  }
+  .reference-cash .wallet-reference-table th {
+    background: #fff;
+    padding: 5px 4px;
+    font-weight: 400;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+    border: 1px solid #dedede;
+  }
+  .reference-cash .wallet-reference-table td {
+    padding: 7px 4px;
+    font-weight: 700;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+    border: 1px solid #dedede;
+  }
+  .reference-cash .wallet-reference-warning {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #792333;
+    margin: 0 0 12px;
+    padding: 10px 8px;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .reference-cash .wallet-reference-action {
+    margin: 0 13px 16px;
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .reference-cash .wallet-reference-action > div:first-child {
+    min-height: 31px;
+    padding: 5px 18px;
+    font-size: 14px;
+    line-height: 21px;
+    font-weight: 700;
+    border-radius: 2px 2px 0 0;
+  }
+  .reference-cash .wallet-reference-deposit > div:first-child {
+    background: #0cc78b;
+  }
+  .reference-cash .wallet-reference-withdraw > div:first-child {
+    background: #cd2049;
+  }
+  .reference-cash .wallet-reference-action .cash-form-body {
+    padding: 24px 18px 12px;
+  }
+  .reference-cash .wallet-reference-action .cash-form-body label {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 9px;
+  }
+  .reference-cash .wallet-reference-action .cash-form-body > div.mb-3 {
+    margin-bottom: 20px;
+  }
+  .reference-cash .wallet-reference-action .cash-form-body > div.mb-3\.5 {
+    margin-bottom: 17px;
+  }
+  .reference-cash .wallet-reference-action input {
+    min-width: 0;
+    height: 34px;
+    border-color: #dedede;
+    font-weight: 400;
+    font-size: 13px;
+    border-radius: 3px;
+  }
+  .reference-cash .wallet-reference-action input[type="number"] {
+    font-weight: 400;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .reference-cash .wallet-reference-action input[type="number"]::-webkit-inner-spin-button,
+  .reference-cash .wallet-reference-action input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .reference-cash .wallet-reference-action .cash-form-footer {
+    padding-right: 13px;
+    padding-top: 1px;
+  }
+  .reference-cash .wallet-reference-action .cash-form-footer button {
+    min-height: 34px;
+    padding: 5px 13px;
+    border: 0;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: none;
+  }
+  .reference-cash .wallet-reference-deposit button {
+    background-color: #08c58b;
+  }
+  .reference-cash .wallet-reference-withdraw button {
+    background-color: #cd2049;
+  }
+}
+
+/* Match standalone reference body without altering normal Admin/User dashboard styles. */
+.reference-admin.reference-standalone .reference-cash {
+  background: rgb(236, 236, 237) !important;
+  color: rgb(33, 37, 41);
+  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+.reference-admin.reference-standalone .reference-cash > .wallet-reference-shell {
+  max-width: none !important;
+  padding: 0 14px 24px !important;
+  margin: 0 auto !important;
+}
+.reference-admin.reference-standalone .reference-cash .wallet-reference-account,
+.reference-admin.reference-standalone .reference-cash .wallet-reference-action {
+  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}

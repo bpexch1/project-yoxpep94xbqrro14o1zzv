@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Lock, Loader2, Key, Eye, EyeOff } from "lucide-react";
 import { Client } from "@/entities";
-import { supabase } from "@/integrations/supabase";
+import { authenticatedLogin } from "@/lib/walletSession";
 import { setClientSession } from "@/hooks/useClientAuth";
-import bcrypt from "bcryptjs";
+
 import { normalizeAccountRole } from "@/lib/accountHierarchy";
 
 export default function Login() {
@@ -34,82 +34,8 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Fetch user credentials directly and securely from clients table
-      let client: any = null;
-
-      const res1 = await supabase
-        .from("clients")
-        .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
-        .ilike("username", cleanUser);
-
-      if (res1.data && Array.isArray(res1.data) && res1.data.length > 0) {
-        client = res1.data.find(
-          (c: any) => (c.username || "").trim().toLowerCase() === cleanUser.toLowerCase()
-        ) || res1.data[0];
-      } else if (res1.data && !Array.isArray(res1.data)) {
-        client = res1.data;
-      }
-
-      // Fallback exact match
-      if (!client) {
-        const res2 = await supabase
-          .from("clients")
-          .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
-          .eq("username", cleanUser);
-
-        if (res2.data && Array.isArray(res2.data) && res2.data.length > 0) {
-          client = res2.data[0];
-        } else if (res2.data && !Array.isArray(res2.data)) {
-          client = res2.data;
-        }
-      }
-
-      if (!client) {
-        setLoginError("Username/Password Incorrect.");
-        return;
-      }
-
-      // 2. Verify Password (BCrypt $2a$/$2b$/$2y$ with seamless plain-text fallback)
-      const storedPw = String(client.password ?? "");
-      const isBcrypt =
-        storedPw.startsWith("$2a$") ||
-        storedPw.startsWith("$2b$") ||
-        storedPw.startsWith("$2y$");
-
-      let isMatch = false;
-      if (isBcrypt) {
-        try {
-          isMatch = bcrypt.compareSync(cleanPw, storedPw);
-        } catch {
-          isMatch = false;
-        }
-      }
-
-      // Plain-text fallback if not verified via bcrypt or non-bcrypt
-      if (!isMatch) {
-        isMatch = storedPw === cleanPw || storedPw.trim() === cleanPw.trim();
-      }
-
-      // Immediately scrub password from client object
-      delete client.password;
-
-      if (!isMatch) {
-        setLoginError("Username/Password Incorrect.");
-        return;
-      }
-
-      // 3. Account Status Validation
-      if (["inactive", "locked", "suspended"].includes(client.status)) {
-        setLoginError("Account Inactive or Suspended. Contact Upline.");
-        return;
-      }
-
-      // 4. Forced Password Change Check
-      if (client.must_change_pw) {
-        setPendingClient({ ...client });
-        setForcedModal(true);
-        return;
-      }
+      // Authenticate through trusted Supabase Edge Function (never fetch password hashes).
+      const client = await authenticatedLogin(cleanUser, cleanPw);
 
       // 5. Set Authenticated Session (without password)
       setClientSession({
@@ -132,7 +58,7 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      setLoginError("Username/Password Incorrect.");
+      setLoginError(err instanceof Error ? err.message : "Authentication service unavailable.");
     } finally {
       setLoading(false);
     }

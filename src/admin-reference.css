@@ -414,3 +414,17 @@
   .reference-admin .report-buttons-wrapper { max-width: 320px; gap: 0 4px; }
   .reference-admin .report-buttons-wrapper .btn { padding: 6px 12px; font-size: 14px; }
 }
+
+/* Reference animated fadeIn. Only legacy standalone Cash/Credit and Ledger pages. */
+@keyframes bpexch-reference-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.reference-admin.reference-standalone.reference-page-fade {
+  animation: bpexch-reference-fade-in 280ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reference-admin.reference-standalone.reference-page-fade {
+    animation: none !important;
+  }
+}
