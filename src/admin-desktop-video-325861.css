@@ -1,0 +1,286 @@
+/*
+ * Admin desktop reference: recording 325861.mp4 (Accounts/Chart).
+ * Desktop ONLY. All existing mobile/tablet styles at 991.98px and below,
+ * and all client/player layouts, are intentionally left unchanged.
+ * No accounting, permissions, network or interaction logic changes.
+ */
+@media screen and (min-width: 992px) {
+  /* Reference header: outlined menu at left, centered BPEXCH, account at right. */
+  .reference-admin:not(.reference-standalone) .app-header.navbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 55px;
+    min-height: 55px;
+    padding: 8px 16px;
+    background: #fff;
+    border-bottom: 1px solid #c8ced3;
+    box-shadow: none;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .reference-admin:not(.reference-standalone) .app-header > div:first-child {
+    flex: 0 0 auto;
+    gap: 0;
+    min-width: 42px;
+  }
+  .reference-admin:not(.reference-standalone) .app-header .navbar-toggler {
+    order: 0 !important;
+    width: 42px;
+    min-width: 42px;
+    height: 33px;
+    min-height: 33px;
+    border: 1px solid #73818f !important;
+    border-radius: 4px;
+    background: #fff;
+    padding: 0;
+    transition: border-color .15s ease-in-out, background-color .15s ease-in-out;
+  }
+  .reference-admin:not(.reference-standalone) .app-header .navbar-toggler:hover {
+    background: #f0f3f5;
+    border-color: #536c79 !important;
+  }
+  .reference-admin:not(.reference-standalone) .app-header .green-logo-text {
+    display: block !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    order: 0 !important;
+    margin: 0;
+    padding: 0;
+    color: #00b181;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0;
+    white-space: nowrap;
+    z-index: 1;
+  }
+  /* Original desktop recording has navigation in the left sidebar,
+     not duplicated as links inside the top header. */
+  .reference-admin:not(.reference-standalone) .app-header nav {
+    display: none !important;
+  }
+  .reference-admin:not(.reference-standalone) .app-header > div:last-of-type {
+    flex: 0 1 auto;
+    margin-left: auto;
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+    max-width: 45%;
+  }
+  .reference-admin:not(.reference-standalone) .app-header .header-user-status {
+    font-size: 14px;
+    max-width: 260px;
+    text-overflow: ellipsis;
+  }
+  .reference-admin:not(.reference-standalone) .app-header > div:last-of-type span {
+    font-size: 14px;
+  }
+
+  /* Fixed, compact CoreUI-style desktop sidebar and canvas. */
+  .reference-admin:not(.reference-standalone) aside.app-sidebar {
+    top: 55px !important;
+    left: 0;
+    height: calc(100vh - 55px) !important;
+    width: 200px !important;
+    background: #2f353a;
+    border-right: 1px solid #23282c;
+    transition: width .25s ease-in-out !important;
+  }
+  .reference-admin:not(.reference-standalone):has(.admin-content-collapsed) aside.app-sidebar {
+    width: 50px !important;
+  }
+  .reference-admin:not(.reference-standalone) .admin-content {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+    max-width: calc(100% - 200px);
+    min-width: 0;
+    background: #e4e5e6;
+    transition: margin-left .25s ease-in-out, width .25s ease-in-out, max-width .25s ease-in-out;
+  }
+  .reference-admin:not(.reference-standalone) .admin-content.admin-content-collapsed {
+    margin-left: 50px;
+    width: calc(100% - 50px);
+    max-width: calc(100% - 50px);
+  }
+  .reference-admin:not(.reference-standalone) .app-sidebar nav button {
+    height: 48px;
+    min-height: 48px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin:not(.reference-standalone) .app-sidebar nav button:hover {
+    background: #3a4248;
+  }
+
+  /* Flat cards with original header/body spacing and thin borders. */
+  .reference-admin .main .container-fluid {
+    padding: 10px 5px;
+  }
+  .reference-admin .card {
+    margin-bottom: 24px;
+    border: 1px solid #c8ced3;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: none !important;
+  }
+  .reference-admin .card-header {
+    min-height: 34px;
+    padding: 4.8px 20px;
+    background: #f0f3f5;
+    border-bottom: 1px solid #c8ced3;
+    color: #23282c;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .card-body,
+  .reference-admin .card-body.reportmenubuttons {
+    padding: 20px;
+  }
+
+  /* Reference report tabs wrap naturally, with compact flat buttons. */
+  .reference-admin .report-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: flex-start;
+    gap: 4px 6px;
+    max-width: none;
+    margin: 0;
+  }
+  .reference-admin .report-buttons-wrapper .btn {
+    font-size: 14px;
+    line-height: 21px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin: 0;
+  }
+  .reference-admin .report-buttons-wrapper .btn-report-active {
+    color: white;
+    background: #00b181;
+    border-color: #00b181;
+  }
+
+  /* Search-Users line remains horizontal on desktop. */
+  .reference-admin .reference-users #Usersearchcustom .card-body {
+    min-height: 86px;
+    padding: 20px;
+  }
+  .reference-admin .reference-users #Usersearchcustom .card-body > div {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child {
+    width: 360px;
+    max-width: 100%;
+    flex: 0 1 360px;
+  }
+  .reference-admin .reference-users #Usersearchcustom input[type="search"],
+  .reference-admin .reference-users #Usersearchcustom button {
+    height: 35px;
+  }
+
+  /* Clients List: summary, toolbar and 9-column data table as in desktop video. */
+  .reference-admin .reference-accounts .card-body > div:first-child table {
+    width: auto;
+    max-width: none;
+    table-layout: auto;
+  }
+  .reference-admin .reference-accounts .card-body > div:first-child th {
+    vertical-align: top;
+    white-space: nowrap;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .reference-admin .reference-accounts .accounts-action-buttons {
+    flex: 0 0 auto;
+  }
+  .reference-admin .reference-accounts .accounts-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px 12px;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .reference-admin .reference-accounts .admin-datatable-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .reference-admin .reference-accounts .admin-datatable-controls input {
+    width: 233px;
+    max-width: 100%;
+  }
+  .reference-admin .reference-accounts .accounts-table {
+    width: 100%;
+    min-width: 980px;
+    table-layout: auto;
+    border-collapse: collapse;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-table th {
+    padding: 10px 18px;
+    white-space: normal;
+    vertical-align: middle;
+    font-size: 16px;
+    font-weight: 700;
+    color: #23282c;
+    border: 1px solid #c8ced3;
+  }
+  .reference-admin .reference-accounts .accounts-table .data-row > td {
+    padding: 8px 10px;
+    vertical-align: top;
+    font-size: 16px;
+    line-height: 24px;
+    border: 1px solid #c8ced3;
+  }
+  .reference-admin .reference-accounts .accounts-table .table-header-row > td {
+    background: #00b181;
+    padding: 10px 18px;
+    border: 1px solid #c8ced3;
+  }
+  .reference-admin .reference-accounts .data-row .client-row-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+  .reference-admin .reference-accounts .admin-datatable-footer {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Desktop ledger forms, transfer screens and exports stay compact. */
+  .reference-admin .reference-ledger .ledger-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .reference-admin .reference-ledger .ledger-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .reference-admin .reference-ledger .ledger-exports {
+    width: auto;
+  }
+  .reference-admin .reference-cash .cash-form-body {
+    width: 75%;
+    max-width: 100%;
+    padding: 20px;
+  }
+}
