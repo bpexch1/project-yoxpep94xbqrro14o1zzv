@@ -90,3 +90,17 @@ test("AWS to database transport sends the service key only server-side and parse
     assert.deepEqual(JSON.parse(calls[0].options.body), { p_action: "placeBet" });
   } finally { globalThis.fetch = original; }
 });
+
+test("new Supabase secret key uses apikey without invalid bearer token", async () => {
+  const original = globalThis.fetch;
+  try {
+    globalThis.fetch = async (_url, options) => {
+      assert.equal(options.headers.apikey, "sb_secret_test_only");
+      assert.equal(options.headers.authorization, undefined);
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    };
+    const response = await __test.dbRpc({ SUPABASE_URL: config.SUPABASE_URL,
+      SUPABASE_SECRET_KEY: "sb_secret_test_only" }, "exchange_request", {});
+    assert.deepEqual(response, { data: { success: true }, error: null });
+  } finally { globalThis.fetch = original; }
+});

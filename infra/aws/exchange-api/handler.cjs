@@ -37,22 +37,25 @@ async function getConfig() {
     new GetSecretValueCommand({ SecretId: process.env.EXCHANGE_CONFIG_SECRET_ARN }),
   );
   const config = JSON.parse(reply.SecretString || "{}");
+  const key = config.SUPABASE_SECRET_KEY || config.SUPABASE_SERVICE_ROLE_KEY;
   if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(config.SUPABASE_URL || "") ||
-      typeof config.SUPABASE_SERVICE_ROLE_KEY !== "string" || !config.SUPABASE_SERVICE_ROLE_KEY)
+      typeof key !== "string" || !key ||
+      (config.SUPABASE_SECRET_KEY && !key.startsWith("sb_secret_")))
     throw Error("CONFIGURATION_UNAVAILABLE");
   cachedConfig = config;
   cachedUntil = Date.now() + 300000;
   return config;
 }
 async function dbRpc(config, name, args) {
+  const key = config.SUPABASE_SECRET_KEY || config.SUPABASE_SERVICE_ROLE_KEY;
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), 8000);
   try {
     const res = await fetch(config.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/rpc/" + name, {
       method: "POST", cache: "no-store", signal: abort.signal,
       headers: {
-        "apikey": config.SUPABASE_SERVICE_ROLE_KEY,
-        "authorization": "Bearer " + config.SUPABASE_SERVICE_ROLE_KEY,
+        "apikey": key,
+        ...(key.startsWith("sb_secret_") ? {} : { "authorization": "Bearer " + key }),
         "content-type": "application/json",
       },
       body: JSON.stringify(args),
