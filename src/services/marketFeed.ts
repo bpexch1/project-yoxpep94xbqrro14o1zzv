@@ -59,6 +59,8 @@ export async function getLiveMarketOdds(eventId: string) {
                 ?.odds,
             ) || undefined
           : undefined,
+        backSize: isFreshMarket(m) ? Number(m.quotes.find(q=>q.runner_id===r.id&&q.side==='back')?.size)||0 : 0,
+        laySize: isFreshMarket(m) ? Number(m.quotes.find(q=>q.runner_id===r.id&&q.side==='lay')?.size)||0 : 0,
         ex: {
           availableToBack: m.quotes
             .filter(

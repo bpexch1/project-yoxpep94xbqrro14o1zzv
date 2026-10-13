@@ -369,8 +369,8 @@ function FootballTeamRow({
   onBet: (type: 'back' | 'lay', odds: number) => void
 }) {
   const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-  const displayBackSize = backSize || `${((hash % 20) / 10 + 0.5).toFixed(1)}M`;
-  const displayLaySize = laySize || `${((hash % 15) / 10 + 0.2).toFixed(1)}M`;
+  const displayBackSize = backSize || '—';
+  const displayLaySize = laySize || '—';
   const hasPos = position !== undefined && position !== 0;
 
   return (
@@ -409,7 +409,7 @@ function FootballTeamRow({
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5bb5f5")}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#7ec8f8")}
       >
-        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{odds.toFixed(2)}</span>
+        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{Number.isFinite(odds) ? odds.toFixed(2) : '—'}</span>
         <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600, lineHeight: 1 }}>{displayBackSize}</span>
       </div>
       <div
@@ -430,7 +430,7 @@ function FootballTeamRow({
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f87171")}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fca5a5")}
       >
-        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{layOdds.toFixed(2)}</span>
+        <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{Number.isFinite(layOdds) ? layOdds.toFixed(2) : '—'}</span>
         <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600, lineHeight: 1 }}>{displayLaySize}</span>
       </div>
     </div>
