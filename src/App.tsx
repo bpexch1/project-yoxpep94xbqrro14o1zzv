@@ -34,6 +34,7 @@ import BetLock from "@/pages/BetLock";
 import SettleMatch from "@/pages/SettleMatch";
 import ApiSettings from "@/pages/ApiSettings";
 import NotFound from "@/pages/NotFound";
+import V2StatusPage from "@/v2/V2StatusPage";
 import { BrandingBadge } from "@/components/BrandingBadge";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GlobalRouteLoader } from "@/components/ui/GlobalRouteLoader";
@@ -160,6 +161,7 @@ const App = () => (
             <Route path="/Customer/EventDetail" element={<MatchDetail />} />
             <Route path="/Common/EventDetail" element={<MatchDetail />} />
             
+            <Route path="/v2/status" element={<V2StatusPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
