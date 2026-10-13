@@ -1,3 +1,4 @@
+import { placeSelectionBet } from "@/services/bettingApi";
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -207,16 +208,14 @@ export default function MatchDetail() {
 
   // Team 1 odds: MongoDB > Betfair Live > DB
   const runner1 = getLiveRunner(match?.team1, 0);
-  const t1_back = mongoOddsData?.teamA_back ?? (hasLiveOdds ? (runner1?.backPrice ?? match?.back_odds) : match?.back_odds);
-  const t1_lay  = mongoOddsData?.teamA_lay  ?? (hasLiveOdds ? (runner1?.layPrice  ?? match?.lay_odds)  : match?.lay_odds);
-
-  // Team 2 odds: MongoDB > Betfair Live > DB
+  const t1_back = runner1?.backPrice;
+  const t1_lay = runner1?.layPrice;
   const runner2 = getLiveRunner(match?.team2, 1);
-  const t2_back = mongoOddsData?.teamB_back ?? (hasLiveOdds ? (runner2?.backPrice ?? (match?.back_odds2 || match?.back_odds)) : (match?.back_odds2 || match?.back_odds));
-  const t2_lay  = mongoOddsData?.teamB_lay  ?? (hasLiveOdds ? (runner2?.layPrice  ?? (match?.lay_odds2 || match?.lay_odds)) : (match?.lay_odds2 || match?.lay_odds));
+  const t2_back = runner2?.backPrice;
+  const t2_lay = runner2?.layPrice;
 
   // Combined suspension
-  const isSuspended = isMongoSuspended || isMarketSuspended;
+  const isSuspended = isMongoSuspended || isMarketSuspended || !matchOddsMarket || matchOddsMarket.stale;
 
   // Score logic
   const liveScore = cricketScoreData?.score || liveOddsData?.score || null;
@@ -230,7 +229,7 @@ export default function MatchDetail() {
     );
 
   const crrDisplay = liveScore?.crr || (match?.status === 'live' ? '--' : '--');
-  const thisOverBalls: string[] = liveScore?.thisOver || (match?.status === 'live' ? ['6', '6', '0', '4', '1'] : []);
+  const thisOverBalls: string[] = liveScore?.thisOver || [];
 
   // Last ball label and color
   const lastBall = liveScore?.lastBall || (thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null);
@@ -278,41 +277,9 @@ export default function MatchDetail() {
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
-      if (!activeBet || !session || !clientData) return;
-      if (stake > clientBalance) throw new Error("Insufficient balance");
-
-      // Require explicit odds validation; an acknowledgement is not validation.
-      const side = activeBet.selection === match.team1 
-        ? (activeBet.betType === 'back' ? 'teamA_back' : 'teamA_lay')
-        : (activeBet.betType === 'back' ? 'teamB_back' : 'teamB_lay');
-      
-      const validation = await oddsEngine({
-        action: 'validateOdds',
-        matchId: match.id,
-        requestedOdds: activeBet.odds,
-        side,
-      });
-
-      if (!validation || !("valid" in validation) || validation.valid !== true) {
-        const reason = validation && "reason" in validation && typeof validation.reason === "string"
-          ? validation.reason
-          : 'Odds could not be verified. Please refresh and try again.';
-        throw new Error(reason);
-      }
-
-      const potentialWin = (stake * activeBet.odds) - stake;
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
-        selection: activeBet.selection,
-        bet_type: activeBet.betType,
-        stake,
-        odds: activeBet.odds,
-        potential_win: potentialWin,
-        status: 'pending'
-      });
-      await Client.update(clientData.id, { cash: clientBalance - stake });
+      if (!activeBet || !session || !clientData) throw new Error("Select a bet first");
+      return placeSelectionBet({matchId: activeBet.match.id, eventId: activeBet.match.betfair_event_id,
+        selection: activeBet.selection, side: activeBet.betType, stake, odds: activeBet.odds});
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -322,7 +289,7 @@ export default function MatchDetail() {
       queryClient.invalidateQueries({ queryKey: ['open-bets', matchId] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+        description: `Accepted on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
       });
     },
     onError: (error: any) => {

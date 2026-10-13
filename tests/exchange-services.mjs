@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {normalizeMarket} from '../supabase/functions/exchange-api/feed.ts';
+import {csvCell} from '../src/services/csv.ts';
+const catalog={marketId:'1.123',marketName:'Match Odds',event:{id:'12345678901234567890',name:'A v B'},eventType:{id:'4'},marketStartTime:'2026-10-13T10:00:00Z',runners:[{selectionId:12,runnerName:'A'}]};
+const book={marketId:'1.123',status:'OPEN',isMarketDataDelayed:false,runners:[{selectionId:12,status:'ACTIVE',ex:{availableToBack:[{price:2,size:10},{price:3,size:20},{price:NaN,size:99}],availableToLay:[{price:4,size:20},{price:3.5,size:30}]}}]};
+test('provider IDs retain precision; best back and lay normalize independently',()=>{const m=normalizeMarket(catalog,book,'2026-10-13T10:00:00Z');assert.equal(m.eventId,catalog.event.id);assert.deepEqual(m.quotes.map(q=>q.odds),[3,3.5]);assert.equal(m.delayed,false)});
+test('unknown delay defaults to delayed; suspended or removed runners have no executable quotes',()=>{assert.equal(normalizeMarket(catalog,{...book,isMarketDataDelayed:undefined},'x').delayed,true);assert.equal(normalizeMarket(catalog,{...book,status:'SUSPENDED'},'x').quotes.length,0);assert.equal(normalizeMarket(catalog,{...book,runners:[{...book.runners[0],status:'REMOVED'}]},'x').quotes.length,0)});
+test('mismatched market identity is rejected',()=>assert.throws(()=>normalizeMarket(catalog,{...book,marketId:'1.456'},'x'),/Invalid provider/));
+test('CSV escapes quotes and protects formula injection including whitespace',()=>{assert.equal(csvCell('a"b'),'"a""b"');assert.equal(csvCell(' =1+1'),'"\' =1+1"');assert.equal(csvCell('@SUM(A1)'),'"\'@SUM(A1)"');assert.equal(csvCell(-12),'"-12"');assert.equal(csvCell(null),'""')});

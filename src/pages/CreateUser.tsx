@@ -80,8 +80,8 @@ export default function CreateUser() {
 
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 4) {
-      newErrors.password = "Min 4 characters";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Min 8 characters";
     }
 
     if (!formData.type || !canCreateChild(parentRecord?.role, formData.type)) newErrors.type = "Account type is not permitted for your role";

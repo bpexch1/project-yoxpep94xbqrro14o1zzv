@@ -1,3 +1,4 @@
+import { RealtimeStatus } from "@/components/services/RealtimeStatus";
 import { useState, useEffect } from "react";
 import { Menu, ChevronDown, LogOut, User } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
@@ -213,6 +214,7 @@ export function Header({ isMobileSidebarOpen, onToggleMobileSidebar, onToggleDes
         session={session}
         roleLabel={session?.role ? formatRole(session.role) : "Admin"}
       />
+    <RealtimeStatus />
     </header>
   );
 }

@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase";
-import bcrypt from "bcryptjs";
+import { loginService, logoutService } from "@/services/client";
+import { readAccount } from "@/services/accounting";
 
 const SESSION_KEY = "clientSession";
 
@@ -26,6 +27,7 @@ export const setClientSession = (session: ClientSession | null) => {
 
 export const getClientSession = (): ClientSession | null => {
   try {
+    if (!sessionStorage.getItem("exchangeSessionToken")) return null;
     const data = localStorage.getItem(SESSION_KEY);
     return data ? JSON.parse(data) : null;
   } catch {
@@ -36,6 +38,7 @@ export const getClientSession = (): ClientSession | null => {
 
 export const clearClientSession = () => {
   localStorage.removeItem(SESSION_KEY);
+  void logoutService().catch(() => {});
 };
 
 export const updateClientSessionBalance = (cash: number) => {
@@ -58,13 +61,8 @@ export async function refreshClientSession(targetUsername?: string): Promise<Cli
     const uname = targetUsername || current?.username;
     if (!uname) return null;
 
-    const { data, error } = await supabase
-      .from("public_clients")
-      .select("id, username, full_name, role, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
-      .ilike("username", uname.trim())
-      .maybeSingle();
-
-    if (error || !data) return null;
+    const data: any = await readAccount(current?.id);
+    if (!data || (targetUsername && data.username.toLowerCase()!==targetUsername.toLowerCase())) return null;
 
     const sanitized: ClientSession = {
       id: data.id,
@@ -92,90 +90,8 @@ export async function refreshClientSession(targetUsername?: string): Promise<Cli
 }
 
 export async function loginClient(username: string, password: string): Promise<ClientSession> {
-  const cleanUsername = username.trim();
-  const cleanPassword = password;
-
-  try {
-    let clientData: any = null;
-
-    // 1. Primary ilike query from clients table
-    const res1 = await supabase
-      .from("clients")
-      .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
-      .ilike("username", cleanUsername);
-
-    if (res1.data && Array.isArray(res1.data) && res1.data.length > 0) {
-      clientData = res1.data.find(
-        (c: any) => (c.username || "").trim().toLowerCase() === cleanUsername.toLowerCase()
-      ) || res1.data[0];
-    } else if (res1.data && !Array.isArray(res1.data)) {
-      clientData = res1.data;
-    }
-
-    // 2. Fallback eq query if ilike returned nothing
-    if (!clientData) {
-      const res2 = await supabase
-        .from("clients")
-        .select("id, username, full_name, role, password, status, credit_received, credit_remaining, cash, pl_downline, balance_upline")
-        .eq("username", cleanUsername);
-
-      if (res2.data && Array.isArray(res2.data) && res2.data.length > 0) {
-        clientData = res2.data[0];
-      } else if (res2.data && !Array.isArray(res2.data)) {
-        clientData = res2.data;
-      }
-    }
-
-    if (clientData) {
-      const storedPw = String(clientData.password ?? "");
-      const isBcrypt =
-        storedPw.startsWith("$2a$") ||
-        storedPw.startsWith("$2b$") ||
-        storedPw.startsWith("$2y$");
-
-      let isMatch = false;
-      if (isBcrypt) {
-        try {
-          isMatch = bcrypt.compareSync(cleanPassword, storedPw);
-        } catch {
-          isMatch = false;
-        }
-      }
-
-      // Legacy plaintext accounts use exact comparison only. Never accept a bcrypt hash as a password.
-      if (!isBcrypt) {
-        isMatch = storedPw === cleanPassword;
-      }
-
-      if (!isMatch) {
-        throw new Error("Invalid username or password");
-      }
-
-      if (clientData.status === "inactive" || clientData.status === "locked" || clientData.status === "suspended") {
-        throw new Error("Account is inactive or disabled");
-      }
-
-      const session: ClientSession = {
-        id: clientData.id,
-        username: clientData.username,
-        full_name: clientData.full_name || clientData.username,
-        role: clientData.role || "client",
-        credit_received: clientData.credit_received || 0,
-        credit_remaining: clientData.credit_remaining || 0,
-        cash: clientData.cash || 0,
-        pl_downline: clientData.pl_downline || 0,
-        balance_upline: clientData.balance_upline || 0,
-        status: clientData.status || "active",
-      };
-      setClientSession(session);
-      return session;
-    }
-  } catch (err: any) {
-    if (err?.message === "Account is inactive or disabled") {
-      throw err;
-    }
-    // Never log raw passwords
-  }
-
-  throw new Error("Invalid username or password");
+  const account = await loginService(username.trim(), password);
+  const session: ClientSession = { ...account, full_name: account.full_name || account.username };
+  setClientSession(session);
+  return session;
 }

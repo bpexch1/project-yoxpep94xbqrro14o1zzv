@@ -1,3 +1,4 @@
+import { RealtimeStatus } from "@/components/services/RealtimeStatus";
 
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
@@ -330,6 +331,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
         </div>
         <div className="reference-user-status-item reference-user-status-bets">Active Bets: {activeBetsCount > 0 ? activeBetsCount : "*"}</div>
       </div>}
+    <RealtimeStatus />
     </header>
   );
 }

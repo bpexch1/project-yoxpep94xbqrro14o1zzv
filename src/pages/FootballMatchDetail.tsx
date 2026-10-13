@@ -1,3 +1,4 @@
+import { placeSelectionBet } from "@/services/bettingApi";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -35,7 +36,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
     queryKey: ['open-bets', match?.id, match?.title, session?.username],
     queryFn: async () => {
       if (!session?.username) return [];
-      const userBets = await Bet.filter({ 
+      const userBets = await Bet.filter({
         user_email: session.username,
         status: 'pending'
       });
@@ -54,24 +55,9 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
 
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
-      if (!activeBet || !session || !clientData) return;
-      if (stake > clientBalance) throw new Error("Insufficient balance");
-
-      const potentialWin = (stake * activeBet.odds) - stake;
-
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
-        selection: activeBet.selection,
-        bet_type: activeBet.betType,
-        stake,
-        odds: activeBet.odds,
-        potential_win: potentialWin,
-        status: 'pending'
-      });
-
-      await Client.update(clientData.id, { cash: clientBalance - stake });
+      if (!activeBet || !session || !clientData) throw new Error("Select a bet first");
+      return placeSelectionBet({matchId: activeBet.match.id, eventId: activeBet.match.betfair_event_id,
+        selection: activeBet.selection, side: activeBet.betType, stake, odds: activeBet.odds});
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -81,7 +67,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
       queryClient.invalidateQueries({ queryKey: ['open-bets', match?.id, session?.username] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+        description: `Accepted on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
       });
     },
     onError: (error: any) => {
@@ -118,8 +104,8 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
 
   const getLiveRunner = (teamName: string, idx: number) => {
     if (!matchOddsMarket) return null;
-    return matchOddsMarket.runners?.[idx] || 
-      matchOddsMarket.runners?.find((r: any) => 
+    return matchOddsMarket.runners?.[idx] ||
+      matchOddsMarket.runners?.find((r: any) =>
         r.runnerName?.toLowerCase() === teamName?.toLowerCase()
       ) || null;
   };
@@ -184,35 +170,35 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
           const runner1 = getLiveRunner(match.team1, 0);
           const runner2 = getLiveRunner(match.team2, 1);
           const runnerDraw = getLiveRunner("The Draw", 2) || matchOddsMarket?.runners?.find((r: any) => r.runnerName?.toLowerCase().includes('draw'));
-          
+
           return (
             <>
-              <FootballTeamRow 
-                name={match.team1} 
+              <FootballTeamRow
+                name={match.team1}
                 position={matchOddsPositions[match.team1]}
-                odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? 2.1) : (match.back_odds ?? 2.1)} 
-                layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? 2.12) : (match.lay_odds ?? 2.12)} 
+                odds={runner1?.backPrice}
+                layOdds={runner1?.layPrice}
                 backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} 
+                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
               />
-              <FootballTeamRow 
-                name={match.team2} 
+              <FootballTeamRow
+                name={match.team2}
                 position={matchOddsPositions[match.team2]}
-                odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? 3.4) : (match.back_odds2 ?? 3.4)} 
-                layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? 3.45) : (match.lay_odds2 ?? 3.45)} 
+                odds={runner2?.backPrice}
+                layOdds={runner2?.layPrice}
                 backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
+                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
               />
-              <FootballTeamRow 
-                name="The Draw" 
+              <FootballTeamRow
+                name="The Draw"
                 position={matchOddsPositions["The Draw"]}
-                odds={hasLiveOdds ? (runnerDraw?.backPrice ?? 3.85) : 3.85} 
-                layOdds={hasLiveOdds ? (runnerDraw?.layPrice ?? 3.9) : 3.9} 
+                odds={runnerDraw?.backPrice}
+                layOdds={runnerDraw?.layPrice}
                 backSize={hasLiveOdds ? formatSize(runnerDraw?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runnerDraw?.laySize) : undefined}
-                onBet={(t, o) => setActiveBet({ match, selection: "The Draw", betType: t, odds: o })} 
+                onBet={(t, o) => setActiveBet({ match, selection: "The Draw", betType: t, odds: o })}
               />
             </>
           );
@@ -225,32 +211,32 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
           </span>
         </div>
 
-        <GoalsSection 
-          title="OVER/UNDER 2.5 GOALS (MaxBet: 250K)" 
-          underOdds={3.75} 
-          underLay={3.8} 
-          overOdds={1.35} 
-          overLay={1.37} 
+        <GoalsSection
+          title="OVER/UNDER 2.5 GOALS (MaxBet: 250K)"
+          underOdds={undefined}
+          underLay={undefined}
+          overOdds={undefined}
+          overLay={undefined}
           positions={underOver25Positions}
-          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })} 
+          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })}
         />
-        <GoalsSection 
-          title="OVER/UNDER 3.5 GOALS (MaxBet: 250K)" 
-          underOdds={1.58} 
-          underLay={1.59} 
-          overOdds={2.68} 
-          overLay={2.72} 
+        <GoalsSection
+          title="OVER/UNDER 3.5 GOALS (MaxBet: 250K)"
+          underOdds={undefined}
+          underLay={undefined}
+          overOdds={undefined}
+          overLay={undefined}
           positions={underOver15Positions}
-          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })} 
+          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })}
         />
-        <GoalsSection 
-          title="OVER/UNDER 4.5 GOALS (MaxBet: 250K)" 
-          underOdds={1.13} 
-          underLay={1.14} 
-          overOdds={8.0} 
-          overLay={8.2} 
+        <GoalsSection
+          title="OVER/UNDER 4.5 GOALS (MaxBet: 250K)"
+          underOdds={undefined}
+          underLay={undefined}
+          overOdds={undefined}
+          overLay={undefined}
           positions={underOver05Positions}
-          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })} 
+          onBet={(s: string, t: any, o: any) => setActiveBet({ match, selection: s, betType: t, odds: o })}
         />
 
         {/* TV / SCORE CARD */}
@@ -365,22 +351,22 @@ function FootballCombinedSectionHeader({ title }: { title: string }) {
   );
 }
 
-function FootballTeamRow({ 
-  name, 
-  odds, 
-  layOdds, 
-  backSize, 
-  laySize, 
+function FootballTeamRow({
+  name,
+  odds,
+  layOdds,
+  backSize,
+  laySize,
   position,
-  onBet 
-}: { 
-  name: string; 
-  odds: number; 
-  layOdds: number; 
-  backSize?: string; 
-  laySize?: string; 
+  onBet
+}: {
+  name: string;
+  odds: number;
+  layOdds: number;
+  backSize?: string;
+  laySize?: string;
   position?: number;
-  onBet: (type: 'back' | 'lay', odds: number) => void 
+  onBet: (type: 'back' | 'lay', odds: number) => void
 }) {
   const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
   const displayBackSize = backSize || `${((hash % 20) / 10 + 0.5).toFixed(1)}M`;
@@ -392,10 +378,10 @@ function FootballTeamRow({
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "6px 12px" }}>
         <span style={{ fontWeight: 700, fontSize: 13.5, color: "#1e293b", lineHeight: 1.2 }}>{name}</span>
         {hasPos && (
-          <span 
-            style={{ 
-              fontWeight: 800, 
-              fontSize: 12, 
+          <span
+            style={{
+              fontWeight: 800,
+              fontSize: 12,
               marginTop: 1.5,
               color: position > 0 ? "#00b181" : "#e53935",
               letterSpacing: "0.2px"
@@ -405,17 +391,17 @@ function FootballTeamRow({
           </span>
         )}
       </div>
-      <div 
-        onClick={() => onBet('back', odds)} 
-        style={{ 
-          width: 62, 
-          backgroundColor: "#7ec8f8", 
-          display: "flex", 
-          flexDirection: "column", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          cursor: "pointer", 
-          gap: 0, 
+      <div
+        onClick={() => Number.isFinite(odds) && odds > 1 && onBet('back', odds)}
+        style={{
+          width: 62,
+          backgroundColor: "#7ec8f8",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          gap: 0,
           padding: "2px 0",
           borderLeft: "1px solid #c4d9ea",
           transition: "background-color 0.1s"
@@ -426,17 +412,17 @@ function FootballTeamRow({
         <span style={{ fontWeight: 800, fontSize: 13.5, color: "#000", lineHeight: 1.1 }}>{odds.toFixed(2)}</span>
         <span style={{ fontSize: 9.5, color: "#333", fontWeight: 600, lineHeight: 1 }}>{displayBackSize}</span>
       </div>
-      <div 
-        onClick={() => onBet('lay', layOdds)} 
-        style={{ 
-          width: 62, 
-          backgroundColor: "#fca5a5", 
-          display: "flex", 
-          flexDirection: "column", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          cursor: "pointer", 
-          gap: 0, 
+      <div
+        onClick={() => Number.isFinite(layOdds) && layOdds > 1 && onBet('lay', layOdds)}
+        style={{
+          width: 62,
+          backgroundColor: "#fca5a5",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          gap: 0,
           padding: "2px 0",
           borderLeft: "1px solid #c4d9ea",
           transition: "background-color 0.1s"
@@ -459,19 +445,19 @@ function GoalsSection({ title, underOdds, underLay, overOdds, overLay, positions
   return (
     <>
       <FootballCombinedSectionHeader title={title} />
-      <FootballTeamRow 
-        name={underName} 
-        odds={underOdds} 
-        layOdds={underLay} 
+      <FootballTeamRow
+        name={underName}
+        odds={underOdds}
+        layOdds={underLay}
         position={positions?.[underName]}
-        onBet={(t, o) => onBet(underName, t, o)} 
+        onBet={(t, o) => onBet(underName, t, o)}
       />
-      <FootballTeamRow 
-        name={overName} 
-        odds={overOdds} 
-        layOdds={overLay} 
+      <FootballTeamRow
+        name={overName}
+        odds={overOdds}
+        layOdds={overLay}
         position={positions?.[overName]}
-        onBet={(t, o) => onBet(overName, t, o)} 
+        onBet={(t, o) => onBet(overName, t, o)}
       />
     </>
   );
@@ -509,7 +495,7 @@ function FootballScoreCard({ match }: { match: any }) {
           <span className="text-[11px] text-white/50">MAN</span>
         </div>
         <div className="flex gap-4">
-          {[ 
+          {[
             { val: '00', label: 'DAYS' },
             { val: '18', label: 'HRS' },
             { val: '42', label: 'MINS' },

@@ -1,3 +1,4 @@
+import { placeSelectionBet } from "@/services/bettingApi";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -37,7 +38,7 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
     queryKey: ['open-bets', match?.id, match?.title, session?.username],
     queryFn: async () => {
       if (!session?.username) return [];
-      const userBets = await Bet.filter({ 
+      const userBets = await Bet.filter({
         user_email: session.username,
         status: 'pending'
       });
@@ -56,24 +57,9 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
 
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
     mutationFn: async (stake: number) => {
-      if (!activeBet || !session || !clientData) return;
-      if (stake > clientBalance) throw new Error("Insufficient balance");
-      
-      const potentialWin = (stake * activeBet.odds) - stake;
-      
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match.id,
-        match_title: activeBet.match.title || `${activeBet.match.team1} v ${activeBet.match.team2}`,
-        selection: activeBet.selection,
-        bet_type: activeBet.betType,
-        stake,
-        odds: activeBet.odds,
-        potential_win: potentialWin,
-        status: 'pending'
-      });
-      
-      await Client.update(clientData.id, { cash: clientBalance - stake });
+      if (!activeBet || !session || !clientData) throw new Error("Select a bet first");
+      return placeSelectionBet({matchId: activeBet.match.id, eventId: activeBet.match.betfair_event_id,
+        selection: activeBet.selection, side: activeBet.betType, stake, odds: activeBet.odds});
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -83,7 +69,7 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
       queryClient.invalidateQueries({ queryKey: ['open-bets', match?.id, session?.username] });
       toast({
         title: "Bet Placed Successfully",
-        description: `Matched on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
+        description: `Accepted on ${activeBet?.selection || ""} at ${activeBet?.odds}`,
       });
     },
     onError: (error: any) => {
@@ -111,8 +97,8 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
 
   const getLiveRunner = (teamName: string, idx: number) => {
     if (!matchOddsMarket) return null;
-    return matchOddsMarket.runners?.[idx] || 
-      matchOddsMarket.runners?.find((r: any) => 
+    return matchOddsMarket.runners?.[idx] ||
+      matchOddsMarket.runners?.find((r: any) =>
         r.runnerName?.toLowerCase() === teamName?.toLowerCase()
       ) || null;
   };
@@ -123,10 +109,10 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* 1. MATCH INFO HEADER */}
-      <TennisMatchInfo 
-        match={match} 
-        keepDisplayOn={keepDisplayOn} 
-        setKeepDisplayOn={setKeepDisplayOn} 
+      <TennisMatchInfo
+        match={match}
+        keepDisplayOn={keepDisplayOn}
+        setKeepDisplayOn={setKeepDisplayOn}
       />
 
       {/* 2. TENNIS SCORE TABLE */}
@@ -159,44 +145,44 @@ export default function TennisMatchDetail({ match, clientData, session, liveOdds
           const runner2 = getLiveRunner(match.team2, 1);
           return (
             <>
-              <TennisOddsRow 
-                name={match.team1} 
+              <TennisOddsRow
+                name={match.team1}
                 position={tennisPositions[match.team1]}
-                odds={hasLiveOdds ? (runner1?.backPrice ?? match.back_odds ?? 1.72) : (match.back_odds ?? 1.72)} 
-                layOdds={hasLiveOdds ? (runner1?.layPrice ?? match.lay_odds ?? 1.74) : (match.lay_odds ?? 1.74)} 
+                odds={runner1?.backPrice}
+                layOdds={runner1?.layPrice}
                 backSize={hasLiveOdds ? formatSize(runner1?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runner1?.laySize) : undefined}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })} 
+                onBet={(t, o) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
               />
-              <TennisOddsRow 
-                name={match.team2} 
+              <TennisOddsRow
+                name={match.team2}
                 position={tennisPositions[match.team2]}
-                odds={hasLiveOdds ? (runner2?.backPrice ?? match.back_odds2 ?? 2.36) : (match.back_odds2 ?? 2.36)} 
-                layOdds={hasLiveOdds ? (runner2?.layPrice ?? match.lay_odds2 ?? 2.4) : (match.lay_odds2 ?? 2.4)} 
+                odds={runner2?.backPrice}
+                layOdds={runner2?.layPrice}
                 backSize={hasLiveOdds ? formatSize(runner2?.backSize) : undefined}
                 laySize={hasLiveOdds ? formatSize(runner2?.laySize) : undefined}
-                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })} 
+                onBet={(t, o) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
               />
             </>
           );
         })()}
 
         {/* 5. TV / SCORE CARD TABS & COURT VISUAL */}
-        <TennisScoreCard 
-          scoreTab={scoreTab} 
-          setScoreTab={setScoreTab} 
-          match={match} 
+        <TennisScoreCard
+          scoreTab={scoreTab}
+          setScoreTab={setScoreTab}
+          match={match}
         />
 
         {/* 7. OPEN & MATCHED BETS SECTION */}
         <MatchedAndOpenBets openBets={[]} matchedBets={openBets} />
       </main>
 
-      <BetSlip 
-        bet={activeBet} 
-        onClose={() => setActiveBet(null)} 
-        onSubmit={(stake) => placeBet(stake)} 
-        isSubmitting={isSubmitting} 
+      <BetSlip
+        bet={activeBet}
+        onClose={() => setActiveBet(null)}
+        onSubmit={(stake) => placeBet(stake)}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

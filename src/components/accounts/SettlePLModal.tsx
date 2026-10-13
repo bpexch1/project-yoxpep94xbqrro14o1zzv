@@ -1,3 +1,4 @@
+import { serviceRequest } from "@/services/client";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Client, Transaction } from "@/entities";
@@ -60,21 +61,14 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
 
     setIsSubmitting(true);
     try {
-      // Update client: deduct pl_downline, add to cash
-      await Client.update(client.id, {
-        pl_downline: (client.pl_downline || 0) - settleAmount,
-        cash: (client.cash || 0) + settleAmount,
-      });
-
-      // Create transaction record
-      await Transaction.create({
-        client_username: client.username,
-        type: 'cash',
-        amount: settleAmount,
-        description: description,
-        before_balance: client.cash || 0,
-        after_balance: (client.cash || 0) + settleAmount,
-      });
+      const key=`pendingPL:${client.id}`;
+      const fingerprint=JSON.stringify({amount:settleAmount,reason:description});
+      const pending=JSON.parse(sessionStorage.getItem(key)||'null');
+      if(pending&&pending.fingerprint!==fingerprint) throw new Error('Retry the previous unconfirmed P/L transfer first');
+      const requestId=pending?.requestId||crypto.randomUUID();
+      sessionStorage.setItem(key,JSON.stringify({requestId,fingerprint}));
+      await serviceRequest('settlePL',{requestId,clientId:client.id,amount:settleAmount,reason:description});
+      sessionStorage.removeItem(key);
 
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       onClose();

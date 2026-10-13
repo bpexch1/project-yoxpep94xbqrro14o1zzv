@@ -1,3 +1,4 @@
+import { serviceRequest } from "@/services/client";
 import { supabase } from "@/integrations/supabase";
 import bcrypt from "bcryptjs";
 
@@ -102,35 +103,7 @@ class QueryBuilder {
   }
 
   async exec(): Promise<any[]> {
-    try {
-      const isClientTable = this._table === "clients" || this._table === "public_clients";
-      const targetTable = isClientTable ? "public_clients" : this._table;
-      const selectCols = isClientTable ? CLIENT_SAFE_COLUMNS : "*";
-
-      let query = supabase.from(targetTable).select(selectCols);
-
-      for (const f of this._filters) {
-        if (f.method === "eq") query = (query as any).eq(f.column, f.value);
-        else if (f.method === "neq") query = (query as any).neq(f.column, f.value);
-        else if (f.method === "gt") query = (query as any).gt(f.column, f.value);
-        else if (f.method === "gte") query = (query as any).gte(f.column, f.value);
-        else if (f.method === "lt") query = (query as any).lt(f.column, f.value);
-        else if (f.method === "lte") query = (query as any).lte(f.column, f.value);
-      }
-
-      for (const f of this._inFilters) {
-        query = (query as any).in(f.column, f.values);
-      }
-
-      query = (query as any).order(this._sortColumn, { ascending: this._sortAsc });
-      query = (query as any).limit(this._limitVal);
-
-      const { data, error } = await query;
-      if (error) throw new Error(error.message || "Unable to load records.");
-      return (data || []).map(transformRow);
-    } catch (err: any) {
-      throw err;
-    }
+    return serviceRequest<any[]>('entityRead', {table:this._table,filters:[...this._filters,...this._inFilters.map(f=>({column:f.column,method:'in',value:f.values}))],sort:this._sortColumn,ascending:this._sortAsc,limit:this._limitVal});
   }
 }
 
@@ -144,8 +117,7 @@ class BatchBuilder {
 
   async delete(ids: string[]): Promise<void> {
     if (!ids || ids.length === 0) return;
-    const { error } = await supabase.from(this._table).delete().in("id", ids);
-    if (error) throw new Error(error.message);
+    throw new Error("Record deletion requires an audited backend workflow");
   }
 }
 
@@ -153,40 +125,8 @@ class BatchBuilder {
  * Checks if a username already exists in the system (case-insensitive) using public_clients view.
  */
 export async function checkUsernameExists(username: string): Promise<boolean> {
-  if (!username || !username.trim()) return false;
-  const clean = username.trim().toLowerCase();
-
-  // Check Supabase public_clients view case-insensitively using ilike
-  try {
-    const { data, error } = await supabase
-      .from("public_clients")
-      .select("id, username")
-      .ilike("username", clean);
-
-    if (!error && Array.isArray(data) && data.length > 0) {
-      const match = data.some(
-        (c: any) => (c.username || "").trim().toLowerCase() === clean
-      );
-      if (match) return true;
-    }
-
-    // Secondary fallback in case ilike is not indexed or exact matching
-    const { data: allData, error: allErr } = await supabase
-      .from("public_clients")
-      .select("username")
-      .limit(1000);
-
-    if (!allErr && Array.isArray(allData)) {
-      const exists = allData.some(
-        (c: any) => (c.username || "").trim().toLowerCase() === clean
-      );
-      if (exists) return true;
-    }
-  } catch (err) {
-    // Silent check
-  }
-
-  return false;
+ const rows=await serviceRequest<any[]>('entityRead',{table:'clients',filters:[{column:'username',method:'eq',value:username.trim()}],limit:1});
+ return rows.length>0;
 }
 
 const CLIENT_SAFE_COLUMNS =
@@ -199,110 +139,22 @@ function createEntity(entityName: string) {
 
   return {
     list: async (sort?: string, limitN?: number): Promise<any[]> => {
-      try {
-        const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-        let q = supabase.from(readTable).select(selectCols);
-        if (sort) {
-          const asc = !sort.startsWith("-");
-          const col = sort.startsWith("-") ? sort.slice(1) : sort;
-          q = (q as any).order(col, { ascending: asc });
-        } else {
-          q = (q as any).order("created_at", { ascending: false });
-        }
-        if (limitN) q = (q as any).limit(limitN);
-        else q = (q as any).limit(500);
-
-        const { data, error } = await q;
-        if (error) throw new Error(error.message || "Unable to load records.");
-        return (data || []).map(transformRow);
-      } catch (err) {
-        throw err;
-      }
+      return new QueryBuilder(readTable).sort(sort||'-created_at').limit(limitN||500).exec();
     },
-
     filter: async (filters: Record<string, any>, sort?: string, limitN?: number): Promise<any[]> => {
-      try {
-        const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-        let q = supabase.from(readTable).select(selectCols);
-
-        for (const [key, val] of Object.entries(filters)) {
-          if (val !== undefined && val !== null) {
-            q = (q as any).eq(key, val);
-          }
-        }
-
-        if (sort) {
-          const asc = !sort.startsWith("-");
-          const col = sort.startsWith("-") ? sort.slice(1) : sort;
-          q = (q as any).order(col, { ascending: asc });
-        } else {
-          q = (q as any).order("created_at", { ascending: false });
-        }
-
-        q = (q as any).limit(limitN ?? 500);
-
-        const { data, error } = await q;
-        if (error) throw new Error(error.message || "Unable to load records.");
-        return (data || []).map(transformRow);
-      } catch (err) {
-        throw err;
-      }
+      const query=new QueryBuilder(readTable).sort(sort||'-created_at').limit(limitN||500);
+      for(const [key,value] of Object.entries(filters)) if(value!==undefined&&value!==null) query.where(key,value);
+      return query.exec();
     },
-
     create: async (payload: Record<string, any>): Promise<any> => {
-      try {
-        const dataToInsert = { ...payload };
-
-        if (entityName === "Client") {
-          if (dataToInsert.username) {
-            const isDuplicate = await checkUsernameExists(dataToInsert.username);
-            if (isDuplicate) {
-              throw new Error("Username already exists. Please choose a different username");
-            }
-          }
-          if (dataToInsert.password) {
-            dataToInsert.password = hashPasswordIfPlain(dataToInsert.password);
-          }
-        }
-
-        const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-        const { data, error } = await supabase
-          .from(writeTable)
-          .insert(dataToInsert)
-          .select(selectCols)
-          .maybeSingle();
-        if (error) throw new Error(error.message);
-        return transformRow(data);
-      } catch (err: any) {
-        if (err.message && err.message.includes("already exists")) {
-          throw err;
-        }
-        throw err;
-      }
+      if(entityName==='Client') return serviceRequest('saveClient',{data:payload});
+      throw new Error('Use the dedicated backend service to create this record');
     },
-
-    update: async (id: string, payload: Record<string, any>): Promise<any> => {
-      const dataToUpdate = { ...payload };
-
-      if (entityName === "Client" && dataToUpdate.password) {
-        dataToUpdate.password = hashPasswordIfPlain(dataToUpdate.password);
-      }
-
-      const selectCols = entityName === "Client" ? CLIENT_SAFE_COLUMNS : "*";
-      const { data, error } = await supabase
-        .from(writeTable)
-        .update(dataToUpdate)
-        .eq("id", id)
-        .select(selectCols)
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      return transformRow(data);
+    update: async (id:string,payload:Record<string,any>):Promise<any> => {
+      if(entityName==='Client') return serviceRequest('saveClient',{id,data:payload});
+      throw new Error('Use the dedicated backend service to change this record');
     },
-
-    delete: async (id: string): Promise<void> => {
-      const { error } = await supabase.from(writeTable).delete().eq("id", id);
-      if (error) throw new Error(error.message);
-    },
+    delete: async (_id:string):Promise<void> => { throw new Error('Record deletion is unavailable through the client'); },
 
     query: (): QueryBuilder => new QueryBuilder(readTable),
 
