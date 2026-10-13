@@ -26,6 +26,10 @@ export function RealtimeStatus() {
       }, setStatus),
     [cache],
   );
+  // Hide the feed availability banner when no licensed feed is configured.
+  // Keep the realtime connection subscription active for future configuration.
+  if (health?.feedConfigured === false) return null;
+
   return (
     <span
       role="status"
@@ -33,15 +37,13 @@ export function RealtimeStatus() {
       title="Realtime database connection. Odds freshness is checked separately."
       className={`text-[10px] whitespace-nowrap px-1 ${status === "connected" ? "text-emerald-700" : "text-amber-700"}`}
     >
-      {health?.feedConfigured === false
-        ? "● Feed not configured"
-        : status === "connected"
-          ? "● Connected"
-          : status === "disconnected"
-            ? "● Disconnected"
-            : status === "reconnecting"
-              ? "● Reconnecting…"
-              : "● Connecting…"}
+      {status === "connected"
+        ? "● Connected"
+        : status === "disconnected"
+          ? "● Disconnected"
+          : status === "reconnecting"
+            ? "● Reconnecting…"
+            : "● Connecting…"}
     </span>
   );
 }
