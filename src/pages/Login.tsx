@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Lock, Loader2, Key, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Loader2, Key } from "lucide-react";
 import { Client } from "@/entities";
 import { supabase } from "@/integrations/supabase";
 import { setClientSession } from "@/hooks/useClientAuth";
@@ -10,7 +10,6 @@ import { normalizeAccountRole } from "@/lib/accountHierarchy";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [loading, setLoading] = useState(false);
   const [forcedModal, setForcedModal] = useState(false);
@@ -23,7 +22,10 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoginError("");
+    // Dismiss the mobile keyboard when submitting, as in the reference.
+    (document.activeElement as HTMLElement | null)?.blur();
 
     const cleanUser = username.trim();
     const cleanPw = password;
@@ -64,6 +66,7 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err: any) {
+      setPassword("");
       setLoginError("Username/Password Incorrect.");
     } finally {
       setLoading(false);
@@ -125,7 +128,7 @@ export default function Login() {
         >
           {/* Top Logo: Aqua-Mint Circle with BP Letters */}
           <div className="bpexch-login-logo">
-            <img src="/login-bp.jpg" alt="BP" width={120} height={120} />
+            <img src="/login-bp.png" alt="BP" width={120} height={120} />
           </div>
 
           <form onSubmit={handleLogin} className="bpexch-login-form">
@@ -148,6 +151,9 @@ export default function Login() {
                     if (loginError) setLoginError("");
                   }}
                   required
+                  name="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   autoComplete="username"
                   className="w-full bg-transparent text-white text-[15px] font-normal placeholder:text-[#d1dbe6] focus:outline-none"
                 />
@@ -173,18 +179,12 @@ export default function Login() {
                     if (loginError) setLoginError("");
                   }}
                   required
+                  name="password"
                   autoComplete="current-password"
                   className="w-full bg-transparent text-white text-[15px] font-normal placeholder:text-[#d1dbe6] focus:outline-none"
                 />
               </div>
             </div>
-
-            {/* Error Message */}
-            {loginError && (
-              <div className="text-[#ff5c5c] text-center text-[13.5px] font-medium pt-1 animate-in fade-in duration-200">
-                {loginError}
-              </div>
-            )}
 
             {/* Login Button: Centered Pill Shaped Blue Gradient Button */}
             <div className="bpexch-login-submit">
@@ -192,21 +192,16 @@ export default function Login() {
                 type="submit"
                 disabled={loading}
                 className="bpexch-login-button"
-                style={{
-                  background: "linear-gradient(180deg, #8dbed7, #15364a)",
-                  boxShadow: "0 10px 22px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.35)",
-                }}
+                aria-busy={loading}
               >
-                {loading ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span>Login...</span>
-                  </>
-                ) : (
-                  <span>Login</span>
-                )}
+                <span>Login</span>
               </button>
             </div>
+            {loginError && (
+              <div className="bpexch-login-error" role="alert">
+                {loginError}
+              </div>
+            )}
           </form>
         </div>
       </div>
