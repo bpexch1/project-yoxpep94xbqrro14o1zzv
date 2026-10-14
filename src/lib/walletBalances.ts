@@ -21,6 +21,7 @@ export function getWalletSummary(client: WalletSummaryInput) {
     combinedAvailable,
     cashTabBalance: isBettor ? combinedAvailable : pl,
     maxCashWithdraw: Math.max(0, isBettor ? combinedAvailable : cash),
-    maxCreditWithdraw: Math.max(0, credit),
+    // Bettors cannot revoke more credit than their combined unreserved funds permit.
+    maxCreditWithdraw: Math.max(0, isBettor ? Math.min(credit, combinedAvailable) : credit),
   };
 }
