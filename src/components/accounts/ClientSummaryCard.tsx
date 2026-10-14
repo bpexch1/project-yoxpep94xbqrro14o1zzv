@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/entities";
+import { readAccount, type Account } from "@/services/accounting";
 
 interface ClientSummaryCardProps {
   clients: any[];
@@ -41,6 +42,7 @@ export function ClientSummaryCard({
   const columnCount = showFullColumns ? 9 : 3;
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [accountDetails, setAccountDetails] = useState<Record<string, Account | null>>({});
 
   // DataTable states
   const [pageSize, setPageSize] = useState(25);
@@ -51,6 +53,7 @@ export function ClientSummaryCard({
     setIsLoadingBalances(true);
     try {
       await onRefresh?.();
+      setAccountDetails({});
       setBalancesLoaded(true);
       setExpandedIds(new Set());
     } catch {
@@ -149,6 +152,28 @@ export function ClientSummaryCard({
     return tableFilteredClients.slice(start, start + pageSize);
   }, [tableFilteredClients, currentPage, pageSize]);
 
+  // Load the actual wallet/exposure snapshot for visible rows only. The
+  // lightweight client listing does not contain pending-bet exposure.
+  useEffect(() => {
+    if (!balancesLoaded || !paginatedClients.length) return;
+    let cancelled = false;
+    const pending = paginatedClients.filter(client => client.id && !(client.id in accountDetails));
+    if (!pending.length) return;
+    (async () => {
+      const found: Record<string, Account | null> = {};
+      for (let index = 0; index < pending.length; index += 5) {
+        const batch = pending.slice(index, index + 5);
+        const results = await Promise.allSettled(batch.map(client => readAccount(client.id)));
+        results.forEach((result, offset) => {
+          found[batch[offset].id] = result.status === "fulfilled" ? result.value : null;
+        });
+        if (cancelled) return;
+      }
+      if (!cancelled) setAccountDetails(previous => ({ ...previous, ...found }));
+    })();
+    return () => { cancelled = true; };
+  }, [balancesLoaded, paginatedClients, accountDetails]);
+
   const totalPages = Math.ceil(tableFilteredClients.length / pageSize) || 1;
 
   const toggleStatus = async (client: any) => {
@@ -164,18 +189,17 @@ export function ClientSummaryCard({
   };
 
   const getClientDisplay = (client: any) => {
-    const credit = Number(client.credit_remaining ?? 0);
-    const cash = Number(client.cash ?? 0);
-    const pl = Number(client.pl_downline ?? 0);
-    const totalBalance = credit + cash + pl;
-    const clientPL = cash + pl !== 0 ? cash + pl : (client.client_pl ?? 0);
-    const share = client.downline_share ?? 85;
-    const exposure = 0;
-    const available = totalBalance - exposure;
+    const account = accountDetails[client.id];
+    const credit = Number(account?.credit_remaining ?? client.credit_remaining ?? 0);
+    const balance = Number(account?.balance_upline ?? client.balance_upline ?? client.cash ?? 0);
+    const clientPL = Number(account?.pl_downline ?? client.pl_downline ?? 0);
+    const share = Number(account?.downline_share ?? client.downline_share ?? 0);
+    const exposure = account ? Number(account.exposure ?? 0) : null;
+    const available = account ? Number(account.availableBalance ?? account.cash ?? 0) : null;
 
     return {
       credit,
-      balance: totalBalance,
+      balance,
       clientPL,
       share,
       exposure,
@@ -402,6 +426,12 @@ export function ClientSummaryCard({
               </span>
               <span className="font-medium">InActive</span>
             </div>
+            {filteredClients.some(client => client.can_settle_pl === true) && (
+              <div className="flex items-center gap-1.5">
+                <span className="btn btn-sm btn-settle">S</span>
+                <span className="font-medium">Settle Account</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -443,8 +473,8 @@ export function ClientSummaryCard({
                     </td>
                     {showFullColumns && (
                       <>
-                        <td>{filteredClients.reduce((sum, client) => sum + getClientDisplay(client).balance, 0).toLocaleString()}</td>
-                        <td>{filteredClients.reduce((sum, client) => sum + Number(getClientDisplay(client).clientPL), 0).toLocaleString()}</td>
+                        <td>{filteredClients.reduce((sum, client) => sum + Number(client.balance_upline ?? client.cash ?? 0), 0).toLocaleString()}</td>
+                        <td>{filteredClients.reduce((sum, client) => sum + Number(client.pl_downline ?? 0), 0).toLocaleString()}</td>
                         <td></td><td></td><td></td><td></td>
                       </>
                     )}
@@ -531,8 +561,8 @@ export function ClientSummaryCard({
                             <td>{balancesLoaded ? display.balance.toLocaleString() : "-"}</td>
                             <td style={{ color: display.clientPL < 0 ? "#f86c6b" : undefined }}>{balancesLoaded ? Number(display.clientPL).toLocaleString() : "-"}</td>
                             <td>{display.share}</td>
-                            <td>{display.exposure}</td>
-                            <td>{balancesLoaded ? display.available.toLocaleString() : "-"}</td>
+                            <td>{display.exposure === null ? "-" : display.exposure.toLocaleString()}</td>
+                            <td>{balancesLoaded && display.available !== null ? display.available.toLocaleString() : "-"}</td>
                             <td>{renderOptions(client)}</td>
                           </>
                         )}
@@ -546,8 +576,8 @@ export function ClientSummaryCard({
                               <li>Balance {balancesLoaded ? display.balance.toLocaleString() : "0"}</li>
                               <li>Client (P/L) {balancesLoaded ? Number(display.clientPL).toLocaleString() : "0"}</li>
                               <li>Share {display.share}</li>
-                              <li>Exposure {display.exposure}</li>
-                              <li>Available Balance {balancesLoaded ? display.available.toLocaleString() : "0"}</li>
+                              <li>Exposure {display.exposure === null ? "-" : display.exposure.toLocaleString()}</li>
+                              <li>Available Balance {balancesLoaded && display.available !== null ? display.available.toLocaleString() : "-"}</li>
                               <li>
                                 <div className="client-detail-options">
                                   <span>Options</span>
