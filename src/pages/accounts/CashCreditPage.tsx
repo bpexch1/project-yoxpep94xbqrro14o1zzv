@@ -16,7 +16,6 @@ export default function CashCreditPage() {
   const { toast } = useToast();
   const session = getClientSession();
 
-  const [operatorPassword, setOperatorPassword] = useState("");
   const inFlight = useRef(false);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
   const [activeTab, setActiveTab] = useState<'cash' | 'credit'>('cash');
@@ -115,12 +114,10 @@ export default function CashCreditPage() {
     setSubmitting(true);
     try {
       await manualWalletTransfer({
-        operatorUsername: session.username, operatorPassword,
         clientId: client.id, wallet: activeTab, direction, amount, description,
         requestId: pendingRequest.current!.id,
       });
       pendingRequest.current = null;
-      setOperatorPassword("");
       if (direction === "deposit") setDepositAmount("0");
       else setWithdrawAmount("0");
       toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
@@ -296,10 +293,6 @@ export default function CashCreditPage() {
               </div>
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="deposit-operator-password" className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">Administrator password</label>
-              <input id="deposit-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} placeholder="Confirm your identity" className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] outline-none focus:border-[#009678]" />
-            </div>
             {transferError?.direction === "deposit" && <p role="alert" className="mb-3 text-sm text-[#c7254e]">{transferError.message}</p>}
             {/* Submit */}
             <div className="cash-form-footer flex justify-end">
@@ -356,10 +349,6 @@ export default function CashCreditPage() {
               </div>
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="withdraw-operator-password" className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">Administrator password</label>
-              <input id="withdraw-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} placeholder="Confirm your identity" className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] outline-none focus:border-[#c7254e]" />
-            </div>
             {transferError?.direction === "withdraw" && <p role="alert" className="mb-3 text-sm text-[#c7254e]">{transferError.message}</p>}
             {/* Submit */}
             <div className="cash-form-footer flex justify-end">

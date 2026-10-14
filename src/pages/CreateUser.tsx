@@ -4,7 +4,7 @@ import { Client, checkUsernameExists } from "@/entities";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
-import { canCreateChild, permittedChildRole, roleLabel, type AccountRole } from "@/lib/accountHierarchy";
+import { canCreateChild, permittedChildRoles, roleLabel, type AccountRole } from "@/lib/accountHierarchy";
 import { Loader2 } from "lucide-react";
 
 export default function CreateUser() {
@@ -13,7 +13,7 @@ export default function CreateUser() {
   const { toast } = useToast();
   const session = getClientSession();
   const username = session?.username || '';
-  const childRole = permittedChildRole(session?.role);
+  const childRoles = permittedChildRoles(session?.role);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -85,7 +85,7 @@ export default function CreateUser() {
     }
 
     if (!formData.type || !canCreateChild(parentRecord?.role, formData.type)) newErrors.type = "Account type is not permitted for your role";
-    if (childRole !== "bettor" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
+    if (formData.type !== "bettor" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
       newErrors.downlineShare = `Enter a share between 0 and ${maxShare}`;
     }
     setErrors(newErrors);
@@ -123,7 +123,7 @@ export default function CreateUser() {
         status: formData.isActive ? "active" : "inactive",
         parent_username: username,
         phone: formData.phone,
-        downline_share: childRole === "bettor" ? 0 : Number(formData.downlineShare),
+        downline_share: formData.type === "bettor" ? 0 : Number(formData.downlineShare),
         reference: formData.reference,
         notes: formData.notes,
       });
@@ -227,21 +227,21 @@ export default function CreateUser() {
                 Type
               </label>
               <div className="flex items-center gap-6 pt-0.5">
-                {childRole ? (
-                  <label className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
+                {childRoles.length ? childRoles.map(childRole => (
+                  <label key={childRole} className="inline-flex items-center gap-2 text-[14px] text-[#212529] cursor-pointer">
                     <input type="radio" name="account_type"
                       checked={formData.type === childRole}
                       onChange={() => setFormData({ ...formData, type: childRole })}
                       className="w-4 h-4 text-[#00a65a] accent-[#00a65a] cursor-pointer" />
                     <span>{roleLabel(childRole)}</span>
                   </label>
-                ) : <span className="text-xs text-red-600">Account creation is not permitted for this role.</span>}
+                )) : <span className="text-xs text-red-600">Account creation is not permitted for this role.</span>}
 
               </div>
             </div>
 
             {errors.type && <p role="alert" className="text-red-600">{errors.type}</p>}
-            {childRole !== "bettor" && childRole !== null && (
+            {formData.type !== "bettor" && childRoles.length > 0 && (
               <div className="create-share-field">
                 <label htmlFor="downline-share">Downline Share</label>
                 <input id="downline-share" type="number" min="0" max={maxShare} step="0.01" required value={formData.downlineShare} onChange={event => setFormData({ ...formData, downlineShare: event.target.value })} />

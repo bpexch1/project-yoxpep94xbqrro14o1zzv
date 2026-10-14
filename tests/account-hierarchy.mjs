@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ACCOUNT_ROLES, canCreateChild, normalizeAccountRole, permittedChildRole, roleLabel } from "../src/lib/accountHierarchy.ts";
+import { ACCOUNT_ROLES, canCreateChild, normalizeAccountRole, permittedChildRole, permittedChildRoles, roleLabel } from "../src/lib/accountHierarchy.ts";
 
-test("company may create SuperAdmin, but cannot skip to SuperMaster or Bettor", () => {
+test("company may create SuperAdmin or Bettor, but cannot skip to SuperMaster", () => {
   assert.equal(permittedChildRole("company"), "superadmin");
   assert.equal(canCreateChild("company", "superadmin"), true);
   assert.equal(canCreateChild("company", "supermaster"), false);
-  assert.equal(canCreateChild("company", "bettor"), false);
+  assert.equal(canCreateChild("company", "bettor"), true);
+  assert.deepEqual(permittedChildRoles("company"), ["superadmin", "bettor"]);
 });
 test("six-level hierarchy: Master creates Bettor directly; Bettor cannot create users", () => {
   const chain = ["company", "superadmin", "admin", "supermaster", "master", "bettor"];
@@ -14,7 +15,7 @@ test("six-level hierarchy: Master creates Bettor directly; Bettor cannot create 
   for (let i = 0; i < chain.length - 1; i++) {
     assert.equal(permittedChildRole(chain[i]), chain[i + 1]);
     for (const role of chain) {
-      assert.equal(canCreateChild(chain[i], role), role === chain[i + 1], chain[i] + " -> " + role);
+      assert.equal(canCreateChild(chain[i], role), role === chain[i + 1] || (chain[i] === "company" && role === "bettor"), chain[i] + " -> " + role);
     }
   }
   assert.equal(permittedChildRole("bettor"), null);

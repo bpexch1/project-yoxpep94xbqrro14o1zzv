@@ -1,8 +1,6 @@
 import { realClient } from "@/integrations/supabase";
 
 export interface ManualTransfer {
-  operatorUsername: string;
-  operatorPassword: string;
   clientId: string;
   wallet: "cash" | "credit";
   direction: "deposit" | "withdraw";
@@ -16,9 +14,13 @@ export async function manualWalletTransfer(input: ManualTransfer) {
   if (!/^\d+(\.\d{1,2})?$/.test(input.amount) || !Number.isFinite(Number(input.amount)) || Number(input.amount) <= 0) {
     throw new Error("Enter a positive amount with no more than two decimal places.");
   }
-  if (!input.operatorPassword) throw new Error("Enter your administrator password.");
+  const sessionToken = sessionStorage.getItem("exchangeSessionToken");
+  if (!sessionToken) throw new Error("Your session expired. Please sign in again.");
   // Use the real client directly: never fall back to browser/demo writes.
-  const { data, error } = await realClient.functions.invoke("manual-wallet", { body: input });
+  const { data, error } = await realClient.functions.invoke("manual-wallet-session", {
+    body: input,
+    headers: { "x-exchange-session": sessionToken },
+  });
   if (error || !data?.success) {
     const failure = error?.context instanceof Response
       ? await error.context.json().catch(() => null)
