@@ -32,24 +32,43 @@ export default function LedgerPage() {
   });
   const { data: transactions, isLoading, isError } = useQuery({
     queryKey: ["transactions", username],
-    queryFn: () => Transaction.filter({ client_username: username }, "created_at"),
+    // Fetch recent transactions, not only the earliest 500 ever written.
+    queryFn: () => Transaction.filter({ client_username: username }, "-created_at", 10000),
     enabled: authorized === true,
     refetchInterval: 15000,
   });
   const entries = useMemo(() => {
     const start = new Date(range.from).getTime();
     const end = new Date(range.to).getTime() + 59999;
-    return (transactions || []).filter(tx => {
+    const scoped = (transactions || []).filter(tx => {
       const date = new Date(tx.created_at).getTime();
       return date >= start && date <= end;
-    }).map(tx => ({
-      id: tx.id,
-      date: new Date(tx.created_at).toLocaleString(),
-      description: tx.description || tx.type || "Transaction",
-      amount: Number(tx.amount) || 0,
-      // Only display the recorded balance; never synthesize financial history.
-      balance: tx.after_balance == null ? "—" : Number(tx.after_balance),
-    })).filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
+    }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    const rows = scoped.map(tx => {
+      const kind = tx.request_id && ["cash", "credit"].includes(String(tx.type || "").toLowerCase())
+        ? " (" + String(tx.type).charAt(0).toUpperCase() + String(tx.type).slice(1) + ")" : "";
+      const description = String(tx.description || tx.type || "Transaction");
+      return {
+        id: String(tx.id),
+        date: new Date(tx.created_at).toLocaleString(),
+        description: description + (kind && !description.toLowerCase().endsWith(kind.toLowerCase()) ? kind : ""),
+        amount: Number(tx.amount) || 0,
+        // New transfers persist combined snapshots. Legacy rows keep the wallet balance originally recorded.
+        balance: tx.combined_after_balance != null ? Number(tx.combined_after_balance)
+          : tx.after_balance == null ? "—" : Number(tx.after_balance),
+      };
+    });
+    // Include opening balance only when it can be derived from an actual server snapshot.
+    if (scoped.length && scoped[0].combined_before_balance != null) {
+      rows.unshift({
+        id: "opening-" + range.from,
+        date: new Date(range.from).toLocaleString(),
+        description: "Opening Balance",
+        amount: 0,
+        balance: Number(scoped[0].combined_before_balance),
+      });
+    }
+    return rows.filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
   }, [transactions, range, search]);
   const pages = Math.max(1, Math.ceil(entries.length / pageSize));
   const currentPage = Math.min(page, pages);
