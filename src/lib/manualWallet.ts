@@ -10,6 +10,9 @@ export interface ManualTransfer {
 }
 
 export async function manualWalletTransfer(input: ManualTransfer) {
+  if (import.meta.env.VITE_PREVIEW_READ_ONLY === "true") {
+    throw new Error("This preview is read-only. Cash/Credit transfers must be performed on the live website.");
+  }
   if (!realClient) throw new Error("Wallet service is not configured. No balance was changed.");
   if (!/^\d+(\.\d{1,2})?$/.test(input.amount) || !Number.isFinite(Number(input.amount)) || Number(input.amount) <= 0) {
     throw new Error("Enter a positive amount with no more than two decimal places.");
