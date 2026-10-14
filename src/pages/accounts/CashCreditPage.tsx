@@ -75,7 +75,7 @@ export default function CashCreditPage() {
     if (!client) return;
     if (activeTab === 'cash') {
       setDepositDesc(`Cash deposit in ${client.username}`);
-      setWithdrawDesc(`Cash withdrawn from ${client.username}`);
+      setWithdrawDesc(`Cash withdrawal from ${client.username}`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
@@ -169,21 +169,23 @@ export default function CashCreditPage() {
   const clientAvailableBalance = walletSummary.combinedAvailable;
   const maxWithdraw = walletSummary.maxCashWithdraw;
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
+  const adminCreditText = adminCreditLimit.toLocaleString("en-US");
 
   return (
     <div className="reference-cash min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-      <div className="max-w-md mx-auto px-2 py-3">
+      <div className="max-w-md mx-auto px-[14px] py-3">
 
-        {/* Top 2 Flat Action Buttons: Cash & Credit */}
-        <div className="flex gap-2.5 mb-3">
+        {/* Reference: tabs and account summary share one white panel. */}
+        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-4 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="flex gap-2.5 mb-3 pb-3 border-b border-[#dee2e6]">
           <button
             type="button"
             onClick={() => { setActiveTab('cash'); setTransferError(null); }}
             className={cn(
-              "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
+              "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors text-center border",
               activeTab === 'cash'
-                ? "bg-[#007bff] text-white border-[#007bff]"
-                : "bg-white text-[#009678] border-[#009678] hover:bg-gray-50"
+                ? "bg-[#007bff] text-white border-[#007bff] shadow-sm"
+                : "bg-white text-[#009678] border-transparent hover:bg-gray-50"
             )}
           >
             Cash
@@ -192,18 +194,17 @@ export default function CashCreditPage() {
             type="button"
             onClick={() => { setActiveTab('credit'); setTransferError(null); }}
             className={cn(
-              "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
+              "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors text-center border",
               activeTab === 'credit'
-                ? "bg-[#007bff] text-white border-[#007bff]"
-                : "bg-white text-[#009678] border-[#009678] hover:bg-gray-50"
+                ? "bg-[#007bff] text-white border-[#007bff] shadow-sm"
+                : "bg-white text-[#009678] border-transparent hover:bg-gray-50"
             )}
           >
             Credit
           </button>
         </div>
 
-        {/* Username Header & 3-Column Info Table Box */}
-        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] p-3 mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          {/* Username Header & 3-Column Info Table */}
           <div className="font-bold text-[1.1rem] text-[#23282c] mb-2.5">
             {client.username}
           </div>
@@ -212,10 +213,10 @@ export default function CashCreditPage() {
             /* Cash Tab Header Table: Credit | Balance | Max Withdraw */
             <table className="wallet-summary-table table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
-                <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
-                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Credit</th>
-                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Balance</th>
-                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Max Withdraw</th>
+                <tr className="bg-white text-[rgb(35,40,44)]">
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-normal w-1/3">Credit</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-normal w-1/3">Balance</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-normal w-1/3">Max Withdraw</th>
                 </tr>
               </thead>
               <tbody>
@@ -236,16 +237,20 @@ export default function CashCreditPage() {
             /* Credit Tab Header Table: Credit limit | [Username] Credit | [Username] Available Balance */
             <table className="wallet-summary-table table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
-                <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
-                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[30%] leading-tight">Credit limit</th>
-                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[35%] leading-tight">{client.username} Credit</th>
-                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[35%] leading-tight">{client.username} Available Balance</th>
+                <tr className="bg-white text-[rgb(35,40,44)]">
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-normal w-[30%] leading-tight">Credit limit</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-normal w-[35%] leading-tight">{client.username} Credit</th>
+                  <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-normal w-[35%] leading-tight">{client.username} Available Balance</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="bg-white font-bold text-[rgb(35,40,44)]">
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {adminCreditLimit.toLocaleString()} Rs.
+                    <span title={adminCreditText + " Rs."} className="block text-[0.8rem] [overflow-wrap:normal]">
+                      {adminCreditText.split(",").map((part, index) => (
+                        <span key={index}>{index ? "," : ""}{part}<wbr /></span>
+                      ))} Rs.
+                    </span>
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
                     {clientCredit.toLocaleString()} Rs.
@@ -260,7 +265,7 @@ export default function CashCreditPage() {
         </div>
 
         {/* DEPOSIT FORM BOX (Dark Teal Header #009678) */}
-        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+        <div className="mx-[13px] bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden mb-3 shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
           <div className="bg-[#00b181] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
               ? `Deposit Cash in ${client.username} account`
@@ -270,7 +275,7 @@ export default function CashCreditPage() {
           <div className="cash-form-body p-3.5">
             {/* Description */}
             <div className="mb-3">
-              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-normal mb-1">
                 Description
               </label>
               <input
@@ -283,7 +288,7 @@ export default function CashCreditPage() {
 
             {/* Amount */}
             <div className="mb-3.5">
-              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-normal mb-1">
                 Amount
               </label>
               <div className="flex items-stretch w-full border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden">
@@ -295,7 +300,7 @@ export default function CashCreditPage() {
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   min="0"
-                  className="flex-1 border-0 px-2.5 py-1.5 text-[0.875rem] font-bold text-[rgb(35,40,44)] outline-none"
+                  className="flex-1 min-w-0 border-0 px-2.5 py-1.5 text-[0.875rem] font-normal text-[rgb(35,40,44)] outline-none"
                 />
               </div>
             </div>
@@ -316,8 +321,8 @@ export default function CashCreditPage() {
         </div>
 
         {/* WITHDRAW FORM BOX (Red Header) */}
-        <div className="bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
-          <div className="bg-[#c7254e] px-3.5 py-2 text-[0.875rem] text-white font-bold">
+        <div className="mx-[13px] bg-white border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.05)]">
+          <div className="bg-[#dc3545] px-3.5 py-2 text-[0.875rem] text-white font-bold">
             {activeTab === 'cash'
               ? `Withdraw cash from ${client.username} account`
               : `Withdraw Credit from ${client.username}`}
@@ -326,7 +331,7 @@ export default function CashCreditPage() {
           <div className="cash-form-body p-3.5">
             {/* Description */}
             <div className="mb-3">
-              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-normal mb-1">
                 Description
               </label>
               <input
@@ -339,7 +344,7 @@ export default function CashCreditPage() {
 
             {/* Amount */}
             <div className="mb-3.5">
-              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">
+              <label className="block text-[0.875rem] text-[rgb(35,40,44)] font-normal mb-1">
                 Amount
               </label>
               <div className="flex items-stretch w-full border border-[rgb(200,206,211)] rounded-[0.25rem] overflow-hidden">
@@ -351,7 +356,7 @@ export default function CashCreditPage() {
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                   min="0"
-                  className="flex-1 border-0 px-2.5 py-1.5 text-[0.875rem] font-bold text-[rgb(35,40,44)] outline-none"
+                  className="flex-1 min-w-0 border-0 px-2.5 py-1.5 text-[0.875rem] font-normal text-[rgb(35,40,44)] outline-none"
                 />
               </div>
             </div>
@@ -363,7 +368,7 @@ export default function CashCreditPage() {
                 type="button"
                 onClick={handleWithdraw}
                 disabled={isSubmittingDeposit || isSubmittingWithdraw}
-                className="bg-[#c7254e] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
+                className="bg-[#dc3545] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingWithdraw ? "Submitting..." : "Submit"}
               </button>
