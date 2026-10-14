@@ -27,6 +27,7 @@ export default function CashCreditPage() {
 
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
   const [isSubmittingWithdraw, setIsSubmittingWithdraw] = useState(false);
+  const [transferError, setTransferError] = useState<{ direction: "deposit" | "withdraw"; message: string } | null>(null);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -102,6 +103,7 @@ export default function CashCreditPage() {
 
   const submitTransfer = async (direction: "deposit" | "withdraw") => {
     if (!client || !session || inFlight.current) return;
+    setTransferError(null);
     const amount = direction === "deposit" ? depositAmount : withdrawAmount;
     const description = direction === "deposit" ? depositDesc : withdrawDesc;
     const fingerprint = JSON.stringify([client.id, activeTab, direction, amount, description]);
@@ -125,7 +127,9 @@ export default function CashCreditPage() {
       // A refresh failure must not turn a confirmed transfer into a failed transfer.
       await refreshAll().catch(() => undefined);
     } catch (err: unknown) {
-      toast({ variant: "destructive", title: "Transfer Failed", description: err instanceof Error ? err.message : "Unable to confirm transfer. Retry with the same details." });
+      const message = err instanceof Error ? err.message : "Unable to confirm transfer. Retry with the same details.";
+      setTransferError({ direction, message });
+      toast({ variant: "destructive", title: "Transfer Failed", description: message });
     } finally {
       setSubmitting(false);
       inFlight.current = false;
@@ -158,7 +162,7 @@ export default function CashCreditPage() {
   const clientCredit = Number(client.credit_remaining ?? 0);
   const clientCash = Number(client.cash ?? 0);
   const clientPL = Number(client.pl_downline ?? 0);
-  const clientTotalBalance = clientCredit + clientCash + clientPL;
+  const clientAvailableBalance = clientCredit + clientCash + clientPL;
   const maxWithdraw = Math.max(0, clientCash);
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
 
@@ -166,15 +170,11 @@ export default function CashCreditPage() {
     <div className="reference-cash min-h-screen bg-[rgb(228,229,230)] pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <div className="max-w-md mx-auto px-2 py-3">
 
-          <div className="bg-white border border-gray-300 rounded p-3 mb-3">
-            <label className="block text-sm font-semibold mb-1" htmlFor="wallet-operator-password">Your administrator password</label>
-            <input id="wallet-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Confirm your identity" />
-          </div>
         {/* Top 2 Flat Action Buttons: Cash & Credit */}
         <div className="flex gap-2.5 mb-3">
           <button
             type="button"
-            onClick={() => setActiveTab('cash')}
+            onClick={() => { setActiveTab('cash'); setTransferError(null); }}
             className={cn(
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
               activeTab === 'cash'
@@ -186,7 +186,7 @@ export default function CashCreditPage() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('credit')}
+            onClick={() => { setActiveTab('credit'); setTransferError(null); }}
             className={cn(
               "flex-1 py-2 text-[0.875rem] font-bold rounded-[0.2rem] transition-colors shadow-sm text-center border",
               activeTab === 'credit'
@@ -220,7 +220,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientTotalBalance.toLocaleString()} Rs.
+                    {clientCash.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
                     {maxWithdraw.toLocaleString()} Rs.
@@ -247,7 +247,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientTotalBalance.toLocaleString()} Rs.
+                    {clientAvailableBalance.toLocaleString()} Rs.
                   </td>
                 </tr>
               </tbody>
@@ -296,12 +296,17 @@ export default function CashCreditPage() {
               </div>
             </div>
 
+            <div className="mb-3">
+              <label htmlFor="deposit-operator-password" className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">Administrator password</label>
+              <input id="deposit-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} placeholder="Confirm your identity" className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] outline-none focus:border-[#009678]" />
+            </div>
+            {transferError?.direction === "deposit" && <p role="alert" className="mb-3 text-sm text-[#c7254e]">{transferError.message}</p>}
             {/* Submit */}
             <div className="cash-form-footer flex justify-end">
               <button
                 type="button"
                 onClick={handleDeposit}
-                disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                disabled={isSubmittingDeposit || isSubmittingWithdraw}
                 className="bg-[#00b181] hover:bg-[#007a62] text-white border border-[#009678] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingDeposit ? "Submitting..." : "Submit"}
@@ -351,12 +356,17 @@ export default function CashCreditPage() {
               </div>
             </div>
 
+            <div className="mb-3">
+              <label htmlFor="withdraw-operator-password" className="block text-[0.875rem] text-[rgb(35,40,44)] font-medium mb-1">Administrator password</label>
+              <input id="withdraw-operator-password" type="password" autoComplete="current-password" value={operatorPassword} onChange={(e) => setOperatorPassword(e.target.value)} placeholder="Confirm your identity" className="w-full border border-[rgb(200,206,211)] rounded-[0.25rem] px-2.5 py-1.5 text-[0.875rem] outline-none focus:border-[#c7254e]" />
+            </div>
+            {transferError?.direction === "withdraw" && <p role="alert" className="mb-3 text-sm text-[#c7254e]">{transferError.message}</p>}
             {/* Submit */}
             <div className="cash-form-footer flex justify-end">
               <button
                 type="button"
                 onClick={handleWithdraw}
-                disabled={isSubmittingDeposit || isSubmittingWithdraw || !operatorPassword}
+                disabled={isSubmittingDeposit || isSubmittingWithdraw}
                 className="bg-[#c7254e] hover:bg-[#c82333] text-white border border-[#dc3545] rounded-[0.2rem] px-5 py-1.5 text-[0.875rem] font-medium flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-75"
               >
                 {isSubmittingWithdraw ? "Submitting..." : "Submit"}
