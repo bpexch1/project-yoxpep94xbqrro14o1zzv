@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Transaction } from "@/entities";
+import { Client, Transaction } from "@/entities";
 import { Filter } from "lucide-react";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { verifyInHierarchy } from "@/lib/hierarchyCheck";
@@ -11,9 +11,12 @@ function todayAt(time: string) {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${time}`;
 }
 const columns = ["Date", "Description", "Amount", "Balance"];
+type LedgerRow = { id: string; date: string; description: string; amount: number; balance: number | string };
 
 export default function LedgerPage() {
   const params = useParams();
+  const [searchParams] = useSearchParams();
+  const wallet = searchParams.get("wallet") === "credit" ? "credit" : "cash";
   const session = getClientSession();
   const username = params.username || session?.username;
   const [fromDate, setFromDate] = useState(() => todayAt("00:00"));
@@ -30,27 +33,39 @@ export default function LedgerPage() {
     queryFn: () => verifyInHierarchy(username!, session!.username, session!.role),
     enabled: !!username && !!session,
   });
-  const { data: transactions, isLoading, isError } = useQuery({
-    queryKey: ["transactions", username],
-    queryFn: () => Transaction.filter({ client_username: username }, "created_at"),
+  const { data: ledger, isLoading, isError } = useQuery({
+    queryKey: ["transactions", username, wallet, range],
+    queryFn: async () => {
+      const start = new Date(range.from).toISOString();
+      const end = new Date(new Date(range.to).getTime() + 60000).toISOString();
+      const [current, previous, accounts] = await Promise.all([
+        Transaction.query().where("client_username", username).where("type", wallet)
+          .where("created_at", "gte", start).where("created_at", "lt", end).sort("created_at").limit(10000).exec(),
+        Transaction.query().where("client_username", username).where("type", wallet)
+          .where("created_at", "lt", start).sort("-created_at").limit(1).exec(),
+        Client.filter({ username }, "-created_at", 1),
+      ]);
+      return { current, previous, account: accounts[0] };
+    },
     enabled: authorized === true,
     refetchInterval: 15000,
   });
   const entries = useMemo(() => {
-    const start = new Date(range.from).getTime();
-    const end = new Date(range.to).getTime() + 59999;
-    return (transactions || []).filter(tx => {
-      const date = new Date(tx.created_at).getTime();
-      return date >= start && date <= end;
-    }).map(tx => ({
+    const current = ledger?.current || [];
+    // The opening row comes from the last stored balance before the selected
+    // range (or the first stored transaction's before_balance).
+    const opening = ledger?.previous?.[0]?.after_balance ?? current[0]?.before_balance
+      ?? (wallet === "cash" ? ledger?.account?.cash : ledger?.account?.credit_remaining) ?? 0;
+    const rows: LedgerRow[] = [{ id: "opening", date: new Date(range.from).toLocaleString(), description: "Opening Balance", amount: 0, balance: Number(opening) }];
+    rows.push(...current.map(tx => ({
       id: tx.id,
       date: new Date(tx.created_at).toLocaleString(),
-      description: tx.description || tx.type || "Transaction",
+      description: `${tx.description || tx.type || "Transaction"}${(tx.description || "").endsWith(`(${wallet === "cash" ? "Cash" : "Credit"})`) ? "" : ` (${wallet === "cash" ? "Cash" : "Credit"})`}`,
       amount: Number(tx.amount) || 0,
-      // Only display the recorded balance; never synthesize financial history.
       balance: tx.after_balance == null ? "—" : Number(tx.after_balance),
-    })).filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
-  }, [transactions, range, search]);
+    })));
+    return rows.filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(search.toLowerCase())));
+  }, [ledger, range, search, wallet]);
   const pages = Math.max(1, Math.ceil(entries.length / pageSize));
   const currentPage = Math.min(page, pages);
   const offset = (currentPage - 1) * pageSize;
@@ -59,7 +74,7 @@ export default function LedgerPage() {
   const exportFile = async (kind: "excel" | "pdf") => {
     setExportError("");
     try {
-      const filename = `${username}-ledger`;
+      const filename = `${username}-${wallet}-ledger`;
       if (kind === "excel") {
         const XLSX = await import("xlsx");
         const workbook = XLSX.utils.book_new();
@@ -68,7 +83,7 @@ export default function LedgerPage() {
       } else {
         const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
         const doc = new jsPDF();
-        doc.text(`${username} - Account Ledger`, 14, 16);
+        doc.text(`${wallet === "cash" ? "Cash" : "Credit"} - Account Ledger`, 14, 16);
         autoTable(doc, { startY: 24, head: [columns], body: exportRows });
         doc.save(`${filename}.pdf`);
       }
@@ -92,7 +107,7 @@ export default function LedgerPage() {
         </form>
       </section>
       <section className="card">
-        <div className="card-header">{username} - Account Ledger</div>
+        <div className="card-header">{wallet === "cash" ? "Cash" : "Credit"} - Account Ledger</div>
         <div className="card-body">
           <div className="ledger-controls">
             <label><select aria-label="Entries per page" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[100,250,500,1000].map(size => <option key={size}>{size}</option>)}</select> entries per page</label>
