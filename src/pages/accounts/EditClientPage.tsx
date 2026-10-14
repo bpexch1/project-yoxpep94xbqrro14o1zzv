@@ -186,7 +186,7 @@ export default function EditClientPage() {
   }
 
   const roleLabel = client.role === "client" || !client.role ? "Bettor" : (client.role.charAt(0).toUpperCase() + client.role.slice(1));
-  const numericId = client.id?.replace?.(/\D/g, "")?.slice?.(0, 7) || "8703594";
+  const accountId = client.id || "-";
 
   return (
     <div className="reference-edit" style={{ minHeight: "100vh", background: "#ececed", fontFamily: '"Roboto Condensed", HelveticaNeue, Helvetica, Arial, sans-serif', fontSize: "1rem", color: "#212529", paddingBottom: 40 }}>
@@ -296,7 +296,7 @@ export default function EditClientPage() {
               {/* ID */}
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>ID</div>
-                <div style={{ color: "#111827", fontWeight: 600 }}>{numericId}</div>
+                <div title={accountId} style={{ color: "#111827", fontWeight: 600 }}>{accountId.slice(0, 8)}</div>
               </div>
 
               {/* Username */}
@@ -457,7 +457,7 @@ export default function EditClientPage() {
               {/* UserDomain */}
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ width: 110, color: "#374151", fontWeight: 500, lineHeight: 1.2 }}>UserDomai<br />n</div>
-                <div style={{ color: "#374151", fontSize: 13 }}>1 ( betproexch.com )</div>
+                <div style={{ color: "#374151", fontSize: 13 }}>{window.location.hostname.endsWith(".vercel.app") ? "bpexch1.com" : window.location.hostname}</div>
               </div>
 
             </div>
