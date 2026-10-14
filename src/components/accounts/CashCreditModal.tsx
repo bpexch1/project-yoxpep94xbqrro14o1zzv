@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { TransactionHistoryModal } from "./TransactionHistoryModal";
 import { Client } from "@/entities";
 import { manualWalletTransfer } from "@/lib/manualWallet";
+import { getWalletSummary } from "@/lib/walletBalances";
 import { getClientSession } from "@/hooks/useClientAuth";
 
 interface CashCreditModalProps {
@@ -40,9 +41,9 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
     enabled: !!session?.username && isOpen,
   });
   const adminClient = adminClients?.[0];
-  const isBettor = ["client", "bettor", "user"].includes(String(client?.role || "").toLowerCase());
-  const combinedAvailable = Number(client?.credit_remaining || 0) + Number(client?.cash || 0) + Number(client?.pl_downline || 0);
-  const maxCashWithdraw = Math.max(0, isBettor ? combinedAvailable : Number(client?.cash || 0));
+  const walletSummary = getWalletSummary(client || {});
+  const combinedAvailable = walletSummary.combinedAvailable;
+  const maxCashWithdraw = walletSummary.maxCashWithdraw;
 
   useEffect(() => {
     if (!client) return;
@@ -188,7 +189,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                           className="px-2.5 py-1.5 font-bold border-r border-[#dee2e6] text-[#212529] underline cursor-pointer"
                           onClick={() => setShowHistory(true)}
                         >
-                          {(isBettor ? combinedAvailable : Number(client?.pl_downline || 0)).toLocaleString()} Rs.
+                          {walletSummary.cashTabBalance.toLocaleString()} Rs.
                         </td>
                         <td
                           className="px-2.5 py-1.5 font-bold text-[#212529] underline cursor-pointer"
@@ -308,7 +309,7 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
                   <button
                     type="button"
                     onClick={() => {
-                      const available = activeTab === "cash" ? maxCashWithdraw : Number(client?.credit_remaining || 0);
+                      const available = activeTab === "cash" ? maxCashWithdraw : walletSummary.maxCreditWithdraw;
                       setWithdrawAmount(Math.max(0, available).toString());
                     }}
                     className="px-2.5 bg-gray-100 hover:bg-gray-200 text-[#212529] font-bold rounded-[3px] text-[11px] uppercase transition-colors"
