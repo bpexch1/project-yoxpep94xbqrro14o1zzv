@@ -296,7 +296,7 @@ export default function EditClientPage() {
               {/* ID */}
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ width: 110, color: "#374151", fontWeight: 500 }}>ID</div>
-                <div style={{ color: "#111827", fontWeight: 600, overflowWrap: "anywhere" }}>{accountId}</div>
+                <div title={accountId} style={{ color: "#111827", fontWeight: 600 }}>{accountId.slice(0, 8)}</div>
               </div>
 
               {/* Username */}
@@ -457,7 +457,7 @@ export default function EditClientPage() {
               {/* UserDomain */}
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ width: 110, color: "#374151", fontWeight: 500, lineHeight: 1.2 }}>UserDomai<br />n</div>
-                <div style={{ color: "#374151", fontSize: 13 }}>{window.location.hostname}</div>
+                <div style={{ color: "#374151", fontSize: 13 }}>{window.location.hostname.endsWith(".vercel.app") ? "bpexch1.com" : window.location.hostname}</div>
               </div>
 
             </div>
