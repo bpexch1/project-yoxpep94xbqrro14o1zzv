@@ -12,6 +12,13 @@ export async function serviceRequest<T>(
   const token = sessionStorage.getItem(TOKEN_KEY);
   if (action !== "login" && action !== "health" && !token)
     throw new Error("Please sign in again to use the secure backend");
+  // Preview can inspect existing production accounts but must not submit live
+  // wallet, betting, settlement, admin-write or feed-sync mutations.
+  // Client-side UX guard only; real authorization stays on the backend.
+  if (import.meta.env.VITE_PREVIEW_READ_ONLY === "true" &&
+      !new Set(["login", "logout", "health", "account", "entityRead", "reports", "markets", "betStatus", "commissionHistory"]).has(action)) {
+    throw new Error("This preview is read-only. Use the live website for account changes or financial transactions.");
+  }
   if (AWS_API_URL) {
     if (!/^https:\/\/[a-z0-9.-]+(?:\/exchange)?$/i.test(AWS_API_URL))
       throw new Error("AWS backend URL is invalid");
