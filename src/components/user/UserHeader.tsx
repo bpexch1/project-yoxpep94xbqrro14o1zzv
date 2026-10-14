@@ -1,3 +1,5 @@
+import { readAccount } from "@/services/accounting";
+import { getWalletSummary } from "@/lib/walletBalances";
 import { RealtimeStatus } from "@/components/services/RealtimeStatus";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -61,8 +63,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
     queryKey: ["user-header-balance", session?.username],
     queryFn: async () => {
       if (!session?.username) return null;
-      const clients = await Client.filter({ username: session.username }, "-created_at", 1);
-      return (clients as any)?.[0] ?? null;
+      return readAccount(session.id);
     },
     enabled: !!session?.username,
     refetchInterval: 3000,
@@ -87,8 +88,8 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
     refetchInterval: 3000,
   });
 
-  const balance = Number(clientData?.cash ?? 0);
-  const totalLiability = calculateTotalLiability(userPendingBets as any);
+  const balance = getWalletSummary(clientData || {}).combinedAvailable;
+  const totalLiability = Number(clientData?.exposure ?? 0);
   const activeBetsCount = (userPendingBets as any[])?.length || 0;
 
   const handleLogout = () => {
@@ -156,9 +157,11 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
               gap: 3,
             }}
           >
-            <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
-            <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
-            <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
+            {sidebarOpen ? <b aria-hidden="true" style={{color: "white", fontSize: 28, fontWeight: 400, lineHeight: "22px"}}>×</b> : <>
+              <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
+              <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
+              <span style={{ display: "block", width: 18, height: 2, backgroundColor: "white" }} />
+            </>}
           </button>
           <button
             onClick={handleDashboardClick}
@@ -208,7 +211,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
               fontWeight: 700,
             }}
           >
-            Welcome to Exchange. - null
+            Welcome to Exchange.
           </div>
         </div>
 
@@ -324,7 +327,7 @@ export function UserHeader({ sidebarOpen, onMenuToggle, onLoadBalance, showStatu
           borderTop: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <div className="reference-user-status-item">Credit: 0</div>
+        <div className="reference-user-status-item">Credit: {Number(clientData?.credit_received ?? 0).toLocaleString("en-IN")}</div>
         <div className="reference-user-status-item">Balance: {balance.toLocaleString("en-IN")}</div>
         <div className="reference-user-status-item" style={{ color: "white" }}>
           Liable: {totalLiability > 0 ? `-${totalLiability.toLocaleString("en-IN")}` : "0"}

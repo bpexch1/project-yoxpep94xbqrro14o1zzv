@@ -61,7 +61,7 @@ export default function SettleMatch() {
     onSuccess: (data: any) => {
       if (data?.success) {
         setSettlementResult(data);
-        queryClient.invalidateQueries({ queryKey: ["matches-active"] });
+        queryClient.invalidateQueries();
       } else {
         toast({
           variant: "destructive",
@@ -114,7 +114,7 @@ export default function SettleMatch() {
           Settle Match
         </h1>
         <p className="text-muted-foreground">
-          Select a live or upcoming match to settle bets. Revenue split: 85% Admin | 15% Company.
+          Select a live or upcoming match to settle bets. P/L follows each account’s share recorded when the bet was placed.
         </p>
       </div>
 
@@ -211,15 +211,14 @@ export default function SettleMatch() {
                       <TableHead>Username</TableHead>
                       <TableHead>Stake</TableHead>
                       <TableHead>Result</TableHead>
-                      <TableHead>Raw P/L</TableHead>
-                      <TableHead>Admin (85%)</TableHead>
-                      <TableHead>Company (15%)</TableHead>
+                      <TableHead>Net P/L</TableHead>
+                      <TableHead>Commission</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {safeSettlements.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground py-4">
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
                           No settlements details available.
                         </TableCell>
                       </TableRow>
@@ -233,15 +232,8 @@ export default function SettleMatch() {
                               {s?.status || "lost"}
                             </Badge>
                           </TableCell>
-                          <TableCell className={(s?.pl_raw || 0) >= 0 ? "text-green-600" : "text-red-600"}>
-                            {(s?.pl_raw || 0) >= 0 ? "+" : ""}{(s?.pl_raw || 0).toFixed(2)}
-                          </TableCell>
-                          <TableCell className={(s?.pl_downline || 0) >= 0 ? "text-green-600" : "text-red-600"}>
-                            {(s?.pl_downline || 0) >= 0 ? "+" : ""}{(s?.pl_downline || 0).toFixed(2)}
-                          </TableCell>
-                          <TableCell className={(s?.pl_upline || 0) >= 0 ? "text-green-600" : "text-red-600"}>
-                            {(s?.pl_upline || 0) >= 0 ? "+" : ""}{(s?.pl_upline || 0).toFixed(2)}
-                          </TableCell>
+                          <TableCell className={Number(s?.profit || 0) >= 0 ? "text-green-600" : "text-red-600"}>{Number(s?.profit || 0).toFixed(2)}</TableCell>
+                          <TableCell>{Number(s?.commission || 0).toFixed(2)}</TableCell>
                         </TableRow>
                       ))
                     )}
@@ -249,35 +241,9 @@ export default function SettleMatch() {
                 </Table>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-2xl font-bold">{settlementResult?.totalBetsSettled || 0}</div>
-                    <div className="text-xs text-muted-foreground">Total Bets</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className={cn(
-                      "text-2xl font-bold",
-                      safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_downline || 0), 0) >= 0 ? "text-green-600" : "text-red-600"
-                    )}>
-                      {safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_downline || 0), 0).toFixed(2)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Admin Total</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className={cn(
-                      "text-2xl font-bold",
-                      safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_upline || 0), 0) >= 0 ? "text-green-600" : "text-red-600"
-                    )}>
-                      {safeSettlements.reduce((acc: number, s: any) => acc + (s?.pl_upline || 0), 0).toFixed(2)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Company Total</div>
-                  </CardContent>
-                </Card>
+              <div className="rounded-md border overflow-x-auto">
+                <Table><TableHeader><TableRow><TableHead>Upline</TableHead><TableHead>Level</TableHead><TableHead>Allocated P/L</TableHead></TableRow></TableHeader>
+                <TableBody>{(settlementResult.allocations || []).map((allocation: any) => <TableRow key={allocation.username}><TableCell>{allocation.username}</TableCell><TableCell>{allocation.level}</TableCell><TableCell>{Number(allocation.amount).toFixed(2)}</TableCell></TableRow>)}</TableBody></Table>
               </div>
             </div>
           ) : (
@@ -286,7 +252,7 @@ export default function SettleMatch() {
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div className="text-sm text-amber-800">
                   <p className="font-semibold mb-1">Important: Settlement Formula</p>
-                  <p>Settling will permanently update user balances and admin profit/loss based on the 85/15 revenue sharing rule. This action cannot be undone.</p>
+                  <p>Settlement updates the Bettor’s balance, releases the reserved amount and records each upline’s configured P/L share.</p>
                 </div>
               </div>
 
@@ -320,6 +286,7 @@ export default function SettleMatch() {
                 >
                   Settle as Draw / Tie
                 </Button>
+                <Button variant="ghost" className="w-full h-12 border-2" onClick={() => handleConfirmSettle("void")} disabled={settleMutation.isPending}>Void / Refund reserved balance</Button>
               </div>
 
               {settleMutation.isPending && (

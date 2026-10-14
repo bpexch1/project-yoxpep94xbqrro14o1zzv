@@ -1,3 +1,4 @@
+import { settledProfit } from "@/lib/settledProfit";
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -167,7 +168,7 @@ export default function UserBetHistory() {
                   <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
                     <span className="text-xs font-semibold text-gray-500">P/L Amount</span>
                     <span className={`text-sm font-bold ${bet.status === 'won' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                      {bet.status === 'won' ? '+' : '-'}{bet.status === 'won' ? (bet.potential_win - bet.stake).toLocaleString("en-IN") : bet.stake.toLocaleString("en-IN")}
+                      {settledProfit(bet) == null ? "—" : Number(settledProfit(bet)).toLocaleString("en-IN")}
                     </span>
                   </div>
                 )}

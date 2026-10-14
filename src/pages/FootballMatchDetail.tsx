@@ -1,3 +1,4 @@
+import { getWalletSummary } from "@/lib/walletBalances";
 import { placeSelectionBet } from "@/services/bettingApi";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +30,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [keepDisplayOn, setKeepDisplayOn] = useState(true);
 
-  const clientBalance = clientData?.cash ?? 0;
+  const clientBalance = getWalletSummary(clientData || {}).combinedAvailable;
 
   // Fetch real-time open bets for this match and user
   const { data: openBets = [] } = useQuery({
@@ -54,10 +55,10 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
   });
 
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
-    mutationFn: async (stake: number) => {
+    mutationFn: async ({stake, odds}: {stake: number; odds?: number}) => {
       if (!activeBet || !session || !clientData) throw new Error("Select a bet first");
       return placeSelectionBet({matchId: activeBet.match.id, eventId: activeBet.match.betfair_event_id,
-        selection: activeBet.selection, side: activeBet.betType, stake, odds: activeBet.odds});
+        selection: activeBet.selection, side: activeBet.betType, stake, odds: odds ?? activeBet.odds});
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -322,7 +323,7 @@ export default function FootballMatchDetail({ match, clientData, session, liveOd
         </div>
       </main>
 
-      <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake) => placeBet(stake)} isSubmitting={isSubmitting} />
+      <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake, odds) => placeBet({stake, odds})} isSubmitting={isSubmitting} />
     </div>
   );
 }

@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { settleAccountPL } from "@/services/walletLedger";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Client, Transaction } from "@/entities";
+import { Client } from "@/entities";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ChevronLeft, ArrowRightLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ export default function SettlePLPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
+  const inFlight = useRef(false);
+  const pending = useRef<{fingerprint: string; id: string} | null>(null);
   const [amount, setAmount] = useState("0.00");
   const [description, setDescription] = useState("P/L to Cash transfer");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,10 +37,10 @@ export default function SettlePLPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!client) return;
+    if (!client || inFlight.current) return;
 
     const settleAmount = parseFloat(amount);
-    if (isNaN(settleAmount) || settleAmount <= 0) {
+    if (!/^\d+(\.\d{1,2})?$/.test(amount) || !Number.isFinite(settleAmount) || settleAmount <= 0) {
       toast({
         variant: "destructive",
         title: "Invalid amount",
@@ -65,34 +68,30 @@ export default function SettlePLPage() {
       return;
     }
 
+    const fingerprint = JSON.stringify([client.id, amount, description]);
+    if (pending.current && pending.current.fingerprint !== fingerprint) {
+      toast({variant: "destructive", title: "Unconfirmed transfer", description: "Retry the same amount and description first."}); return;
+    }
+    pending.current ||= {fingerprint, id: crypto.randomUUID()};
+    inFlight.current = true;
     setIsSubmitting(true);
     try {
-      await Client.update(client.id, {
-        pl_downline: (client.pl_downline || 0) - settleAmount,
-        cash: (client.cash || 0) + settleAmount,
-      });
-
-      await Transaction.create({
-        client_username: client.username,
-        type: 'cash',
-        amount: settleAmount,
-        description: description,
-        before_balance: client.cash || 0,
-        after_balance: (client.cash || 0) + settleAmount,
-      });
-
+      await settleAccountPL({clientId: client.id, amount: settleAmount, reason: description, requestId: pending.current.id});
+      pending.current = null;
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });
       
-      navigate(-1);
+      await queryClient.invalidateQueries().catch(() => undefined);
+      navigate(`/accounts/ledger/${encodeURIComponent(client.username)}?wallet=cash`);
     } catch (err) {
       console.error("Settle P/L Error:", err);
       toast({
         variant: "destructive",
         title: "Settlement Failed",
-        description: "An error occurred while settling the account.",
+        description: err instanceof Error ? err.message : "Unable to confirm transfer. Retry the same details.",
       });
     } finally {
+      inFlight.current = false;
       setIsSubmitting(false);
     }
   };

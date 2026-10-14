@@ -1,3 +1,4 @@
+import { settledProfit } from "@/lib/settledProfit";
 import { ReferenceAmountTables } from "@/components/reports/ReferenceAmountTables";
 import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
 import { useState, useEffect } from "react";
@@ -63,12 +64,7 @@ export default function BookDetail2() {
     setSearchTrigger(prev => prev + 1);
   };
 
-  const getPL = (bet: any) => {
-    if (!bet) return 0;
-    if (bet.status === "won") return bet.potential_win || 0;
-    if (bet.status === "lost") return -(bet.stake || 0);
-    return 0;
-  };
+  const getPL = (bet: any) => settledProfit(bet) ?? 0;
 
   // Safe array conversion for reduce and map functions
   const safeBets = Array.isArray(bets) ? bets : [];

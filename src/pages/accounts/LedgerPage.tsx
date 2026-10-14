@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Client, Transaction } from "@/entities";
+import { walletLedger, type LedgerWallet } from "@/services/walletLedger";
 import { Filter } from "lucide-react";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { verifyInHierarchy } from "@/lib/hierarchyCheck";
@@ -16,7 +16,9 @@ type LedgerRow = { id: string; date: string; description: string; amount: number
 export default function LedgerPage() {
   const params = useParams();
   const [searchParams] = useSearchParams();
-  const wallet = searchParams.get("wallet") === "credit" ? "credit" : "cash";
+  const requestedWallet = searchParams.get("wallet");
+  const wallet: LedgerWallet = requestedWallet === "credit" || requestedWallet === "pl" ? requestedWallet : "cash";
+  const walletLabel = wallet === "pl" ? "P/L" : wallet === "cash" ? "Cash" : "Credit";
   const session = getClientSession();
   const username = params.username || session?.username;
   const [fromDate, setFromDate] = useState(() => todayAt("00:00"));
@@ -38,29 +40,19 @@ export default function LedgerPage() {
     queryFn: async () => {
       const start = new Date(range.from).toISOString();
       const end = new Date(new Date(range.to).getTime() + 60000).toISOString();
-      const [current, previous, accounts] = await Promise.all([
-        Transaction.query().where("client_username", username).where("type", wallet)
-          .where("created_at", "gte", start).where("created_at", "lt", end).sort("created_at").limit(10000).exec(),
-        Transaction.query().where("client_username", username).where("type", wallet)
-          .where("created_at", "lt", start).sort("-created_at").limit(1).exec(),
-        Client.filter({ username }, "-created_at", 1),
-      ]);
-      return { current, previous, account: accounts[0] };
+      return walletLedger({username: username!, wallet, from: start, to: end, limit: 10000});
     },
     enabled: authorized === true,
     refetchInterval: 15000,
   });
   const entries = useMemo(() => {
-    const current = ledger?.current || [];
-    // The opening row comes from the last stored balance before the selected
-    // range (or the first stored transaction's before_balance).
-    const opening = ledger?.previous?.[0]?.after_balance ?? current[0]?.before_balance
-      ?? (wallet === "cash" ? ledger?.account?.cash : ledger?.account?.credit_remaining) ?? 0;
-    const rows: LedgerRow[] = [{ id: "opening", date: new Date(range.from).toLocaleString(), description: "Opening Balance", amount: 0, balance: Number(opening) }];
+    const current = ledger?.rows || [];
+    const opening = ledger?.openingBalance;
+    const rows: LedgerRow[] = [{ id: "opening", date: new Date(range.from).toLocaleString(), description: "Opening Balance", amount: 0, balance: opening == null ? "—" : Number(opening) }];
     rows.push(...current.map(tx => ({
       id: tx.id,
       date: new Date(tx.created_at).toLocaleString(),
-      description: `${tx.description || tx.type || "Transaction"}${(tx.description || "").endsWith(`(${wallet === "cash" ? "Cash" : "Credit"})`) ? "" : ` (${wallet === "cash" ? "Cash" : "Credit"})`}`,
+      description: `${tx.description || tx.type || "Transaction"}${(tx.description || "").endsWith(`(${walletLabel})`) ? "" : ` (${walletLabel})`}`,
       amount: Number(tx.amount) || 0,
       balance: tx.after_balance == null ? "—" : Number(tx.after_balance),
     })));
@@ -83,7 +75,7 @@ export default function LedgerPage() {
       } else {
         const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
         const doc = new jsPDF();
-        doc.text(`${wallet === "cash" ? "Cash" : "Credit"} - Account Ledger`, 14, 16);
+        doc.text(`${walletLabel} - Account Ledger`, 14, 16);
         autoTable(doc, { startY: 24, head: [columns], body: exportRows });
         doc.save(`${filename}.pdf`);
       }
@@ -107,13 +99,14 @@ export default function LedgerPage() {
         </form>
       </section>
       <section className="card">
-        <div className="card-header">{wallet === "cash" ? "Cash" : "Credit"} - Account Ledger</div>
+        <div className="card-header">{walletLabel} - Account Ledger</div>
         <div className="card-body">
           <div className="ledger-controls">
             <label><select aria-label="Entries per page" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[100,250,500,1000].map(size => <option key={size}>{size}</option>)}</select> entries per page</label>
-            <div className="ledger-exports"><button onClick={() => window.print()}>Print</button><button disabled={!entries.length} onClick={() => void exportFile("excel")}>Excel</button><button disabled={!entries.length} onClick={() => void exportFile("pdf")}>PDF</button></div>
+            <div className="ledger-exports"><button onClick={() => window.print()}>Print</button><button disabled={!entries.length || isError || isLoading || authorized !== true || ledger?.truncated} onClick={() => void exportFile("excel")}>Excel</button><button disabled={!entries.length || isError || isLoading || authorized !== true || ledger?.truncated} onClick={() => void exportFile("pdf")}>PDF</button></div>
             <label className="text-center">Search:<input type="search" className="block border px-2 py-1" value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} /></label>
           </div>
+          {ledger?.truncated && <p role="alert">More than 10,000 entries: narrow the date range before exporting.</p>}
           {exportError && <p role="alert">{exportError}</p>}
           {isError ? <p role="alert">Unable to load ledger. Please try again.</p> : authorized !== true || isLoading ? <p role="status">Loading ledger…</p> : <table className="table table-bordered table-sm mb-0">
             <thead><tr><th>#</th><th>Date</th><th>Description</th><th className="ledger-desktop-cell">Amount</th><th className="ledger-desktop-cell">Balance</th></tr></thead>

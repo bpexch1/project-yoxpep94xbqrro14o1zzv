@@ -1,3 +1,5 @@
+import { placeSelectionBet } from "@/services/bettingApi";
+import { getWalletSummary } from "@/lib/walletBalances";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -51,110 +53,6 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string; color
   );
 };
 
-const DEFAULT_SCREENSHOT_MATCHES = [
-  // Football
-  {
-    id: "fb-1",
-    sport: "Soccer",
-    title: "Roma V Inter",
-    team1: "Roma",
-    team2: "Inter",
-    status: "live",
-    match_time: "21:00",
-    matched_amount: "14029346",
-    odds: 1.95,
-  },
-  {
-    id: "fb-2",
-    sport: "Soccer",
-    title: "Nottm Forest V Coventry",
-    team1: "Nottm Forest",
-    team2: "Coventry",
-    status: "live",
-    match_time: "21:30",
-    matched_amount: "14040110",
-    odds: 2.1,
-  },
-  {
-    id: "fb-3",
-    sport: "Soccer",
-    title: "Stuttgart V Dortmund",
-    team1: "Stuttgart",
-    team2: "Dortmund",
-    status: "live",
-    match_time: "21:30",
-    matched_amount: "8835988",
-    odds: 1.88,
-  },
-  {
-    id: "fb-4",
-    sport: "Soccer",
-    title: "Trabzonspor V Galatasaray",
-    team1: "Trabzonspor",
-    team2: "Galatasaray",
-    status: "live",
-    match_time: "22:00",
-    matched_amount: "822308",
-    odds: 2.25,
-  },
-  // Cricket
-  {
-    id: "cr-1",
-    sport: "Cricket",
-    title: "Afghanistan v India",
-    team1: "Afghanistan",
-    team2: "India",
-    status: "live",
-    match_time: "19:30",
-    matched_amount: "24198340",
-    odds: 1.65,
-  },
-  {
-    id: "cr-2",
-    sport: "Cricket",
-    title: "England v Sri Lanka",
-    team1: "England",
-    team2: "Sri Lanka",
-    status: "live",
-    match_time: "20:00",
-    matched_amount: "18340120",
-    odds: 1.72,
-  },
-  {
-    id: "cr-3",
-    sport: "Cricket",
-    title: "Zimbabwe v Australia",
-    team1: "Zimbabwe",
-    team2: "Australia",
-    status: "live",
-    match_time: "21:00",
-    matched_amount: "11200900",
-    odds: 1.5,
-  },
-  // Tennis
-  {
-    id: "tn-1",
-    sport: "Tennis",
-    title: "Bucsa v Bejlek",
-    team1: "Bucsa",
-    team2: "Bejlek",
-    status: "live",
-    match_time: "20:30",
-    matched_amount: "3420100",
-    odds: 1.9,
-  },
-  {
-    id: "tn-2",
-    sport: "Tennis",
-    title: "Frech v I Jovic",
-    team1: "Frech",
-    team2: "I Jovic",
-    status: "live",
-    match_time: "21:15",
-    matched_amount: "2890450",
-    odds: 2.05,
-  },
-];
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -227,7 +125,7 @@ export default function UserDashboard() {
     retry: 2,
   });
 
-  const safeMatches = Array.isArray(matches) && matches.length > 0 ? matches : DEFAULT_SCREENSHOT_MATCHES;
+  const safeMatches = Array.isArray(matches) ? matches : [];
 
   // Fetch real-time client data for balance
   const { data: clients } = useQuery({
@@ -238,11 +136,11 @@ export default function UserDashboard() {
 
   const clientData = Array.isArray(clients) && clients.length > 0 ? clients[0] : null;
   const clientCash = typeof clientData?.cash === "number" ? clientData.cash : parseFloat(String(clientData?.cash || 0)) || 0;
-  const clientBalance = clientCash;
+  const clientBalance = getWalletSummary(clientData || {}).combinedAvailable;
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
-    mutationFn: async (stake: number) => {
+    mutationFn: async ({stake, odds}: {stake: number; odds?: number}) => {
       if (!activeBet) {
         throw new Error("No active bet selected. Please select odds first.");
       }
@@ -258,36 +156,14 @@ export default function UserDashboard() {
         throw new Error("Please enter a valid positive stake amount.");
       }
 
-      if (numericStake > clientBalance) {
-        throw new Error(`Insufficient balance. Current balance is ${clientBalance.toLocaleString("en-IN")}`);
-      }
-
-      const oddsVal = typeof activeBet.odds === "number" ? activeBet.odds : parseFloat(String(activeBet.odds || 1));
-      const potentialWin = numericStake * oddsVal - numericStake;
-
-      await Bet.create({
-        user_email: session.username,
-        match_id: activeBet.match?.id || "unknown-match",
-        match_title:
-          activeBet.match?.title || `${activeBet.match?.team1 || ""} v ${activeBet.match?.team2 || ""}`.trim() || "Match Event",
-        selection: activeBet.selection,
-        bet_type: activeBet.betType,
-        stake: numericStake,
-        odds: oddsVal,
-        potential_win: potentialWin > 0 ? potentialWin : 0,
-        status: "pending",
-      });
-
-      const updatedCash = Math.max(0, clientBalance - numericStake);
-      await Client.update(clientData.id, {
-        cash: updatedCash,
-      });
+      await placeSelectionBet({ matchId: activeBet.match.id, eventId: activeBet.match.betfair_event_id,
+        selection: activeBet.selection, side: activeBet.betType, stake: numericStake, odds: odds ?? activeBet.odds });
       return { stake: numericStake, selection: activeBet.selection };
     },
     onSuccess: (receipt) => {
       setActiveBet(null);
       queryClient.invalidateQueries({ queryKey: ["client-data", session?.username] });
-      queryClient.invalidateQueries({ queryKey: ["bets"] });
+      queryClient.invalidateQueries();
       toast({
         title: "Bet Placed Successfully",
         description: `Stake: ₹${receipt.stake} on ${receipt.selection}`,
@@ -331,22 +207,23 @@ export default function UserDashboard() {
       sport: sport || "Soccer",
       status: isLive ? "live" : "upcoming",
       odds: oddsVal,
-      matched_amount: m.matched_amount || "14,029,346",
+      matched_amount: m.matched_amount || 0,
       match_time: m.match_time || "21:00",
     };
   };
 
   const matchesList = safeMatches
+    .filter(m => m.status !== "completed")
     .map(normalizeMatch)
     .filter((m: any) => {
       const sport = m.sport?.toLowerCase();
       return sport === "cricket" || sport === "soccer" || sport === "tennis";
     });
 
-  const inplayCount = 5;
-  const cricketCount = 3;
-  const tennisCount = 2;
-  const soccerCount = 9;
+  const inplayCount = matchesList.filter(m => m.status === "live").length;
+  const cricketCount = matchesList.filter(m => m.sport.toLowerCase() === "cricket").length;
+  const tennisCount = matchesList.filter(m => m.sport.toLowerCase() === "tennis").length;
+  const soccerCount = matchesList.filter(m => m.sport.toLowerCase() === "soccer").length;
 
   if (!session) return null;
 
@@ -564,7 +441,7 @@ export default function UserDashboard() {
         <BetSlip
           activeBet={activeBet}
           onClose={() => setActiveBet(null)}
-          onSubmit={(stake) => placeBet(stake)}
+          onSubmit={(stake, odds) => placeBet({stake, odds})}
           isSubmitting={isSubmitting}
           balance={clientBalance}
         />

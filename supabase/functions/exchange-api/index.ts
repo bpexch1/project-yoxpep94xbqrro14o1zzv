@@ -113,6 +113,7 @@ Deno.serve(async (req) => {
       "reports",
       "commissionHistory",
       "entityRead",
+      "walletLedger",
       "saveClient",
       "settlePL",
       "lockMarket",
@@ -140,7 +141,7 @@ Deno.serve(async (req) => {
               { appKey, sessionToken },
               undefined,
               undefined,
-              (access.data || []).filter((m: any) => !m.settled_at),
+              (access.data || []).filter((m: any) => !m.settled_at && !m.is_demo),
             );
             const write = await db.rpc("exchange_ingest", {
               p_markets: markets,
@@ -165,7 +166,7 @@ Deno.serve(async (req) => {
     });
     if (error) {
       const allowed =
-        /^(Authentication required|Permission denied|Bet not found|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed; refresh and confirm|Insufficient quoted liquidity|Insufficient balance|Settlement permission required|Settlement reason and request ID required|Market not found|Market already settled|Suspend or close market before settlement|Invalid winning runner|Market contains accounts outside your downline|Invalid commission parameters|Invalid report range or limit|Invalid report kind|Invalid query|Invalid account parameters|Username already exists|Invalid account share|Self account changes require administrator|Use the dedicated financial service|Password must contain 8 to 72 bytes|Invalid settlement amount|Insufficient P\/L balance)$/;
+        /^(Authentication required|Permission denied|Bet not found|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed; refresh and confirm|Insufficient quoted liquidity|Insufficient balance|Settlement permission required|Settlement reason and request ID required|Market not found|Market already settled|Suspend or close market before settlement|Invalid winning runner|Market contains accounts outside your downline|Invalid commission parameters|Invalid report range or limit|Invalid report kind|Invalid query|Invalid ledger wallet|Legacy bet lacks funding\/commission snapshot\. Manual review required before settlement|Missing\/invalid P\/L snapshot\. Manual review required|Invalid account parameters|Username already exists|Invalid account share|Self account changes require administrator|Use the dedicated financial service|Password must contain 8 to 72 bytes|Invalid settlement amount|Insufficient P\/L balance)$/;
       return json(
         {
           error: allowed.test(error.message)

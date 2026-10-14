@@ -1,3 +1,4 @@
+import { settledProfit } from "@/lib/settledProfit";
 import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -63,11 +64,7 @@ export default function DailyReport() {
     setSearchTrigger(prev => prev + 1);
   };
 
-  const getPL = (bet: any) => {
-    if (bet.status === "won") return bet.potential_win || 0;
-    if (bet.status === "lost") return -(bet.stake || 0);
-    return 0;
-  };
+  const getPL = (bet: any) => settledProfit(bet) ?? 0;
 
   const totalStake = bets?.reduce((acc, b) => acc + (b.stake || 0), 0) || 0;
   const totalPL = bets?.reduce((acc, b) => acc + getPL(b), 0) || 0;

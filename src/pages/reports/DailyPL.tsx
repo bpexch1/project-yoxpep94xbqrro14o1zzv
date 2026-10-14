@@ -1,3 +1,4 @@
+import { serviceRequest } from "@/services/client";
 import { ReferenceAmountTables } from "@/components/reports/ReferenceAmountTables";
 import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
 import { useState, useEffect } from "react";
@@ -33,60 +34,28 @@ export default function DailyPL() {
     queryFn: async () => {
       if (!session) return [];
       
-      // Fetch bets based on role
-      let all: any[] = [];
-      const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
-
-      if (downlineUsernames === null) {
-        // Company role: see all bets
-        const res = await BetEntity.query().sort("-created_at").exec();
-        all = Array.isArray(res) ? res : [];
-      } else if (session.role === 'client') {
-        const res = await BetEntity.query().where("user_email", session.username).sort("-created_at").exec();
-        all = Array.isArray(res) ? res : [];
-      } else {
-        // Admin/agent: see downline bets
-        if (safeDownlineUsernames.length === 0) return [];
-        const allBets = await BetEntity.query().sort("-created_at").exec();
-        const safeAllBets = Array.isArray(allBets) ? allBets : [];
-        all = safeAllBets.filter((b: any) => b?.user_email && safeDownlineUsernames.includes(b.user_email));
-      }
-      
-      const filtered = all.filter(b => {
-        if (!b?.created_at) return false;
-        const date = b.created_at.split('T')[0];
-        return date >= fromDate && date <= toDate;
+      const start = new Date(fromDate+"T00:00:00"), end = new Date(toDate+"T00:00:00"); end.setDate(end.getDate()+1);
+      const isBettor = ["bettor","client","user"].includes(session.role.toLowerCase());
+      const rows = await serviceRequest<any[]>("entityRead", {
+        table:isBettor ? "bets" : "exchange_pl_allocations",
+        filters:[{column:isBettor ? "user_email" : "account_id",method:"eq",value:isBettor ? session.username : session.id},
+          {column:isBettor ? "updated_at" : "created_at",method:"gte",value:start.toISOString()},
+          {column:isBettor ? "updated_at" : "created_at",method:"lt",value:end.toISOString()}],
+        sort:isBettor ? "updated_at" : "created_at",ascending:true,limit:10000,
       });
-
-      // Group by date
+      if (rows.length === 10000) throw new Error("Narrow the date range to view a complete report.");
       const groups: Record<string, any> = {};
-      filtered.forEach(b => {
-        if (!b?.created_at) return;
-        const date = b.created_at.split('T')[0];
-        if (!groups[date]) {
-          groups[date] = {
-            date,
-            totalBets: 0,
-            totalStake: 0,
-            totalWon: 0,
-            totalLost: 0,
-          };
-        }
-        groups[date].totalBets += 1;
-        groups[date].totalStake += b.stake || 0;
-        if (b.status === "won") groups[date].totalWon += b.potential_win || 0;
-        if (b.status === "lost") groups[date].totalLost += b.stake || 0;
-      });
-
-      return Object.values(groups).sort((a, b) => b.date.localeCompare(a.date)).map(day => {
-        const netPL = day.totalWon - day.totalLost;
-        const commission = netPL > 0 ? netPL * 0.02 : 0; // 2% commission on profit
-        return {
-          ...day,
-          netPL,
-          commission
-        };
-      });
+      for (const row of rows) {
+        if (isBettor && !["won","lost","void"].includes(row.status)) continue;
+        if (isBettor && row.profit == null) continue;
+        const date = new Date(isBettor ? row.updated_at : row.created_at).toLocaleDateString("en-CA");
+        const pl = Number(isBettor ? row.profit : row.allocated_pl);
+        const day = groups[date] ||= {date,totalBets:0,totalStake:0,totalWon:0,totalLost:0,netPL:0,commission:0};
+        day.totalBets++; day.totalStake += isBettor ? Number(row.stake) : 0;
+        day.totalWon += Math.max(pl,0); day.totalLost += Math.max(-pl,0);
+        day.netPL += pl; day.commission += isBettor ? Number(row.commission_amount || 0) : 0;
+      }
+      return Object.values(groups).sort((a,b)=>b.date.localeCompare(a.date));
     },
     enabled: !!session && downlineUsernames !== undefined,
   });

@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReportTypeTabs } from "@/components/layout/ReportTypeTabs";
 import { AlignJustify, Loader2 } from "lucide-react";
-import { Client as ClientEntity } from "@/entities";
+import { Bet as BetEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
 
@@ -21,11 +21,15 @@ export default function CommissionReport() {
     queryKey: ["commission-report-clients", session?.username],
     queryFn: async () => {
       if (!session) return [];
-      let query = ClientEntity.query().sort("username");
-      if (session.role !== "company") {
-        query = query.where("parent_username", session.username);
+      const bets = await BetEntity.query().where("status", "in", ["won","lost","void"]).limit(10000).exec();
+      if (bets.length === 10000) throw new Error("Commission report exceeds its row limit.");
+      const groups = new Map<string, {id:string; username:string; commission_amount:number}>();
+      for (const bet of bets) {
+        if (bet.commission_amount == null) continue;
+        const row = groups.get(bet.user_email) || {id:bet.user_email,username:bet.user_email,commission_amount:0};
+        row.commission_amount += Number(bet.commission_amount); groups.set(row.username,row);
       }
-      return await query.exec();
+      return [...groups.values()];
     },
     enabled: !!session,
   });
@@ -41,7 +45,7 @@ export default function CommissionReport() {
 
   const totalCommission = useMemo(() => {
     return sortedClients.reduce((sum, c) => {
-      const comm = Number(c.commission_amount || c.commission || 0);
+      const comm = Number(c.commission_amount || 0);
       return sum + comm;
     }, 0);
   }, [sortedClients]);
@@ -74,7 +78,7 @@ export default function CommissionReport() {
           {/* Subtext Banner */}
           <div className="p-3 border-b border-[rgb(200,206,211)] bg-white">
             <span className="text-[0.875rem] font-bold text-[rgb(35,40,44)]">
-              All Commission goes to As per share (Auto Commission)
+              Recorded commission from settled bets
             </span>
           </div>
 
@@ -108,7 +112,7 @@ export default function CommissionReport() {
                     </tr>
                   ) : (
                     sortedClients.map((client: any, idx: number) => {
-                      const comm = Number(client.commission_amount || client.commission || 0);
+                      const comm = Number(client.commission_amount || 0);
                       return (
                         <tr 
                           key={client.id || idx}

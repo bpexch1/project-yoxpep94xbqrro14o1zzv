@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getClientSession } from "@/hooks/useClientAuth";
-import { Transaction, Client } from "@/entities";
+import { walletLedger } from "@/services/walletLedger";
 import { UserHeader } from "@/components/user/UserHeader";
 import { DashboardSidebar } from "@/components/user/DashboardSidebar";
 import { Calendar, AlignJustify, X, Printer, FileSpreadsheet, FileText } from "lucide-react";
@@ -25,11 +25,12 @@ export default function UserStatement() {
   }, [session, navigate]);
 
   // Filter dates
-  const [fromDate, setFromDate] = useState("08/19/2026");
+  const today = new Date().toLocaleDateString("en-US");
+  const [fromDate, setFromDate] = useState(today);
   const [fromTime, setFromTime] = useState("12:00");
   const [fromAmPm, setFromAmPm] = useState("AM");
 
-  const [toDate, setToDate] = useState("09/19/2026");
+  const [toDate, setToDate] = useState(today);
   const [toTime, setToTime] = useState("11:59");
   const [toAmPm, setToAmPm] = useState("PM");
 
@@ -37,75 +38,57 @@ export default function UserStatement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTx, setSelectedTx] = useState<any | null>(null);
 
-  const { data: transactions } = useQuery({
-    queryKey: ["user-transactions", session?.username],
-    queryFn: async () => {
-      if (!session?.username) return [];
-      const res = await Transaction.filter({ client_username: session.username });
-      return Array.isArray(res) ? res : [];
-    },
-    enabled: !!session?.username,
-  });
-
-  const { data: clients } = useQuery({
-    queryKey: ["client-profile", session?.username],
-    queryFn: async () => {
-      if (!session?.username) return null;
-      const res = await Client.filter({ username: session.username });
-      return res && res.length > 0 ? res[0] : null;
-    },
-    enabled: !!session?.username,
-  });
-
-  if (!session) {
-    navigate("/login");
-    return null;
-  }
-
-  const username = session.username || "TariqH4778";
-  const userCash = clients?.cash ?? 2;
-
-  // Map database transactions into format
-  const mappedDbEntries = (transactions || []).map((t, idx) => {
-    let formattedDate = "8/19/2026 12:00:00 am";
-    try {
-      const d = new Date(t.created_at);
-      formattedDate = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()} ${d.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      }).toLowerCase()}`;
-    } catch {
-      // keep fallback
-    }
-
-    return {
-      id: t.id,
-      num: idx + 1,
-      date: formattedDate,
-      description: t.description || `Transaction in ${username}`,
-      isLink: true,
-      amount: t.amount || 0,
-      balance: t.after_balance || 0,
+  const [range, setRange] = useState(() => { const start = new Date(); start.setHours(0,0,0,0); const end = new Date(start); end.setDate(end.getDate()+1); return {from:start.toISOString(), to:end.toISOString()}; });
+  const [page, setPage] = useState(1);
+  const [errorMessage, setErrorMessage] = useState("");
+  const applyRange = () => {
+    const parse = (date: string, time: string, period: string) => {
+      const d = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(date);
+      const t = /^(\d{1,2}):(\d{2})$/.exec(time);
+      if (!d || !t || +t[1]<1 || +t[1]>12 || +t[2]>59) throw new Error("Use MM/DD/YYYY and a valid time.");
+      const result = new Date(+d[3], +d[1]-1, +d[2], (+t[1]%12)+(period === "PM" ? 12 : 0), +t[2]);
+      if (result.getMonth()!==+d[1]-1 || result.getDate()!==+d[2]) throw new Error("Choose a valid date.");
+      return result;
     };
+    try {
+      const from = parse(fromDate,fromTime,fromAmPm), to = parse(toDate,toTime,toAmPm);
+      if (from>to) throw new Error("Start date must be before end date.");
+      to.setMinutes(to.getMinutes()+1);
+      setRange({from:from.toISOString(),to:to.toISOString()}); setPage(1); setErrorMessage("");
+    } catch(error) { setErrorMessage(error instanceof Error ? error.message : "Invalid dates."); }
+  };
+  const { data: ledger, isLoading, isError } = useQuery({
+    queryKey: ["user-transactions", session?.username, range],
+    queryFn: () => walletLedger({username: session!.username, wallet: "combined", ...range, limit: 10000}),
+    enabled: !!session?.username, refetchInterval: 15000,
   });
-
-  const displayList = mappedDbEntries;
-
-  const filteredEntries = displayList.filter((item) => {
-    if (!searchTerm) return true;
-    const s = searchTerm.toLowerCase();
-    return (
-      item.description.toLowerCase().includes(s) ||
-      item.date.toLowerCase().includes(s) ||
-      String(item.amount).includes(s)
-    );
-  });
+  if (!session) return null;
+  const username = session.username;
+  const displayList = [
+    {id:"opening",date: new Date(range.from).toLocaleString(),description:"Opening Balance",isLink:false,amount:0,balance:ledger?.openingBalance},
+    ...(ledger?.rows || []).map(t => ({id:t.id,date:new Date(t.created_at).toLocaleString(),description:t.description,isLink:true,amount:Number(t.amount),balance:t.after_balance})),
+  ].map((entry,index)=>({...entry,num:index+1}));
+  const filteredEntries = displayList.filter(item => [item.description,item.date,item.amount,item.balance].some(v=>String(v).toLowerCase().includes(searchTerm.toLowerCase())));
+  const pages = Math.max(1,Math.ceil(filteredEntries.length/entriesPerPage));
+  const currentPage = Math.min(page,pages), offset = (currentPage-1)*entriesPerPage;
+  const visibleEntries = filteredEntries.slice(offset,offset+entriesPerPage);
+  const exportFile = async (kind: "excel" | "pdf") => {
+    try {
+      const headings = ["Date","Description","Amount","Balance"];
+      const rows = filteredEntries.map(r=>[r.date,r.description,r.amount,r.balance ?? "—"]);
+      if (kind === "excel") {
+        const XLSX = await import("xlsx"), workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook,XLSX.utils.aoa_to_sheet([headings,...rows]),"Statement"); XLSX.writeFile(workbook,`${username}-statement.xlsx`);
+      } else {
+        const [{default:jsPDF},{default:autoTable}] = await Promise.all([import("jspdf"),import("jspdf-autotable")]);
+        const doc = new jsPDF(); doc.text(`${username} - Account Ledger`,14,16); autoTable(doc,{startY:24,head:[headings],body:rows}); doc.save(`${username}-statement.pdf`);
+      }
+    } catch { setErrorMessage("Export failed. Please try again."); }
+  };
 
   return (
     <div
-      className="min-h-screen text-[#212529] select-none"
+      className="user-statement min-h-screen text-[#212529] select-none"
       style={{
         backgroundColor: "#e8eff5",
         fontFamily:
@@ -193,6 +176,7 @@ export default function UserStatement() {
             <div className="flex justify-end">
               <button
                 type="button"
+                onClick={applyRange}
                 className="bg-[#00a676] hover:bg-[#008f64] text-white font-bold text-xs px-6 py-2 rounded-none transition-colors"
               >
                 Submit
@@ -201,6 +185,10 @@ export default function UserStatement() {
           </div>
         </div>
 
+        {errorMessage && <p role="alert">{errorMessage}</p>}
+        {isError && <p role="alert">Unable to load statement. Please try again.</p>}
+        {isLoading && <p role="status">Loading statement…</p>}
+        {ledger?.truncated && <p role="alert">Narrow the date range: this statement has more than 10,000 entries.</p>}
         {/* 2. Account Ledger Card */}
         <div className="bg-white rounded-none border border-[#c8d4e2] shadow-sm">
           {/* Card Header */}
@@ -216,7 +204,7 @@ export default function UserStatement() {
               <div className="flex items-center gap-1.5 text-xs text-[#334155]">
                 <select
                   value={entriesPerPage}
-                  onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                  onChange={(e) => {setEntriesPerPage(Number(e.target.value)); setPage(1);}}
                   className="border border-[#c8d4e2] px-2 py-1 bg-white font-medium text-xs focus:outline-none"
                 >
                   <option value={10}>10</option>
@@ -238,14 +226,14 @@ export default function UserStatement() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert("Exporting to Excel...")}
+                  disabled={isLoading || isError || !ledger || ledger.truncated} onClick={() => void exportFile("excel")}
                   className="bg-[#6c757d] hover:bg-[#5a6268] text-white px-3 py-1 text-xs font-semibold rounded-none transition-colors"
                 >
                   Excel
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert("Exporting to PDF...")}
+                  disabled={isLoading || isError || !ledger || ledger.truncated} onClick={() => void exportFile("pdf")}
                   className="bg-[#6c757d] hover:bg-[#5a6268] text-white px-3 py-1 text-xs font-semibold rounded-none transition-colors"
                 >
                   PDF
@@ -259,7 +247,7 @@ export default function UserStatement() {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {setSearchTerm(e.target.value); setPage(1);}}
                 className="border border-[#c8d4e2] px-2 py-1 text-xs bg-white focus:outline-none focus:border-[#00a676] w-36 sm:w-48"
               />
             </div>
@@ -278,7 +266,7 @@ export default function UserStatement() {
                 </tr>
               </thead>
               <tbody>
-                {filteredEntries.map((item) => (
+                {(!isLoading && !isError ? visibleEntries : []).map((item) => (
                   <tr key={item.id} className="border-b border-[#dee2e6] hover:bg-[#f6f9fc]">
                     <td className="px-2 py-2 border-r border-[#dee2e6]">{item.num}</td>
                     <td className="px-2 py-2 border-r border-[#dee2e6] whitespace-nowrap">{item.date}</td>
@@ -290,7 +278,7 @@ export default function UserStatement() {
                       ) : <span className="text-[#00a676] font-semibold">{item.description}</span>}
                     </td>
                     <td className="px-2 py-2 border-r border-[#dee2e6] text-right font-medium">{item.amount.toLocaleString("en-IN")}</td>
-                    <td className="px-2 py-2 text-right font-medium">{item.balance.toLocaleString("en-IN")}</td>
+                    <td className="px-2 py-2 text-right font-medium">{item.balance == null ? "—" : Number(item.balance).toLocaleString("en-IN")}</td>
                   </tr>
                 ))}
                 {filteredEntries.length === 0 && (
@@ -303,32 +291,32 @@ export default function UserStatement() {
           {/* Footer Pagination */}
           <div className="flex flex-wrap items-center justify-between p-3 bg-[#eaeff5] border-t border-[#cbd7e6] text-xs text-[#334155] gap-2">
             <span>
-              Showing 1 to {filteredEntries.length} of {filteredEntries.length} entry
+              Showing {filteredEntries.length ? offset+1 : 0} to {Math.min(offset+entriesPerPage,filteredEntries.length)} of {filteredEntries.length} entries
             </span>
             <div className="flex items-center gap-1">
               <button
-                disabled
+                disabled={currentPage === 1} onClick={() => setPage(1)}
                 className="w-7 h-7 flex items-center justify-center bg-white border border-[#c8d4e2] text-gray-400 cursor-default"
               >
                 «
               </button>
               <button
-                disabled
+                disabled={currentPage === 1} onClick={() => setPage(currentPage-1)}
                 className="w-7 h-7 flex items-center justify-center bg-white border border-[#c8d4e2] text-gray-400 cursor-default"
               >
                 ‹
               </button>
               <button className="w-7 h-7 flex items-center justify-center bg-[#00a676] text-white font-bold">
-                1
+                {currentPage}
               </button>
               <button
-                disabled
+                disabled={currentPage === pages} onClick={() => setPage(currentPage+1)}
                 className="w-7 h-7 flex items-center justify-center bg-white border border-[#c8d4e2] text-gray-400 cursor-default"
               >
                 ›
               </button>
               <button
-                disabled
+                disabled={currentPage === pages} onClick={() => setPage(pages)}
                 className="w-7 h-7 flex items-center justify-center bg-white border border-[#c8d4e2] text-gray-400 cursor-default"
               >
                 »

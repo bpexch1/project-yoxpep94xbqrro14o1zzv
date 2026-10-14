@@ -1,3 +1,4 @@
+import { settledProfit } from "@/lib/settledProfit";
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -167,7 +168,7 @@ export default function UserProfitLoss() {
                       <td className="p-2.5 border-r border-[#dee2e6] font-bold text-[#142a45]">{b.match_title}</td>
                       <td className="p-2.5 border-r border-[#dee2e6] text-right font-medium">{b.stake}</td>
                       <td className={`p-2.5 text-right font-bold ${b.status === "won" ? "text-[#28a745]" : "text-[#dc3545]"}`}>
-                        {b.status === "won" ? `+${b.potential_win - b.stake}` : `-${b.stake}`}
+                        {settledProfit(b) == null ? "—" : Number(settledProfit(b)).toLocaleString("en-IN")}
                       </td>
                     </tr>
                   ))}

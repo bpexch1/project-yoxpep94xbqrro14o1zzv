@@ -1,3 +1,4 @@
+import { settledProfit } from "@/lib/settledProfit";
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -112,7 +113,7 @@ export default function UserResult() {
                     <div className="text-right">
                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Win/Loss</p>
                       <p className={`text-lg font-black ${bet.status === 'won' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {bet.status === 'won' ? '+' : '-'}₹{bet.status === 'won' ? (bet.potential_win - bet.stake).toLocaleString("en-IN") : bet.stake.toLocaleString("en-IN")}
+                        {settledProfit(bet) == null ? "—" : Number(settledProfit(bet)).toLocaleString("en-IN")}
                       </p>
                     </div>
                   </div>

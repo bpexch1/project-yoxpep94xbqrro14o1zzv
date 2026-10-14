@@ -67,7 +67,7 @@ export default function Login() {
       }
     } catch (err: any) {
       setPassword("");
-      setLoginError("Username/Password Incorrect.");
+      setLoginError(err?.message === "Invalid username or password" ? "Username/Password Incorrect." : err?.message || "Login could not be completed. Please try again.");
     } finally {
       setLoading(false);
     }

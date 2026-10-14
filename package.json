@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test:hierarchy": "node --experimental-strip-types --test tests/account-hierarchy.mjs",
     "test:v2": "node --test tests/v2-foundation.test.mjs",
-    "test:wallet": "node --experimental-strip-types --test tests/wallet-reference.test.mjs tests/pl-distribution.test.mjs",
+    "test:wallet": "node --experimental-strip-types --test tests/wallet-reference.test.mjs tests/pl-distribution.test.mjs tests/migration-history.test.mjs",
     "build:aws-exchange": "esbuild supabase/functions/exchange-api/feed.ts --bundle --platform=node --format=cjs --target=node22 --outfile=infra/aws/exchange-api/feed.cjs",
     "test:aws-exchange": "node --test tests/aws-exchange.test.mjs"
   },

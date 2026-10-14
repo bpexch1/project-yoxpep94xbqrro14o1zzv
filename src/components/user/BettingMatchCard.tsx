@@ -21,10 +21,8 @@ export function BettingMatchCard({ match, mongoOdds }: BettingMatchCardProps) {
   const isLive = match.status === 'live' || String(match.status || '').toLowerCase() === 'inplay';
 
   // Format matched volume number
-  const matchedAmount = match.matched_amount 
-    ? Number(match.matched_amount).toLocaleString('en-US') 
-    : (match.id ? (Number(String(match.id).replace(/\D/g, '').substring(0, 8)) || 14029346).toLocaleString('en-US') : '14,029,346');
-  
+  const matchedAmount = Number(match.matched_amount || 0).toLocaleString('en-US');
+
   // Time display
   const mt = match.match_time != null ? String(match.match_time) : '';
   const timeDisplay = (() => {

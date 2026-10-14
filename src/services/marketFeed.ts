@@ -17,6 +17,7 @@ export interface Market {
   name: string;
   status: string;
   delayed: boolean;
+  is_demo?: boolean;
   betting_locked?: boolean;
   observed_at: string;
   runners: { id: string; name: string }[];

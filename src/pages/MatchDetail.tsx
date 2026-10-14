@@ -1,3 +1,4 @@
+import { getWalletSummary } from "@/lib/walletBalances";
 import { placeSelectionBet } from "@/services/bettingApi";
 
 import { useState, useEffect, useRef } from "react";
@@ -119,7 +120,7 @@ export default function MatchDetail() {
   });
 
   const clientData = clients?.[0];
-  const clientBalance = clientData?.cash ?? 0;
+  const clientBalance = getWalletSummary(clientData || {}).combinedAvailable;
 
   // Fetch all matches for Related Events list
   const { data: allMatches = [] } = useQuery({
@@ -276,10 +277,10 @@ export default function MatchDetail() {
 
   // Place bet mutation
   const { mutate: placeBet, isPending: isSubmitting } = useMutation({
-    mutationFn: async (stake: number) => {
+    mutationFn: async ({stake, odds}: {stake: number; odds?: number}) => {
       if (!activeBet || !session || !clientData) throw new Error("Select a bet first");
       return placeSelectionBet({matchId: activeBet.match.id, eventId: activeBet.match.betfair_event_id,
-        selection: activeBet.selection, side: activeBet.betType, stake, odds: activeBet.odds});
+        selection: activeBet.selection, side: activeBet.betType, stake, odds: odds ?? activeBet.odds});
     },
     onSuccess: () => {
       setActiveBet(null);
@@ -766,7 +767,7 @@ export default function MatchDetail() {
         </div>
       </main>
 
-      <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake) => placeBet(stake)} isSubmitting={isSubmitting} />
+      <BetSlip bet={activeBet} onClose={() => setActiveBet(null)} onSubmit={(stake, odds) => placeBet({stake, odds})} isSubmitting={isSubmitting} />
     </div>
   );
 }

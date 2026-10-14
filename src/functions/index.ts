@@ -12,13 +12,15 @@ export const settleBets=async(data:any)=>{
  const markets=await getMarkets({matchId:data.matchId});
  const market=markets.filter(m=>/match.odds/i.test(m.name));
  if(market.length!==1) throw new Error('A unique provider market is required for settlement');
- const runner=market[0].runners.find(r=>r.name.toLowerCase()===data.winningSide.toLowerCase());
- if(!runner) throw new Error('Winning selection is not in the provider market');
- const key=`settlement:${market[0].id}:${runner.id}`;
+ const isVoid = data.winningSide === "void";
+ const selection = data.winningSide === "draw" ? "The Draw" : data.winningSide;
+ const runner=market[0].runners.find(r=>r.name.toLowerCase()===selection.toLowerCase());
+ if(!runner && !isVoid) throw new Error('Winning selection is not in the provider market');
+ const key=`settlement:${market[0].id}:${isVoid ? "void" : runner!.id}`;
  const ids=JSON.parse(sessionStorage.getItem(key)||'null')||{lock:crypto.randomUUID(),settle:crypto.randomUUID()};
  sessionStorage.setItem(key,JSON.stringify(ids));
  await lockMarket({requestId:ids.lock,marketId:market[0].id,locked:true});
- const result=await requestSettlement({requestId:ids.settle,marketId:market[0].id,winnerId:runner.id,reason:'Result confirmed from administrator settlement page'});
+ const result=await requestSettlement({requestId:ids.settle,marketId:market[0].id,winnerId:runner?.id,void:isVoid,reason:'Result confirmed from administrator settlement page'});
  // Keep receipt IDs so repeated confirmation is an idempotent replay, including across reloads.
  return result;
 };
