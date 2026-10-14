@@ -70,7 +70,7 @@ begin
   before_amount := case when p_wallet = 'cash' then target.cash else target.credit_remaining end;
   after_amount := before_amount + signed_amount;
   -- Credit cannot be withdrawn above issued credit, regardless of available cash.
-  if p_wallet = 'credit' and after_amount < 0 then raise exception 'Insufficient credit balance'; end if;
+  if p_wallet = 'credit' and (after_amount < 0 or (is_bettor and p_direction = 'withdraw' and combined_after < 0)) then raise exception 'Insufficient credit balance'; end if;
   -- Original Bettor flow: cash withdrawal may exceed cash alone, but never combined funds.
   -- Staff cash withdrawals remain restricted to cash itself.
   if p_wallet = 'cash' and p_direction = 'withdraw' and
@@ -357,5 +357,5 @@ begin
   return jsonb_build_object('rows',case when jsonb_array_length(rows)>lim then rows-lim else rows end,'truncated',jsonb_array_length(rows)>lim,'from',since_at,'to',until_at);
  end if;
  raise exception 'Unknown action';
-end $$;
-
+end;
+$$;
