@@ -1,22 +1,30 @@
 # Manual deposit and withdrawal
 
-Both the account Cash/Credit page and modal now call `manual-wallet` instead of directly writing balances. Staff confirm each operation using their existing username account's password; the server verifies its bcrypt hash and database role. Plaintext legacy passwords are deliberately rejected and must be reset to bcrypt before using this feature.
+Cash and Credit screens call the `manual-wallet-session` Edge Function. The operator is taken from the existing login session (`x-exchange-session`). There is no second password box. The function checks the session with `manual_wallet_transfer_session`, then writes the ledger in the same transaction.
 
-Cash and Credit stay separate. Withdrawals cannot spend the other wallet. The existing funding model is retained: deposits consume dealer credit; cash transfers also move dealer cash. Only the company role is allowed to issue funds without a remaining-credit limit. Cash/credit movement does not settle P/L.
+Cash and Credit stay in separate ledger rows. A cash withdrawal may use combined available balance (cash + remaining credit + downline P/L) and can leave cash negative while credit stays issued. A later credit withdrawal cannot take that pledged credit: combined balance is not allowed to go below zero. Credit withdrawal also cannot exceed remaining credit.
 
-The database verifies the target is below the operator, serializes transfers against current balances and writes the ledger in the same transaction. A request UUID prevents duplicate application when the same screen retries identical details. Failed verification, insufficient funds or ledger failure leaves balances unchanged. New ledger records include the operator, timestamp, before/after balance and request UUID. Passwords are never stored in localStorage or ledger records.
+Dealer funding:
 
-## Deployment prerequisites
+- Credit deposit still consumes the operator's credit, except Company.
+- Cash deposit moves the operator's cash and does not touch their credit. If the operator is not Company, the deposit is rejected when their cash is lower than the amount.
+- Cash and credit movement does not settle P/L.
 
-1. Apply `supabase/migrations/20261003141624_manual_wallet_transactions.sql` to the same Supabase database used by the website. Run the SQL tests only against a disposable database.
-2. Deploy `supabase/functions/manual-wallet/index.ts` as `manual-wallet`. Its `verify_jwt = false` setting is intentional because this website currently has custom username login: the handler performs password reauthentication server-side. The financial RPC itself is executable only by `service_role`; browser/anonymous roles are denied.
-3. The Edge Function needs its platform-provided `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Never place the service role key in Vite environment variables. Frontend requires its existing Supabase URL and anon/publishable key.
-4. Validate a staff deposit, withdrawal, failed password, outsider account, insufficient funds, duplicate retry and ledger record on a staging deployment before release.
+The database checks that the target is in the operator's downline, locks the client table, and stores a request UUID. Repeating the same request returns the original ledger row. A different transfer with that same UUID is rejected. A failed check leaves balances unchanged.
 
-## Validation and limits
+Passwords are not sent by this flow and are not written to the ledger.
 
-PostgreSQL-compatible PGlite with the real pgcrypto extension passed the migration and SQL tests for decimal cash transfer, dealer deductions, credit separation, replay prevention, password rejection, outside-downline denial, RPC grants, rate limiting and atomic rollback on ledger failure. This is an isolated database test, not verification of the live Supabase deployment. Transfers take a table lock to keep hierarchy and financial mutations consistent; high-volume systems should migrate to carefully ordered row locks.
+## Apply the latest rule
 
-Per-operator rate limiting caps requests at ten per minute. Existing clients must have unique, correctly linked username hierarchy records. Username login still needs the broader authentication redesign described in the audit. Other generic entity mutations, public-read policies, odds and bet settlement were not rewritten by this change and are not certified safe. A pending request key is retained while the screen stays mounted; after a network interruption, keep the same screen/details when retrying and check the ledger before restarting the operation elsewhere.
+1. Review `supabase/migrations/20261014201000_cash_credit_reference_329811.sql` (already the previous function) and `supabase/migrations/20261014224500_fix_wallet_overdraw.sql`.
+2. Apply `20261014224500_fix_wallet_overdraw.sql` on a disposable database first. Do not run it against production until the cases below pass there.
+3. `manual-wallet-session` must stay deployed with `verify_jwt` suitable for the custom session header. The RPC itself is granted only to `service_role`.
+4. The function needs `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in the function environment only.
 
-Build passes. Lint retains thirteen existing warnings. Five pre-existing TypeScript diagnostics outside the changed wallet screens remain; the wallet page's missing `cn` import was fixed. The migration and Edge Function were applied to Supabase project hbaronayzunrrhzujujy on 2026-10-03. Live checks confirmed the RPC exists, browser roles cannot execute it, and malformed function requests return HTTP 400. Production Vercel configuration uses the project URL and public publishable key. The function gateway currently retains legacy JWT verification; publishable-key invocation requires applying the checked-in verify_jwt=false configuration after explicit approval. No live deposit or withdrawal has been tested.
+## Cases to replay before production
+
+- Bettor: 50,000 cash + 50,000 credit + 1,007 P/L, withdraw 100,000 cash, credit remains 50,000, combined available is 1,007.
+- That same account then rejects a credit withdrawal above 1,007.
+- SuperMaster: 10,000 cash + 50,000 credit withdraws 60,000 cash, then cannot withdraw the 50,000 credit while combined available is 0.
+- Dealer with less cash than the deposit amount is rejected. Company is not.
+- Wrong session, outside downline, disabled target, and a repeated request id do not double-post.

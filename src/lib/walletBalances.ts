@@ -7,12 +7,19 @@ export interface WalletSummaryInput {
   credit_remaining?: number | null;
   pl_downline?: number | null;
 }
+
+function money(value: number | null | undefined) {
+  const amount = Number(value ?? 0);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
 export function getWalletSummary(client: WalletSummaryInput) {
-  const cash = Number(client.cash ?? 0);
-  const credit = Number(client.credit_remaining ?? 0);
-  const pl = Number(client.pl_downline ?? 0);
+  const cash = money(client.cash);
+  const credit = money(client.credit_remaining);
+  const pl = money(client.pl_downline);
   const isBettor = ["client", "bettor", "user"].includes(String(client.role || "").toLowerCase());
   const combinedAvailable = cash + credit + pl;
+  const spendable = Math.max(0, combinedAvailable);
   return {
     cash,
     credit,
@@ -20,7 +27,8 @@ export function getWalletSummary(client: WalletSummaryInput) {
     isBettor,
     combinedAvailable,
     cashTabBalance: isBettor ? combinedAvailable : pl,
-    maxCashWithdraw: Math.max(0, combinedAvailable),
-    maxCreditWithdraw: Math.max(0, credit),
+    maxCashWithdraw: spendable,
+    // Credit already backing a negative cash balance cannot be withdrawn again.
+    maxCreditWithdraw: Math.min(Math.max(0, credit), spendable),
   };
 }
