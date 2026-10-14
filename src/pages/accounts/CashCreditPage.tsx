@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client } from "@/entities";
 import { manualWalletTransfer } from "@/lib/manualWallet";
@@ -13,13 +13,16 @@ import { verifyInHierarchy } from "@/lib/hierarchyCheck";
 export default function CashCreditPage() {
   const { username } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const session = getClientSession();
 
   const inFlight = useRef(false);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'cash' | 'credit'>('cash');
+  const [activeTab, setActiveTab] = useState<'cash' | 'credit'>(
+    () => /\/credit\//i.test(location.pathname) ? 'credit' : 'cash',
+  );
   const [depositDesc, setDepositDesc] = useState('');
   const [depositAmount, setDepositAmount] = useState('0');
   const [withdrawDesc, setWithdrawDesc] = useState('');
@@ -74,15 +77,15 @@ export default function CashCreditPage() {
   useEffect(() => {
     if (!client) return;
     if (activeTab === 'cash') {
-      setDepositDesc(`Cash deposit in ${client.username}`);
-      setWithdrawDesc(`Cash withdrawn from ${client.username}`);
+      setDepositDesc(`Cash payment to ${session?.username} from ${client.username} (Cash)`);
+      setWithdrawDesc(`Cash payment to ${client.username} from ${session?.username} (Cash)`);
     } else {
       setDepositDesc(`Credit Issued to ${client.username}`);
       setWithdrawDesc(`Credit Withdrawn from ${client.username}`);
     }
     setDepositAmount('0');
     setWithdrawAmount('0');
-  }, [client?.username, activeTab]);
+  }, [client?.username, activeTab, session?.username]);
 
   const refreshAll = async (updatedClientCash?: number) => {
     if (updatedClientCash !== undefined && client && session?.username === client.username) {
@@ -131,6 +134,7 @@ export default function CashCreditPage() {
       toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
       // A refresh failure must not turn a confirmed transfer into a failed transfer.
       await refreshAll().catch(() => undefined);
+      navigate(`/accounts/ledger/${encodeURIComponent(client.username)}?wallet=${activeTab}`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unable to confirm transfer. Retry with the same details.";
       setTransferError({ direction, message });

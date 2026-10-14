@@ -20,7 +20,7 @@ export function getWalletSummary(client: WalletSummaryInput) {
     isBettor,
     combinedAvailable,
     cashTabBalance: isBettor ? combinedAvailable : pl,
-    maxCashWithdraw: Math.max(0, isBettor ? combinedAvailable : cash),
+    maxCashWithdraw: Math.max(0, combinedAvailable),
     maxCreditWithdraw: Math.max(0, credit),
   };
 }
