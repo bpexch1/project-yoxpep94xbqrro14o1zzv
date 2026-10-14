@@ -284,3 +284,14 @@
     padding: 20px;
   }
 }
+/* Cash/Credit summary must stay inside the card even with very large balances. */
+.reference-admin main .reference-cash .wallet-summary-table {
+  width: 100%;
+  table-layout: fixed;
+  white-space: normal;
+}
+.reference-admin main .reference-cash .wallet-summary-table th,
+.reference-admin main .reference-cash .wallet-summary-table td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
