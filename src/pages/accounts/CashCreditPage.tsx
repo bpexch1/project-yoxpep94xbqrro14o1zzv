@@ -203,7 +203,7 @@ export default function CashCreditPage() {
 
           {activeTab === 'cash' ? (
             /* Cash Tab Header Table: Credit | Balance | Max Withdraw */
-            <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
+            <table className="wallet-summary-table table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
                 <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
                   <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-1/3">Credit</th>
@@ -227,7 +227,7 @@ export default function CashCreditPage() {
             </table>
           ) : (
             /* Credit Tab Header Table: Credit limit | [Username] Credit | [Username] Available Balance */
-            <table className="table table-bordered table-sm mb-0 text-[0.875rem]">
+            <table className="wallet-summary-table table table-bordered table-sm mb-0 text-[0.875rem]">
               <thead>
                 <tr className="bg-[#f0f3f5] text-[rgb(35,40,44)]">
                   <th className="border border-[rgb(200,206,211)] p-1.5 text-left font-bold w-[30%] leading-tight">Credit limit</th>
