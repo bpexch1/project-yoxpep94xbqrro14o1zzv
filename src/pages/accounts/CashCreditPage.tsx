@@ -103,6 +103,16 @@ export default function CashCreditPage() {
   const submitTransfer = async (direction: "deposit" | "withdraw") => {
     if (!client || !session || inFlight.current) return;
     setTransferError(null);
+    const entered = Number(direction === "deposit" ? depositAmount : withdrawAmount);
+    const isBettorAccount = ["client", "bettor", "user"].includes(String(client.role || "").toLowerCase());
+    const ceiling = activeTab === "credit" ? Math.max(0, Number(client.credit_remaining || 0)) :
+      Math.max(0, isBettorAccount
+        ? Number(client.credit_remaining || 0) + Number(client.cash || 0) + Number(client.pl_downline || 0)
+        : Number(client.cash || 0));
+    if (direction === "withdraw" && Number.isFinite(entered) && entered > ceiling) {
+      setTransferError({ direction, message: `Max ${activeTab} to withdraw is ${ceiling.toLocaleString()}` });
+      return;
+    }
     const amount = direction === "deposit" ? depositAmount : withdrawAmount;
     const description = direction === "deposit" ? depositDesc : withdrawDesc;
     const fingerprint = JSON.stringify([client.id, activeTab, direction, amount, description]);
@@ -160,7 +170,9 @@ export default function CashCreditPage() {
   const clientCash = Number(client.cash ?? 0);
   const clientPL = Number(client.pl_downline ?? 0);
   const clientAvailableBalance = clientCredit + clientCash + clientPL;
-  const maxWithdraw = Math.max(0, clientCash);
+  // Bettors can withdraw against their combined available balance; staff are cash-wallet limited.
+  const isBettor = ["client", "bettor", "user"].includes(String(client.role || "").toLowerCase());
+  const maxWithdraw = Math.max(0, isBettor ? clientAvailableBalance : clientCash);
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
 
   return (
@@ -217,7 +229,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {clientCash.toLocaleString()} Rs.
+                    {(isBettor ? clientAvailableBalance : clientPL).toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
                     {maxWithdraw.toLocaleString()} Rs.
