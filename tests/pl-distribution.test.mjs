@@ -58,7 +58,7 @@ test('New P/L tables, RLS, non-public function privileges and idempotency are pr
     'enable row level security',
     'revoke all on public.exchange_bet_share_snapshot',
     'grant execute on function public.exchange_distribute_bet_pl',
-    'unique (bet_id,account_id)',
+    'unique(bet_id,account_id)',
     'P/L already allocated for this bet',
     'Missing/invalid P/L snapshot',
     "p_bettor_net_pl<>round(p_bettor_net_pl,2)",
