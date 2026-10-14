@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client } from "@/entities";
 import { manualWalletTransfer } from "@/lib/manualWallet";
+import { getWalletSummary } from "@/lib/walletBalances";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { getClientSession, updateClientSessionBalance } from "@/hooks/useClientAuth";
@@ -104,11 +105,8 @@ export default function CashCreditPage() {
     if (!client || !session || inFlight.current) return;
     setTransferError(null);
     const entered = Number(direction === "deposit" ? depositAmount : withdrawAmount);
-    const isBettorAccount = ["client", "bettor", "user"].includes(String(client.role || "").toLowerCase());
-    const ceiling = activeTab === "credit" ? Math.max(0, Number(client.credit_remaining || 0)) :
-      Math.max(0, isBettorAccount
-        ? Number(client.credit_remaining || 0) + Number(client.cash || 0) + Number(client.pl_downline || 0)
-        : Number(client.cash || 0));
+    const summary = getWalletSummary(client);
+    const ceiling = activeTab === "credit" ? summary.maxCreditWithdraw : summary.maxCashWithdraw;
     if (direction === "withdraw" && Number.isFinite(entered) && entered > ceiling) {
       setTransferError({ direction, message: `Max ${activeTab} to withdraw is ${ceiling.toLocaleString()}` });
       return;
@@ -166,13 +164,10 @@ export default function CashCreditPage() {
     );
   }
 
-  const clientCredit = Number(client.credit_remaining ?? 0);
-  const clientCash = Number(client.cash ?? 0);
-  const clientPL = Number(client.pl_downline ?? 0);
-  const clientAvailableBalance = clientCredit + clientCash + clientPL;
-  // Bettors can withdraw against their combined available balance; staff are cash-wallet limited.
-  const isBettor = ["client", "bettor", "user"].includes(String(client.role || "").toLowerCase());
-  const maxWithdraw = Math.max(0, isBettor ? clientAvailableBalance : clientCash);
+  const walletSummary = getWalletSummary(client);
+  const clientCredit = walletSummary.credit;
+  const clientAvailableBalance = walletSummary.combinedAvailable;
+  const maxWithdraw = walletSummary.maxCashWithdraw;
   const adminCreditLimit = adminClient ? Number(adminClient.credit_remaining ?? 0) : 0;
 
   return (
@@ -229,7 +224,7 @@ export default function CashCreditPage() {
                     {clientCredit.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
-                    {(isBettor ? clientAvailableBalance : clientPL).toLocaleString()} Rs.
+                    {walletSummary.cashTabBalance.toLocaleString()} Rs.
                   </td>
                   <td className="border border-[rgb(200,206,211)] p-2">
                     {maxWithdraw.toLocaleString()} Rs.
