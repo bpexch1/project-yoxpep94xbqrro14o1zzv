@@ -14,6 +14,7 @@ test("Bettor: cash and issued credit contribute to combined withdrawable balance
   assert.equal(after.credit, 50000);
   assert.equal(after.combinedAvailable, 1007);
   assert.equal(after.maxCashWithdraw, 1007);
+  assert.equal(after.maxCreditWithdraw, 1007);
 });
 
 test("SuperMaster: cash max does not include issued credit", () => {
@@ -25,5 +26,5 @@ test("SuperMaster: cash max does not include issued credit", () => {
 test("No negative withdrawal limit; credit cannot be withdrawn beyond available credit", () => {
   const summary = getWalletSummary({ role: "client", cash: -12000, credit_remaining: 10000, pl_downline: 0 });
   assert.equal(summary.maxCashWithdraw, 0);
-  assert.equal(summary.maxCreditWithdraw, 10000);
+  assert.equal(summary.maxCreditWithdraw, 0);
 });
