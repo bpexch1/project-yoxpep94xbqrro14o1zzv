@@ -23,11 +23,17 @@ export function permittedChildRole(parentRole: unknown): AccountRole | null {
   const parent = normalizeAccountRole(parentRole);
   return parent ? CHILD_ROLE[parent] : null;
 }
+export function permittedChildRoles(parentRole: unknown): AccountRole[] {
+  const parent = normalizeAccountRole(parentRole);
+  if (parent === "company") return ["superadmin", "bettor"];
+  const child = parent ? CHILD_ROLE[parent] : null;
+  return child ? [child] : [];
+}
 export function canCreateChild(parentRole: unknown, childRole: unknown): boolean {
   const desired = normalizeAccountRole(childRole);
   // Legacy aliases work for existing sessions, but only canonical roles may be created.
   const requested = String(childRole ?? "").trim().toLowerCase().replace(/[\s_-]+/g, "");
-  return desired !== null && requested === desired && permittedChildRole(parentRole) === desired;
+  return desired !== null && requested === desired && permittedChildRoles(parentRole).includes(desired);
 }
 export function roleLabel(role: unknown): string {
   const normalized = normalizeAccountRole(role);
