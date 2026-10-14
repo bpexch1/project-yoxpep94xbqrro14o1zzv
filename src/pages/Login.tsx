@@ -67,7 +67,12 @@ export default function Login() {
       }
     } catch (err: any) {
       setPassword("");
-      setLoginError("Username/Password Incorrect.");
+      const detail = err instanceof Error ? err.message : "";
+      setLoginError(
+        /backend service is not configured|database service is not configured|backend request failed|failed to fetch|networkerror/i.test(detail)
+          ? "Login service is unavailable. Please try again or contact the administrator."
+          : "Username/Password Incorrect."
+      );
     } finally {
       setLoading(false);
     }
