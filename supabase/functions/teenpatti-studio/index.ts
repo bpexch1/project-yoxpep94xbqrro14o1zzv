@@ -13,7 +13,7 @@ Deno.serve(async req=>{
   const config=action==='state'?configFor(String(input.gameId)):null;
   if(action==='state'&&!config)return json({error:'Game unavailable'},400);
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if(action==='bet'&&(!uuid.test(input.roundId)||!uuid.test(input.requestId)||input.side!=='back'||typeof input.runnerId!=='string'||!Number.isFinite(input.stake)||input.stake<=0||input.stake>1000000||!Number.isFinite(input.odds)))return json({error:'Invalid bet parameters'},400);
+  if(action==='bet'&&(!uuid.test(input.roundId)||!uuid.test(input.requestId)||!['back','lay'].includes(input.side)||typeof input.runnerId!=='string'||!Number.isFinite(input.stake)||input.stake<=0||input.stake>1000000||!Number.isFinite(input.odds)))return json({error:'Invalid bet parameters'},400);
   const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data,error}=await db.rpc('studio_request',{p_token:token,p_action:action,p_input:input,p_config:config,p_outcome:config?createOutcome(config.id):null});
   if(error){const permitted=/^(Authentication required|Bettor account required|Round unavailable|Betting closed|Game unavailable|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed; refresh and confirm|Insufficient quoted liquidity|Insufficient balance)$/;return json({error:permitted.test(error.message)?error.message:'Studio request failed. Retry with the same request ID.'},error.message==='Authentication required'?401:400);}
