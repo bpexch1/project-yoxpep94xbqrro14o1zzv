@@ -64,3 +64,28 @@
  .studio-game-heading h1{font-size:14px}
 }
 @media(prefers-reduced-motion:reduce){.studio-thumb{transition:none}}
+
+
+/* Animated result-independent game scenes; outcomes always come from the server. */
+.studio-scene{width:100%;min-height:165px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:9px 6px;color:#e6d7ac;text-align:center}
+.studio-scene small{font-size:11px;letter-spacing:.25px;color:#c8bfae}
+.studio-spinning-wheel{width:138px;height:138px;border:6px solid #c99f52;border-radius:100%;display:grid;place-items:center;box-shadow:0 0 20px #d7a24950, inset 0 0 0 5px #181a25;background:repeating-conic-gradient(#bf2428 0deg 20deg,#222c31 20deg 40deg,#2c793e 40deg 60deg);animation:studio-spin 8s linear infinite}
+.studio-spinning-wheel span{display:grid;place-items:center;border:2px solid #cba967;border-radius:100%;background:#12191c;width:76px;height:76px;font-size:9px;letter-spacing:1px;color:#efdb9b}
+.flight-scene{background:linear-gradient(135deg,#051423,#192447 60%,#19202f)}
+.studio-aircraft{font-size:66px;color:#e32a37;filter:drop-shadow(0 8px 10px #000);animation:studio-flight 3s ease-in-out infinite alternate}
+.flight-scene strong{font-size:15px;letter-spacing:3px;color:#fff}
+.studio-die{font-size:60px;line-height:.9;display:inline-block;color:#eee4d2;animation:studio-dice 2.5s ease-in-out infinite}
+.studio-die.second{font-size:48px;animation-delay:.7s}
+.dice-scene{gap:4px}
+.sports-scene strong,.arcade-scene strong{font-size:68px;color:#d1ad60}
+.studio-coin-flip{width:110px;height:110px;border:9px ridge #dbad56;display:grid;place-items:center;border-radius:100%;background:radial-gradient(#f4d57a,#ad6928);color:#51330c;font:67px Georgia,serif;animation:studio-coin 2.3s linear infinite}
+.slots-scene{display:flex;flex-direction:row;flex-wrap:wrap}
+.slots-scene span{font-size:54px;color:#b6eeed;filter:drop-shadow(0 4px 10px #56e8e5);animation:studio-dice 3s ease-in-out infinite}
+.slots-scene span:nth-child(2){color:#ffa4c7;animation-delay:.35s}
+.slots-scene span:nth-child(3){color:#f2d16a;animation-delay:.7s}
+.slots-scene small{flex-basis:100%}
+@keyframes studio-spin{to{transform:rotate(360deg)}}
+@keyframes studio-flight{from{transform:translate(-35px,15px) rotate(-10deg)}to{transform:translate(35px,-15px) rotate(9deg)}}
+@keyframes studio-dice{0%,100%{transform:rotate(-13deg) scale(.92)}50%{transform:rotate(15deg) scale(1.03)}}
+@keyframes studio-coin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+@media(prefers-reduced-motion:reduce){.studio-spinning-wheel,.studio-aircraft,.studio-die,.studio-coin-flip,.slots-scene span{animation:none}}
