@@ -303,7 +303,7 @@ export function DashboardSidebar({ isOpen, onClose, onFilterChange }: DashboardS
 
               {/* 12. TeenPatti Studio (Animated Red Light-to-Dark Slow Breathing) */}
               <button
-                onClick={() => handleFilter("Casino")}
+                onClick={() => handleNav("/teenpatti-studio")}
                 className="flex items-center gap-2.5 w-full px-3 h-[38px] animate-teen-patti text-white font-medium"
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">

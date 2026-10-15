@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "npm run test:hierarchy && npm run test:v2 && npm run test:wallet && vite build",
+    "build": "npm run test:hierarchy && npm run test:v2 && npm run test:wallet && npm run test:studio && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint . --max-warnings=999",
     "preview": "vite preview",
@@ -13,7 +13,8 @@
     "test:v2": "node --test tests/v2-foundation.test.mjs",
     "test:wallet": "node --experimental-strip-types --test tests/wallet-reference.test.mjs tests/pl-distribution.test.mjs tests/migration-history.test.mjs",
     "build:aws-exchange": "esbuild supabase/functions/exchange-api/feed.ts --bundle --platform=node --format=cjs --target=node22 --outfile=infra/aws/exchange-api/feed.cjs",
-    "test:aws-exchange": "node --test tests/aws-exchange.test.mjs"
+    "test:aws-exchange": "node --test tests/aws-exchange.test.mjs",
+    "test:studio": "node --experimental-strip-types --test tests/teenpatti-engine.test.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

@@ -20,6 +20,7 @@ import CommissionReport from "@/pages/reports/CommissionReport";
 import CurrentPosition from "@/pages/CurrentPosition";
 import AccountView from "@/pages/AccountView";
 import UserDashboard from "@/pages/UserDashboard";
+import TeenPattiStudio from "@/pages/TeenPattiStudio";
 import UserProfile from "@/pages/UserProfile";
 import UserStatement from "@/pages/UserStatement";
 import UserResult from "@/pages/UserResult";
@@ -109,6 +110,8 @@ const App = () => (
             <Route path="/admin/profile" element={<AppLayout><UserProfile /></AppLayout>} />
             {/* User Client Routes */}
             <Route path="/play" element={<UserDashboard />} />
+            <Route path="/teenpatti-studio" element={<TeenPattiStudio />} />
+            <Route path="/Common/BetProGames" element={<TeenPattiStudio />} />
             <Route path="/casino" element={<UserDashboard />} />
             <Route path="/play/casino" element={<UserDashboard />} />
             <Route path="/casino-games" element={<UserDashboard />} />

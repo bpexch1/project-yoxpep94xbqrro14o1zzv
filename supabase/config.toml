@@ -8,3 +8,7 @@ verify_jwt = false
 # Custom high-entropy expiring sessions are verified inside every server RPC.
 [functions.exchange-api]
 verify_jwt = false
+
+# Custom exchange session is verified by studio_request on every call.
+[functions.teenpatti-studio]
+verify_jwt = false
