@@ -12,7 +12,7 @@ begin
  end loop;
  insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true);
  player:=public.exchange_login(user_name,'SyntheticOnly984!');
- conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","runners":[{"id":"1","name":"Heads","odds":1.95},{"id":"2","name":"Tails","odds":1.95}]}'::jsonb;
+ conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","runners":[{"id":"1","name":"Heads","odds":1.95,"layOdds":2.03},{"id":"2","name":"Tails","odds":1.95,"layOdds":2.03}]}'::jsonb;
  foreach kind in array array['win','loss','void'] loop
   outcome:=jsonb_build_object('winner',case kind when 'win' then '1' when 'loss' then '2' else null end,'groups','[]'::jsonb,'summary','QA');
   state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
