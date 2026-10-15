@@ -23,3 +23,15 @@ const entries = [
 ];
 const supported = new Set(['9001','9005','9006','9030','9002','9004','9007','9017','9018','9019','9055','9085']);
 export const studioGames: Game[] = entries.map(([id,name,category,symbol,color]) => ({id,name,category,symbol,color,playable:supported.has(id)}));
+
+// Lobby/menu only: the owner supplied matching artwork for these 34 catalog games.
+// Keep studioGames intact for existing game configuration and settlement tests.
+// Do not mistake the supplied "Dragon Tiger Lion" image for DragonTiger.
+const artworkProvidedIds = new Set([
+  '9301', '9022', '9040', '9023', '9100', '9035', '9001', '9005',
+  '9030', '9006', '9021', '9015', '9002', '9003', '9007', '9008',
+  '9009', '9011', '9010', '9012', '9016', '9017', '9018', '9019',
+  '9020', '9045', '9050', '9055', '9065', '9070', '9075', '9080',
+  '9085', '9105',
+]);
+export const studioLobbyGames: Game[] = studioGames.filter(game => artworkProvidedIds.has(game.id));
