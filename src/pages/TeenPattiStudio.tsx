@@ -80,7 +80,7 @@ function GameTable({game,username}:{game:Game;username:string}){
   {!data&&!error&&<div className="studio-empty" role="status">Loading table…</div>}
   {data&&view==='Game'&&<><div className={"studio-table studio-game-"+data.config.kind} key={data.round.id}>
    <div className="studio-table-brand">BPEXCH <span>TEENPATTI STUDIO</span></div>
-   {data.round.outcome?<Result outcome={data.round.outcome}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>
+   {data.round.outcome?<Result outcome={data.round.outcome}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>}
    <p className="studio-table-note">{canBet?'Select a price below':data.round.settled?'Next round starts shortly':'Revealing result…'}</p>
   </div>
   <div className={"studio-markets studio-market-rows"+(game.id==='9030'?' roulette':'')}><div className="studio-market-header"><span>MARKET ODDS</span><b>BACK</b><b>LAY</b></div>{data.config.runners.map(r=><div className={"studio-market-row"+(data.round.outcome?.winner===r.id?' winner':'')} key={r.id}><span className="studio-runner-name">{r.name}</span><button type="button" className="studio-price back" disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('back');setMessage('');}}><strong>{r.odds.toFixed(2)}</strong><small>DEMO</small></button><button type="button" className="studio-price lay" disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('lay');setMessage('');}}><strong>{r.layOdds?.toFixed(2)||'—'}</strong><small>DEMO</small></button></div>)}</div>
