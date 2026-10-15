@@ -35,6 +35,17 @@ function StudioLogo({onClick}:{onClick:()=>void}){
   {broken?<><b>B</b><span>TEENPATTI<br/>STUDIO</span></>:<img src="/reference/teenpatti-games/bps-logo.png" alt="TeenPatti Studio" onError={()=>setBroken(true)}/>}
  </button>;
 }
+function WaitingScene({game,kind,runners}:{game:Game;kind:string;runners:StudioState['config']['runners']}){
+ if(kind==='wheel'||kind==='roulette')return <div className="studio-scene wheel-scene" aria-label="Virtual demo wheel animation"><div className="studio-spinning-wheel"><span>{kind==='roulette'?'ROULETTE':'DREAM CATCHER'}</span></div><small>Virtual wheel spins until the round closes</small></div>;
+ if(kind==='crash')return <div className="studio-scene flight-scene" aria-label="Virtual flight demo"><span className="studio-aircraft">✈</span><strong>VIRTUAL FLIGHT</strong><small>Predict the result · No live cash-out</small></div>;
+ if(kind==='dice'||kind==='seven')return <div className="studio-scene dice-scene" aria-label="Virtual dice game"><span className="studio-die">⚄</span><span className="studio-die second">⚅</span><small>Virtual dice roll</small></div>;
+ if(kind==='sports')return <div className="studio-scene sports-scene" aria-label="Virtual score game"><strong>◉</strong><small>Virtual score in progress</small></div>;
+ if(kind==='coin')return <div className="studio-scene coin-scene" aria-label="Virtual coin toss"><span className="studio-coin-flip">B</span><small>Virtual coin toss</small></div>;
+ if(kind==='slots')return <div className="studio-scene slots-scene" aria-label="Virtual gems"><span>◆</span><span>◆</span><span>◆</span><small>Virtual gem reveal</small></div>;
+ if(kind==='arcade')return <div className="studio-scene arcade-scene"><strong>♟</strong><small>Choose your virtual route</small></div>;
+ const isCards=['Cards','cards','cards3','cards4','teen','teen3','muflis','andar','hilo','lucky'].includes(kind)||game.category==='Cards';
+ return <div className="studio-hands waiting">{(isCards?runners.slice(0,kind==='cards4'?4:3):[{id:'visual',name:game.name,odds:1,layOdds:1}]).map(r=><div className="studio-hand" key={r.id}><span>{r.name}</span><div className="studio-cards">{isCards?Array.from({length:['teen','teen3','muflis'].includes(kind)?3:1},(_,i)=><Card key={i}/>):<span className="studio-wait-symbol">{game.symbol}</span>}</div></div>)}</div>;
+}
 function GameTable({game,username}:{game:Game;username:string}){
  const qc=useQueryClient();const [view,setView]=useState('Game');const [runner,setRunner]=useState<StudioState['config']['runners'][number]|null>(null);const [betSide,setBetSide]=useState<'back'|'lay'>('back');const [stake,setStake]=useState('100');const [busy,setBusy]=useState(false);const busyRef=useRef(false);const [message,setMessage]=useState('');const [pending,setPending]=useState<StudioBet|null>(()=>{try{return JSON.parse(sessionStorage.getItem(pendingKey(username))||'null');}catch{return null;}});
  const [clock,setClock]=useState(Date.now());
@@ -69,7 +80,7 @@ function GameTable({game,username}:{game:Game;username:string}){
   {!data&&!error&&<div className="studio-empty" role="status">Loading table…</div>}
   {data&&view==='Game'&&<><div className={"studio-table studio-game-"+data.config.kind} key={data.round.id}>
    <div className="studio-table-brand">BPEXCH <span>TEENPATTI STUDIO</span></div>
-   {data.round.outcome?<Result outcome={data.round.outcome}/>:<div className="studio-hands waiting">{(game.category==='Cards'?data.config.runners.slice(0,3):[{id:'result',name:game.name}]).map(r=><div className="studio-hand" key={r.id}><span>{r.name}</span><div className="studio-cards">{game.category==='Cards'?Array.from({length:['9001','9005','9006'].includes(game.id)?3:1},(_,i)=><Card key={i}/>):<span className="studio-wait-symbol">{game.symbol}</span>}</div></div>)}</div>}
+   {data.round.outcome?<Result outcome={data.round.outcome}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>
    <p className="studio-table-note">{canBet?'Select a price below':data.round.settled?'Next round starts shortly':'Revealing result…'}</p>
   </div>
   <div className={"studio-markets studio-market-rows"+(game.id==='9030'?' roulette':'')}><div className="studio-market-header"><span>MARKET ODDS</span><b>BACK</b><b>LAY</b></div>{data.config.runners.map(r=><div className={"studio-market-row"+(data.round.outcome?.winner===r.id?' winner':'')} key={r.id}><span className="studio-runner-name">{r.name}</span><button type="button" className="studio-price back" disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('back');setMessage('');}}><strong>{r.odds.toFixed(2)}</strong><small>DEMO</small></button><button type="button" className="studio-price lay" disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('lay');setMessage('');}}><strong>{r.layOdds?.toFixed(2)||'—'}</strong><small>DEMO</small></button></div>)}</div>
