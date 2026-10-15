@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {configFor,createOutcome,handScore,compare,shuffledDeck,rank} from '../supabase/functions/teenpatti-studio/engine.ts';
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
+test('34 supplied-thumbnail games are playable with two-sided finite prices',()=>{const live=studioGames.filter(g=>g.playable);assert.equal(live.length,34);for(const g of live){const c=configFor(g.id);assert.ok(c?.runners.length>0,g.name);for(const r of c.runners){assert.ok(r.odds>1&&r.layOdds>=r.odds&&r.layOdds<=1000,g.name);}}});
 test('catalog contains all 38 unique reference names and exactly supported tables',()=>{
  assert.equal(studioGames.length,38);assert.equal(new Set(studioGames.map(x=>x.id)).size,38);
  for(const g of studioGames)assert.equal(!!configFor(g.id),g.playable,g.name);
@@ -34,8 +35,8 @@ test('all enabled games return valid outcomes; shuffled decks never repeat cards
     assert.equal(rank(side.at(-1)),joker);
    }
    if(game.id==='9007'){const total=o.groups[0].value.split(' + ').map(Number).reduce((a,b)=>a+b,0);assert.equal(o.winner,total<7?'1':total===7?'2':'3');}
-   if(game.id==='9030')assert.equal(o.winner,o.groups[0].value);
+   if(game.id==='9030'){const matched=cfg.runners.find(r=>r.id===o.winner);assert.equal(matched?.name,o.groups[0].value);}
   }
  }
- assert.throws(()=>createOutcome('9022'),/unavailable/);
+ assert.throws(()=>createOutcome('9004'),/unavailable/);
 });
