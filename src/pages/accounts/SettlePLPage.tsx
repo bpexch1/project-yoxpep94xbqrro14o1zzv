@@ -1,3 +1,4 @@
+import { validPLTransfer } from "@/lib/accountingValidation";
 import { settleAccountPL } from "@/services/walletLedger";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -30,7 +31,20 @@ export default function SettlePLPage() {
   useEffect(() => {
     if (client) {
       const plAmount = client.pl_downline || 0;
-      setAmount(plAmount > 0 ? plAmount.toString() : "0");
+      const stored = sessionStorage.getItem(`pendingPLPage:${client.id}`);
+      let previous = null;
+      try {
+      previous = stored ? JSON.parse(stored) : null;
+      if (previous?.id && previous?.fingerprint) {
+        const details = JSON.parse(previous.fingerprint);
+        if (details[0] === client.id) {
+          pending.current = previous;
+          setAmount(details[1]); setDescription(details[2]); return;
+        }
+      }
+      } catch { /* Invalid local cache is ignored. */ }
+      pending.current = null;
+      setAmount(plAmount.toString());
       setDescription("P/L to Cash transfer");
     }
   }, [client]);
@@ -39,18 +53,20 @@ export default function SettlePLPage() {
     e.preventDefault();
     if (!client || inFlight.current) return;
 
+    const fingerprint = JSON.stringify([client.id, amount, description]);
+    const replay = pending.current?.fingerprint === fingerprint;
     const settleAmount = parseFloat(amount);
-    if (!/^\d+(\.\d{1,2})?$/.test(amount) || !Number.isFinite(settleAmount) || settleAmount <= 0) {
+    if (!validPLTransfer(amount, replay ? settleAmount : Number(client.pl_downline || 0))) {
       toast({
         variant: "destructive",
         title: "Invalid amount",
-        description: "Please enter an amount greater than 0",
+        description: "Enter an amount with the same sign as the outstanding P/L, within its limit",
       });
       return;
     }
 
     const maxAmount = client.pl_downline || 0;
-    if (maxAmount <= 0) {
+    if (!replay && maxAmount === 0) {
       toast({
         variant: "destructive",
         title: "No P/L to settle",
@@ -59,7 +75,7 @@ export default function SettlePLPage() {
       return;
     }
 
-    if (settleAmount > maxAmount) {
+    if (!replay && Math.abs(settleAmount) > Math.abs(maxAmount)) {
       toast({
         variant: "destructive",
         title: "Amount exceeds balance",
@@ -68,7 +84,6 @@ export default function SettlePLPage() {
       return;
     }
 
-    const fingerprint = JSON.stringify([client.id, amount, description]);
     if (pending.current && pending.current.fingerprint !== fingerprint) {
       toast({variant: "destructive", title: "Unconfirmed transfer", description: "Retry the same amount and description first."}); return;
     }
@@ -76,7 +91,9 @@ export default function SettlePLPage() {
     inFlight.current = true;
     setIsSubmitting(true);
     try {
+      sessionStorage.setItem(`pendingPLPage:${client.id}`, JSON.stringify(pending.current));
       await settleAccountPL({clientId: client.id, amount: settleAmount, reason: description, requestId: pending.current.id});
+      sessionStorage.removeItem(`pendingPLPage:${client.id}`);
       pending.current = null;
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.invalidateQueries({ queryKey: ["client", username] });

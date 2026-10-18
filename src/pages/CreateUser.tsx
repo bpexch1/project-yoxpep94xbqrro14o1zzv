@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getClientSession } from "@/hooks/useClientAuth";
 import { canCreateChild, permittedChildRoles, roleLabel, type AccountRole } from "@/lib/accountHierarchy";
 import { Loader2 } from "lucide-react";
+import { shareCeiling, validShare } from "@/lib/accountingValidation";
 
 export default function CreateUser() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function CreateUser() {
     queryFn: async () => (await Client.filter({ username }))?.[0],
     enabled: !!session,
   });
-  const maxShare = Math.max(0, Math.min(100, Number(parentRecord?.downline_share ?? 85)));
+  const maxShare = shareCeiling(parentRecord?.role, parentRecord?.downline_share);
 
   const handleUsernameBlur = async () => {
     const raw = formData.username.trim();
@@ -85,7 +86,7 @@ export default function CreateUser() {
     }
 
     if (!formData.type || !canCreateChild(parentRecord?.role, formData.type)) newErrors.type = "Account type is not permitted for your role";
-    if (formData.type !== "bettor" && (!Number.isFinite(Number(formData.downlineShare)) || Number(formData.downlineShare) < 0 || Number(formData.downlineShare) > maxShare)) {
+    if (formData.type !== "bettor" && !validShare(formData.downlineShare, maxShare)) {
       newErrors.downlineShare = `Enter a share between 0 and ${maxShare}`;
     }
     setErrors(newErrors);

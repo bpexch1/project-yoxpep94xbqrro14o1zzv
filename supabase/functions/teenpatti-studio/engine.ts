@@ -111,7 +111,7 @@ export function createOutcome(id:string,rand=randomInt):Outcome{
  }
  if(kind==='lucky'||kind==='hilo'){
   const card=deck[0],num=kind==='lucky'&&rank(card)===14?1:rank(card);
-  let n=id==='9070'?(num>10?0:num<10?1:2):kind==='lucky'?(num<7?0:num===7?1:2):(num>7?0:num<7?1:2);
+  const n=id==='9070'?(num>10?0:num<10?1:2):kind==='lucky'?(num<7?0:num===7?1:2):(num>7?0:num<7?1:2);
   return result(n,[{label:'Result card',cards:[card]}],runners[n].name+' — '+num);
  }
  if(kind==='wheel'){

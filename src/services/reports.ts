@@ -1,7 +1,7 @@
 import { csvCell } from "./csv";
 import { serviceRequest } from "./client";
 export interface ReportFilter {
-  kind: "bets" | "ledger";
+  kind: "bets" | "ledger" | "dailyPL";
   clientId?: string;
   matchId?: string;
   status?: string;
@@ -37,7 +37,7 @@ export async function exportReport(filters: ReportFilter): Promise<Blob> {
           "commission_amount",
           "created_at",
         ]
-      : [
+      : filters.kind === "dailyPL" ? ["username", "amount"] : [
           "id",
           "client_username",
           "type",

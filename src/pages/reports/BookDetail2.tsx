@@ -34,7 +34,9 @@ export default function BookDetail2() {
     queryFn: async () => {
       if (!session || downlineUsernames === undefined) return [];
       
-      let query = BetEntity.query().sort("-created_at");
+      const start = new Date(fromDate + "T00:00:00+05:00");
+      const end = new Date(toDate + "T00:00:00+05:00"); end.setUTCDate(end.getUTCDate() + 1);
+      let query = BetEntity.query().sort("-created_at").where("created_at", "gte", start.toISOString()).where("created_at", "lt", end.toISOString()).limit(10000);
       const safeDownlineUsernames = Array.isArray(downlineUsernames) ? downlineUsernames : [];
       
       // Ownership check: Only Company sees all
@@ -49,12 +51,12 @@ export default function BookDetail2() {
       }
       
       const all = await query.exec();
+      if (all.length === 10000) throw new Error("Narrow the date range to view a complete report.");
       const safeAll = Array.isArray(all) ? all : [];
       
       return safeAll.filter(b => {
         if (!b?.created_at) return false;
-        const date = b.created_at.split('T')[0];
-        return date >= fromDate && date <= toDate;
+        return true;
       });
     },
     enabled: !!session && downlineUsernames !== undefined,

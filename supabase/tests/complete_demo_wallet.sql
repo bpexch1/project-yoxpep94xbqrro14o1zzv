@@ -48,6 +48,7 @@ begin
   market_id:='qa-market-'||gen_random_uuid()::text;
   perform public.exchange_ingest(jsonb_build_array(jsonb_build_object('id',market_id,'eventId',market_id,'eventName','QA A v B','sport','cricket','name','Match Odds','startTime',now(),'status','OPEN','delayed',false,'observedAt',clock_timestamp(),
    'runners','[{"id":"1","name":"A"},{"id":"2","name":"B"}]'::jsonb,'quotes',jsonb_build_array(jsonb_build_object('runnerId','1','selection','A','side',case when kind like 'lay%' then 'lay' else 'back' end,'odds',case when kind like 'lay%' then 4 else 3 end,'size',10000)))));
+  update public.exchange_markets set is_demo=true where id=market_id;
   input:=jsonb_build_object('requestId',gen_random_uuid(),'marketId',market_id,'runnerId','1','side',case when kind like 'lay%' then 'lay' else 'back' end,'stake',100,'odds',case when kind like 'lay%' then 4 else 3 end);
   bet:=public.exchange_request(player->>'token','placeBet',input);
   replay:=public.exchange_request(player->>'token','placeBet',input);

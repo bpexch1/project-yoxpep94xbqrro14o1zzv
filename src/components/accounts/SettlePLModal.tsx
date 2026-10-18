@@ -1,7 +1,7 @@
+import { validPLTransfer } from "@/lib/accountingValidation";
 import { serviceRequest } from "@/services/client";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Client, Transaction } from "@/entities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -22,26 +22,36 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
   useEffect(() => {
     if (isOpen && client) {
       const plAmount = client.pl_downline || 0;
-      setAmount(plAmount > 0 ? plAmount.toString() : "0");
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(`pendingPL:${client.id}`) || "null");
+        if (saved?.requestId && saved?.fingerprint) {
+          const details = JSON.parse(saved.fingerprint);
+          setAmount(String(details.amount)); setDescription(details.reason); return;
+        }
+      } catch { /* Ignore malformed local cache. */ }
+      setAmount(plAmount.toString());
       setDescription("P/L to Cash transfer");
     }
   }, [isOpen, client]);
 
   const handleSubmit = async () => {
-    if (!client) return;
+    if (!client || isSubmitting) return;
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(`pendingPL:${client.id}`) || "null"); } catch { /* Ignore malformed local cache. */ }
+    const replay = saved?.fingerprint === JSON.stringify({amount:parseFloat(amount),reason:description});
 
     const settleAmount = parseFloat(amount);
-    if (isNaN(settleAmount) || settleAmount <= 0) {
+    if (!validPLTransfer(amount, replay ? settleAmount : Number(client.pl_downline || 0))) {
       toast({
         variant: "destructive",
         title: "Invalid amount",
-        description: "Please enter an amount greater than 0",
+        description: "Enter an amount with the same sign as the outstanding P/L, within its limit",
       });
       return;
     }
 
     const maxAmount = client.pl_downline || 0;
-    if (maxAmount <= 0) {
+    if (!replay && maxAmount === 0) {
       toast({
         variant: "destructive",
         title: "No P/L to settle",
@@ -50,7 +60,7 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
       return;
     }
 
-    if (settleAmount > maxAmount) {
+    if (!replay && Math.abs(settleAmount) > Math.abs(maxAmount)) {
       toast({
         variant: "destructive",
         title: "Amount exceeds balance",
@@ -63,7 +73,7 @@ export function SettlePLModal({ isOpen, onClose, client }: SettlePLModalProps) {
     try {
       const key=`pendingPL:${client.id}`;
       const fingerprint=JSON.stringify({amount:settleAmount,reason:description});
-      const pending=JSON.parse(sessionStorage.getItem(key)||'null');
+      const pending=saved;
       if(pending&&pending.fingerprint!==fingerprint) throw new Error('Retry the previous unconfirmed P/L transfer first');
       const requestId=pending?.requestId||crypto.randomUUID();
       sessionStorage.setItem(key,JSON.stringify({requestId,fingerprint}));

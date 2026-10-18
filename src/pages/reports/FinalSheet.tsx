@@ -23,10 +23,7 @@ export default function FinalSheet() {
     queryKey: ["final-sheet-v2", session?.username],
     queryFn: async () => {
       if (!session) return [];
-      let query = ClientEntity.query().sort("username");
-      if (session.role !== "company") {
-        query = query.where("parent_username", session.username);
-      }
+      const query = ClientEntity.query().sort("username").where("parent_username", session.username);
       return await query.exec();
     },
     enabled: !!session,
@@ -85,13 +82,13 @@ export default function FinalSheet() {
   const negativeClients = useMemo(() => {
     const base = sortedClients.filter((c) => {
       const amt = c.balance_upline || 0;
-      return hideZero ? amt < 0 : amt <= 0;
+      return amt < 0;
     });
     if (cashEntry && cashEntry.balance_upline < 0) {
       return [...base, cashEntry];
     }
     return base;
-  }, [sortedClients, hideZero, cashEntry]);
+  }, [sortedClients, cashEntry]);
 
   const positiveTotal = positiveClients.reduce((s, c) => s + (c.balance_upline || 0), 0);
   const negativeTotal = negativeClients.reduce((s, c) => s + (c.balance_upline || 0), 0);

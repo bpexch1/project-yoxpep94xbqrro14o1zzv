@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       p_description: description, p_request_id: requestId,
     });
     if (error) {
-      const allowed = /^(Authentication required|Administrator permission required|Select a downline account|Target account is disabled|Account is outside your downline|Insufficient (cash|credit) balance|Insufficient dealer credit limit|Request ID was already used for a different transfer|Invalid transfer parameters)$/;
+      const allowed = /^(Authentication required|Administrator permission required|Select a downline account|Target account is disabled|Account is outside your downline|Insufficient (cash|credit) balance|Insufficient upline credit limit|Insufficient upline available balance|Select an active hierarchy account|Request ID was already used for a different transfer|Invalid transfer parameters)$/;
       return json({ error: allowed.test(error.message) ? error.message : "Transfer could not be completed" }, error.message === "Authentication required" ? 401 : 400);
     }
     return json(data);

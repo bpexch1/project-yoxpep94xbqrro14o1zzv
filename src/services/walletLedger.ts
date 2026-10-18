@@ -14,4 +14,4 @@ export const walletLedger = (input: {
 
 export const settleAccountPL = (input: {
   clientId: string; amount: number; reason: string; requestId: string;
-}) => serviceRequest<{success: boolean; balance: number}>("settlePL", input);
+}) => serviceRequest<{success: boolean; balance: number; plDownline: number}>("settlePL", input);

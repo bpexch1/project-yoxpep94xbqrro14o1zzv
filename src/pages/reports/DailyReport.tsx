@@ -34,7 +34,9 @@ export default function DailyReport() {
     queryFn: async () => {
       if (!session || downlineUsernames === undefined) return [];
       
-      let query = BetEntity.query().sort("-created_at");
+      const start = new Date(fromDate + "T00:00:00+05:00");
+      const end = new Date(toDate + "T00:00:00+05:00"); end.setUTCDate(end.getUTCDate() + 1);
+      let query = BetEntity.query().sort("-created_at").where("created_at", "gte", start.toISOString()).where("created_at", "lt", end.toISOString()).limit(10000);
       
       // Ownership check: Only Company sees all
       if (downlineUsernames === null) {
@@ -48,10 +50,10 @@ export default function DailyReport() {
       }
 
       const all = await query.exec();
+      if (all.length === 10000) throw new Error("Narrow the date range to view a complete report.");
       
       return all.filter(b => {
-        const date = b.created_at.split('T')[0];
-        const dateMatch = date >= fromDate && date <= toDate;
+        const dateMatch = true;
         const userMatch = usernameFilter ? b.user_email?.toLowerCase().includes(usernameFilter.toLowerCase()) : true;
         
         return dateMatch && userMatch;

@@ -1,3 +1,4 @@
+import { queryReport } from "@/services/reports";
 import { serviceRequest } from "@/services/client";
 import { ReferenceAmountTables } from "@/components/reports/ReferenceAmountTables";
 import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
@@ -34,7 +35,7 @@ export default function DailyPL() {
     queryFn: async () => {
       if (!session) return [];
       
-      const start = new Date(fromDate+"T00:00:00"), end = new Date(toDate+"T00:00:00"); end.setDate(end.getDate()+1);
+      const start = new Date(fromDate+"T00:00:00+05:00"), end = new Date(toDate+"T00:00:00+05:00"); end.setUTCDate(end.getUTCDate()+1);
       const isBettor = ["bettor","client","user"].includes(session.role.toLowerCase());
       const rows = await serviceRequest<any[]>("entityRead", {
         table:isBettor ? "bets" : "exchange_pl_allocations",
@@ -48,7 +49,7 @@ export default function DailyPL() {
       for (const row of rows) {
         if (isBettor && !["won","lost","void"].includes(row.status)) continue;
         if (isBettor && row.profit == null) continue;
-        const date = new Date(isBettor ? row.updated_at : row.created_at).toLocaleDateString("en-CA");
+        const date = new Date(isBettor ? row.updated_at : row.created_at).toLocaleDateString("en-CA", {timeZone: "Asia/Karachi"});
         const pl = Number(isBettor ? row.profit : row.allocated_pl);
         const day = groups[date] ||= {date,totalBets:0,totalStake:0,totalWon:0,totalLost:0,netPL:0,commission:0};
         day.totalBets++; day.totalStake += isBettor ? Number(row.stake) : 0;
@@ -58,6 +59,18 @@ export default function DailyPL() {
       return Object.values(groups).sort((a,b)=>b.date.localeCompare(a.date));
     },
     enabled: !!session && downlineUsernames !== undefined,
+  });
+
+  const { data: accountTotals, isLoading: totalsLoading, isError: totalsError } = useQuery({
+    queryKey: ["daily-pl-accounts", session?.username, fromDate, toDate, searchTrigger],
+    queryFn: async () => {
+      const start = new Date(fromDate + "T00:00:00+05:00");
+      const end = new Date(toDate + "T00:00:00+05:00"); end.setUTCDate(end.getUTCDate() + 1);
+      const report = await queryReport({kind: "dailyPL", from: start.toISOString(), to: end.toISOString(), limit: 10000});
+      if (report.truncated) throw new Error("Narrow the date range to view a complete report.");
+      return report.rows.map(row => ({name: String(row.username), amount: Number(row.amount)}));
+    },
+    enabled: !!session,
   });
 
   const handleSearch = () => {
@@ -96,7 +109,7 @@ export default function DailyPL() {
     commission: (day?.commission || 0).toFixed(2),
   }));
 
-  if (isError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
+  if (isError || totalsError) return <div role="alert" className="card card-body">Report could not be loaded. Please refresh and try again. No totals are available.</div>;
 
   return (
     <div className="reference-report bg-[rgb(228,229,230)] min-h-screen pb-16 text-[rgb(35,40,44)]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
@@ -109,7 +122,7 @@ export default function DailyPL() {
 
         <ReferenceReportFilter fromDate={fromDate} toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} onSubmit={handleSearch} />
 
-        <ReferenceAmountTables rows={safeDailyData.map(day => ({ name: day.date, amount: Number(day.netPL || 0) }))} title="Report" loading={isLoading} />
+        <ReferenceAmountTables rows={accountTotals || []} title="Report" loading={isLoading || totalsLoading} />
         <details className="reference-report-details"><summary>Detailed report / Export</summary>
         {/* Report Table */}
         <div>
