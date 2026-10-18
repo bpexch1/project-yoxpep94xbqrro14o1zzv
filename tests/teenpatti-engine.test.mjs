@@ -4,8 +4,8 @@ import {configFor,createOutcome,handScore,compare,shuffledDeck,rank} from '../su
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
 test('34 supplied-thumbnail games are playable with two-sided finite prices',()=>{const live=studioGames.filter(g=>g.playable);assert.equal(live.length,34);for(const g of live){const c=configFor(g.id);assert.ok(c?.runners.length>0,g.name);for(const r of c.runners){assert.ok(r.odds>1&&r.layOdds>=r.odds&&r.layOdds<=1000,g.name);}}});
-test('catalog contains all 38 unique reference names and exactly supported tables',()=>{
- assert.equal(studioGames.length,38);assert.equal(new Set(studioGames.map(x=>x.id)).size,38);
+test('catalog contains only the 34 supplied thumbnail games',()=>{
+ assert.equal(studioGames.length,34);assert.equal(new Set(studioGames.map(x=>x.id)).size,34);
  for(const g of studioGames)assert.equal(!!configFor(g.id),g.playable,g.name);
 });
 test('Teen Patti ranking, A23, ties and pair kickers',()=>{
