@@ -121,3 +121,27 @@
 .reference-admin .reference-final-columns > div { align-self: start; }
 .reference-admin .reference-cash .cash-form-body { padding: 20px; }
 .reference-admin .reference-cash > div > div:has(.cash-form-body) { margin-bottom: 24px; }
+
+/* Report date inputs: Tempus Dominus-inspired shell, scoped to existing native pickers.
+   Retain browser/mobile calendar behavior; do not load Bootstrap or jQuery globally. */
+.reference-admin .reference-report-filter .card-body > input[type="date"],
+.reference-admin .reference-ledger .ledger-filter > input[type="datetime-local"] {
+  background-color: #fff;
+  color: #23282c;
+  color-scheme: light;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  max-width: 100%;
+  min-width: 0;
+}
+.reference-admin .reference-report-filter .card-body > input[type="date"]:focus-visible,
+.reference-admin .reference-ledger .ledger-filter > input[type="datetime-local"]:focus-visible {
+  border-color: #00b181;
+  outline: 2px solid rgba(0, 177, 129, 0.30);
+  outline-offset: 0;
+}
+.reference-admin .reference-report-filter input[type="date"]::-webkit-calendar-picker-indicator,
+.reference-admin .reference-ledger input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.82;
+}
