@@ -1,3 +1,4 @@
+import { todayInExchangeTimezone } from "@/lib/exchangeDate";
 import { settledProfit } from "@/lib/settledProfit";
 import { ReferenceReportFilter } from "@/components/reports/ReferenceReportFilter";
 import { useState, useEffect } from "react";
@@ -13,7 +14,7 @@ import { ExportButtons } from "@/components/reports/ExportButtons";
 
 export default function DailyReport() {
   const [activeTab, setActiveTab] = useState("Daily Report");
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayInExchangeTimezone();
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
   const [usernameFilter, setUsernameFilter] = useState("");
