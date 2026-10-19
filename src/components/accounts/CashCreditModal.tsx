@@ -86,7 +86,6 @@ export function CashCreditModal({ isOpen, onClose, client }: CashCreditModalProp
       pendingRequest.current = null;
       if (direction === "deposit") setDepositAmount("0");
       else setWithdrawAmount("0");
-      toast({ title: "Success", description: `${activeTab === "cash" ? "Cash" : "Credit"} ${direction === "deposit" ? "deposited" : "withdrawn"} successfully.` });
       // A refresh failure must not turn a confirmed transfer into a failed transfer.
       await refreshAll().catch(() => undefined);
     } catch (err: unknown) {
