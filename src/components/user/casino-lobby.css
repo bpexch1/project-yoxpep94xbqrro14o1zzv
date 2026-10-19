@@ -1,0 +1,25 @@
+/* Scoped BPEXCH casino styles. No global Bootstrap, video, or table overrides. */
+.bpexch-casino-lobby{font-family:"Roboto Condensed",Arial,sans-serif;color:#fff;background:#e6f2fc;min-height:55vh}
+.bpexch-casino-header{background:#254465;min-height:39px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bpexch-casino-header h2{margin:0;font-size:17px;font-weight:700;line-height:1.2}
+.bpexch-casino-header span{font-size:11px;font-weight:700;color:#c5ede0;white-space:nowrap}
+.bpexch-casino-toolbar{background:#3d6b8b;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;padding:8px 10px}
+.bpexch-casino-toolbar p{margin:0;font-size:12px}
+.bpexch-casino-search{display:flex;align-items:center;gap:6px;background:#fff;color:#254465;border-radius:3px;padding:5px 8px;min-width:140px;flex:0 1 220px}
+.bpexch-casino-search input{border:0;background:transparent;color:#254465;font-size:13px;outline:none;min-width:0;width:100%}
+.bpexch-casino-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:10px}
+.bpexch-casino-game{min-width:0;padding:0 0 6px;text-align:center;overflow:hidden;background:#172b3e;border:1px solid #315877;color:#fff;cursor:pointer;animation:bpexch-casino-fade 240ms ease both;transition:transform 150ms ease,box-shadow 150ms ease}
+.bpexch-casino-game img,.bpexch-casino-fallback{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1.6/1;object-fit:cover;background:#102031}
+.bpexch-casino-fallback{font-size:32px;color:#d5b276}
+.bpexch-casino-name{display:block;font-size:12px;font-weight:700;line-height:1.25;min-height:29px;padding:5px 3px 0;overflow-wrap:anywhere}
+.bpexch-casino-mode{display:block;font-size:10px;color:#8be6c4;font-weight:700}
+.bpexch-casino-game:hover{transform:translateY(-2px);box-shadow:0 3px 12px #07111a33}
+.bpexch-casino-game:focus-visible,.bpexch-casino-footer button:focus-visible,.bpexch-casino-search:focus-within{outline:2px solid #00b181;outline-offset:2px}
+.bpexch-casino-footer{text-align:center;padding:10px 8px 18px;color:#254465}
+.bpexch-casino-footer button{background:#00b181;color:#fff;border:0;padding:8px 14px;font-size:13px;font-weight:700;border-radius:3px;cursor:pointer}
+.bpexch-casino-footer p{margin:9px 0 0;font-size:11px}
+.bpexch-casino-no-results,.bpexch-casino-empty p{color:#254465;text-align:center;padding:25px 12px}
+@keyframes bpexch-casino-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:767px){.bpexch-casino-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px}.bpexch-casino-name{font-size:11px;min-height:31px}.bpexch-casino-header h2{font-size:15px}.bpexch-casino-toolbar{padding:7px 6px}}
+@media(max-width:355px){.bpexch-casino-search{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.bpexch-casino-game{animation:none;transition:none}}
