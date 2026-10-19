@@ -1,3 +1,4 @@
+import { todayInExchangeTimezone } from "@/lib/exchangeDate";
 import { queryReport } from "@/services/reports";
 import { serviceRequest } from "@/services/client";
 import { ReferenceAmountTables } from "@/components/reports/ReferenceAmountTables";
@@ -15,7 +16,7 @@ import { ExportButtons } from "@/components/reports/ExportButtons";
 
 export default function DailyPL() {
   const [activeTab, setActiveTab] = useState("Daily PL");
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayInExchangeTimezone();
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
   const [searchTrigger, setSearchTrigger] = useState(0);
