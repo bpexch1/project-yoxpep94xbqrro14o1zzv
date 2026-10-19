@@ -53,7 +53,18 @@ export function ClientSummaryCard({
     setIsLoadingBalances(true);
     try {
       await onRefresh?.();
-      setAccountDetails({});
+      // Fetch the visible accounts before switching from the unloaded reference
+      // state, so post-click rows do not briefly render stale fallback amounts.
+      const visible = paginatedClients.filter(client => Boolean(client.id));
+      const fetched: Record<string, Account | null> = {};
+      for (let index = 0; index < visible.length; index += 5) {
+        const batch = visible.slice(index, index + 5);
+        const results = await Promise.allSettled(batch.map(client => readAccount(client.id)));
+        results.forEach((result, offset) => {
+          fetched[batch[offset].id] = result.status === "fulfilled" ? result.value : null;
+        });
+      }
+      setAccountDetails(fetched);
       setBalancesLoaded(true);
       setExpandedIds(new Set());
     } catch {
@@ -277,7 +288,7 @@ export function ClientSummaryCard({
       {/* 1. Header Bar (Inspected card-header) */}
       {!hideHeader && (
         <div className="card-header">
-          <span><strong>{username}</strong> - Clients List{!balancesLoaded ? " | Default" : ""}</span>
+          <span><strong>{username}</strong> - Clients List</span>
         </div>
       )}
 
@@ -456,8 +467,11 @@ export function ClientSummaryCard({
                 {!balancesLoaded ? (
                   <td colSpan={columnCount} className="px-3.5 py-2.5 border-b border-[#007a62]">
                     <button
+                      type="button"
                       onClick={handleLoadBalance}
-                      className="btn btn-warning"
+                      disabled={isLoadingBalances || isLoading}
+                      aria-busy={isLoadingBalances}
+                      className="btn btn-warning disabled:opacity-60"
                     >
                       {isLoadingBalances ? "Loading..." : "Load Balance"}
                     </button>
