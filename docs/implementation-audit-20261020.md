@@ -19,7 +19,7 @@ mobile behavior remain unverified against the reference.
 | Area | Existing code / database | Verification / gap |
 | --- | --- | --- |
 | React shell and navigation | `src/App.tsx`, `src/pages/UserDashboard.tsx`, account and report routes | Build passes; authenticated browser workflows not yet verified |
-| Cricket | DB-backed `Match.list()`, demo quotes, `exchange-api` licensed-feed adapter | New CricketData score read path is separate, with no tradable price; real provider call needs a server secret |
+| Cricket | DB-backed `Match.list()`, demo quotes, `exchange-api` licensed-feed adapter | New CricketData score read path is separate, with no tradable price; real provider call needs a server secret. Legacy invented fancy/bookmaker prices were removed from the match page. |
 | Betting | `exchange_request(placeBet,lockMarket,settle)`, `bets`, `exchange_quotes`, `exchange_audit` | Atomic immediate fills, reserve, Back/Lay settlement, commission, idempotent request replay tested in isolated SQL; unmatched placement and cancellation are not implemented |
 | Cash/Credit and hierarchy | `manual_wallet_transfer_session`, `saveClient`, account/share triggers, ledger and reports | Isolated staging SQL suites pass; authenticated UI and concurrency load tests remain |
 | Teen Patti Studio | `teenpatti-studio` Edge Function, server-generated outcome, `studio_rounds`, `studio_settle_due`, pg_cron | Round/rule tests and settlement SQL pass; cron active on isolated staging; browser playthrough remains |
