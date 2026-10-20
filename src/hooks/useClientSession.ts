@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 const SESSION_KEY = "clientSession";
 
+const clearLegacySession = () => localStorage.removeItem(SESSION_KEY);
+
 export interface ClientSession {
   id: string;
   username: string;
@@ -17,24 +19,29 @@ export interface ClientSession {
 
 export const setClientSession = (session: ClientSession | null) => {
   if (session) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    clearLegacySession();
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   } else {
-    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+    clearLegacySession();
   }
 };
 
 export const getClientSession = (): ClientSession | null => {
   try {
-    const data = localStorage.getItem(SESSION_KEY);
+    clearLegacySession();
+    if (!sessionStorage.getItem("exchangeSessionToken")) return null;
+    const data = sessionStorage.getItem(SESSION_KEY);
     return data ? JSON.parse(data) : null;
   } catch {
-    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     return null;
   }
 };
 
 export const clearClientSession = () => {
-  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+  clearLegacySession();
 };
 
 export const useClientSession = () => {
