@@ -91,3 +91,14 @@
 @media(prefers-reduced-motion:reduce){.studio-spinning-wheel,.studio-aircraft,.studio-die,.studio-coin-flip,.slots-scene span{animation:none}}
 
 .studio-round-result{background:#17281e;color:#f4edda;padding:10px;margin-top:8px;border:1px solid #a78a44}.studio-round-result h2{font-size:13px;margin-bottom:4px}.studio-round-result .studio-result>strong{padding-top:2px}.studio-round-result ul{margin:6px 0 0;padding-left:18px;font-size:11px}.studio-round-result li{margin:3px 0}.studio-round-result li strong{color:#c7ec88}
+
+/* 32 Cards reference-style four positions. The board reveals only server-public cards. */
+.studio-32-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:440px;margin:12px auto 0}
+.studio-32-player{min-width:0;min-height:116px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto;align-items:center;gap:2px 8px;padding:7px;border:1px solid #705e3c;border-radius:5px;background:#0a231ab8}
+.studio-32-player>strong{grid-column:1/-1;color:#e2d1a4;font-size:12px}
+.studio-32-player>.studio-card{grid-row:2/4}
+.studio-32-player>span{font-size:12px;overflow-wrap:anywhere}
+.studio-32-player>b{font-size:10px;color:#a5e96b}
+.studio-32-player.winner{border-color:#aeef76;background:#255d2b}
+.studio-32-board>p{grid-column:1/-1;text-align:center;color:#e9d697;font-size:12px}
+.studio-slip-body .profit{color:#16845a}.studio-slip-body .loss{color:#b63342}

@@ -1,34 +1,40 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {configFor,createOutcome,handScore,compare,shuffledDeck,rank} from '../supabase/functions/teenpatti-studio/engine.ts';
+import {configFor,createOutcome,handScore,compare,shuffledDeck,rank,score32Cards} from '../supabase/functions/teenpatti-studio/engine.ts';
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
 import {currentRoundMatchedBets,settledRoundBets} from '../src/features/teenpatti/bets.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
-test('34 supplied-thumbnail games are playable with two-sided finite prices',()=>{const live=studioGames.filter(g=>g.playable);assert.equal(live.length,34);for(const g of live){const c=configFor(g.id);assert.ok(c?.runners.length>0,g.name);for(const r of c.runners){assert.ok(r.odds>1&&r.layOdds>=r.odds&&r.layOdds<=1000,g.name);}}});
+test('only bounded demo mechanics accept bets; 34 lobby tiles remain',()=>{const live=studioGames.filter(g=>g.playable);assert.equal(studioGames.length,34);assert.equal(live.length,13);assert.equal(studioGames.filter(g=>g.status==='UNAVAILABLE').length,21);for(const g of live){const c=configFor(g.id);assert.ok(c?.runners.length>0,g.name);assert.equal(g.status,'LIMITED');for(const r of c.runners){assert.ok(r.odds>1&&r.layOdds>=r.odds&&r.layOdds<=1000,g.name);}}for(const id of ['9301','9022','9040','9023','9100','9035','9030','9021'])assert.equal(configFor(id),null,id);});
 test('catalog contains only the 34 supplied thumbnail games',()=>{
  assert.equal(studioGames.length,34);assert.equal(new Set(studioGames.map(x=>x.id)).size,34);
  for(const g of studioGames)assert.equal(!!configFor(g.id),g.playable,g.name);
 });
-test('matched bets are round-scoped and settled results stay separate from history',()=>{
+test('matched bets stay through ROUND OVER and clear on next round without deleting history',()=>{
  const rows=[{id:'a',round_id:'R1',status:'pending'},{id:'b',round_id:'R1',status:'won'},{id:'c',round_id:'R2',status:'pending'},{id:'d',round_id:'R1',status:'matched'}];
- assert.deepEqual(currentRoundMatchedBets(rows,'R1').map(x=>x.id),['a','d']);
+ assert.deepEqual(currentRoundMatchedBets(rows,'R1').map(x=>x.id),['a','b','d']);
+ assert.deepEqual(currentRoundMatchedBets(rows,'R2').map(x=>x.id),['c']);
  assert.deepEqual(settledRoundBets(rows,'R1').map(x=>x.id),['b']);
  assert.equal(rows.length,4,'filtering active rows must not delete historical rows');
 });
-test('32 Cards exposes the requested runner labels and deals from a 32-card deck',()=>{
+test('32 Cards uses base plus card rank with a conservative tie void',()=>{
  const cfg=configFor('9010');assert.deepEqual(cfg.runners.map(x=>x.name),['Player 8','Player 9','Player 10','Player 11']);
  assert.deepEqual(cfg.runners.map(x=>x.id),['8','9','10','11']);
+ assert.deepEqual(score32Cards([card(6),card(6,1),card(13),card(11)]),[14,15,23,22]);
+ assert.deepEqual(score32Cards([card(13),card(12,1),card(11,2),card(10,3)]),[21,21,21,21]);
+ assert.throws(()=>score32Cards([0,0,1,2]),/Invalid/);
  for(let n=0;n<100;n++){
   const outcome=createOutcome('9010');const cards=outcome.groups.flatMap(g=>g.cards||[]);
-  assert.equal(cards.length,4);assert.equal(new Set(cards).size,4);assert.ok(cards.every(c=>c%13>=5));
+  assert.equal(cards.length,4);assert.equal(new Set(cards).size,4);
+  assert.deepEqual(outcome.groups.map(g=>g.value),score32Cards(cards).map((t,i)=>`${i+8} + ${rank(cards[i])} = ${t}`));
+  const totals=score32Cards(cards),best=Math.max(...totals),indices=totals.map((t,i)=>t===best?i:-1).filter(i=>i>=0);
+  assert.equal(outcome.winner,indices.length===1?String(indices[0]+8):null);
   assert.ok(outcome.winner===null||cfg.runners.some(r=>r.id===outcome.winner));
  }
 });
 test('each gameplay family has a server-owned timing policy',()=>{
- assert.notDeepEqual(configFor('9010').timing,configFor('9022').timing);
- assert.notDeepEqual(configFor('9022').timing,configFor('9030').timing);
- assert.deepEqual(configFor('9030').timing,{bettingSeconds:18,resultSeconds:12});
- for(const game of studioGames){const timing=configFor(game.id).timing;assert.ok(timing.bettingSeconds>0&&timing.resultSeconds>0,game.name);}
+ assert.notDeepEqual(configFor('9010').timing,configFor('9015').timing);
+ assert.deepEqual(configFor('9010').timing,{bettingSeconds:20,resultSeconds:10,revealSeconds:7});
+ for(const game of studioGames.filter(g=>g.playable)){const timing=configFor(game.id).timing;assert.ok(timing.bettingSeconds>0&&timing.resultSeconds>0,game.name);}
 });
 test('Teen Patti ranking, A23, ties and pair kickers',()=>{
  const trail=[card(5),card(5,1),card(5,2)];

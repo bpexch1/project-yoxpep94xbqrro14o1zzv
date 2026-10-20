@@ -2,7 +2,7 @@
 // Odds are an immutable round quote snapshot; wins are computed on the server.
 export type Outcome = { winner: string|null; groups: {label:string;cards?:number[];value?:string}[];summary:string };
 export type Runner = {id:string;name:string;odds:number;layOdds:number};
-export type Config = {id:string;name:string;rules:string;kind:string;timing:{bettingSeconds:number;resultSeconds:number};runners:Runner[]};
+export type Config = {id:string;name:string;rules:string;kind:string;timing:{bettingSeconds:number;resultSeconds:number;revealSeconds?:number};runners:Runner[]};
 const games: Record<string,[string,string,string[],string]> = {
  '9301':['Chicken Road 2','arcade',['Safe crossing','Risk crossing','Gold crossing'],'Choose a route before the round closes. This is an independent three-route simulation.'],
  '9022':['Aviator','crash',['Below 2x','2x to 5x','Above 5x'],'Virtual flight multiplier prediction. This is not a real-time cash-out game.'],
@@ -22,7 +22,7 @@ const games: Record<string,[string,string,string[],string]> = {
  '9008':['Ammar Akbar Anthony','cards3',['Ammar','Akbar','Anthony'],'Virtual highest-card prediction among three sides; ties void.'],
  '9009':['Super Over OneDay','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
  '9011':['Super Over T20','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
- '9010':['32 Cards','cards4',['Player 8','Player 9','Player 10','Player 11'],'Independent 32-card demo: one card is dealt to each player from ranks 7 through Ace; the highest card wins and equal ranks void.'],
+ '9010':['32 Cards','cards4',['Player 8','Player 9','Player 10','Player 11'],'Independent demo: add each player’s base number (8, 9, 10, 11) to their revealed card rank. Highest total wins; equal highest totals void. Exact provider tie rules remain unverified.'],
  '9012':['Bollywood Casino','cards3',['Hero','Heroine','Villain'],'Independent virtual three-card high-card draw; ties void.'],
  '9016':['Race To 17','sports',['0–7','8–12','13–17'],'Independent virtual number-draw game.'],
  '9017':['High Card','cards',['Player A','Player B'],'Higher single card wins. Equal rank voids the round.'],
@@ -39,6 +39,9 @@ const games: Record<string,[string,string,string[],string]> = {
  '9085':['Heads & Tails','coin',['Heads','Tails'],'Independent virtual coin toss.'],
  '9105':['Fortune Gems','slots',['Red gem','Blue gem','Gold gem'],'Independent virtual three-symbol gem selection.']
 };
+// Incomplete interactive and generic-placeholder tables stay in the lobby but
+// cannot open a new betting round until their actual mechanics are implemented.
+const enabledDemoIds=new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085']);
 const oddsFor = (id:string,count:number,i:number):number => {
  if(id==='9030')return 36;
  if(id==='9035')return [2,3,6,12,24,48][i];
@@ -52,9 +55,9 @@ const oddsFor = (id:string,count:number,i:number):number => {
  return 1.95;
 };
 export function configFor(id:string):Config|null {
- const row=games[id]; if(!row)return null;
+ const row=games[id]; if(!row||!enabledDemoIds.has(id))return null;
  const [name,kind,names,rules]=row;
- const timing=kind==='crash'?{bettingSeconds:8,resultSeconds:12}:kind==='wheel'||kind==='roulette'?{bettingSeconds:18,resultSeconds:12}:kind==='dice'?{bettingSeconds:15,resultSeconds:10}:kind==='arcade'?{bettingSeconds:16,resultSeconds:10}:{bettingSeconds:20,resultSeconds:10};
+ const timing=id==='9010'?{bettingSeconds:20,resultSeconds:10,revealSeconds:7}:kind==='crash'?{bettingSeconds:8,resultSeconds:12}:kind==='wheel'||kind==='roulette'?{bettingSeconds:18,resultSeconds:12}:kind==='dice'?{bettingSeconds:15,resultSeconds:10}:kind==='arcade'?{bettingSeconds:16,resultSeconds:10}:{bettingSeconds:20,resultSeconds:10};
  return {id,name,kind,timing,rules:'FREE-COIN DEMO. '+rules+' No cash value. Results are simulated independently.',
  runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
 }
@@ -82,14 +85,25 @@ export function handScore(cards:number[]):number[]{
 export function compare(a:number[],b:number[]):number{
  for(let i=0;i<Math.max(a.length,b.length);i++){const n=(a[i]||0)-(b[i]||0);if(n)return Math.sign(n);}return 0;
 }
+export function score32Cards(cards:number[]):number[]{
+ if(cards.length!==4||new Set(cards).size!==4||cards.some(c=>!Number.isInteger(c)||c<0||c>=52))throw new Error('Invalid 32 Cards deal');
+ return cards.map((card,i)=>i+8+rank(card));
+}
 export function createOutcome(id:string,rand=randomInt):Outcome{
  const cfg=configFor(id);if(!cfg)throw new Error('Game unavailable');
  const {kind,runners}=cfg,deck=shuffledDeck(rand);
  const result=(index:number|null,groups:Outcome['groups'],summary:string):Outcome=>({winner:index===null?null:runners[index].id,groups,summary});
- if(['teen','teen3','muflis','cards','cards3','cards4'].includes(kind)){
+ if(kind==='cards4'){
+  // The reference includes both a six and a king; a ranks-7-to-A deck cannot produce it.
+  // Keep the independent draw honest while the provider's deck composition is unverified.
+  const cards=deck.slice(0,4),totals=score32Cards(cards),best=Math.max(...totals);
+  const winners=totals.map((total,i)=>total===best?i:-1).filter(i=>i>=0);
+  const groups=runners.map((r,i)=>({label:r.name,cards:[cards[i]],value:`${i+8} + ${rank(cards[i])} = ${totals[i]}`}));
+  return result(winners.length===1?winners[0]:null,groups,winners.length===1?`${runners[winners[0]].name} wins with ${best}`:'Equal highest totals — bets void');
+ }
+ if(['teen','teen3','muflis','cards','cards3'].includes(kind)){
   const size=['teen','teen3','muflis'].includes(kind)||id==='9021'?3:1;
-  const cardsForGame=kind==='cards4'?deck.filter(c=>c%13>=5):deck;
-  const groups=runners.map((r,i)=>({label:r.name,cards:cardsForGame.slice(i*size,(i+1)*size)}));
+  const groups=runners.map((r,i)=>({label:r.name,cards:deck.slice(i*size,(i+1)*size)}));
   const scores=groups.map(g=>size===3?handScore(g.cards):[rank(g.cards[0])]);
   const direction=kind==='muflis'?-1:1;let best=0;
   for(let i=1;i<scores.length;i++)if(compare(scores[i],scores[best])*direction>0)best=i;

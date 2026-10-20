@@ -48,10 +48,36 @@ begin
   if sum_pl<>-(receipt->>'profit')::numeric then raise exception 'P/L mismatch';end if;
   if (select count(*) from public.transactions where client_username=user_name and type='bet_settlement' and description like '%'||rid||'%')<>1 then raise exception 'Duplicate settlement ledger';end if;
   state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
-  if jsonb_array_length(state->'matchedBets')<>0 then raise exception 'Settled order remained in active Matched Bets'; end if;
+  if jsonb_array_length(state->'matchedBets')<>1 or state->'matchedBets'->0->>'id'<>bet->>'id' then raise exception 'Same-round settled bet disappeared before ROUND OVER ended'; end if;
   if not exists(select 1 from jsonb_array_elements(state->'bets') x where x->>'id'=bet->>'id' and x->>'status'=case kind when 'win' then 'won' when 'loss' then 'lost' else 'void' end) then raise exception 'Settled order missing from historical bets'; end if;
   update public.studio_rounds set ends_at=clock_timestamp()-interval '0.5 second' where id=rid;
+  state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
+  if state->'round'->>'id'=rid::text or jsonb_array_length(state->'matchedBets')<>0 then raise exception 'Next-round Matched Bets retained prior round'; end if;
  end loop;
+ -- 32 Cards reveals its four cards from server time, then settles and keeps the
+ -- just-finished wager through ROUND OVER. Test data remains in this rollback.
+ conf:='{"id":"9010","name":"32 Cards","timing":{"bettingSeconds":20,"resultSeconds":10,"revealSeconds":7},"runners":[{"id":"8","name":"Player 8","odds":3.85,"layOdds":3.93},{"id":"9","name":"Player 9","odds":3.85,"layOdds":3.93},{"id":"10","name":"Player 10","odds":3.85,"layOdds":3.93},{"id":"11","name":"Player 11","odds":3.85,"layOdds":3.93}]}'::jsonb;
+ outcome:='{"winner":"10","summary":"Player 10 wins with 23","groups":[{"label":"Player 8","cards":[4],"value":"8 + 6 = 14"},{"label":"Player 9","cards":[17],"value":"9 + 6 = 15"},{"label":"Player 10","cards":[11],"value":"10 + 13 = 23"},{"label":"Player 11","cards":[9],"value":"11 + 11 = 22"}]}'::jsonb;
+ market:='qa-studio-'||gen_random_uuid()::text;
+ perform public.exchange_ingest(jsonb_build_array(jsonb_build_object('id',market,'eventId',market,'eventName','QA 32 Cards','sport','casino','name','QA 32 Cards','startTime',clock_timestamp(),'status','OPEN','delayed',false,'observedAt',clock_timestamp(),'runners',conf->'runners','quotes','[{"runnerId":"8","selection":"Player 8","side":"back","odds":3.85,"size":10000}]'::jsonb)));
+ update public.exchange_markets set is_demo=true where id=market;
+ insert into public.studio_rounds(game_id,market_id,config,outcome,closes_at,ends_at) values('9010',market,conf,outcome,clock_timestamp()+interval '20 seconds',clock_timestamp()+interval '30 seconds') returning id into rid;
+ request:=jsonb_build_object('roundId',rid,'requestId',gen_random_uuid(),'runnerId','8','side','back','stake',100,'odds',3.85);
+ bet:=public.studio_request(player->>'token','bet',request);
+ update public.studio_rounds set closes_at=clock_timestamp()-interval '3 seconds',ends_at=clock_timestamp()+interval '7 seconds' where id=rid;
+ state:=public.studio_request(player->>'token','state','{"gameId":"9010"}',conf,outcome);
+ if (state->'round'->>'settled')::boolean or state->'round'->'outcome'->>'winner' is not null then raise exception '32 Cards winner disclosed before final reveal'; end if;
+ if jsonb_array_length(state->'round'->'outcome'->'groups'->0->'cards')<>1 or jsonb_array_length(state->'round'->'outcome'->'groups'->1->'cards')<>0 then raise exception '32 Cards staged reveal count wrong'; end if;
+ if jsonb_array_length(state->'matchedBets')<>1 then raise exception '32 Cards bet vanished during reveal'; end if;
+ update public.studio_rounds set closes_at=clock_timestamp()-interval '8 seconds',ends_at=clock_timestamp()+interval '2 seconds' where id=rid;
+ perform public.studio_settle_due();
+ state:=public.studio_request(player->>'token','state','{"gameId":"9010"}',conf,outcome);
+ if (state->'round'->>'settled')::boolean is false or state->'round'->'outcome'->>'winner'<>'10' then raise exception '32 Cards final winner missing'; end if;
+ if jsonb_array_length(state->'matchedBets')<>1 or state->'matchedBets'->0->>'status'<>'lost' then raise exception '32 Cards ROUND OVER wager missing'; end if;
+ update public.studio_rounds set ends_at=clock_timestamp()-interval '1 second' where id=rid;
+ state:=public.studio_request(player->>'token','state','{"gameId":"9010"}',conf,outcome);
+ if state->'round'->>'id'=rid::text or jsonb_array_length(state->'matchedBets')<>0 then raise exception '32 Cards next round did not reset live panel'; end if;
+ if not exists(select 1 from jsonb_array_elements(state->'bets') x where x->>'id'=bet->>'id' and x->>'status'='lost') then raise exception '32 Cards historical bet missing'; end if;
  denied:=false;
  begin perform public.studio_request('invalid-token','state','{"gameId":"9085"}',conf,outcome);
  exception when others then if sqlerrm='Authentication required' then denied:=true;else raise;end if;end;
@@ -59,4 +85,4 @@ begin
  if has_table_privilege('anon','public.studio_rounds','select') or has_function_privilege('authenticated','public.studio_request(text,text,jsonb,jsonb,jsonb)','execute') then raise exception 'Public access to hidden results';end if;
 end $qa$;
 rollback;
-select 'PASS: authenticated rounds, private outcomes, credit-backed reserve, duplicate replay, cutoff bypass rejection, win/loss/void, single ledger settlement and upline P/L. Synthetic data rolled back.' as result;
+select 'PASS: round-over retention/next-round reset, staged 32 Cards reveal/settlement, authenticated win/loss/void, wallet/ledger/upline P-L. Synthetic data rolled back.' as result;
