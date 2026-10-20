@@ -17,6 +17,7 @@ import { Loader2, Trophy } from "lucide-react";
 import { TennisIcon, CricketIcon, SoccerIcon } from "@/components/icons/ReferenceSportsIcons";
 import { SportsBookIcon } from "@/components/icons/CustomIcons";
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
+import { getCricketFeed } from "@/services/cricket";
 
 // Crisp SVG Icons matching the screenshots
 const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string; color?: string; size?: number }) => {
@@ -126,6 +127,11 @@ export default function UserDashboard() {
   });
 
   const safeMatches = Array.isArray(matches) ? matches : [];
+  const { data: cricketFeed, error: cricketError } = useQuery({
+    queryKey: ["cricket-feed"], queryFn: getCricketFeed, enabled: !!session,
+    staleTime: 60_000, refetchInterval: 120_000, retry: 1,
+  });
+  const providerMatches = (cricketFeed?.matches || []).filter((match) => match.status !== "completed");
 
   // Fetch real-time client data for balance
   const { data: clients } = useQuery({
@@ -242,14 +248,14 @@ export default function UserDashboard() {
 
   const categories = [
     { id: "Inplay", label: "Inplay", count: inplayCount },
-    { id: "Cricket", label: "Cricket", count: cricketCount },
+    { id: "Cricket", label: "Cricket", count: cricketCount + providerMatches.length },
     { id: "Tennis", label: "Tennis", count: tennisCount },
     { id: "Soccer", label: "Soccer", count: soccerCount },
     { id: "SportsBook", label: "SportsBook", count: matchesList.length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
-    if (activeFilter === "Inplay") return true;
+    if (activeFilter === "Inplay") return m.status === "live";
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === "soccer") return sport === "football" || sport === "soccer";
@@ -379,6 +385,28 @@ export default function UserDashboard() {
           <CasinoSection title={activeFilter === "Casino" ? "Premium Casino" : `${activeFilter} Feed`} />
         ) : (
           <div className="flex flex-col bg-white">
+            {(activeFilter === "Cricket" || activeFilter === "Inplay" || activeFilter === "SportsBook") && (
+              <section className="border-b border-gray-200 p-3" aria-label="Cricket score provider matches">
+                <h2 className="text-sm font-bold text-[#142a45]">Cricket scores · CricketData</h2>
+                {cricketFeed?.stale && <p className="text-xs text-amber-800">Score feed delayed; showing cached information.</p>}
+                {cricketError && <p role="status" className="text-xs text-gray-600">Cricket score feed unavailable. Existing exchange markets are shown separately.</p>}
+                {cricketFeed && providerMatches.length === 0 && <p role="status" className="text-xs text-gray-600">No live or upcoming matches in the current score feed.</p>}
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {providerMatches.filter((match) => activeFilter !== "Inplay" || match.status === "live").map((match) => (
+                    <button key={match.id} type="button" onClick={() => navigate(`/play/cricket/${encodeURIComponent(match.providerId)}`)}
+                      className="rounded border border-gray-200 p-3 text-left hover:border-[#19A9D1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#19A9D1]">
+                      <span className="text-xs font-semibold uppercase text-[#254465]">{match.status} · Score only</span>
+                      <strong className="mt-1 block text-sm">{match.teams.join(" vs ")}</strong>
+                      <span className="block text-xs text-gray-600">{match.statusText || (match.startsAt ? new Date(match.startsAt).toLocaleString() : "Time pending")}</span>
+                      {match.scores.map((score, index) => <span key={`${score.inning}-${index}`} className="block text-xs text-[#254465]">
+                        {score.inning}: {score.runs}/{score.wickets} ({score.overs} ov)
+                      </span>)}
+                      <span className="block text-xs text-amber-800">Back/Lay unavailable · no licensed odds</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
             {orderedSports.map((sport) => {
               const sportMatches = groupedMatches[sport] || [];
 
@@ -421,7 +449,7 @@ export default function UserDashboard() {
               );
             })}
 
-            {filteredMatches.length === 0 && (
+            {filteredMatches.length === 0 && providerMatches.filter((match) => activeFilter !== "Inplay" || match.status === "live").length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 text-center px-4 bg-white m-3 rounded border border-gray-200">
                 <Trophy className="w-12 h-12 text-[#173456]/30 mb-3" />
                 <p className="text-sm font-bold text-[#173456] uppercase tracking-wide">

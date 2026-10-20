@@ -12,3 +12,7 @@ verify_jwt = false
 # Custom exchange session is verified by studio_request on every call.
 [functions.teenpatti-studio]
 verify_jwt = false
+
+# Custom exchange session is checked before the server fetches cached scores.
+[functions.cricket-feed]
+verify_jwt = false

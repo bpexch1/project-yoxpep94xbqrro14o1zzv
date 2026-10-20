@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "npm run test:hierarchy && npm run test:v2 && npm run test:wallet && npm run test:studio && npm run test:accounting && vite build",
+    "build": "npm run test:hierarchy && npm run test:v2 && npm run test:wallet && npm run test:studio && npm run test:accounting && npm run test:cricket && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint . --max-warnings=999",
     "preview": "vite preview",
@@ -16,6 +16,7 @@
     "test:aws-exchange": "node --test tests/aws-exchange.test.mjs",
     "test:studio": "node --experimental-strip-types --test tests/teenpatti-engine.test.mjs",
     "test:accounting": "node --experimental-strip-types --test tests/accounting-validation.test.mjs",
+    "test:cricket": "node --experimental-strip-types --test tests/cricket-feed.test.mjs",
     "test:accounting:db": "node tests/database/run-local.mjs"
   },
   "dependencies": {

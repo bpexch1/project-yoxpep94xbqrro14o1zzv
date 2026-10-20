@@ -28,6 +28,7 @@ import UserProfitLoss from "@/pages/UserProfitLoss";
 import UserBetHistory from "@/pages/UserBetHistory";
 import AdminMarketPage from "@/pages/AdminMarketPage";
 import MatchDetail from "@/pages/MatchDetail";
+import CricketProviderMatch from "@/pages/CricketProviderMatch";
 import EditClientPage from "@/pages/accounts/EditClientPage";
 import CashCreditPage from "@/pages/accounts/CashCreditPage";
 import SettlePLPage from "@/pages/accounts/SettlePLPage";
@@ -110,6 +111,7 @@ const App = () => (
             <Route path="/admin/profile" element={<AppLayout><UserProfile /></AppLayout>} />
             {/* User Client Routes */}
             <Route path="/play" element={<UserDashboard />} />
+            <Route path="/play/cricket/:providerId" element={<CricketProviderMatch />} />
             <Route path="/teenpatti-studio" element={<TeenPattiStudio />} />
             <Route path="/Common/BetProGames" element={<TeenPattiStudio />} />
             <Route path="/casino" element={<UserDashboard />} />

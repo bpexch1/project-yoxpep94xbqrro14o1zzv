@@ -42,6 +42,7 @@ export async function getLiveMarketOdds(eventId: string) {
     markets: markets.map((m) => ({
       marketId: m.id,
       marketName: m.name,
+      isDemo: m.is_demo === true,
       status: m.status,
       stale: !isFreshMarket(m),
       runners: m.runners.map((r) => ({
