@@ -1,16 +1,17 @@
 begin;
 set local role service_role;
 do $qa$
-declare root_name text; role_name text; parent_name text; user_name text:='qa_studio_'||substr(replace(gen_random_uuid()::text,'-',''),1,12); player jsonb; conf jsonb; outcome jsonb; state jsonb; bet jsonb; request jsonb; receipt jsonb; balance numeric; sum_pl numeric; denied boolean; kind text; rid uuid; market text;
+declare root_name text; role_name text; parent_name text; user_name text:='qa_studio_'||substr(replace(gen_random_uuid()::text,'-',''),1,12); player jsonb; conf jsonb; outcome jsonb; state jsonb; bet jsonb; request jsonb; receipt jsonb; balance numeric; sum_pl numeric; denied boolean; kind text; rid uuid; market text; level_no integer:=0; shares numeric[]:=array[85,70,60,10,0];
 begin
  select username into root_name from public.clients where lower(role)='company' and status='active' limit 1;
  if root_name is null then raise exception 'No Company root'; end if;
  parent_name:=root_name;
  foreach role_name in array array['superadmin','admin','supermaster','master'] loop
-  insert into public.clients(username,password,role,parent_username,downline_share) values(user_name||'_'||role_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),role_name,parent_name,50);
+  level_no:=level_no+1;
+  insert into public.clients(username,password,role,parent_username,downline_share,can_settle_pl) values(user_name||'_'||role_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),role_name,parent_name,shares[level_no],true);
   parent_name:=user_name||'_'||role_name;
  end loop;
- insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true);
+ insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed,downline_share,can_settle_pl) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true,shares[5],true);
  player:=public.exchange_login(user_name,'SyntheticOnly984!');
  conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","runners":[{"id":"1","name":"Heads","odds":1.95,"layOdds":2.03},{"id":"2","name":"Tails","odds":1.95,"layOdds":2.03}]}'::jsonb;
  foreach kind in array array['win','loss','void'] loop
@@ -20,6 +21,7 @@ begin
   -- If a real demo round already exists, use an isolated synthetic game round instead.
   market:='qa-studio-'||gen_random_uuid()::text;
   perform public.exchange_ingest(jsonb_build_array(jsonb_build_object('id',market,'eventId',market,'eventName','QA Studio','sport','casino','name','QA','startTime',clock_timestamp(),'status','OPEN','delayed',false,'observedAt',clock_timestamp(),'runners',conf->'runners','quotes','[{"runnerId":"1","selection":"Heads","side":"back","odds":1.95,"size":10000}]'::jsonb)));
+  update public.exchange_markets set is_demo=true where id=market;
   insert into public.studio_rounds(game_id,market_id,config,outcome,closes_at,ends_at) values('9085',market,conf,outcome,clock_timestamp()+interval '20 seconds',clock_timestamp()+interval '30 seconds') returning id into rid;
   if state->'round'->'outcome'<>'null'::jsonb and (state->'round'->>'settled')::boolean is false then raise exception 'Outcome disclosed before close'; end if;
   select cash+credit_remaining+pl_downline into balance from public.clients where username=user_name;
@@ -27,6 +29,9 @@ begin
   bet:=public.studio_request(player->>'token','bet',request);
   receipt:=public.studio_request(player->>'token','bet',request);
   if bet->>'id'<>receipt->>'id' then raise exception 'Duplicate bet'; end if;
+  state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
+  if jsonb_array_length(state->'matchedBets')<>1 or state->'matchedBets'->0->>'id'<>bet->>'id' or state->'matchedBets'->0->>'round_id'<>rid::text then raise exception 'Accepted bet missing from current Matched Bets'; end if;
+  if (state->'matchedBets'->0->>'stake')::numeric<>100 or (state->'matchedBets'->0->>'odds')::numeric<>1.95 or state->'matchedBets'->0->>'bet_type'<>'back' then raise exception 'Matched bet receipt mismatch'; end if;
   if (select cash+credit_remaining+pl_downline from public.clients where username=user_name)<>balance-100 then raise exception 'Reserve mismatch'; end if;
   update public.studio_rounds set closes_at=clock_timestamp()-interval '1 second' where id=rid;
   denied:=false;
@@ -42,6 +47,9 @@ begin
   select coalesce(sum(allocated_pl),0) into sum_pl from public.exchange_pl_allocations where bet_id=(bet->>'id')::uuid;
   if sum_pl<>-(receipt->>'profit')::numeric then raise exception 'P/L mismatch';end if;
   if (select count(*) from public.transactions where client_username=user_name and type='bet_settlement' and description like '%'||rid||'%')<>1 then raise exception 'Duplicate settlement ledger';end if;
+  state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
+  if jsonb_array_length(state->'matchedBets')<>0 then raise exception 'Settled order remained in active Matched Bets'; end if;
+  if not exists(select 1 from jsonb_array_elements(state->'bets') x where x->>'id'=bet->>'id' and x->>'status'=case kind when 'win' then 'won' when 'loss' then 'lost' else 'void' end) then raise exception 'Settled order missing from historical bets'; end if;
   update public.studio_rounds set ends_at=clock_timestamp()-interval '0.5 second' where id=rid;
  end loop;
  denied:=false;

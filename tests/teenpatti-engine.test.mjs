@@ -2,11 +2,32 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {configFor,createOutcome,handScore,compare,shuffledDeck,rank} from '../supabase/functions/teenpatti-studio/engine.ts';
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
+import {currentRoundMatchedBets,settledRoundBets} from '../src/features/teenpatti/bets.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
 test('34 supplied-thumbnail games are playable with two-sided finite prices',()=>{const live=studioGames.filter(g=>g.playable);assert.equal(live.length,34);for(const g of live){const c=configFor(g.id);assert.ok(c?.runners.length>0,g.name);for(const r of c.runners){assert.ok(r.odds>1&&r.layOdds>=r.odds&&r.layOdds<=1000,g.name);}}});
 test('catalog contains only the 34 supplied thumbnail games',()=>{
  assert.equal(studioGames.length,34);assert.equal(new Set(studioGames.map(x=>x.id)).size,34);
  for(const g of studioGames)assert.equal(!!configFor(g.id),g.playable,g.name);
+});
+test('matched bets are round-scoped and settled results stay separate from history',()=>{
+ const rows=[{id:'a',round_id:'R1',status:'pending'},{id:'b',round_id:'R1',status:'won'},{id:'c',round_id:'R2',status:'pending'},{id:'d',round_id:'R1',status:'matched'}];
+ assert.deepEqual(currentRoundMatchedBets(rows,'R1').map(x=>x.id),['a','d']);
+ assert.deepEqual(settledRoundBets(rows,'R1').map(x=>x.id),['b']);
+ assert.equal(rows.length,4,'filtering active rows must not delete historical rows');
+});
+test('32 Cards exposes the requested runner labels and deals from a 32-card deck',()=>{
+ const cfg=configFor('9010');assert.deepEqual(cfg.runners.map(x=>x.name),['Player 8','Player 9','Player 10','Player 11']);
+ assert.deepEqual(cfg.runners.map(x=>x.id),['8','9','10','11']);
+ for(let n=0;n<100;n++){
+  const outcome=createOutcome('9010');const cards=outcome.groups.flatMap(g=>g.cards||[]);
+  assert.equal(cards.length,4);assert.equal(new Set(cards).size,4);assert.ok(cards.every(c=>c%13>=5));
+  assert.ok(outcome.winner===null||cfg.runners.some(r=>r.id===outcome.winner));
+ }
+});
+test('each gameplay family has a server-owned timing policy',()=>{
+ assert.notDeepEqual(configFor('9010').timing,configFor('9022').timing);
+ assert.notDeepEqual(configFor('9022').timing,configFor('9030').timing);
+ for(const game of studioGames){const timing=configFor(game.id).timing;assert.ok(timing.bettingSeconds>0&&timing.resultSeconds>0,game.name);}
 });
 test('Teen Patti ranking, A23, ties and pair kickers',()=>{
  const trail=[card(5),card(5,1),card(5,2)];

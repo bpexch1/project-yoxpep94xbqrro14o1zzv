@@ -89,3 +89,5 @@
 @keyframes studio-dice{0%,100%{transform:rotate(-13deg) scale(.92)}50%{transform:rotate(15deg) scale(1.03)}}
 @keyframes studio-coin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
 @media(prefers-reduced-motion:reduce){.studio-spinning-wheel,.studio-aircraft,.studio-die,.studio-coin-flip,.slots-scene span{animation:none}}
+
+.studio-round-result{background:#17281e;color:#f4edda;padding:10px;margin-top:8px;border:1px solid #a78a44}.studio-round-result h2{font-size:13px;margin-bottom:4px}.studio-round-result .studio-result>strong{padding-top:2px}.studio-round-result ul{margin:6px 0 0;padding-left:18px;font-size:11px}.studio-round-result li{margin:3px 0}.studio-round-result li strong{color:#c7ec88}
