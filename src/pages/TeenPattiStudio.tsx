@@ -3,7 +3,8 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Home, Menu, Search, X, ArrowLeft, RefreshCw } from 'lucide-react';
 import { studioLobbyGames, type Game } from '@/features/teenpatti/catalog';
-import { studioRequest, pendingKey, type StudioState, type StudioBet, type Outcome } from '@/features/teenpatti/api';
+import { studioRequest, pendingKey, type StudioState, type StudioBet, type StudioBetRecord, type Outcome } from '@/features/teenpatti/api';
+import { activeRoundBets } from '@/features/teenpatti/activeBets';
 import { getClientSession } from '@/hooks/useClientAuth';
 import { readAccount } from '@/services/accounting';
 import '@/features/teenpatti/studio.css';
@@ -14,7 +15,12 @@ function Card({value,delay=0}:{value?:number;delay?:number}){
  const suit=value===undefined?'♠':['♠','♥','♣','♦'][Math.floor(value/13)];
  return <span className={`studio-card ${value===undefined?'face-down':'face-up'} ${suit==='♥'||suit==='♦'?'red':''}`} style={{animationDelay:`${delay}ms`}} aria-label={value===undefined?'Hidden card':`${rank}${suit}`}><small>{rank}</small><b>{suit}</b><small>{rank}</small></span>;
 }
-function Result({outcome}:{outcome:Outcome}){return <div className="studio-result"><strong>{outcome.summary}</strong><div className="studio-hands">{outcome.groups.map(g=><div className="studio-hand" key={g.label}><span>{g.label}</span><div className="studio-cards">{g.cards?.map((c,i)=><Card key={c} value={c} delay={i*90}/>)}{g.value&&<b className="studio-result-value">{g.value}</b>}</div></div>)}</div></div>;}
+function Result({outcome,showWinner=false}:{outcome:Outcome;showWinner?:boolean}){
+ return <div className="studio-result"><strong>{outcome.summary}</strong><div className="studio-hands">{outcome.groups.map((g,i)=>{
+  const verdict=showWinner?(outcome.winner===null?'VOID':outcome.winner===String(i+1)?'WINNER':'LOSER'):null;
+  return <div className={`studio-hand${verdict?' studio-hand-'+verdict.toLowerCase():''}`} key={g.label}><span>{g.label}</span><div className="studio-cards">{g.cards?.map((c,j)=><Card key={c} value={c} delay={j*90}/>)}{g.value&&<b className="studio-result-value">{g.value}</b>}</div>{verdict&&<b className="studio-hand-verdict">{verdict}</b>}</div>;
+ })}</div></div>;
+}
 function Artwork({game}:{game:Game}){return <div className="studio-art" style={{'--game-color':game.color} as CSSProperties}><span className="studio-art-pattern">♠ ♦ ♣ ♥</span><span className="studio-art-symbol">{game.symbol}</span><strong>{game.name}</strong><span className="studio-art-line"/></div>;}
 const artworkFiles:Record<string,string>={
  '9301':'chicken-road-2','9022':'aviator','9040':'aviator-x','9023':'blast-off','9100':'cricket-x','9035':'dream-catcher','9001':'teenpatti-t20','9005':'teenpatti-odi',
@@ -49,12 +55,28 @@ function WaitingScene({game,kind,runners}:{game:Game;kind:string;runners:StudioS
 function GameTable({game,username}:{game:Game;username:string}){
  const qc=useQueryClient();const [view,setView]=useState('Game');const [runner,setRunner]=useState<StudioState['config']['runners'][number]|null>(null);const [betSide,setBetSide]=useState<'back'|'lay'>('back');const [stake,setStake]=useState('100');const [busy,setBusy]=useState(false);const busyRef=useRef(false);const [message,setMessage]=useState('');const [pending,setPending]=useState<StudioBet|null>(()=>{try{return JSON.parse(sessionStorage.getItem(pendingKey(username))||'null');}catch{return null;}});
  const [clock,setClock]=useState(Date.now());
+ const [resultNotice,setResultNotice]=useState('');
+ const previousBetStatuses=useRef<Map<string,string>|null>(null);
  const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:()=>studioRequest<StudioState>('state',{gameId:game.id}),refetchInterval:2000,retry:1,enabled:game.playable});
  useEffect(()=>{const id=setInterval(()=>setClock(Date.now()),250);return()=>clearInterval(id);},[]);
  const serverTime=data?new Date(data.serverNow).getTime()+Math.max(0,clock-dataUpdatedAt):clock;
  const seconds=data?Math.max(0,Math.ceil((new Date(data.round.closesAt).getTime()-serverTime)/1000)):0;
  const stale=clock-dataUpdatedAt>6000;
  const canBet=!!data&&!error&&!stale&&!data.round.settled&&seconds>0;
+ // The API may expose a dedicated current-round array; always filter defensively.
+ const activeBets=activeRoundBets(data?.matchedBets??data?.activeBets??data?.bets,data?.round.id);
+ const betRows=view==='Game'?activeBets:(data?.bets??[]);
+ useEffect(()=>{
+  if(!data)return;
+  const current=new Map(data.bets.map(b=>[b.id,b.status]));
+  const previous=previousBetStatuses.current;
+  if(previous){
+   const settled=data.bets.filter(b=>['pending','matched'].includes(previous.get(b.id)||'')&&!['pending','matched'].includes(b.status));
+   if(settled.length)setResultNotice(settled.map(b=>`${b.selection}: ${b.status.toUpperCase()} · P/L ${money(b.profit||0)}`).join(' · '));
+  }
+  previousBetStatuses.current=current;
+ },[data?.bets]);
+ useEffect(()=>{if(!resultNotice)return;const timer=setTimeout(()=>setResultNotice(''),7000);return()=>clearTimeout(timer);},[resultNotice]);
  useEffect(()=>{setRunner(null);},[data?.round.id]);
  useEffect(()=>{if(data){window.dispatchEvent(new Event('balance-updated'));qc.invalidateQueries({queryKey:['studio-account',username]});}},[data?.balance,data?.round.settled,qc,username]);
  async function submit(retry=false){
@@ -67,7 +89,22 @@ function GameTable({game,username}:{game:Game;username:string}){
   try{
    // Persist before sending. A timeout never creates a new wager on retry.
    sessionStorage.setItem(pendingKey(username),JSON.stringify(request));setPending(request);
-   await studioRequest('bet',request);sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);setMessage('Bet accepted. Result and balance update automatically.');await refetch();window.dispatchEvent(new Event('balance-updated'));
+   const receipt=await studioRequest<StudioBetRecord>('bet',request);
+   if(!receipt?.id)throw new Error('Bet receipt unavailable. Check the pending request before submitting again.');
+   // Display only after an authoritative server receipt, and deduplicate by bet ID.
+   qc.setQueryData<StudioState>(['studio',username,game.id],old=>{
+    if(!old||old.round.id!==request.roundId||old.bets.some(b=>b.id===receipt.id))return old;
+    const matched:StudioBetRecord={
+     id:receipt.id,request_id:request.requestId,round_id:request.roundId,
+     selection:receipt.selection||old.config.runners.find(r=>r.id===request.runnerId)?.name||request.runnerId,
+     bet_type:receipt.bet_type||request.side,stake:receipt.stake??request.stake,
+     odds:receipt.odds??request.odds,status:receipt.status||'pending',
+     profit:receipt.profit??null,created_at:receipt.created_at||new Date().toISOString()
+    };
+    return {...old,bets:[matched,...old.bets],activeBets:old.activeBets?[matched,...old.activeBets]:undefined,matchedBets:old.matchedBets?[matched,...old.matchedBets]:undefined};
+   });
+   sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);
+   setMessage('Bet accepted. Matched Bets has been updated.');await refetch();window.dispatchEvent(new Event('balance-updated'));
   }catch(e){const text=e instanceof Error?e.message:'Bet could not be confirmed';setMessage(text);if(/^(Betting closed|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed|Insufficient quoted liquidity|Insufficient balance|Round unavailable)/.test(text)){sessionStorage.removeItem(pendingKey(username));setPending(null);}}
   finally{busyRef.current=false;setBusy(false);}
  }
@@ -78,16 +115,17 @@ function GameTable({game,username}:{game:Game;username:string}){
   <nav className="studio-tabs" aria-label="Game sections">{['Game','Results','Rules','My Bets'].map(v=><button key={v} aria-current={view===v?'page':undefined} onClick={()=>setView(v)}>{v}</button>)}</nav>
   {error&&<p role="alert" className="studio-message">{error.message}</p>}
   {!data&&!error&&<div className="studio-empty" role="status">Loading table…</div>}
+  {resultNotice&&<p className="studio-settlement-notice" role="status">{resultNotice}</p>}
   {data&&view==='Game'&&<><div className={"studio-table studio-game-"+data.config.kind} key={data.round.id}>
    <div className="studio-table-brand">BPEXCH <span>TEENPATTI STUDIO</span></div>
-   {data.round.outcome?<Result outcome={data.round.outcome}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>}
+   {data.round.outcome?<Result outcome={data.round.outcome} showWinner={game.id==='9010'}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>}
    <p className="studio-table-note">{canBet?'Select a price below':data.round.settled?'Next round starts shortly':'Revealing result…'}</p>
   </div>
   <div className={"studio-markets studio-market-rows"+(game.id==='9030'?' roulette':'')}><div className="studio-market-header"><span>MARKET ODDS</span><b>BACK</b><b>LAY</b></div>{data.config.runners.map(r=><div className={"studio-market-row"+(data.round.outcome?.winner===r.id?' winner':'')} key={r.id}><span className="studio-runner-name">{r.name}</span><button type="button" className="studio-price back" disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('back');setMessage('');}}><strong>{r.odds.toFixed(2)}</strong><small>DEMO</small></button><button type="button" className="studio-price lay" disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('lay');setMessage('');}}><strong>{r.layOdds?.toFixed(2)||'—'}</strong><small>DEMO</small></button></div>)}</div>
   <div className="studio-history-strip" aria-label="Recent round results">{data.history.slice(0,12).map(h=><span title={h.outcome.summary} key={h.id}>{h.outcome.winner===null?'T':data.config.runners.find(r=>r.id===h.outcome.winner)?.name.replace('Player ','')||h.outcome.winner}</span>)}</div></>}
-  {data&&view==='Results'&&<div className="studio-results">{data.history.length?data.history.map(h=><article key={h.id}><small>{new Date(h.settled_at).toLocaleString()} · {h.id.slice(0,8)}</small><Result outcome={h.outcome}/></article>):<p className="studio-empty">No completed rounds yet.</p>}</div>}
-  {data&&view==='Rules'&&<div className="studio-rules"><h2>Demo game rules</h2><p>{data.config.rules}</p><p>Betting lasts 20 seconds. Results display for 10 seconds. Your stake is reserved immediately. Winning returns and any configured commission are recorded in your account statement. A void returns your stake.</p><p>These are free test coins with no cash value. This simulation does not use the original provider’s game feed.</p></div>}
-  {data&&(view==='My Bets'||view==='Game')&&<section className="studio-bets"><h2>{view==='Game'?'Matched Bets':'My Bets'} ({data.bets.filter(b=>b.status==='pending').length} pending)</h2><div className="studio-scroll"><table><thead><tr><th>Selection</th><th>Odds</th><th>Stake</th><th>Status</th><th>P/L</th></tr></thead><tbody>{data.bets.slice(0,view==='Game'?8:50).map(b=><tr key={b.id}><td>{b.selection}<small>{b.round_id.slice(0,8)}</small></td><td>{b.odds}</td><td>{money(b.stake)}</td><td>{b.status}</td><td className={(b.profit||0)<0?'loss':'profit'}>{b.profit===null?'—':money(b.profit)}</td></tr>)}</tbody></table>{!data.bets.length&&<p className="studio-empty">No bets placed.</p>}</div></section>}
+  {data&&view==='Results'&&<div className="studio-results">{data.history.length?data.history.map(h=><article key={h.id}><small>{new Date(h.settled_at).toLocaleString()} · {h.id.slice(0,8)}</small><Result outcome={h.outcome} showWinner={game.id==='9010'}/></article>):<p className="studio-empty">No completed rounds yet.</p>}</div>}
+  {data&&view==='Rules'&&<div className="studio-rules"><h2>Demo game rules</h2><p>{data.config.rules}</p><p>The countdown follows the server betting cutoff. Your stake or lay liability is reserved on accepted bets. Settlement, commission and void refunds are recorded in your account statement.</p><p>These are free test coins with no cash value. This simulation does not use the original provider’s game feed.</p></div>}
+  {data&&(view==='My Bets'||view==='Game')&&<section className="studio-bets"><h2>{view==='Game'?'Matched Bets':'My Bets'} ({betRows.length}{view==='Game'?' active':''})</h2><div className="studio-scroll"><table><thead><tr><th>Selection / Order</th><th>Side</th><th>Odds</th><th>Stake</th><th>Status</th><th>P/L</th></tr></thead><tbody>{betRows.slice(0,view==='Game'?100:50).map(b=><tr key={b.id}><td>{b.selection}<small>Round {b.round_id.slice(0,8)} · Order {b.id.slice(0,8)}</small></td><td>{b.bet_type?.toUpperCase()||'—'}</td><td>{b.odds}</td><td>{money(b.stake)}</td><td>{b.status}</td><td className={(b.profit||0)<0?'loss':'profit'}>{b.profit===null?'—':money(b.profit)}</td></tr>)}</tbody></table>{!betRows.length&&<p className="studio-empty">{view==='Game'?'No matched bets in this round.':'No bets placed.'}</p>}</div></section>}
   {message&&<p className="studio-message" role="status">{message}</p>}
   {pending&&<div className="studio-pending" role="status"><p>Confirm the response to your pending {money(pending.stake)}-coin bet before placing another.</p><button disabled={busy} onClick={()=>submit(true)}>{busy?'Checking…':'Check / retry pending bet'}</button></div>}
   {runner&&!pending&&<div className="studio-modal-overlay" onClick={()=>!busy&&setRunner(null)}><section className="studio-slip" role="dialog" aria-modal="true" aria-label="Confirm demo bet" onClick={e=>e.stopPropagation()}><header><strong>{betSide.toUpperCase()} · {runner.name}</strong><button onClick={()=>setRunner(null)} aria-label="Close bet slip"><X size={19}/></button></header><div className="studio-slip-body"><p>Odds <b>{(betSide==='back'?runner.odds:runner.layOdds).toFixed(2)}</b> · Available <b>{money(data?.balance||0)}</b></p><label>Stake (free coins)<input autoFocus inputMode="decimal" type="number" min="0.01" max="1000000" step="0.01" value={stake} onChange={e=>setStake(e.target.value)}/></label><div className="studio-chips">{[100,500,1000,5000].map(n=><button key={n} onClick={()=>setStake(String(n))}>{money(n)}</button>)}</div><p>{betSide==='lay'?'Reserved liability':'Potential profit before commission'}: <b>{money(betSide==='lay'?Math.ceil((Number(stake)||0)*(runner.layOdds-1)*100)/100:Math.max(0,Number(stake)||0)*(runner.odds-1))}</b></p><button className="studio-place" disabled={!canBet||busy} onClick={()=>submit()}>{canBet?'Place demo bet':'Betting closed'}</button></div></section></div>}

@@ -1,6 +1,7 @@
 import { realClient } from '@/integrations/supabase';
 export type Outcome={winner:string|null;groups:{label:string;cards?:number[];value?:string}[];summary:string};
-export type StudioState={round:{id:string;gameId:string;closesAt:string;endsAt:string;settled:boolean;outcome:Outcome|null};config:{name:string;kind:string;rules:string;runners:{id:string;name:string;odds:number;layOdds:number}[]};balance:number;exposure:number;serverNow:string;history:{id:string;settled_at:string;outcome:Outcome}[];bets:{id:string;selection:string;stake:number;odds:number;status:string;profit:number|null;round_id:string;created_at:string}[]};
+export type StudioBetRecord={id:string;request_id?:string;selection:string;bet_type?:string;stake:number;odds:number;status:string;profit:number|null;round_id:string;created_at:string};
+export type StudioState={round:{id:string;gameId:string;closesAt:string;endsAt:string;settled:boolean;outcome:Outcome|null};config:{name:string;kind:string;rules:string;runners:{id:string;name:string;odds:number;layOdds:number}[]};balance:number;exposure:number;serverNow:string;history:{id:string;settled_at:string;outcome:Outcome}[];bets:StudioBetRecord[];activeBets?:StudioBetRecord[];matchedBets?:StudioBetRecord[]};
 export async function studioRequest<T>(action:string,input:unknown):Promise<T>{
  const token=sessionStorage.getItem('exchangeSessionToken');
  if(!token||!realClient)throw new Error('Please sign in again to use TeenPatti Studio');

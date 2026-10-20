@@ -89,3 +89,12 @@
 @keyframes studio-dice{0%,100%{transform:rotate(-13deg) scale(.92)}50%{transform:rotate(15deg) scale(1.03)}}
 @keyframes studio-coin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
 @media(prefers-reduced-motion:reduce){.studio-spinning-wheel,.studio-aircraft,.studio-die,.studio-coin-flip,.slots-scene span{animation:none}}
+
+/* TeenPatti Studio result highlighting: scoped to this route only. */
+.teenpatti-studio .studio-hand-winner{background:#086424;border:1px solid #28a74b;border-radius:6px;padding:8px}
+.teenpatti-studio .studio-hand-loser{background:#3a2829;border:1px solid #ad3f4c;border-radius:6px;padding:8px}
+.teenpatti-studio .studio-hand-void{background:#37312a;border:1px solid #b39347;border-radius:6px;padding:8px}
+.teenpatti-studio .studio-hand-verdict{display:block;margin-top:8px;border-radius:3px;background:#16552d;color:#fff;font-size:10px;padding:3px 6px;text-align:center}
+.teenpatti-studio .studio-hand-loser .studio-hand-verdict{background:#ab3447}
+.teenpatti-studio .studio-hand-void .studio-hand-verdict{background:#80672e}
+.teenpatti-studio .studio-settlement-notice{background:#153826;border:1px solid #36915a;color:#edfff1;padding:10px;margin:8px 0;font-size:12px}
