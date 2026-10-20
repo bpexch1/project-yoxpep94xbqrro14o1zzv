@@ -24,8 +24,8 @@
 
 ## Acceptance coverage
 
-- **Passed in staging:** AT-01, AT-04, AT-06, AT-07, AT-08, AT-09, and AT-19 for the demonstrated bets and SQL fixture. These are backend results; no browser acceptance is implied.
-- **Partial / unverified:** AT-02, AT-03, AT-05, AT-10, AT-11, AT-12 (the observed 32 Cards scoring and reveal case passed, provider tie/deck rules remain unknown), AT-18 (BACK tested, LAY needs staging parity), AT-20, AT-21, AT-23, AT-24. There is no complete browser or concurrent workload evidence.
+- **Passed in staging:** AT-01, AT-04, AT-06, AT-07, AT-08 and AT-09 for the demonstrated bets and SQL fixture. These are backend results; no browser acceptance is implied.
+- **Partial / unverified:** AT-02, AT-03, AT-05, AT-10, AT-11, AT-12 (the observed 32 Cards scoring and reveal case passed, provider tie/deck rules remain unknown), AT-18 (BACK tested, LAY needs staging parity), AT-19 (upline allocation tested, configured commission variations need staging parity), AT-20, AT-21, AT-23, AT-24. There is no complete browser or concurrent workload evidence.
 - **Open:** AT-13 through AT-17 where the original game mechanics are absent; AT-22 mobile 360/390/412 screenshots; AT-25 per-game playable audit and user-visible demo video. No missing test is counted as a pass.
 
 ## Release decision
