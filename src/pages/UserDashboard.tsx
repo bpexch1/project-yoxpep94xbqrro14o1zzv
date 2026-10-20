@@ -390,6 +390,7 @@ export default function UserDashboard() {
                 <h2 className="text-sm font-bold text-[#142a45]">Cricket scores · CricketData</h2>
                 {cricketFeed?.stale && <p className="text-xs text-amber-800">Score feed delayed; showing cached information.</p>}
                 {cricketError && <p role="status" className="text-xs text-gray-600">Cricket score feed unavailable. Existing exchange markets are shown separately.</p>}
+                {cricketFeed && providerMatches.length === 0 && <p role="status" className="text-xs text-gray-600">No live or upcoming matches in the current score feed.</p>}
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
                   {providerMatches.filter((match) => activeFilter !== "Inplay" || match.status === "live").map((match) => (
                     <button key={match.id} type="button" onClick={() => navigate(`/play/cricket/${encodeURIComponent(match.providerId)}`)}
@@ -397,6 +398,9 @@ export default function UserDashboard() {
                       <span className="text-xs font-semibold uppercase text-[#254465]">{match.status} · Score only</span>
                       <strong className="mt-1 block text-sm">{match.teams.join(" vs ")}</strong>
                       <span className="block text-xs text-gray-600">{match.statusText || (match.startsAt ? new Date(match.startsAt).toLocaleString() : "Time pending")}</span>
+                      {match.scores.map((score, index) => <span key={`${score.inning}-${index}`} className="block text-xs text-[#254465]">
+                        {score.inning}: {score.runs}/{score.wickets} ({score.overs} ov)
+                      </span>)}
                       <span className="block text-xs text-amber-800">Back/Lay unavailable · no licensed odds</span>
                     </button>
                   ))}
