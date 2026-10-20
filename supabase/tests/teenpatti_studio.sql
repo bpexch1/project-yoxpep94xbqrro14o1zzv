@@ -10,7 +10,7 @@ begin
   insert into public.clients(username,password,role,parent_username,downline_share) values(user_name||'_'||role_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),role_name,parent_name,50);
   parent_name:=user_name||'_'||role_name;
  end loop;
- insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true);
+ insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed,downline_share) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true,0);
  player:=public.exchange_login(user_name,'SyntheticOnly984!');
  conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","runners":[{"id":"1","name":"Heads","odds":1.95,"layOdds":2.03},{"id":"2","name":"Tails","odds":1.95,"layOdds":2.03}]}'::jsonb;
  foreach kind in array array['win','loss','void'] loop
@@ -20,6 +20,8 @@ begin
   -- If a real demo round already exists, use an isolated synthetic game round instead.
   market:='qa-studio-'||gen_random_uuid()::text;
   perform public.exchange_ingest(jsonb_build_array(jsonb_build_object('id',market,'eventId',market,'eventName','QA Studio','sport','casino','name','QA','startTime',clock_timestamp(),'status','OPEN','delayed',false,'observedAt',clock_timestamp(),'runners',conf->'runners','quotes','[{"runnerId":"1","selection":"Heads","side":"back","odds":1.95,"size":10000}]'::jsonb)));
+  update public.exchange_markets set is_demo=true where id=market;
+  update public.matches set is_demo=true,status='live' where id=(select match_id from public.exchange_markets where id=market);
   insert into public.studio_rounds(game_id,market_id,config,outcome,closes_at,ends_at) values('9085',market,conf,outcome,clock_timestamp()+interval '20 seconds',clock_timestamp()+interval '30 seconds') returning id into rid;
   if state->'round'->'outcome'<>'null'::jsonb and (state->'round'->>'settled')::boolean is false then raise exception 'Outcome disclosed before close'; end if;
   select cash+credit_remaining+pl_downline into balance from public.clients where username=user_name;

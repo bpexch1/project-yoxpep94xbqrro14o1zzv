@@ -15,7 +15,9 @@ try {
  create function auth.role() returns text language sql as 'select current_user::text';`);
  const migrations = readdirSync('supabase/migrations').filter(n=>n.endsWith('.sql')).sort();
  const candidate = migrations.find(n=>n.includes('cumulative_accounting_integrity'));
- for (const name of migrations.filter(n=>n!==candidate)) {
+ // This migration only registers a pg_cron job. Embedded PostgreSQL has no
+ // scheduler; the refresh function itself remains covered by SQL tests.
+ for (const name of migrations.filter(n=>n!==candidate&&!n.includes('demo_odds_refresh_schedule'))) {
   let sql = readFileSync('supabase/migrations/'+name,'utf8');
   // Scheduling is not supported in the embedded runtime. Settlement functions are tested directly.
   sql = sql.replace(/^create extension if not exists pg_cron;$/m,'').replace(/^select cron.schedule\(.*$/m,'');
@@ -27,7 +29,7 @@ try {
  console.log('PASS: baseline migrations applied to isolated PostgreSQL');
  await db.exec('begin;'+readFileSync('supabase/migrations/'+candidate,'utf8')+'commit;');
  console.log('PASS: candidate migration applied');
- for (const file of ['supabase/tests/accounting_completion.sql','supabase/tests/complete_demo_wallet.sql']) {
+ for (const file of ['supabase/tests/accounting_completion.sql','supabase/tests/complete_demo_wallet.sql','supabase/tests/teenpatti_studio.sql']) {
   if (!readdirSync('supabase/tests').includes(file.split('/').at(-1))) continue;
   try { const results=await db.exec(readFileSync(file,'utf8')); console.log(file,JSON.stringify(results.at(-1)?.rows)); }
   catch(e){throw new Error(file+': '+e.message+' '+(e.where||''));}
