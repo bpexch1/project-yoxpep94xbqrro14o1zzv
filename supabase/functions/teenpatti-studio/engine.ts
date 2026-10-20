@@ -22,7 +22,7 @@ const games: Record<string,[string,string,string[],string]> = {
  '9008':['Ammar Akbar Anthony','cards3',['Ammar','Akbar','Anthony'],'Virtual highest-card prediction among three sides; ties void.'],
  '9009':['Super Over OneDay','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
  '9011':['Super Over T20','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
- '9010':['32 Cards','cards4',['Player A','Player B','Player C','Player D'],'Highest virtual card among four players wins; ties void.'],
+ '9010':['32 Cards','cards4',['Player 8','Player 9','Player 10','Player 11'],'Independent four-runner card demo. One card per player; highest rank wins, tied top ranks void. This is not a licensed reference game feed.'],
  '9012':['Bollywood Casino','cards3',['Hero','Heroine','Villain'],'Independent virtual three-card high-card draw; ties void.'],
  '9016':['Race To 17','sports',['0–7','8–12','13–17'],'Independent virtual number-draw game.'],
  '9017':['High Card','cards',['Player A','Player B'],'Higher single card wins. Equal rank voids the round.'],
