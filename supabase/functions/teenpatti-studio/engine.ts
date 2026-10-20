@@ -54,7 +54,7 @@ const oddsFor = (id:string,count:number,i:number):number => {
 export function configFor(id:string):Config|null {
  const row=games[id]; if(!row)return null;
  const [name,kind,names,rules]=row;
- const timing=kind==='crash'?{bettingSeconds:8,resultSeconds:12}:kind==='wheel'?{bettingSeconds:18,resultSeconds:12}:kind==='dice'?{bettingSeconds:15,resultSeconds:10}:kind==='arcade'?{bettingSeconds:16,resultSeconds:10}:{bettingSeconds:20,resultSeconds:10};
+ const timing=kind==='crash'?{bettingSeconds:8,resultSeconds:12}:kind==='wheel'||kind==='roulette'?{bettingSeconds:18,resultSeconds:12}:kind==='dice'?{bettingSeconds:15,resultSeconds:10}:kind==='arcade'?{bettingSeconds:16,resultSeconds:10}:{bettingSeconds:20,resultSeconds:10};
  return {id,name,kind,timing,rules:'FREE-COIN DEMO. '+rules+' No cash value. Results are simulated independently.',
  runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
 }

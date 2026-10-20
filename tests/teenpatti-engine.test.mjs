@@ -27,6 +27,7 @@ test('32 Cards exposes the requested runner labels and deals from a 32-card deck
 test('each gameplay family has a server-owned timing policy',()=>{
  assert.notDeepEqual(configFor('9010').timing,configFor('9022').timing);
  assert.notDeepEqual(configFor('9022').timing,configFor('9030').timing);
+ assert.deepEqual(configFor('9030').timing,{bettingSeconds:18,resultSeconds:12});
  for(const game of studioGames){const timing=configFor(game.id).timing;assert.ok(timing.bettingSeconds>0&&timing.resultSeconds>0,game.name);}
 });
 test('Teen Patti ranking, A23, ties and pair kickers',()=>{
