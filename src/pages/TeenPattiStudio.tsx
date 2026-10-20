@@ -64,7 +64,7 @@ function GameTable({game,username}:{game:Game;username:string}){
  const stale=clock-dataUpdatedAt>6000;
  const canBet=!!data&&!error&&!stale&&!data.round.settled&&seconds>0;
  // The API may expose a dedicated current-round array; always filter defensively.
- const activeBets=activeRoundBets(data?.activeBets??data?.bets,data?.round.id);
+ const activeBets=activeRoundBets(data?.matchedBets??data?.activeBets??data?.bets,data?.round.id);
  const betRows=view==='Game'?activeBets:(data?.bets??[]);
  useEffect(()=>{
   if(!data)return;
@@ -101,7 +101,7 @@ function GameTable({game,username}:{game:Game;username:string}){
      odds:receipt.odds??request.odds,status:receipt.status||'pending',
      profit:receipt.profit??null,created_at:receipt.created_at||new Date().toISOString()
     };
-    return {...old,bets:[matched,...old.bets],activeBets:old.activeBets?[matched,...old.activeBets]:undefined};
+    return {...old,bets:[matched,...old.bets],activeBets:old.activeBets?[matched,...old.activeBets]:undefined,matchedBets:old.matchedBets?[matched,...old.matchedBets]:undefined};
    });
    sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);
    setMessage('Bet accepted. Matched Bets has been updated.');await refetch();window.dispatchEvent(new Event('balance-updated'));
