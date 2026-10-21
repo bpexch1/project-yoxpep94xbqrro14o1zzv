@@ -23,7 +23,7 @@ const entries = [
 ];
 // These have independent, bounded demo settlement rules. They still require
 // provider-parity QA and are intentionally marked LIMITED, never READY.
-const supported = new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085']);
+const supported = new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085','9030','9035']);
 export const studioGames: Game[] = entries.map(([id,name,category,symbol,color]) => ({id,name,category,symbol,color,playable:supported.has(id),status:supported.has(id)?'LIMITED':'UNAVAILABLE'}));
 
 // Lobby/menu only: the owner supplied matching artwork for these 34 catalog games.

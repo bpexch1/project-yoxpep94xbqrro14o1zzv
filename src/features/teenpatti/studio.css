@@ -96,9 +96,17 @@
 .studio-32-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:440px;margin:12px auto 0}
 .studio-32-player{min-width:0;min-height:116px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto;align-items:center;gap:2px 8px;padding:7px;border:1px solid #705e3c;border-radius:5px;background:#0a231ab8}
 .studio-32-player>strong{grid-column:1/-1;color:#e2d1a4;font-size:12px}
-.studio-32-player>.studio-card{grid-row:2/4}
+.studio-32-cards{grid-row:2/4;display:flex;align-items:center;min-height:54px}.studio-32-cards .studio-card+.studio-card{margin-left:-17px}
 .studio-32-player>span{font-size:12px;overflow-wrap:anywhere}
 .studio-32-player>b{font-size:10px;color:#a5e96b}
 .studio-32-player.winner{border-color:#aeef76;background:#255d2b}
 .studio-32-board>p{grid-column:1/-1;text-align:center;color:#e9d697;font-size:12px}
 .studio-slip-body .profit{color:#16845a}.studio-slip-body .loss{color:#b63342}
+.studio-market-rows .studio-price.status,.studio-market-rows .studio-price.status:disabled{background:#fff;color:#b73048;opacity:1}
+.studio-market-rows .studio-price.status strong{font-size:11px;white-space:nowrap}
+.studio-wheel-betting{background:#080909;border:1px solid #6c573c;padding:8px;color:#eee;margin-top:5px}.studio-wheel-tools{display:flex;align-items:center;gap:6px}.studio-wheel-tools strong{flex:1;font-size:11px}.studio-wheel-tools button{font-size:9px;padding:6px;border:1px solid #937a52;color:#e1cfaf}.studio-wheel-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:9px 0}.studio-wheel-chips button{padding:10px 1px;border-radius:50%;border:3px dashed #e2bb72;background:#654029;font-size:12px;color:#fff}.studio-wheel-chips button:nth-child(2){background:#278c46}.studio-wheel-chips button:nth-child(3){background:#92265e}.studio-wheel-chips button:nth-child(4){background:#9a3646}.studio-wheel-chips button.selected{outline:2px solid #f5d548;outline-offset:2px}.studio-dream-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.studio-dream-grid button{min-height:66px;background:#25256a;border:2px solid #e1c83b;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center}.studio-dream-grid button:nth-child(3n+1){background:#4b5d00}.studio-dream-grid button:nth-child(3n){background:#59265c}.studio-dream-grid strong{font-size:20px}.studio-dream-grid small,.studio-roulette-grid small{font-size:9px}.studio-roulette-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}.studio-roulette-grid button{min-height:48px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid #9c8a6c;color:#fff}.studio-roulette-grid button.red{background:#a92f42}.studio-roulette-grid button.black{background:#282929}.studio-roulette-grid button.green{background:#168354}.studio-roulette-grid button:disabled,.studio-dream-grid button:disabled{opacity:.55}
+@media(max-width:767px){
+ .studio-bets table th:nth-child(2),.studio-bets table td:nth-child(2),.studio-bets table th:nth-child(5),.studio-bets table td:nth-child(5),.studio-bets table th:nth-child(6),.studio-bets table td:nth-child(6){display:none}
+ .studio-bets table{table-layout:fixed}.studio-bets table th:first-child{width:54%}.studio-bets table th:nth-child(3),.studio-bets table th:nth-child(4){width:23%}
+ .studio-slip{align-self:flex-start;margin-top:60px;border-radius:0;background:#e9f6fc}.studio-slip header{background:#e9f6fc}
+}

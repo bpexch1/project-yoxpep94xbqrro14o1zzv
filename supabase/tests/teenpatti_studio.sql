@@ -13,7 +13,7 @@ begin
  end loop;
  insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed,downline_share,can_settle_pl) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true,shares[5],true);
  player:=public.exchange_login(user_name,'SyntheticOnly984!');
- conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","runners":[{"id":"1","name":"Heads","odds":1.95,"layOdds":2.03},{"id":"2","name":"Tails","odds":1.95,"layOdds":2.03}]}'::jsonb;
+ conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","timing":{"bettingSeconds":18,"revealSeconds":2,"resultSeconds":9},"runners":[{"id":"1","name":"Heads","odds":1.95,"layOdds":2.03},{"id":"2","name":"Tails","odds":1.95,"layOdds":2.03}]}'::jsonb;
  foreach kind in array array['win','loss','void'] loop
   outcome:=jsonb_build_object('winner',case kind when 'win' then '1' when 'loss' then '2' else null end,'groups','[]'::jsonb,'summary','QA');
   state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
@@ -39,6 +39,9 @@ begin
    perform public.exchange_request(player->>'token','placeBet',jsonb_build_object('requestId',gen_random_uuid(),'marketId',market,'runnerId','1','side','back','stake',1,'odds',1.95));
   exception when others then if sqlerrm='Market unavailable or stale' then denied:=true;else raise;end if;end;
   if not denied then raise exception 'Direct endpoint bypassed cutoff'; end if;
+  perform public.studio_settle_due();
+  if (select settled_at is not null from public.studio_rounds where id=rid) then raise exception 'Heads & Tails settled before its reveal phase ended'; end if;
+  update public.studio_rounds set closes_at=clock_timestamp()-interval '3 seconds' where id=rid;
   perform public.studio_settle_due();perform public.studio_settle_due();
   receipt:=public.studio_request(player->>'token','bet',request);
   if bet->>'id'<>receipt->>'id' then raise exception 'Post-settlement replay failed'; end if;
@@ -78,6 +81,11 @@ begin
  state:=public.studio_request(player->>'token','state','{"gameId":"9010"}',conf,outcome);
  if state->'round'->>'id'=rid::text or jsonb_array_length(state->'matchedBets')<>0 then raise exception '32 Cards next round did not reset live panel'; end if;
  if not exists(select 1 from jsonb_array_elements(state->'bets') x where x->>'id'=bet->>'id' and x->>'status'='lost') then raise exception '32 Cards historical bet missing'; end if;
+ outcome:='{"winner":"9","summary":"Player 9 wins with 29","groups":[{"label":"Player 8","cards":[11,4],"value":"8 + 13 + 6 = 27"},{"label":"Player 9","cards":[10,6],"value":"9 + 12 + 8 = 29"},{"label":"Player 10","cards":[9,5],"value":"10 + 11 + 7 = 28"},{"label":"Player 11","cards":[8,17],"value":"11 + 10 + 6 = 27"}]}'::jsonb;
+ state:=public.studio_public_outcome('9010',outcome,clock_timestamp()-interval '5 seconds',clock_timestamp()+interval '5 seconds',null,clock_timestamp(),7);
+ if state->>'winner' is not null or jsonb_array_length(state->'groups'->0->'cards')<>2 or jsonb_array_length(state->'groups'->1->'cards')<>1 or state->'groups'->1 ? 'value' then raise exception '32 Cards tied-player extra-card reveal leaked future result'; end if;
+ state:=public.studio_public_outcome('9010',outcome,clock_timestamp()-interval '8 seconds',clock_timestamp()+interval '2 seconds',clock_timestamp(),clock_timestamp(),7);
+ if state->>'winner'<>'9' or jsonb_array_length(state->'groups'->1->'cards')<>2 then raise exception '32 Cards tied-player final reveal failed'; end if;
  denied:=false;
  begin perform public.studio_request('invalid-token','state','{"gameId":"9085"}',conf,outcome);
  exception when others then if sqlerrm='Authentication required' then denied:=true;else raise;end if;end;
