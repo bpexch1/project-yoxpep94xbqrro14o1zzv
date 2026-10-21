@@ -63,18 +63,22 @@ function WaitingScene({game,kind,runners}:{game:Game;kind:string;runners:StudioS
 }
 function GameTable({game,username}:{game:Game;username:string}){
  const qc=useQueryClient();const [view,setView]=useState('Game');const [runner,setRunner]=useState<StudioState['config']['runners'][number]|null>(null);const [betSide,setBetSide]=useState<'back'|'lay'>('back');const [stake,setStake]=useState('100');const [busy,setBusy]=useState(false);const busyRef=useRef(false);const [message,setMessage]=useState('');const [pending,setPending]=useState<StudioBet|null>(()=>{try{return JSON.parse(sessionStorage.getItem(pendingKey(username))||'null');}catch{return null;}});
+ const previousRoundId=useRef<string|null>(null);
  const [wheelChip,setWheelChip]=useState(2000);
  const [clock,setClock]=useState(Date.now());
- const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:()=>studioRequest<StudioState>('state',{gameId:game.id}),refetchInterval:2000,retry:1,enabled:game.playable});
+ const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:async()=>{const started=Date.now();const state=await studioRequest<StudioState>('state',{gameId:game.id});return {...state,roundTripMs:Date.now()-started};},refetchInterval:2000,retry:1,enabled:game.playable});
  useEffect(()=>{const id=setInterval(()=>setClock(Date.now()),250);return()=>clearInterval(id);},[]);
- const serverTime=data?new Date(data.serverNow).getTime()+Math.max(0,clock-dataUpdatedAt):clock;
+ // The server timestamp is created before the HTTP response arrives. Account
+ // for transit time so a slow connection never shows an optimistic deadline.
+ const serverTime=data?new Date(data.serverNow).getTime()+Math.max(0,clock-dataUpdatedAt)+data.roundTripMs:clock;
  const seconds=data?Math.max(0,Math.ceil((new Date(data.round.closesAt).getTime()-serverTime)/1000)):0;
  const stale=clock-dataUpdatedAt>6000;
  const canBet=!!data&&!error&&!stale&&!data.round.settled&&seconds>0;
  const marketStatus=data&&(data.round.settled?new Date(data.round.endsAt).getTime()-serverTime<3000?'NEXT ROUND !':'ROUND OVER !':seconds===0||error||stale?'SUSPENDED !':null);
  const matchedBets=data?(data.matchedBets??currentRoundMatchedBets(data.bets,data.round.id)):[];
  const settledRoundBets=data?getSettledRoundBets(data.bets,data.round.id):[];
- useEffect(()=>{setRunner(null);},[data?.round.id]);
+ const activeRoundId=data?.round.id;
+ useEffect(()=>{if(!activeRoundId)return;const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;previousRoundId.current=activeRoundId;if(changed)setRunner(open=>{if(open)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');return null;});},[activeRoundId]);
  useEffect(()=>{if(data){window.dispatchEvent(new Event('balance-updated'));qc.invalidateQueries({queryKey:['studio-account',username]});}},[data?.balance,data?.round.settled,qc,username]);
  async function submit(retry=false){
   if(busyRef.current)return;
