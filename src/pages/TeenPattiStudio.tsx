@@ -78,7 +78,7 @@ function GameTable({game,username}:{game:Game;username:string}){
  const matchedBets=data?(data.matchedBets??currentRoundMatchedBets(data.bets,data.round.id)):[];
  const settledRoundBets=data?getSettledRoundBets(data.bets,data.round.id):[];
  const activeRoundId=data?.round.id;
- useEffect(()=>{if(!activeRoundId)return;const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;previousRoundId.current=activeRoundId;if(changed)setRunner(open=>{if(open)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');return null;});},[activeRoundId]);
+ useEffect(()=>{if(!activeRoundId)return;const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;previousRoundId.current=activeRoundId;if(changed)setRunner(open=>{if(open&&!busyRef.current)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');return null;});},[activeRoundId]);
  useEffect(()=>{if(data){window.dispatchEvent(new Event('balance-updated'));qc.invalidateQueries({queryKey:['studio-account',username]});}},[data?.balance,data?.round.settled,qc,username]);
  async function submit(retry=false){
   if(busyRef.current)return;
