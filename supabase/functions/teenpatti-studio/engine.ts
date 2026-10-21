@@ -2,7 +2,7 @@
 // Odds are an immutable round quote snapshot; wins are computed on the server.
 export type Outcome = { winner: string|null; groups: {label:string;cards?:number[];value?:string}[];summary:string };
 export type Runner = {id:string;name:string;odds:number;layOdds:number};
-export type Config = {id:string;name:string;rules:string;kind:string;runners:Runner[]};
+export type Config = {id:string;name:string;rules:string;kind:string;timing:{bettingSeconds:number;resultSeconds:number;revealSeconds?:number};runners:Runner[]};
 const games: Record<string,[string,string,string[],string]> = {
  '9301':['Chicken Road 2','arcade',['Safe crossing','Risk crossing','Gold crossing'],'Choose a route before the round closes. This is an independent three-route simulation.'],
  '9022':['Aviator','crash',['Below 2x','2x to 5x','Above 5x'],'Virtual flight multiplier prediction. This is not a real-time cash-out game.'],
@@ -17,12 +17,12 @@ const games: Record<string,[string,string,string[],string]> = {
  '9021':['Poker','cards',['Player A','Player B'],'Independent demo: two three-card hands compared using Teen Patti-style ranking; not a licensed poker variant.'],
  '9015':['Sic-Bo','dice',['Low (4–10)','High (11–17)','Triple'],'Virtual roll of three dice. Triple wins its own selection; non-triples are low or high.'],
  '9002':['AndarBahar','andar',['Andar','Bahar'],'Draw a joker card then alternate Andar and Bahar until the rank matches.'],
- '9003':['HiLo','hilo',['High','Low','Same'],'Draw a card; Ace counts high. The base reference card is seven.'],
- '9007':['7UpDown','seven',['Under 7','Exactly 7','Over 7'],'Roll two dice; predict total below, equal to, or above seven.'],
+ '9003':['HiLo','hilo',['High','Snap','Low'],'The Ante card is compared with a separately dealt Joker card; equal ranks are Snap. Ace counts high.'],
+ '9007':['7UpDown','seven',['7Up','7','7Down'],'Draw one card from a 52-card deck; its rank is compared with seven. Ace counts high.'],
  '9008':['Ammar Akbar Anthony','cards3',['Ammar','Akbar','Anthony'],'Virtual highest-card prediction among three sides; ties void.'],
  '9009':['Super Over OneDay','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
  '9011':['Super Over T20','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
- '9010':['32 Cards','cards4',['Player A','Player B','Player C','Player D'],'Highest virtual card among four players wins; ties void.'],
+ '9010':['32 Cards','cards4',['Player 8','Player 9','Player 10','Player 11'],'32-card deck (6 through King). Add each player’s base number (8, 9, 10, 11) to the ranks dealt to that player. If the highest totals tie, deal extra cards to those players until one wins. Tie-round market reopening is not yet supported in this demo.'],
  '9012':['Bollywood Casino','cards3',['Hero','Heroine','Villain'],'Independent virtual three-card high-card draw; ties void.'],
  '9016':['Race To 17','sports',['0–7','8–12','13–17'],'Independent virtual number-draw game.'],
  '9017':['High Card','cards',['Player A','Player B'],'Higher single card wins. Equal rank voids the round.'],
@@ -39,23 +39,47 @@ const games: Record<string,[string,string,string[],string]> = {
  '9085':['Heads & Tails','coin',['Heads','Tails'],'Independent virtual coin toss.'],
  '9105':['Fortune Gems','slots',['Red gem','Blue gem','Gold gem'],'Independent virtual three-symbol gem selection.']
 };
+// Incomplete interactive and generic-placeholder tables stay in the lobby but
+// cannot open a new betting round until their actual mechanics are implemented.
+const enabledDemoIds=new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085','9030','9035']);
+// Independent free-coin policy values. The videos show differing clocks but
+// do not establish a complete provider schedule for every title.
+const demoTimings:Record<string,Config['timing']>={
+ '9001':{bettingSeconds:25,revealSeconds:5,resultSeconds:12},
+ '9005':{bettingSeconds:26,revealSeconds:6,resultSeconds:12},
+ '9006':{bettingSeconds:24,revealSeconds:6,resultSeconds:12},
+ '9015':{bettingSeconds:28,revealSeconds:4,resultSeconds:11},
+ '9002':{bettingSeconds:24,revealSeconds:6,resultSeconds:12},
+ '9003':{bettingSeconds:22,revealSeconds:5,resultSeconds:11},
+ '9007':{bettingSeconds:24,revealSeconds:3,resultSeconds:10},
+ '9010':{bettingSeconds:20,revealSeconds:7,resultSeconds:10},
+ '9017':{bettingSeconds:20,revealSeconds:3,resultSeconds:10},
+ '9018':{bettingSeconds:21,revealSeconds:3,resultSeconds:10},
+ '9019':{bettingSeconds:21,revealSeconds:3,resultSeconds:10},
+ '9055':{bettingSeconds:22,revealSeconds:3,resultSeconds:10},
+ '9085':{bettingSeconds:18,revealSeconds:2,resultSeconds:9},
+ '9030':{bettingSeconds:28,revealSeconds:4,resultSeconds:12},
+ '9035':{bettingSeconds:75,revealSeconds:8,resultSeconds:15}
+};
 const oddsFor = (id:string,count:number,i:number):number => {
  if(id==='9030')return 36;
- if(id==='9035')return [2,3,6,12,24,48][i];
- if(id==='9007')return [2.3,5.8,2.3][i];
+ if(id==='9035')return [2,3,6,11,21,41][i];
+ if(id==='9007')return [2.3,11.5,2.3][i];
  if(id==='9019')return [2.5,12,1.8][i];
  if(id==='9015')return [2.2,2.2,11][i];
  if(id==='9022'||id==='9040'||id==='9023'||id==='9100')return [1.9,2.8,7.5][i];
- if(id==='9003'||id==='9020'||id==='9070')return [2.1,2.1,12][i];
+ if(id==='9003')return [2.1,12,2.1][i];
+ if(id==='9020'||id==='9070')return [2.1,2.1,12][i];
  if(count===4)return 3.85;
  if(count===3)return 2.88;
  return 1.95;
 };
 export function configFor(id:string):Config|null {
- const row=games[id]; if(!row)return null;
+ const row=games[id]; if(!row||!enabledDemoIds.has(id))return null;
  const [name,kind,names,rules]=row;
- return {id,name,kind,rules:'FREE-COIN DEMO. '+rules+' No cash value. Results are simulated independently.',
- runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
+ const timing=demoTimings[id];
+ return {id,name,kind,timing,rules:'FREE-COIN DEMO. '+rules+' No cash value. Results are simulated independently.',
+ runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
 }
 export function randomInt(max:number):number {
  if(!Number.isInteger(max)||max<1||max>0xffffffff)throw new Error('Invalid random range');
@@ -81,11 +105,36 @@ export function handScore(cards:number[]):number[]{
 export function compare(a:number[],b:number[]):number{
  for(let i=0;i<Math.max(a.length,b.length);i++){const n=(a[i]||0)-(b[i]||0);if(n)return Math.sign(n);}return 0;
 }
+export function score32Cards(groups:number[][]):number[]{
+ const cards=groups.flat();
+ if(groups.length!==4||groups.some(g=>!g.length)||new Set(cards).size!==cards.length||cards.some(c=>!Number.isInteger(c)||c<0||c>=52||rank(c)<6||rank(c)>13))throw new Error('Invalid 32 Cards deal');
+ return groups.map((group,i)=>i+8+group.reduce((sum,card)=>sum+rank(card),0));
+}
+export function resolve32Cards(deck:number[]):Outcome {
+ if(deck.length!==32||new Set(deck).size!==32||deck.some(c=>!Number.isInteger(c)||c<0||c>=52||rank(c)<6||rank(c)>13))throw new Error('Invalid 32 Cards deck');
+ const groups:number[][]=[[],[],[],[]];let next=0;let contenders=[0,1,2,3];
+ for(const i of contenders)groups[i].push(deck[next++]);
+ while(contenders.length>1){
+  const totals=score32Cards(groups);
+  const highest=Math.max(...contenders.map(i=>totals[i]));
+  contenders=contenders.filter(i=>totals[i]===highest);
+  if(contenders.length===1||next+contenders.length>deck.length)break;
+  for(const i of contenders)groups[i].push(deck[next++]);
+ }
+ const totals=score32Cards(groups);
+ const winner=contenders.length===1?String(contenders[0]+8):null;
+ return {winner,groups:groups.map((cards,i)=>({label:`Player ${i+8}`,cards,value:`${i+8} + ${cards.map(rank).join(' + ')} = ${totals[i]}`})),
+  summary:winner?`Player ${winner} wins with ${totals[Number(winner)-8]}`:'Unresolved tie — bets void'};
+}
 export function createOutcome(id:string,rand=randomInt):Outcome{
  const cfg=configFor(id);if(!cfg)throw new Error('Game unavailable');
  const {kind,runners}=cfg,deck=shuffledDeck(rand);
  const result=(index:number|null,groups:Outcome['groups'],summary:string):Outcome=>({winner:index===null?null:runners[index].id,groups,summary});
- if(['teen','teen3','muflis','cards','cards3','cards4'].includes(kind)){
+ if(kind==='cards4'){
+  // The provider's Rules screen explicitly excludes Ace through Five.
+  return resolve32Cards(deck.filter(c=>rank(c)>=6&&rank(c)<=13));
+ }
+ if(['teen','teen3','muflis','cards','cards3'].includes(kind)){
   const size=['teen','teen3','muflis'].includes(kind)||id==='9021'?3:1;
   const groups=runners.map((r,i)=>({label:r.name,cards:deck.slice(i*size,(i+1)*size)}));
   const scores=groups.map(g=>size===3?handScore(g.cards):[rank(g.cards[0])]);
@@ -101,7 +150,10 @@ export function createOutcome(id:string,rand=randomInt):Outcome{
  }
  if(kind==='roulette'){const n=rand(37);return result(n,[{label:'Roulette wheel',value:String(n)}],'Winning number: '+n);}
  if(kind==='coin'){const n=rand(2);return result(n,[{label:'Coin toss',value:runners[n].name}],runners[n].name);}
- if(kind==='seven'){const dice=[rand(6)+1,rand(6)+1],sum=dice[0]+dice[1];return result(sum<7?0:sum===7?1:2,[{label:'Dice',value:dice.join(' + ')}],'Total '+sum);}
+ if(kind==='seven'){
+  const card=deck[0],number=rank(card),choice=number>7?0:number===7?1:2;
+  return result(choice,[{label:'Drawn card',cards:[card]}],runners[choice].name+' — '+number);
+ }
  if(kind==='dice'){
   const dice=id==='9015'?[rand(6)+1,rand(6)+1,rand(6)+1]:[rand(6)+1,rand(6)+1];
   const sum=dice.reduce((a,b)=>a+b,0);let n=0;
@@ -110,6 +162,10 @@ export function createOutcome(id:string,rand=randomInt):Outcome{
   return result(n,[{label:'Dice',value:dice.join(' + ')}],'Total '+sum+' — '+runners[n].name);
  }
  if(kind==='lucky'||kind==='hilo'){
+  if(id==='9003'){
+   const joker=deck[0],ante=deck[1],choice=rank(ante)>rank(joker)?0:rank(ante)===rank(joker)?1:2;
+   return result(choice,[{label:'Joker',cards:[joker]},{label:'Ante',cards:[ante]}],runners[choice].name+' — '+rank(joker)+' vs '+rank(ante));
+  }
   const card=deck[0],num=kind==='lucky'&&rank(card)===14?1:rank(card);
   const n=id==='9070'?(num>10?0:num<10?1:2):kind==='lucky'?(num<7?0:num===7?1:2):(num>7?0:num<7?1:2);
   return result(n,[{label:'Result card',cards:[card]}],runners[n].name+' — '+num);

@@ -1,4 +1,4 @@
-export type Game = { id: string; name: string; category: string; symbol: string; color: string; playable: boolean };
+export type Game = { id: string; name: string; category: string; symbol: string; color: string; playable: boolean; status: 'LIMITED'|'UNAVAILABLE' };
 // Names and order observed in the original TeenPatti Studio lobby, 14 October 2026.
 const entries = [
  ['9301','Chicken Road 2','Arcade','♟','#9ba83a'],['9022','Aviator','Crash','✈','#bb233d'],
@@ -21,8 +21,10 @@ const entries = [
  ['9075','Side Bet city','Cards','♠','#217e77'],['9080','Lottery','Arcade','8','#a66c30'],
  ['9085','Heads & Tails','Arcade','◐','#b18b3d'],['9105','Fortune Gems','Slots','◆','#237e53'],
 ];
-const supported = new Set(['9301','9022','9040','9023','9100','9035','9001','9005','9030','9006','9021','9015','9002','9003','9007','9008','9009','9011','9010','9012','9016','9017','9018','9019','9020','9045','9050','9055','9065','9070','9075','9080','9085','9105']);
-export const studioGames: Game[] = entries.map(([id,name,category,symbol,color]) => ({id,name,category,symbol,color,playable:supported.has(id)}));
+// These have independent, bounded demo settlement rules. They still require
+// provider-parity QA and are intentionally marked LIMITED, never READY.
+const supported = new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085','9030','9035']);
+export const studioGames: Game[] = entries.map(([id,name,category,symbol,color]) => ({id,name,category,symbol,color,playable:supported.has(id),status:supported.has(id)?'LIMITED':'UNAVAILABLE'}));
 
 // Lobby/menu only: the owner supplied matching artwork for these 34 catalog games.
 const artworkProvidedIds = new Set([
