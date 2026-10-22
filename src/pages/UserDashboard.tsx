@@ -190,7 +190,9 @@ export default function UserDashboard() {
       else if (title.includes("tennis")) sport = "Tennis";
     }
 
-    if (sport.toLowerCase() === "football") sport = "Soccer";
+    // Counts and section grouping must use the same canonical sport names.
+    const sportKey = String(sport).trim().toLowerCase();
+    sport = ({ cricket: "Cricket", tennis: "Tennis", football: "Soccer", soccer: "Soccer" } as Record<string, string>)[sportKey] || String(sport).trim();
 
     const t1 = m.team1 || (m.title ? m.title.split(/ vs | v /i)[0] : "Team 1");
     const t2 = m.team2 || (m.title ? m.title.split(/ vs | v /i)[1] : "Team 2");
