@@ -110,3 +110,31 @@
  .studio-bets table{table-layout:fixed}.studio-bets table th:first-child{width:54%}.studio-bets table th:nth-child(3),.studio-bets table th:nth-child(4){width:23%}
  .studio-slip{align-self:flex-start;margin-top:60px;border-radius:0;background:#e9f6fc}.studio-slip header{background:#e9f6fc}
 }
+
+
+/* Lobby proportions observed in R1 00:05 (720 px recording).
+   Scope these overrides to the lobby so game tables keep their own layout. */
+.studio-menu-search{display:flex;align-items:center;gap:8px;margin:12px;border:1px solid #756142;border-radius:5px;padding:9px}
+.studio-menu-search input{min-width:0;width:100%;background:transparent;color:inherit;outline:none}
+.studio-lobby-page .studio-header{position:relative;top:auto}
+.studio-lobby-page .studio-wallet{flex-direction:row;white-space:nowrap;align-items:center;background:#191919;font-weight:700}
+.studio-lobby-page .studio-wallet span::before{content:'|';margin-right:5px}
+.studio-lobby-page .studio-image-lobby{margin:0;border:0;background:rgba(40,36,36,.94);border-radius:18px 18px 0 0}
+.studio-lobby-page .studio-thumb-wrap{aspect-ratio:1.24;border:0;padding:0;display:block}
+.studio-lobby-page .studio-thumb{object-fit:fill}
+.studio-lobby-page .studio-tile-caption{padding-top:10px;gap:0}
+.studio-lobby-page .studio-tile-caption>span{font-size:16px;font-weight:400;line-height:1.4}
+@media(max-width:767px){
+ .studio-lobby-page .studio-sitebar{height:50px;padding:0 14px}
+ .studio-lobby-page .studio-sitebar>a{font-size:23px}
+ .studio-lobby-page .studio-header{height:62px;padding:8px 15px 8px 10px}
+ .studio-lobby-page .studio-header-left{gap:18px}
+ .studio-lobby-page .studio-header-left>button:first-child svg{width:20px;height:20px}
+ .studio-lobby-page .studio-lobby-button{width:44px;height:44px;border-radius:10px}
+ .studio-lobby-page .studio-lobby-button svg{width:25px;height:25px;fill:currentColor}
+ .studio-lobby-page .studio-lobby-button small{font-size:11px}
+ .studio-lobby-page .studio-wallet{font-size:14px;gap:4px;padding:7px 6px;border-radius:6px}
+ .studio-lobby-page .studio-image-lobby{grid-template-columns:repeat(2,minmax(0,1fr));padding:17px 7.2% 30px;column-gap:10.2vw;row-gap:34px}
+ .studio-lobby-page .studio-thumb-wrap{border-radius:8px}
+ .studio-lobby-page .studio-tile-caption>span{font-size:14px}
+}
