@@ -5,6 +5,7 @@ import { Home, Menu, Search, X, ArrowLeft, RefreshCw } from 'lucide-react';
 import { studioLobbyGames, type Game } from '@/features/teenpatti/catalog';
 import { studioRequest, pendingKey, type StudioState, type StudioBet, type Outcome } from '@/features/teenpatti/api';
 import { currentRoundMatchedBets, settledRoundBets as getSettledRoundBets } from '@/features/teenpatti/bets';
+import { bettingWindowOpen } from '@/features/teenpatti/roundClock';
 import { getClientSession } from '@/hooks/useClientAuth';
 import { readAccount } from '@/services/accounting';
 import '@/features/teenpatti/studio.css';
@@ -73,7 +74,7 @@ function GameTable({game,username}:{game:Game;username:string}){
  const serverTime=data?new Date(data.serverNow).getTime()+Math.max(0,clock-dataUpdatedAt)+data.roundTripMs:clock;
  const seconds=data?Math.max(0,Math.ceil((new Date(data.round.closesAt).getTime()-serverTime)/1000)):0;
  const stale=clock-dataUpdatedAt>6000;
- const canBet=!!data&&!error&&!stale&&!data.round.settled&&seconds>0;
+ const canBet=!!data&&!error&&!stale&&!data.round.settled&&bettingWindowOpen(new Date(data.round.closesAt).getTime(),serverTime);
  const marketStatus=data&&(data.round.settled?new Date(data.round.endsAt).getTime()-serverTime<3000?'NEXT ROUND !':'ROUND OVER !':seconds===0||error||stale?'SUSPENDED !':null);
  const matchedBets=data?(data.matchedBets??currentRoundMatchedBets(data.bets,data.round.id)):[];
  const settledRoundBets=data?getSettledRoundBets(data.bets,data.round.id):[];
