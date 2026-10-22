@@ -11,7 +11,8 @@ begin
   insert into public.clients(username,password,role,parent_username,downline_share,can_settle_pl) values(user_name||'_'||role_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),role_name,parent_name,shares[level_no],true);
   parent_name:=user_name||'_'||role_name;
  end loop;
- insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed,downline_share,can_settle_pl) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true,shares[5],true);
+ -- This fixture isolates gameplay/wallet math at 0%; the 2% path is covered by commission_rule_2_percent.sql.
+ insert into public.clients(username,password,role,parent_username,cash,credit_remaining,betting_allowed,downline_share,can_settle_pl,commission) values(user_name,extensions.crypt('SyntheticOnly984!',extensions.gen_salt('bf',4)),'bettor',parent_name,0,1000,true,shares[5],true,0);
  player:=public.exchange_login(user_name,'SyntheticOnly984!');
  conf:='{"id":"9085","name":"Heads & Tails","rules":"QA","timing":{"bettingSeconds":18,"revealSeconds":2,"resultSeconds":9},"runners":[{"id":"1","name":"Heads","odds":1.95,"layOdds":2.03},{"id":"2","name":"Tails","odds":1.95,"layOdds":2.03}]}'::jsonb;
  foreach kind in array array['win','loss','void'] loop
