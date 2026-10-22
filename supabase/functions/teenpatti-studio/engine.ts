@@ -1,4 +1,4 @@
-// Independent virtual-coin Studio V2 engine. No provider feed or client-submitted outcome.
+// Independent simulated Studio V2 game engine using the existing exchange wallet. No provider feed or client-submitted outcome.
 // Odds are an immutable round quote snapshot; wins are computed on the server.
 export type Outcome = { winner: string|null; groups: {label:string;cards?:number[];value?:string}[];summary:string };
 export type Runner = {id:string;name:string;odds:number;layOdds:number};
@@ -42,7 +42,7 @@ const games: Record<string,[string,string,string[],string]> = {
 // Incomplete interactive and generic-placeholder tables stay in the lobby but
 // cannot open a new betting round until their actual mechanics are implemented.
 const enabledDemoIds=new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085','9030','9035']);
-// Independent free-coin policy values. The videos show differing clocks but
+// Independent simulated-game timing values. The videos show differing clocks but
 // do not establish a complete provider schedule for every title.
 const demoTimings:Record<string,Config['timing']>={
  '9001':{bettingSeconds:25,revealSeconds:5,resultSeconds:12},
@@ -78,7 +78,7 @@ export function configFor(id:string):Config|null {
  const row=games[id]; if(!row||!enabledDemoIds.has(id))return null;
  const [name,kind,names,rules]=row;
  const timing=demoTimings[id];
- return {id,name,kind,timing,rules:'FREE-COIN DEMO. '+rules+' No cash value. Results are simulated independently.',
+ return {id,name,kind,timing,rules:rules+' Results are simulated independently; wagers use your existing BPEXCH1 account balance.',
  runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
 }
 export function randomInt(max:number):number {
