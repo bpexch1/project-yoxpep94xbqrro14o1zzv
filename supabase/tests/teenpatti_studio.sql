@@ -30,6 +30,8 @@ begin
   receipt:=public.studio_request(player->>'token','bet',request);
   if bet->>'id'<>receipt->>'id' then raise exception 'Duplicate bet'; end if;
   state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
+  if (state->>'balance')::numeric<>(public.exchange_request(player->>'token','account','{}')->>'availableBalance')::numeric
+    or (state->>'exposure')::numeric<>(public.exchange_request(player->>'token','account','{}')->>'exposure')::numeric then raise exception 'Studio and main account diverged after reserve'; end if;
   if jsonb_array_length(state->'matchedBets')<>1 or state->'matchedBets'->0->>'id'<>bet->>'id' or state->'matchedBets'->0->>'round_id'<>rid::text then raise exception 'Accepted bet missing from current Matched Bets'; end if;
   if (state->'matchedBets'->0->>'stake')::numeric<>100 or (state->'matchedBets'->0->>'odds')::numeric<>1.95 or state->'matchedBets'->0->>'bet_type'<>'back' then raise exception 'Matched bet receipt mismatch'; end if;
   if (select cash+credit_remaining+pl_downline from public.clients where username=user_name)<>balance-100 then raise exception 'Reserve mismatch'; end if;
@@ -51,6 +53,8 @@ begin
   if sum_pl<>-(receipt->>'profit')::numeric then raise exception 'P/L mismatch';end if;
   if (select count(*) from public.transactions where client_username=user_name and type='bet_settlement' and description like '%'||rid||'%')<>1 then raise exception 'Duplicate settlement ledger';end if;
   state:=public.studio_request(player->>'token','state','{"gameId":"9085"}',conf,outcome);
+  if (state->>'balance')::numeric<>(public.exchange_request(player->>'token','account','{}')->>'availableBalance')::numeric
+    or (state->>'exposure')::numeric<>(public.exchange_request(player->>'token','account','{}')->>'exposure')::numeric then raise exception 'Studio and main account diverged after settlement'; end if;
   if jsonb_array_length(state->'matchedBets')<>1 or state->'matchedBets'->0->>'id'<>bet->>'id' then raise exception 'Same-round settled bet disappeared before ROUND OVER ended'; end if;
   if not exists(select 1 from jsonb_array_elements(state->'bets') x where x->>'id'=bet->>'id' and x->>'status'=case kind when 'win' then 'won' when 'loss' then 'lost' else 'void' end) then raise exception 'Settled order missing from historical bets'; end if;
   update public.studio_rounds set ends_at=clock_timestamp()-interval '0.5 second' where id=rid;
