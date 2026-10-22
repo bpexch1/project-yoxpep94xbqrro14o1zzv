@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import {configFor,createOutcome,handScore,compare,shuffledDeck,rank,score32Cards,resolve32Cards} from '../supabase/functions/teenpatti-studio/engine.ts';
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
 import {currentRoundMatchedBets,settledRoundBets} from '../src/features/teenpatti/bets.ts';
+import {bettingWindowOpen} from '../src/features/teenpatti/roundClock.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
+test('bet slip closes before the server cutoff to account for transit time',()=>{
+ assert.equal(bettingWindowOpen(25000,23000),true);
+ assert.equal(bettingWindowOpen(25000,24000),false);
+ assert.equal(bettingWindowOpen(25000,24800),false);
+ assert.equal(bettingWindowOpen(NaN,23000),false);
+});
 test('only bounded demo mechanics accept bets; 34 lobby tiles remain',()=>{const live=studioGames.filter(g=>g.playable);assert.equal(studioGames.length,34);assert.equal(live.length,15);assert.equal(studioGames.filter(g=>g.status==='UNAVAILABLE').length,19);for(const g of live){const c=configFor(g.id);assert.ok(c?.runners.length>0,g.name);assert.equal(g.status,'LIMITED');for(const r of c.runners){assert.ok(r.odds>1&&r.layOdds>=r.odds&&r.layOdds<=1000,g.name);}}for(const id of ['9301','9022','9040','9023','9100','9021'])assert.equal(configFor(id),null,id);});
 test('catalog contains only the 34 supplied thumbnail games',()=>{
  assert.equal(studioGames.length,34);assert.equal(new Set(studioGames.map(x=>x.id)).size,34);
