@@ -138,3 +138,18 @@
  .studio-lobby-page .studio-thumb-wrap{border-radius:8px}
  .studio-lobby-page .studio-tile-caption>span{font-size:14px}
 }
+
+/* 32 Cards player positions, card reveal, result payout and bet slip. */
+.studio-32-board{max-width:620px;gap:10px;margin:14px auto 4px}
+.studio-32-player{min-height:132px;padding:10px;border-radius:4px;background:linear-gradient(135deg,#103525,#071d17);border-color:#97794c;grid-template-columns:58px minmax(0,1fr)}
+.studio-32-player>strong{font-size:14px;color:#f3deb2}
+.studio-32-player>span{font-size:13px;color:#f5f3e9}
+.studio-32-cards{min-height:65px}
+.studio-32-cards .studio-card{width:46px;height:64px;box-shadow:0 3px 8px #000a}
+.studio-32-cards .studio-card+.studio-card{margin-left:-15px}
+.studio-winning-amount{display:block;font-size:14px;font-weight:700;color:#0e8056;margin-top:5px}
+.studio-slip-summary{display:flex;flex-direction:column;gap:6px;padding:10px;background:#d9eefa;border:1px solid #adcfe0;margin-bottom:13px;font-size:13px}
+.studio-slip-summary span{display:flex;justify-content:space-between;gap:8px}
+.studio-slip-pl{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #ced6d8;padding:10px 0;margin-top:4px;font-size:12px}
+.studio-slip-pl span{display:flex;flex-direction:column;gap:4px}
+@media(max-width:767px){.studio-32-board{gap:6px;margin-top:9px}.studio-32-player{min-height:115px;padding:7px;grid-template-columns:55px minmax(0,1fr);gap:3px}.studio-32-player>strong{font-size:12px}.studio-32-player>span{font-size:11px}.studio-32-cards .studio-card{width:40px;height:58px}.studio-slip-pl{font-size:11px}}
