@@ -413,10 +413,10 @@ export default function UserDashboard() {
                         {sport === "Soccer" ? "Football" : sport}
                       </span>
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "#142a45" }}>
+                    {sportMatches.length > 0 && <><span style={{ fontSize: 12, fontWeight: 800, color: "#142a45" }}>
                       Matched
                     </span>
-                    <div className="reference-odds-heading"><span>1</span><span>X</span><span>2</span></div>
+                    <div className="reference-odds-heading"><span>1</span><span>X</span><span>2</span></div></>}
                   </div>
 
                   {/* Provider scores are informational; they never open a betting slip. */}
@@ -452,7 +452,7 @@ export default function UserDashboard() {
               );
             })}
 
-            {filteredMatches.length === 0 && (activeFilter !== "Cricket" || (cricketScores.length === 0 && !cricketFeedError)) && (
+            {filteredMatches.length === 0 && (activeFilter !== "Cricket" && activeFilter !== "Inplay" || (activeFilter === "Cricket" && cricketScores.length === 0 && !cricketFeedError) || (activeFilter === "Inplay" && cricketScores.every(m => !m.matchStarted) && !cricketFeedError)) && (
               <div className="flex flex-col items-center justify-center py-16 text-center px-4 bg-white m-3 rounded border border-gray-200">
                 <Trophy className="w-12 h-12 text-[#173456]/30 mb-3" />
                 <p className="text-sm font-bold text-[#173456] uppercase tracking-wide">
