@@ -153,3 +153,15 @@
 .studio-slip-pl{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #ced6d8;padding:10px 0;margin-top:4px;font-size:12px}
 .studio-slip-pl span{display:flex;flex-direction:column;gap:4px}
 @media(max-width:767px){.studio-32-board{gap:6px;margin-top:9px}.studio-32-player{min-height:115px;padding:7px;grid-template-columns:55px minmax(0,1fr);gap:3px}.studio-32-player>strong{font-size:12px}.studio-32-player>span{font-size:11px}.studio-32-cards .studio-card{width:40px;height:58px}.studio-slip-pl{font-size:11px}}
+
+/* 32 Cards reveal board follows the supplied mobile recording: empty seats before dealing. */
+.studio-game-cards4{background:radial-gradient(ellipse at 50% 50%,#0a361c,#070807 78%);border-color:#8c713d}
+.studio-game-cards4 .studio-table-brand{display:none}
+.studio-32-board{max-width:430px;gap:13px 10px;margin:15px auto}
+.studio-32-player{min-height:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;border:0;padding:0}
+.studio-32-player>strong{color:#e3cf9f;font-size:11px}
+.studio-32-cards{width:100%;min-height:66px;display:flex;justify-content:center;align-items:center;border:1px solid #414b3b;border-radius:9px;background:radial-gradient(ellipse,#183c19,#0a140d 75%);box-shadow:inset 0 0 16px #102b18}
+.studio-32-player>span{border:1px solid #355634;border-radius:15px;padding:2px 9px;color:#d7cb9f;font-size:11px}
+.studio-32-player.winner{background:transparent;border:0}
+.studio-32-player.winner .studio-32-cards{border-color:#98de6c;box-shadow:0 0 10px #65b752aa,inset 0 0 16px #31582f}
+@media(max-width:767px){.studio-32-board{gap:14px 8px}.studio-32-player{min-height:0;padding:0;gap:5px}.studio-32-cards{min-height:61px}.studio-32-player>strong,.studio-32-player>span{font-size:10px}}
