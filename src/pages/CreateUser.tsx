@@ -294,13 +294,9 @@ export default function CreateUser() {
               />
             </div>
 
-            {/* The reference registration form ends after Reference. Keep
-                optional notes available without changing that default layout. */}
-            <details className="group">
-              <summary className="cursor-pointer text-[14px] text-[#5c6873] py-1">
-                Additional Notes (optional)
-              </summary>
-              <label htmlFor="new-user-notes" className="block text-[14px] font-medium text-[#212529] mb-1 mt-3">Notes</label>
+            {/* Notes are visible in the reference mobile registration form. */}
+            <div>
+              <label htmlFor="new-user-notes" className="block text-[14px] font-medium text-[#212529] mb-1.5">Notes</label>
               <textarea
                 id="new-user-notes"
                 rows={3}
@@ -309,7 +305,7 @@ export default function CreateUser() {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 className="w-full px-3 py-2 text-[14px] bg-white border border-[#ced4da] rounded-[4px] outline-none focus:border-[#00a65a] transition-colors resize-none"
               />
-            </details>
+            </div>
 
             {/* Action Buttons */}
             <div className="pt-2">
