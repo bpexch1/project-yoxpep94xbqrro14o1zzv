@@ -548,6 +548,11 @@ export function ClientSummaryCard({
                               onClick={(e) => { e.stopPropagation(); navigate(`/accounts/view/${client.username}`); }}
                               className="username-text username-staff hover:underline"
                             >{client.username}</button>}
+                            {isDesktop && (
+                              <span className="client-info-button client-info-desktop" aria-hidden="true">
+                                <span className="client-info-glyph">i</span>
+                              </span>
+                            )}
                             {!balancesLoaded && !isDesktop && (
                               <button
                                 onClick={(e) => {
