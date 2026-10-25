@@ -373,6 +373,22 @@
 }
 
 @media screen and (min-width: 900px) {
+  .reference-admin .reference-accounts .data-row > td:first-child > div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    min-width: 0;
+  }
+  .reference-admin .reference-accounts .client-info-desktop {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    margin-left: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: default;
+  }
   .reference-admin .reference-users .report-buttons-wrapper {
     justify-content: flex-start;
     flex-wrap: nowrap;
