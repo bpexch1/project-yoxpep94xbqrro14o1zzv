@@ -431,6 +431,25 @@
   }
   .reference-admin .reference-accounts .username-bettor { color: #00b181 !important; }
 }
+/* The signed-in reference at a 1363px CSS viewport uses 16px/24px
+   table typography and its standard cell spacing. Keep the compact
+   900px layout only for narrower desktop-site viewports. */
+@media screen and (min-width: 1200px) {
+  .reference-admin .reference-accounts .accounts-table {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-table th {
+    padding: 10px 18px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-table .data-row > td {
+    padding: 8px 10px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
 /* Cash/Credit summary must stay inside the card even with very large balances. */
 .reference-admin main .reference-cash .wallet-summary-table {
   width: 100%;
