@@ -165,3 +165,30 @@
 .studio-32-player.winner{background:transparent;border:0}
 .studio-32-player.winner .studio-32-cards{border-color:#98de6c;box-shadow:0 0 10px #65b752aa,inset 0 0 16px #31582f}
 @media(max-width:767px){.studio-32-board{gap:14px 8px}.studio-32-player{min-height:0;padding:0;gap:5px}.studio-32-cards{min-height:61px}.studio-32-player>strong,.studio-32-player>span{font-size:10px}}
+
+/* 32 Cards: keep the market visible and show the gross position per outcome. */
+.studio-32-layout .studio-game-heading{margin-bottom:2px;padding:4px 8px}
+.studio-32-layout .studio-round-bar{padding:3px 7px}
+.studio-32-layout .studio-tabs button{padding:5px 2px}
+.studio-32-layout .studio-table{min-height:0;padding:6px 5px 4px}
+.studio-32-layout .studio-32-board{margin:3px auto 2px;gap:6px 8px}
+.studio-32-layout .studio-32-player{gap:2px}
+.studio-32-layout .studio-32-cards{min-height:57px}
+.studio-32-layout .studio-history-strip{padding:4px 2px;align-items:center;min-height:25px}
+.studio-32-layout .studio-history-strip>span{min-width:23px;padding:2px 4px}
+.studio-32-layout .studio-history-strip>small{margin-left:auto;white-space:nowrap;color:#c5c3bd;font-size:9px}
+.studio-32-layout .studio-market-rows{margin-top:0}
+.studio-32-layout .studio-runner-name{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:2px}
+.studio-32-layout .studio-runner-name strong{font-size:12px}
+.studio-32-layout .studio-runner-name small{font-size:10px;font-weight:700}
+.studio-32-layout .studio-runner-name .profit{color:#00845b}
+.studio-32-layout .studio-runner-name .loss{color:#c23741}
+.studio-market-status{grid-column:2/4;display:grid;place-items:center;background:#f6f6f6;color:#b73048;font-weight:700;font-size:11px;min-width:0;text-align:center}
+@media(max-width:767px){
+ .studio-32-layout .studio-32-cards{min-height:54px}
+ .studio-32-layout .studio-32-player>strong,.studio-32-layout .studio-32-player>span{font-size:9px}
+ .studio-32-layout .studio-market-row{min-height:40px}
+ .studio-32-layout .studio-market-rows .studio-price{min-height:40px}
+ .studio-32-layout .studio-runner-name strong{font-size:11px}
+ .studio-market-status{font-size:10px}
+}

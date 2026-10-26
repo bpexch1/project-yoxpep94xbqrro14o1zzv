@@ -70,6 +70,9 @@ const oddsFor = (id:string,count:number,i:number):number => {
  if(id==='9022'||id==='9040'||id==='9023'||id==='9100')return [1.9,2.8,7.5][i];
  if(id==='9003')return [2.1,12,2.1][i];
  if(id==='9020'||id==='9070')return [2.1,2.1,12][i];
+ // Independent demo quotes for the four 32 Cards selections. These are
+ // fixed round snapshots, not prices or liquidity from the reference site.
+ if(id==='9010')return [12.2,5.95,3.2,2.08][i];
  if(count===4)return 3.85;
  if(count===3)return 2.88;
  return 1.95;
@@ -79,7 +82,7 @@ export function configFor(id:string):Config|null {
  const [name,kind,names,rules]=row;
  const timing=demoTimings[id];
  return {id,name,kind,timing,rules:rules+' Results are simulated independently; wagers use your existing BPEXCH1 account balance.',
- runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
+ runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:id==='9010'?[13.7,6.45,3.45,2.18][i]:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
 }
 export function randomInt(max:number):number {
  if(!Number.isInteger(max)||max<1||max>0xffffffff)throw new Error('Invalid random range');

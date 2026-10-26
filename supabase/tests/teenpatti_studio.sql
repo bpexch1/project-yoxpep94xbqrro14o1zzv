@@ -64,16 +64,17 @@ begin
  end loop;
  -- 32 Cards reveals its four cards from server time, then settles and keeps the
  -- just-finished wager through ROUND OVER. Test data remains in this rollback.
- conf:='{"id":"9010","name":"32 Cards","timing":{"bettingSeconds":20,"resultSeconds":10,"revealSeconds":7},"runners":[{"id":"8","name":"Player 8","odds":3.85,"layOdds":3.93},{"id":"9","name":"Player 9","odds":3.85,"layOdds":3.93},{"id":"10","name":"Player 10","odds":3.85,"layOdds":3.93},{"id":"11","name":"Player 11","odds":3.85,"layOdds":3.93}]}'::jsonb;
+ conf:='{"id":"9010","name":"32 Cards","timing":{"bettingSeconds":20,"resultSeconds":10,"revealSeconds":7},"runners":[{"id":"8","name":"Player 8","odds":12.2,"layOdds":13.7},{"id":"9","name":"Player 9","odds":5.95,"layOdds":6.45},{"id":"10","name":"Player 10","odds":3.2,"layOdds":3.45},{"id":"11","name":"Player 11","odds":2.08,"layOdds":2.18}]}'::jsonb;
  outcome:='{"winner":"10","summary":"Player 10 wins with 23","groups":[{"label":"Player 8","cards":[4],"value":"8 + 6 = 14"},{"label":"Player 9","cards":[17],"value":"9 + 6 = 15"},{"label":"Player 10","cards":[11],"value":"10 + 13 = 23"},{"label":"Player 11","cards":[9],"value":"11 + 11 = 22"}]}'::jsonb;
  market:='qa-studio-'||gen_random_uuid()::text;
- perform public.exchange_ingest(jsonb_build_array(jsonb_build_object('id',market,'eventId',market,'eventName','QA 32 Cards','sport','casino','name','QA 32 Cards','startTime',clock_timestamp(),'status','OPEN','delayed',false,'observedAt',clock_timestamp(),'runners',conf->'runners','quotes','[{"runnerId":"8","selection":"Player 8","side":"back","odds":3.85,"size":10000}]'::jsonb)));
+ perform public.exchange_ingest(jsonb_build_array(jsonb_build_object('id',market,'eventId',market,'eventName','QA 32 Cards','sport','casino','name','QA 32 Cards','startTime',clock_timestamp(),'status','OPEN','delayed',false,'observedAt',clock_timestamp(),'runners',conf->'runners','quotes','[{"runnerId":"8","selection":"Player 8","side":"back","odds":12.2,"size":10000}]'::jsonb)));
  update public.exchange_markets set is_demo=true where id=market;
  insert into public.studio_rounds(game_id,market_id,config,outcome,closes_at,ends_at) values('9010',market,conf,outcome,clock_timestamp()+interval '20 seconds',clock_timestamp()+interval '30 seconds') returning id into rid;
- request:=jsonb_build_object('roundId',rid,'requestId',gen_random_uuid(),'runnerId','8','side','back','stake',100,'odds',3.85);
+ request:=jsonb_build_object('roundId',rid,'requestId',gen_random_uuid(),'runnerId','8','side','back','stake',100,'odds',12.2);
  bet:=public.studio_request(player->>'token','bet',request);
  update public.studio_rounds set closes_at=clock_timestamp()-interval '3 seconds',ends_at=clock_timestamp()+interval '7 seconds' where id=rid;
  state:=public.studio_request(player->>'token','state','{"gameId":"9010"}',conf,outcome);
+ if (state->'config'->'runners'->0->>'odds')::numeric<>12.2 or (state->'matchedBets'->0->>'odds')::numeric<>12.2 then raise exception '32 Cards quote snapshot differs from accepted bet'; end if;
  if (state->'round'->>'settled')::boolean or state->'round'->'outcome'->>'winner' is not null then raise exception '32 Cards winner disclosed before final reveal'; end if;
  if jsonb_array_length(state->'round'->'outcome'->'groups'->0->'cards')<>1 or jsonb_array_length(state->'round'->'outcome'->'groups'->1->'cards')<>0 then raise exception '32 Cards staged reveal count wrong'; end if;
  if jsonb_array_length(state->'matchedBets')<>1 then raise exception '32 Cards bet vanished during reveal'; end if;
