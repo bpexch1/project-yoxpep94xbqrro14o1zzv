@@ -1,4 +1,4 @@
-// Independent virtual-coin Studio V2 engine. No provider feed or client-submitted outcome.
+// Independent simulated Studio V2 game engine using the existing exchange wallet. No provider feed or client-submitted outcome.
 // Odds are an immutable round quote snapshot; wins are computed on the server.
 export type Outcome = { winner: string|null; groups: {label:string;cards?:number[];value?:string}[];summary:string };
 export type Runner = {id:string;name:string;odds:number;layOdds:number};
@@ -14,7 +14,7 @@ const games: Record<string,[string,string,string[],string]> = {
  '9005':['TeenPatti ODI','teen3',['Player A','Player B','Player C'],'Three players, three cards each; strongest hand wins. Equal best hands void.'],
  '9030':['Auto Roulette','roulette',Array.from({length:37},(_,i)=>String(i)),'Independent single-zero virtual roulette. Straight number bets (0–36).'],
  '9006':['Muflis TeenPatti','muflis',['Player A','Player B'],'Three cards each; weakest Teen Patti hand wins. Equal hands void.'],
- '9021':['Poker','cards',['Player A','Player B'],'Independent demo: two three-card hands compared using Teen Patti-style ranking; not a licensed poker variant.'],
+ '9021':['Poker','cards',['Player A','Player B'],'Simulated three-card hands compared using Teen Patti-style ranking; not a licensed poker variant.'],
  '9015':['Sic-Bo','dice',['Low (4–10)','High (11–17)','Triple'],'Virtual roll of three dice. Triple wins its own selection; non-triples are low or high.'],
  '9002':['AndarBahar','andar',['Andar','Bahar'],'Draw a joker card then alternate Andar and Bahar until the rank matches.'],
  '9003':['HiLo','hilo',['High','Snap','Low'],'The Ante card is compared with a separately dealt Joker card; equal ranks are Snap. Ace counts high.'],
@@ -22,7 +22,7 @@ const games: Record<string,[string,string,string[],string]> = {
  '9008':['Ammar Akbar Anthony','cards3',['Ammar','Akbar','Anthony'],'Virtual highest-card prediction among three sides; ties void.'],
  '9009':['Super Over OneDay','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
  '9011':['Super Over T20','sports',['0–7 runs','8–12 runs','13+ runs'],'Predict the independently simulated score of a virtual over.'],
- '9010':['32 Cards','cards4',['Player 8','Player 9','Player 10','Player 11'],'32-card deck (6 through King). Add each player’s base number (8, 9, 10, 11) to the ranks dealt to that player. If the highest totals tie, deal extra cards to those players until one wins. Tie-round market reopening is not yet supported in this demo.'],
+ '9010':['32 Cards','cards4',['Player 8','Player 9','Player 10','Player 11'],'32-card deck (6 through King). Add each player’s base number (8, 9, 10, 11) to the ranks dealt to that player. If the highest totals tie, deal extra cards to those players until one wins. Tie-round market reopening is not yet supported.'],
  '9012':['Bollywood Casino','cards3',['Hero','Heroine','Villain'],'Independent virtual three-card high-card draw; ties void.'],
  '9016':['Race To 17','sports',['0–7','8–12','13–17'],'Independent virtual number-draw game.'],
  '9017':['High Card','cards',['Player A','Player B'],'Higher single card wins. Equal rank voids the round.'],
@@ -42,7 +42,7 @@ const games: Record<string,[string,string,string[],string]> = {
 // Incomplete interactive and generic-placeholder tables stay in the lobby but
 // cannot open a new betting round until their actual mechanics are implemented.
 const enabledDemoIds=new Set(['9001','9005','9006','9015','9002','9003','9007','9010','9017','9018','9019','9055','9085','9030','9035']);
-// Independent free-coin policy values. The videos show differing clocks but
+// Independent simulated-game timing values. The videos show differing clocks but
 // do not establish a complete provider schedule for every title.
 const demoTimings:Record<string,Config['timing']>={
  '9001':{bettingSeconds:25,revealSeconds:5,resultSeconds:12},
@@ -78,7 +78,7 @@ export function configFor(id:string):Config|null {
  const row=games[id]; if(!row||!enabledDemoIds.has(id))return null;
  const [name,kind,names,rules]=row;
  const timing=demoTimings[id];
- return {id,name,kind,timing,rules:'FREE-COIN DEMO. '+rules+' No cash value. Results are simulated independently.',
+ return {id,name,kind,timing,rules:rules+' Results are simulated independently; wagers use your existing BPEXCH1 account balance.',
  runners:names.map((name,i)=>{const odds=oddsFor(id,names.length,i);return {id:id==='9010'?String(i+8):String(i+1),name,odds,layOdds:Number((odds+(odds>10?0.5:0.08)).toFixed(2))};})};
 }
 export function randomInt(max:number):number {

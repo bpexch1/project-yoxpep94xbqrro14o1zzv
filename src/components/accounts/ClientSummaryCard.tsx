@@ -27,9 +27,11 @@ export function ClientSummaryCard({
   hideHeader = false,
   adminRecord,
 }: ClientSummaryCardProps) {
-  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 992px)").matches);
+  // Android Chrome's Desktop Site commonly exposes a CSS viewport just below
+  // 992px. Keep the account table in its desktop form once there is room for it.
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 900px)").matches);
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 992px)");
+    const media = window.matchMedia("(min-width: 900px)");
     const update = () => setIsDesktop(media.matches);
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
@@ -546,6 +548,11 @@ export function ClientSummaryCard({
                               onClick={(e) => { e.stopPropagation(); navigate(`/accounts/view/${client.username}`); }}
                               className="username-text username-staff hover:underline"
                             >{client.username}</button>}
+                            {isDesktop && (
+                              <span className="client-info-button client-info-desktop" aria-hidden="true">
+                                <span className="client-info-glyph">i</span>
+                              </span>
+                            )}
                             {!balancesLoaded && !isDesktop && (
                               <button
                                 onClick={(e) => {

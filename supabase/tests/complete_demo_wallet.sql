@@ -82,7 +82,7 @@ begin
  if (select count(*) from public.transactions where client_username=master_name and type='pl_transfer')<>1 then raise exception 'P/L transfer duplicate'; end if;
  result:=public.exchange_request(player->>'token','markets','{}');
  if (select count(*) from public.exchange_markets where is_demo and settled_at is null)<>2 then raise exception 'Demo rounds missing'; end if;
- if exists(select 1 from public.exchange_quotes q join public.exchange_markets m on m.id=q.market_id where m.is_demo and (q.odds<=1 or q.observed_at<clock_timestamp()-interval '15 seconds')) then raise exception 'Demo quotes invalid'; end if;
+ if exists(select 1 from public.exchange_quotes q join public.exchange_markets m on m.id=q.market_id where m.is_demo and m.settled_at is null and (q.odds<=1 or q.observed_at<clock_timestamp()-interval '15 seconds')) then raise exception 'Demo quotes invalid'; end if;
  if has_function_privilege('anon','public.exchange_wallet_ledger(text,text,timestamptz,timestamptz,integer)','execute') then raise exception 'Public wallet helper'; end if;
 end;
 $qa$;

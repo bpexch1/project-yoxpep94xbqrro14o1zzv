@@ -6,9 +6,9 @@ export default function ApiSettings() {
       <main className="w-full px-3 sm:px-4 py-4 max-w-6xl mx-auto space-y-4">
         <div className="flex items-center justify-between pb-2 border-b border-gray-300">
           <div>
-            <h1 className="text-xl font-bold text-[#212529]">API Diagnostics & Configuration</h1>
+            <h1 className="text-xl font-bold text-[#212529]">Feed Status</h1>
             <p className="text-xs text-gray-600">
-              Monitor live external data feeds, view response codes, and configure API access keys.
+              Check the server feed configuration and connection status.
             </p>
           </div>
         </div>

@@ -167,8 +167,15 @@ function createEntity(entityName: string) {
 export const User = {
   auth: {
     currentUser: () => {
-      const data = localStorage.getItem("clientSession");
-      return data ? JSON.parse(data) : null;
+      localStorage.removeItem("clientSession");
+      if (!sessionStorage.getItem("exchangeSessionToken")) return null;
+      const data = sessionStorage.getItem("clientSession");
+      try {
+        return data ? JSON.parse(data) : null;
+      } catch {
+        sessionStorage.removeItem("clientSession");
+        return null;
+      }
     },
   },
 };

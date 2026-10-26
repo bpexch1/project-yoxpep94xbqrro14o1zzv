@@ -3,13 +3,20 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Home, Menu, Search, X, ArrowLeft, RefreshCw } from 'lucide-react';
 import { studioLobbyGames, type Game } from '@/features/teenpatti/catalog';
-import { studioRequest, pendingKey, type StudioState, type StudioBet, type Outcome } from '@/features/teenpatti/api';
+import { studioRequest, pendingKey, type StudioState, type StudioBet, type StudioBetRow, type Outcome } from '@/features/teenpatti/api';
 import { currentRoundMatchedBets, settledRoundBets as getSettledRoundBets } from '@/features/teenpatti/bets';
+import { bettingWindowOpen } from '@/features/teenpatti/roundClock';
 import { getClientSession } from '@/hooks/useClientAuth';
 import { readAccount } from '@/services/accounting';
 import '@/features/teenpatti/studio.css';
 
 const money=(n:number)=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
+const positionFor=(bets:StudioBetRow[],winnerId:string)=>bets.reduce((total,bet)=>{
+ const stake=Number(bet.stake),odds=Number(bet.odds);
+ if(!Number.isFinite(stake)||!Number.isFinite(odds))return total;
+ const wins=bet.runner_id===winnerId;
+ return total+(bet.bet_type==='back'?(wins?stake*(odds-1):-stake):(wins?-stake*(odds-1):stake));
+},0);
 function Card({value,delay=0}:{value?:number;delay?:number}){
  const rank=value===undefined?'':(['2','3','4','5','6','7','8','9','10','J','Q','K','A'][value%13]);
  const suit=value===undefined?'♠':['♠','♥','♣','♦'][Math.floor(value/13)];
@@ -51,8 +58,8 @@ function StudioLogo({onClick}:{onClick:()=>void}){
  </button>;
 }
 function WaitingScene({game,kind,runners}:{game:Game;kind:string;runners:StudioState['config']['runners']}){
- if(kind==='wheel'||kind==='roulette')return <div className="studio-scene wheel-scene" aria-label="Virtual demo wheel animation"><div className="studio-spinning-wheel"><span>{kind==='roulette'?'ROULETTE':'DREAM CATCHER'}</span></div><small>Virtual wheel spins until the round closes</small></div>;
- if(kind==='crash')return <div className="studio-scene flight-scene" aria-label="Virtual flight demo"><span className="studio-aircraft">✈</span><strong>VIRTUAL FLIGHT</strong><small>Predict the result · No live cash-out</small></div>;
+ if(kind==='wheel'||kind==='roulette')return <div className="studio-scene wheel-scene" aria-label="Virtual wheel animation"><div className="studio-spinning-wheel"><span>{kind==='roulette'?'ROULETTE':'DREAM CATCHER'}</span></div><small>Virtual wheel spins until the round closes</small></div>;
+ if(kind==='crash')return <div className="studio-scene flight-scene" aria-label="Virtual flight"><span className="studio-aircraft">✈</span><strong>VIRTUAL FLIGHT</strong><small>Predict the result · No live cash-out</small></div>;
  if(kind==='dice')return <div className="studio-scene dice-scene" aria-label="Virtual dice game"><span className="studio-die">⚄</span><span className="studio-die second">⚅</span><small>Virtual dice roll</small></div>;
  if(kind==='sports')return <div className="studio-scene sports-scene" aria-label="Virtual score game"><strong>◉</strong><small>Virtual score in progress</small></div>;
  if(kind==='coin')return <div className="studio-scene coin-scene" aria-label="Virtual coin toss"><span className="studio-coin-flip">B</span><small>Virtual coin toss</small></div>;
@@ -63,18 +70,22 @@ function WaitingScene({game,kind,runners}:{game:Game;kind:string;runners:StudioS
 }
 function GameTable({game,username}:{game:Game;username:string}){
  const qc=useQueryClient();const [view,setView]=useState('Game');const [runner,setRunner]=useState<StudioState['config']['runners'][number]|null>(null);const [betSide,setBetSide]=useState<'back'|'lay'>('back');const [stake,setStake]=useState('100');const [busy,setBusy]=useState(false);const busyRef=useRef(false);const [message,setMessage]=useState('');const [pending,setPending]=useState<StudioBet|null>(()=>{try{return JSON.parse(sessionStorage.getItem(pendingKey(username))||'null');}catch{return null;}});
- const [wheelChip,setWheelChip]=useState(2000);
+ const previousRoundId=useRef<string|null>(null);
+ const [wheelChip,setWheelChip]=useState(100);
  const [clock,setClock]=useState(Date.now());
- const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:()=>studioRequest<StudioState>('state',{gameId:game.id}),refetchInterval:2000,retry:1,enabled:game.playable});
+ const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:async()=>{const started=Date.now();const state=await studioRequest<StudioState>('state',{gameId:game.id});return {...state,roundTripMs:Date.now()-started};},refetchInterval:2000,retry:1,enabled:game.playable});
  useEffect(()=>{const id=setInterval(()=>setClock(Date.now()),250);return()=>clearInterval(id);},[]);
- const serverTime=data?new Date(data.serverNow).getTime()+Math.max(0,clock-dataUpdatedAt):clock;
+ // The server timestamp is created before the HTTP response arrives. Account
+ // for transit time so a slow connection never shows an optimistic deadline.
+ const serverTime=data?new Date(data.serverNow).getTime()+Math.max(0,clock-dataUpdatedAt)+data.roundTripMs:clock;
  const seconds=data?Math.max(0,Math.ceil((new Date(data.round.closesAt).getTime()-serverTime)/1000)):0;
  const stale=clock-dataUpdatedAt>6000;
- const canBet=!!data&&!error&&!stale&&!data.round.settled&&seconds>0;
+ const canBet=!!data&&!error&&!stale&&!data.round.settled&&bettingWindowOpen(new Date(data.round.closesAt).getTime(),serverTime);
  const marketStatus=data&&(data.round.settled?new Date(data.round.endsAt).getTime()-serverTime<3000?'NEXT ROUND !':'ROUND OVER !':seconds===0||error||stale?'SUSPENDED !':null);
  const matchedBets=data?(data.matchedBets??currentRoundMatchedBets(data.bets,data.round.id)):[];
  const settledRoundBets=data?getSettledRoundBets(data.bets,data.round.id):[];
- useEffect(()=>{setRunner(null);},[data?.round.id]);
+ const activeRoundId=data?.round.id;
+ useEffect(()=>{if(!activeRoundId)return;const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;previousRoundId.current=activeRoundId;if(changed)setRunner(open=>{if(open&&!busyRef.current)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');return null;});},[activeRoundId]);
  useEffect(()=>{if(data){window.dispatchEvent(new Event('balance-updated'));qc.invalidateQueries({queryKey:['studio-account',username]});}},[data?.balance,data?.round.settled,qc,username]);
  async function submit(retry=false){
   if(busyRef.current)return;
@@ -106,7 +117,7 @@ function GameTable({game,username}:{game:Game;username:string}){
   <div className="studio-history-strip" aria-label="Recent round results">{data.history.slice(0,12).map(h=><span title={h.outcome.summary} key={h.id}>{h.outcome.winner===null?'T':data.config.runners.find(r=>r.id===h.outcome.winner)?.name.replace('Player ','')||h.outcome.winner}</span>)}</div></>}
   {data&&view==='Results'&&<div className="studio-results">{data.history.length?data.history.map(h=><article key={h.id}><small>{new Date(h.settled_at).toLocaleString()} · {h.id.slice(0,8)}</small><Result outcome={h.outcome}/></article>):<p className="studio-empty">No completed rounds yet.</p>}</div>}
   {data&&view==='Rules'&&<div className="studio-rules"><h2>Demo game rules</h2><p>{data.config.rules}</p><p>Betting lasts {data.config.timing?.bettingSeconds??20} seconds. Results display for {data.config.timing?.resultSeconds??10} seconds. These timers are independent demo settings; original provider timings are unverified. Your stake is reserved immediately. Winning returns and any configured commission are recorded in your account statement. A void returns your stake.</p><p>These are free test coins with no cash value. This simulation does not use the original provider’s game feed.</p></div>}
-  {data&&data.round.settled&&data.round.outcome&&view==='Game'&&<section className="studio-round-result" role="status"><h2>Round Result</h2><Result outcome={data.round.outcome}/>{settledRoundBets.length>0&&<ul>{settledRoundBets.map(b=><li key={b.id}><strong>{b.status.toUpperCase()}</strong> · {b.selection} · {money(b.stake)} · P/L {b.profit===null?'—':money(b.profit)}{b.status.toLowerCase()==='won'&&b.profit!==null&&<span className="studio-winning-amount">WINNING AMOUNT {money(Number(b.stake)+Number(b.profit))}</span>}</li>)}</ul>}</section>}
+  {data&&data.round.settled&&data.round.outcome&&view==='Game'&&<section className="studio-round-result" role="status"><h2>Round Result</h2><Result outcome={data.round.outcome}/>{settledRoundBets.length>0&&<p role="status">Round P/L: {money(settledRoundBets.reduce((sum,b)=>sum+Number(b.profit||0),0))} · Updated account balance: {money(data.balance)} · Exposure: {money(data.exposure)}</p>}{settledRoundBets.length>0&&<ul>{settledRoundBets.map(b=><li key={b.id}><strong>{b.status.toUpperCase()}</strong> · {b.selection} · {money(b.stake)} · P/L {b.profit===null?'—':money(b.profit)}{b.status.toLowerCase()==='won'&&b.profit!==null&&<span className="studio-winning-amount">WINNING AMOUNT {money(Number(b.stake)+Number(b.profit))}</span>}</li>)}</ul>}</section>}
   {data&&(view==='My Bets'||view==='Game')&&<section className="studio-bets"><h2>{view==='Game'?`Matched Bets (${matchedBets.length})`:'My Bets'}</h2><div className="studio-scroll"><table><thead><tr><th>Runner</th><th>Side</th><th>Price</th><th>Size</th><th>Status</th><th>P/L</th></tr></thead><tbody>{(view==='Game'?matchedBets:data.bets.slice(0,50)).map(b=><tr key={b.id}><td>{b.selection}<small>{b.status.toUpperCase()}{b.profit===null?'':` · P/L ${money(b.profit)}`} · Order {b.id.slice(0,8)} · Round {b.round_id.slice(0,8)}</small></td><td>{b.bet_type?.toUpperCase()}</td><td>{b.odds}</td><td>{money(b.stake)}</td><td>{b.status}</td><td className={(b.profit||0)<0?'loss':'profit'}>{b.profit===null?'—':money(b.profit)}</td></tr>)}</tbody></table>{view==='Game'&&!matchedBets.length&&<p className="studio-empty">No matched bets in this round.</p>}{view==='My Bets'&&!data.bets.length&&<p className="studio-empty">No bets placed.</p>}</div></section>}
   {message&&<p className="studio-message" role="status">{message}</p>}
   {pending&&<div className="studio-pending" role="status"><p>Confirm the response to your pending {money(pending.stake)} bet before placing another.</p><button disabled={busy} onClick={()=>submit(true)}>{busy?'Checking…':'Check / retry pending bet'}</button></div>}

@@ -284,6 +284,172 @@
     padding: 20px;
   }
 }
+
+/* Accounts PRD V2: Chrome Desktop Site can present a sub-992px CSS viewport.
+   Keep the change scoped to Accounts so the other admin routes retain their
+   existing 992px navigation behavior. The account table remains scrollable
+   within its own container at narrower desktop widths. */
+@media screen and (min-width: 900px) and (max-width: 991.98px) {
+  .reference-admin:has(.reference-users) .app-header .green-logo-text {
+    display: block !important;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #00b181;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .reference-admin:has(.reference-users) .app-header .navbar-toggler {
+    width: 42px;
+    min-width: 42px;
+    height: 33px;
+    min-height: 33px;
+    border: 1px solid #73818f !important;
+    border-radius: 4px;
+  }
+  .reference-admin .reference-users .report-buttons-wrapper {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 6px;
+    max-width: none;
+    margin: 0;
+  }
+  .reference-admin .reference-users .report-buttons-wrapper .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  .reference-admin .reference-users #Usersearchcustom .card-body {
+    padding: 20px;
+    min-height: 86px;
+  }
+  .reference-admin .reference-users #Usersearchcustom .card-body > div > div:first-child {
+    width: 360px;
+    max-width: 100%;
+  }
+  .reference-admin .reference-accounts .accounts-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px 12px;
+  }
+  .reference-admin .reference-accounts .accounts-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px 12px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-legend > div { display: flex; }
+  .reference-admin .reference-accounts .admin-datatable-controls {
+    justify-content: flex-end;
+    margin: 0 0 14px;
+  }
+  .reference-admin .reference-accounts .admin-datatable-controls > label:last-child {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .reference-admin .reference-accounts .admin-datatable-controls input { height: 35px; }
+  .reference-admin .reference-accounts .card-body > div:first-child table { width: auto; }
+  .reference-admin .reference-accounts .card-body > div:first-child th br { display: none; }
+  .reference-admin .reference-accounts .accounts-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: auto;
+  }
+  .reference-admin .reference-accounts .accounts-table tr > :first-child,
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(2),
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(3) { width: auto; }
+  .reference-admin .reference-accounts .data-row > td:first-child > div {
+    display: flex;
+    overflow-wrap: normal;
+  }
+  .reference-admin .reference-accounts .data-row { background: #fff !important; }
+  .reference-admin .reference-accounts .admin-datatable-footer {
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .reference-admin .reference-accounts .data-row > td:first-child > div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    min-width: 0;
+  }
+  .reference-admin .reference-accounts .client-info-desktop {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    margin-left: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: default;
+  }
+  .reference-admin .reference-users .report-buttons-wrapper {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    max-width: none;
+    margin: 0;
+  }
+  .reference-admin .reference-accounts .accounts-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: auto;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .reference-admin .reference-accounts .accounts-table th,
+  .reference-admin .reference-accounts .accounts-table .data-row > td {
+    padding: 7px 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    vertical-align: middle;
+  }
+  .reference-admin .reference-accounts .accounts-table .table-header-row > td {
+    padding: 7px 10px;
+  }
+  .reference-admin .reference-accounts .data-row .client-row-options {
+    gap: 3px;
+  }
+  .reference-admin .reference-accounts .data-row .client-row-options .btn-action {
+    padding: 4px 7px;
+    line-height: 18px;
+  }
+  .reference-admin .reference-accounts .username-bettor { color: #00b181 !important; }
+}
+
+/* Keep the financial summary accessible through its own horizontal scroller. */
+@media screen and (max-width: 899.98px) {
+  .reference-admin .reference-accounts .card-body > div:first-child th,
+  .reference-admin .reference-accounts .card-body > div:first-child td {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .reference-admin .reference-accounts .username-bettor { color: #00b181 !important; }
+}
+/* The signed-in reference at a 1363px CSS viewport uses 16px/24px
+   table typography and its standard cell spacing. Keep the compact
+   900px layout only for narrower desktop-site viewports. */
+@media screen and (min-width: 1200px) {
+  .reference-admin .reference-accounts .accounts-table {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-table th {
+    padding: 10px 18px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-table .data-row > td {
+    padding: 8px 10px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
 /* Cash/Credit summary must stay inside the card even with very large balances. */
 .reference-admin main .reference-cash .wallet-summary-table {
   width: 100%;
