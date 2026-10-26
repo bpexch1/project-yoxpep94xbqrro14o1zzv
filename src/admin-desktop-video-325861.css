@@ -461,3 +461,124 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* Accounts and Edit User desktop-site parity, reference screenshots 26 Oct.
+   900px includes Android Chrome's desktop viewport; phone layout stays intact. */
+@media screen and (min-width: 900px) {
+  .reference-admin .reference-accounts .card-body > div:first-child table {
+    width: 100%;
+  }
+  .reference-admin .reference-accounts .accounts-table {
+    min-width: 1000px;
+    table-layout: fixed;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .reference-admin .reference-accounts .accounts-table th,
+  .reference-admin .reference-accounts .accounts-table .data-row > td {
+    padding: 8px 10px;
+    font-size: 16px;
+    line-height: 24px;
+    vertical-align: top;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .reference-admin .reference-accounts .accounts-table th {
+    padding: 12px 18px;
+    vertical-align: bottom;
+  }
+  .reference-admin .reference-accounts .accounts-table tr > :first-child { width: 145px; }
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(2) { width: 125px; }
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(3) { width: 100px; }
+  .reference-admin .reference-accounts .accounts-table tr > :nth-child(6) { width: 80px; }
+  .reference-admin .reference-accounts .accounts-table tr > :last-child:not([colspan]) { width: 90px; }
+  .reference-admin .reference-accounts .accounts-table tr > [colspan] { width: auto; }
+  .reference-admin .reference-accounts .accounts-table .table-header-row > td {
+    padding: 10px 18px;
+  }
+  .reference-admin .reference-accounts .username-bettor { color: #23282c !important; }
+  .reference-admin .reference-accounts .data-row .client-row-options {
+    display: grid;
+    grid-template-columns: repeat(2, 35px);
+    gap: 2px 4px;
+    align-items: start;
+    justify-content: start;
+  }
+  .reference-admin .reference-accounts .client-row-options .btn-action {
+    width: 35px;
+    min-height: 35px;
+    padding: 6px 8px;
+    line-height: 21px;
+  }
+  .reference-admin .reference-accounts .client-row-options .btn-copy {
+    grid-column: 1 / -1;
+  }
+  .reference-admin .reference-accounts .admin-datatable-controls {
+    margin-top: 34px;
+    margin-bottom: 10px;
+  }
+  .reference-admin .reference-accounts .admin-datatable-controls > label:last-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+  }
+  .reference-admin .reference-edit > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 30px;
+    align-items: start;
+  }
+  .reference-admin .reference-edit > div > div:first-child {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .reference-admin .reference-edit > div > div:first-child > div {
+    display: contents !important;
+  }
+  .reference-admin .reference-edit > div > div:first-child button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .reference-admin .reference-edit > div > div:first-child span {
+    margin-left: auto;
+    font-size: 20px !important;
+  }
+  .reference-admin .reference-edit form > div:first-child > div,
+  .reference-admin .reference-edit > div > div:last-child form > div:first-child > div {
+    display: grid !important;
+    grid-template-columns: 27% minmax(0, 1fr);
+    align-items: start !important;
+    padding: 0 15px;
+  }
+  .reference-admin .reference-edit form > div:first-child > div > div:first-child {
+    width: auto !important;
+    min-width: 0;
+    padding-top: 6px;
+    overflow-wrap: anywhere;
+  }
+  .reference-admin .reference-edit form input:not([type="checkbox"]),
+  .reference-admin .reference-edit form textarea { max-width: 200px !important; }
+  .reference-admin .reference-edit form > div:last-child {
+    justify-content: flex-start !important;
+    background: #f0f3f5;
+    border-top: 1px solid #c8ced3;
+    margin: 36px -20px -20px !important;
+    padding: 12px 20px !important;
+  }
+}
+@media screen and (min-width: 900px) and (max-width: 991.98px) {
+  .reference-admin:has(.reference-edit) .app-header .green-logo-text {
+    display: block !important;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #00b181;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+}
