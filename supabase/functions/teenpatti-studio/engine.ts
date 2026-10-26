@@ -45,21 +45,21 @@ const enabledDemoIds=new Set(['9001','9005','9006','9015','9002','9003','9007','
 // Independent simulated-game timing values. The videos show differing clocks but
 // do not establish a complete provider schedule for every title.
 const demoTimings:Record<string,Config['timing']>={
- '9001':{bettingSeconds:25,revealSeconds:5,resultSeconds:12},
- '9005':{bettingSeconds:26,revealSeconds:6,resultSeconds:12},
- '9006':{bettingSeconds:24,revealSeconds:6,resultSeconds:12},
- '9015':{bettingSeconds:28,revealSeconds:4,resultSeconds:11},
- '9002':{bettingSeconds:24,revealSeconds:6,resultSeconds:12},
- '9003':{bettingSeconds:22,revealSeconds:5,resultSeconds:11},
- '9007':{bettingSeconds:24,revealSeconds:3,resultSeconds:10},
- '9010':{bettingSeconds:20,revealSeconds:7,resultSeconds:10},
- '9017':{bettingSeconds:20,revealSeconds:3,resultSeconds:10},
- '9018':{bettingSeconds:21,revealSeconds:3,resultSeconds:10},
- '9019':{bettingSeconds:21,revealSeconds:3,resultSeconds:10},
- '9055':{bettingSeconds:22,revealSeconds:3,resultSeconds:10},
- '9085':{bettingSeconds:18,revealSeconds:2,resultSeconds:9},
- '9030':{bettingSeconds:28,revealSeconds:4,resultSeconds:12},
- '9035':{bettingSeconds:75,revealSeconds:8,resultSeconds:15}
+ '9001':{bettingSeconds:30,revealSeconds:5,resultSeconds:12},
+ '9005':{bettingSeconds:30,revealSeconds:6,resultSeconds:12},
+ '9006':{bettingSeconds:30,revealSeconds:6,resultSeconds:12},
+ '9015':{bettingSeconds:30,revealSeconds:4,resultSeconds:11},
+ '9002':{bettingSeconds:30,revealSeconds:6,resultSeconds:12},
+ '9003':{bettingSeconds:30,revealSeconds:5,resultSeconds:11},
+ '9007':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
+ '9010':{bettingSeconds:30,revealSeconds:7,resultSeconds:10},
+ '9017':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
+ '9018':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
+ '9019':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
+ '9055':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
+ '9085':{bettingSeconds:30,revealSeconds:2,resultSeconds:9},
+ '9030':{bettingSeconds:30,revealSeconds:4,resultSeconds:12},
+ '9035':{bettingSeconds:30,revealSeconds:8,resultSeconds:15}
 };
 const oddsFor = (id:string,count:number,i:number):number => {
  if(id==='9030')return 36;
