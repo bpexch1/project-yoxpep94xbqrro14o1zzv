@@ -3,20 +3,14 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Home, Menu, Search, X, ArrowLeft, RefreshCw } from 'lucide-react';
 import { studioLobbyGames, type Game } from '@/features/teenpatti/catalog';
-import { studioRequest, pendingKey, type StudioState, type StudioBet, type StudioBetRow, type Outcome } from '@/features/teenpatti/api';
-import { currentRoundMatchedBets, settledRoundBets as getSettledRoundBets } from '@/features/teenpatti/bets';
+import { studioRequest, pendingKey, type StudioState, type StudioBet, type Outcome } from '@/features/teenpatti/api';
+import { currentRoundMatchedBets, roundPositions, settledRoundBets as getSettledRoundBets } from '@/features/teenpatti/bets';
 import { bettingWindowOpen } from '@/features/teenpatti/roundClock';
 import { getClientSession } from '@/hooks/useClientAuth';
 import { readAccount } from '@/services/accounting';
 import '@/features/teenpatti/studio.css';
 
 const money=(n:number)=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
-const positionFor=(bets:StudioBetRow[],winnerId:string)=>bets.reduce((total,bet)=>{
- const stake=Number(bet.stake),odds=Number(bet.odds);
- if(!Number.isFinite(stake)||!Number.isFinite(odds))return total;
- const wins=bet.runner_id===winnerId;
- return total+(bet.bet_type==='back'?(wins?stake*(odds-1):-stake):(wins?-stake*(odds-1):stake));
-},0);
 function Card({value,delay=0}:{value?:number;delay?:number}){
  const rank=value===undefined?'':(['2','3','4','5','6','7','8','9','10','J','Q','K','A'][value%13]);
  const suit=value===undefined?'♠':['♠','♥','♣','♦'][Math.floor(value/13)];
@@ -26,7 +20,6 @@ function Result({outcome}:{outcome:Outcome}){return <div className="studio-resul
 function Cards32Board({runners,outcome}:{runners:StudioState['config']['runners'];outcome:Outcome|null}){
  return <div className="studio-32-board" aria-label="32 Cards round">
   {runners.map((r,i)=>{const group=outcome?.groups[i];const cards=group?.cards||[];const visibleTotal=Number(r.id)+cards.reduce((sum,c)=>sum+c%13+2,0);return <div className={`studio-32-player${outcome?.winner===r.id?' winner':''}`} key={r.id}><strong>{r.name}</strong><div className="studio-32-cards">{cards.map((card,j)=><Card key={card} value={card} delay={j*160}/>)}</div><span>{group?.value||`${r.id} + ${cards.length?cards.map(c=>c%13+2).join(' + '):'?'} = ${cards.length?visibleTotal:'?'}`}</span>{outcome?.winner===r.id&&<b>WINNER</b>}</div>;})}
-  {outcome&&<p role="status">{outcome.summary}</p>}
  </div>;
 }
 function WheelBetPanel({kind,runners,canBet,chip,setChip,onPick,onUndo}:{kind:string;runners:StudioState['config']['runners'];canBet:boolean;chip:number;setChip:(value:number)=>void;onPick:(runner:StudioState['config']['runners'][number])=>void;onUndo:()=>void}){
@@ -84,6 +77,7 @@ function GameTable({game,username}:{game:Game;username:string}){
  const marketStatus=data&&(data.round.settled?new Date(data.round.endsAt).getTime()-serverTime<3000?'NEXT ROUND !':'ROUND OVER !':seconds===0||error||stale?'SUSPENDED !':null);
  const matchedBets=data?(data.matchedBets??currentRoundMatchedBets(data.bets,data.round.id)):[];
  const settledRoundBets=data?getSettledRoundBets(data.bets,data.round.id):[];
+ const positions=data&&game.id==='9010'?roundPositions(matchedBets,data.round.id,data.config.runners.map(r=>r.id),data.round.settled):null;
  const activeRoundId=data?.round.id;
  useEffect(()=>{if(!activeRoundId)return;const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;previousRoundId.current=activeRoundId;if(changed)setRunner(open=>{if(open&&!busyRef.current)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');return null;});},[activeRoundId]);
  useEffect(()=>{if(data){window.dispatchEvent(new Event('balance-updated'));qc.invalidateQueries({queryKey:['studio-account',username]});}},[data?.balance,data?.round.settled,qc,username]);
@@ -102,19 +96,21 @@ function GameTable({game,username}:{game:Game;username:string}){
   finally{busyRef.current=false;setBusy(false);}
  }
  if(!game.playable)return <section className="studio-unavailable"><Artwork game={game}/><h1>{game.name}</h1><p>This game’s reference mechanics are not implemented yet, so betting is unavailable.</p><p>Existing bets and ledger entries remain in account history.</p><Link to="/teenpatti-studio">Back to lobby</Link></section>;
- return <div className="studio-table-wrap">
-  <div className="studio-game-heading"><Link to="/teenpatti-studio" aria-label="Back to lobby"><ArrowLeft size={18}/></Link><h1>{game.name}</h1></div>
-  <div className="studio-round-bar"><span className={`studio-countdown ${seconds<5?'closing':''}`}>{seconds}</span><div><small>ROUND {data?.round.id.slice(0,8)||'—'}</small><strong>{error?'Connection unavailable':stale?'Reconnecting':canBet?'BETTING OPEN':data?.round.settled?'ROUND OVER':'SUSPENDED · revealing'}</strong></div><button onClick={()=>refetch()} aria-label="Refresh game" disabled={isFetching}><RefreshCw size={16}/></button></div>
-  <nav className="studio-tabs" aria-label="Game sections">{['Game','Results','Rules','My Bets'].map(v=><button key={v} aria-current={view===v?'page':undefined} onClick={()=>setView(v)}>{v}</button>)}</nav>
+ return <div className={`studio-table-wrap${game.id==='9010'?' studio-32-layout':''}`}>
+  <div className="studio-32-topline"><div className="studio-game-heading"><Link to="/teenpatti-studio" aria-label="Back to lobby"><ArrowLeft size={18}/></Link><h1>{game.name}</h1></div>
+  <nav className="studio-tabs" aria-label="Game sections">{['Game','Results','Rules','My Bets'].map(v=><button key={v} aria-current={view===v?'page':undefined} onClick={()=>setView(v)}>{v}</button>)}</nav></div>
+  {game.id!=='9010'&&<div className="studio-round-bar"><span className={`studio-countdown ${seconds<5?'closing':''}`}>{seconds}</span><div><small>ROUND {data?.round.id.slice(0,8)||'—'}</small><strong>{error?'Connection unavailable':stale?'Reconnecting':canBet?'BETTING OPEN':data?.round.settled?'ROUND OVER':'SUSPENDED · revealing'}</strong></div><button onClick={()=>refetch()} aria-label="Refresh game" disabled={isFetching}><RefreshCw size={16}/></button></div>}
   {error&&<p role="alert" className="studio-message">{error.message}</p>}
   {!data&&!error&&<div className="studio-empty" role="status">Loading table…</div>}
   {data&&view==='Game'&&<><div className={"studio-table studio-game-"+data.config.kind} key={data.round.id}>
+   {game.id==='9010'&&<div className="studio-round-bar"><span className={`studio-countdown ${seconds<5?'closing':''}`}>{seconds}</span><div><small>ROUND {data.round.id.slice(0,8)}</small><strong>{stale?'Reconnecting':canBet?'BETTING OPEN':data.round.settled?'ROUND OVER':'SUSPENDED · revealing'}</strong></div><button onClick={()=>refetch()} aria-label="Refresh game" disabled={isFetching}><RefreshCw size={16}/></button></div>}
    <div className="studio-table-brand">BPEXCH <span>TEENPATTI STUDIO</span></div>
    {game.id==='9010'?<Cards32Board runners={data.config.runners} outcome={data.round.outcome}/>:data.round.outcome?<Result outcome={data.round.outcome}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>}
-   <p className="studio-table-note">{canBet?'Select a price below':data.round.settled?'Next round starts shortly':'Revealing result…'}</p>
+   {game.id!=='9010'&&<p className="studio-table-note">{canBet?'Select a price below':data.round.settled?'Next round starts shortly':'Revealing result…'}</p>}
   </div>
-  {['wheel','roulette'].includes(data.config.kind)?<WheelBetPanel kind={data.config.kind} runners={data.config.runners} canBet={canBet&&!pending&&!busy} chip={wheelChip} setChip={setWheelChip} onUndo={()=>setRunner(null)} onPick={r=>{setRunner(r);setBetSide('back');setStake(String(wheelChip));setMessage('');}}/>:<div className="studio-markets studio-market-rows"><div className="studio-market-header"><span>MARKET ODDS</span><b>BACK</b><b>LAY</b></div>{data.config.runners.map(r=><div className={"studio-market-row"+(data.round.outcome?.winner===r.id?' winner':'')} key={r.id}><span className="studio-runner-name">{r.name}</span><button type="button" className={'studio-price back'+(marketStatus?' status':'')} disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('back');setMessage('');}}>{marketStatus?<strong>{marketStatus}</strong>:<><strong>{r.odds.toFixed(2)}</strong></>}</button><button type="button" className={'studio-price lay'+(marketStatus?' status':'')} disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('lay');setMessage('');}}>{marketStatus?<strong>{marketStatus}</strong>:<><strong>{r.layOdds?.toFixed(2)||'—'}</strong></>}</button></div>)}</div>}
-  <div className="studio-history-strip" aria-label="Recent round results">{data.history.slice(0,12).map(h=><span title={h.outcome.summary} key={h.id}>{h.outcome.winner===null?'T':data.config.runners.find(r=>r.id===h.outcome.winner)?.name.replace('Player ','')||h.outcome.winner}</span>)}</div></>}
+  {game.id==='9010'&&<div className="studio-history-strip" aria-label="Recent round results">{data.history.slice(0,12).map(h=><span title={h.outcome.summary} key={h.id}>{h.outcome.winner===null?'T':data.config.runners.find(r=>r.id===h.outcome.winner)?.name.replace('Player ','')||h.outcome.winner}</span>)}<small>ROUND {data.round.id.slice(0,8)}</small></div>}
+  {['wheel','roulette'].includes(data.config.kind)?<WheelBetPanel kind={data.config.kind} runners={data.config.runners} canBet={canBet&&!pending&&!busy} chip={wheelChip} setChip={setWheelChip} onUndo={()=>setRunner(null)} onPick={r=>{setRunner(r);setBetSide('back');setStake(String(wheelChip));setMessage('');}}/>:<div className="studio-markets studio-market-rows"><div className="studio-market-header"><span>{game.id==='9010'?'MAIN':'MARKET ODDS'}</span><b>BACK</b><b>LAY</b></div>{data.config.runners.map(r=><div className={"studio-market-row"+(data.round.outcome?.winner===r.id?' winner':'')} key={r.id}><span className="studio-runner-name"><strong>{r.name}</strong>{positions&&<small className={positions[r.id]<0?'loss':'profit'}>{positions[r.id]===0?'0':`${positions[r.id]>0?'+':''}${money(positions[r.id])}`}</small>}</span>{game.id==='9010'&&marketStatus?<span className="studio-market-status">{marketStatus}</span>:<><button type="button" className={'studio-price back'+(marketStatus?' status':'')} disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('back');setMessage('');}}>{marketStatus?<strong>{marketStatus}</strong>:<strong>{r.odds.toFixed(2)}</strong>}</button><button type="button" className={'studio-price lay'+(marketStatus?' status':'')} disabled={!canBet||!!pending||busy} onClick={()=>{setRunner(r);setBetSide('lay');setMessage('');}}>{marketStatus?<strong>{marketStatus}</strong>:<strong>{r.layOdds?.toFixed(2)||'—'}</strong>}</button></>}</div>)}</div>}
+  {game.id!=='9010'&&<div className="studio-history-strip" aria-label="Recent round results">{data.history.slice(0,12).map(h=><span title={h.outcome.summary} key={h.id}>{h.outcome.winner===null?'T':data.config.runners.find(r=>r.id===h.outcome.winner)?.name.replace('Player ','')||h.outcome.winner}</span>)}</div>}</>}
   {data&&view==='Results'&&<div className="studio-results">{data.history.length?data.history.map(h=><article key={h.id}><small>{new Date(h.settled_at).toLocaleString()} · {h.id.slice(0,8)}</small><Result outcome={h.outcome}/></article>):<p className="studio-empty">No completed rounds yet.</p>}</div>}
   {data&&view==='Rules'&&<div className="studio-rules"><h2>Demo game rules</h2><p>{data.config.rules}</p><p>Betting lasts {data.config.timing?.bettingSeconds??20} seconds. Results display for {data.config.timing?.resultSeconds??10} seconds. These timers are independent demo settings; original provider timings are unverified. Your stake is reserved immediately. Winning returns and any configured commission are recorded in your account statement. A void returns your stake.</p><p>These are free test coins with no cash value. This simulation does not use the original provider’s game feed.</p></div>}
   {data&&data.round.settled&&data.round.outcome&&view==='Game'&&<section className="studio-round-result" role="status"><h2>Round Result</h2><Result outcome={data.round.outcome}/>{settledRoundBets.length>0&&<p role="status">Round P/L: {money(settledRoundBets.reduce((sum,b)=>sum+Number(b.profit||0),0))} · Updated account balance: {money(data.balance)} · Exposure: {money(data.exposure)}</p>}{settledRoundBets.length>0&&<ul>{settledRoundBets.map(b=><li key={b.id}><strong>{b.status.toUpperCase()}</strong> · {b.selection} · {money(b.stake)} · P/L {b.profit===null?'—':money(b.profit)}{b.status.toLowerCase()==='won'&&b.profit!==null&&<span className="studio-winning-amount">WINNING AMOUNT {money(Number(b.stake)+Number(b.profit))}</span>}</li>)}</ul>}</section>}

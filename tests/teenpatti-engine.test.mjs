@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {configFor,createOutcome,handScore,compare,shuffledDeck,rank,score32Cards,resolve32Cards} from '../supabase/functions/teenpatti-studio/engine.ts';
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
-import {currentRoundMatchedBets,settledRoundBets} from '../src/features/teenpatti/bets.ts';
+import {currentRoundMatchedBets,roundPositions,settledRoundBets} from '../src/features/teenpatti/bets.ts';
 import {bettingWindowOpen} from '../src/features/teenpatti/roundClock.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
 test('bet slip closes before the server cutoff to account for transit time',()=>{
@@ -23,9 +23,21 @@ test('matched bets stay through ROUND OVER and clear on next round without delet
  assert.deepEqual(settledRoundBets(rows,'R1').map(x=>x.id),['b']);
  assert.equal(rows.length,4,'filtering active rows must not delete historical rows');
 });
+test('32 Cards shows accepted BACK and LAY outcome positions without counting settled or earlier bets',()=>{
+ const ids=['8','9','10','11'];
+ const bets=[
+  {round_id:'R1',status:'pending',runner_id:'9',bet_type:'back',stake:100,odds:5.95},
+  {round_id:'R1',status:'matched',runner_id:'10',bet_type:'lay',stake:50,odds:3.45},
+  {round_id:'R0',status:'pending',runner_id:'8',bet_type:'back',stake:1000,odds:12.2},
+  {round_id:'R1',status:'won',runner_id:'8',bet_type:'back',stake:1000,odds:12.2}
+ ];
+ assert.deepEqual(roundPositions(bets,'R1',ids),{'8':-50,'9':545,'10':-222.5,'11':-50});
+ assert.deepEqual(roundPositions(bets,'R2',ids),{'8':0,'9':0,'10':0,'11':0});
+});
 test('32 Cards uses the 6-to-K deck and resolves a highest-total tie with extra cards',()=>{
  const cfg=configFor('9010');assert.deepEqual(cfg.runners.map(x=>x.name),['Player 8','Player 9','Player 10','Player 11']);
  assert.deepEqual(cfg.runners.map(x=>x.id),['8','9','10','11']);
+ assert.deepEqual(cfg.runners.map(x=>[x.odds,x.layOdds]),[[12.2,13.7],[5.95,6.45],[3.2,3.45],[2.08,2.18]]);
  assert.deepEqual(score32Cards([[card(6)],[card(6,1)],[card(13)],[card(11)]]),[14,15,23,22]);
  assert.deepEqual(score32Cards([[card(13)],[card(12,1)],[card(11,2)],[card(10,3)]]),[21,21,21,21]);
  assert.throws(()=>score32Cards([[card(2)],[card(6)],[card(7)],[card(8)]]),/Invalid/);

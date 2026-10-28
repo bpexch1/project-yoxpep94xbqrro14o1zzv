@@ -165,3 +165,54 @@
 .studio-32-player.winner{background:transparent;border:0}
 .studio-32-player.winner .studio-32-cards{border-color:#98de6c;box-shadow:0 0 10px #65b752aa,inset 0 0 16px #31582f}
 @media(max-width:767px){.studio-32-board{gap:14px 8px}.studio-32-player{min-height:0;padding:0;gap:5px}.studio-32-cards{min-height:61px}.studio-32-player>strong,.studio-32-player>span{font-size:10px}}
+
+/* 32 Cards: keep the market visible and show the gross position per outcome. */
+.studio-32-layout .studio-game-heading{margin-bottom:2px;padding:4px 8px}
+.studio-32-layout .studio-round-bar{padding:3px 7px}
+.studio-32-layout .studio-tabs button{padding:5px 2px}
+.studio-32-layout .studio-table{min-height:0;padding:6px 5px 4px}
+.studio-32-layout .studio-32-board{margin:3px auto 2px;gap:6px 8px}
+.studio-32-layout .studio-32-player{gap:2px}
+.studio-32-layout .studio-32-cards{min-height:57px}
+.studio-32-layout .studio-history-strip{padding:4px 2px;align-items:center;min-height:25px}
+.studio-32-layout .studio-history-strip>span{min-width:23px;padding:2px 4px}
+.studio-32-layout .studio-history-strip>small{margin-left:auto;white-space:nowrap;color:#c5c3bd;font-size:9px}
+.studio-32-layout .studio-market-rows{margin-top:0}
+.studio-32-layout .studio-runner-name{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:2px}
+.studio-32-layout .studio-runner-name strong{font-size:12px}
+.studio-32-layout .studio-runner-name small{font-size:10px;font-weight:700}
+.studio-32-layout .studio-runner-name .profit{color:#00845b}
+.studio-32-layout .studio-runner-name .loss{color:#c23741}
+.studio-market-status{grid-column:2/4;display:grid;place-items:center;background:#f6f6f6;color:#b73048;font-weight:700;font-size:11px;min-width:0;text-align:center}
+@media(max-width:767px){
+ .studio-32-layout .studio-32-cards{min-height:54px}
+ .studio-32-layout .studio-32-player>strong,.studio-32-layout .studio-32-player>span{font-size:9px}
+ .studio-32-layout .studio-market-row{min-height:40px}
+ .studio-32-layout .studio-market-rows .studio-price{min-height:40px}
+ .studio-32-layout .studio-runner-name strong{font-size:11px}
+ .studio-market-status{font-size:10px}
+}
+
+/* 32 Cards: retain the four working views in the original compact title row. */
+.studio-32-layout .studio-32-topline{display:flex;align-items:stretch;min-width:0;background:#111;border:1px solid #80683c}
+.studio-32-layout .studio-game-heading{flex:1;min-width:0;display:flex;align-items:center;margin:0;border:0;background:none}
+.studio-32-layout .studio-game-heading h1{margin:0;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;color:#e7c775}
+.studio-32-layout .studio-tabs{flex:none;align-items:stretch;padding:2px;gap:2px;background:transparent}
+.studio-32-layout .studio-tabs button{flex:none;min-width:47px;padding:5px 6px;color:#fff;background:#079a55;border-radius:0}
+.studio-32-layout .studio-tabs button[aria-current]{background:#111;color:#fff}
+.studio-32-layout .studio-game-cards4 .studio-round-bar{display:flex;align-items:center;justify-content:flex-end;min-height:54px;padding:2px 5px;background:transparent;border:0;color:#eee}
+.studio-32-layout .studio-game-cards4 .studio-round-bar>div{flex:none;text-align:right;margin-right:8px}
+.studio-32-layout .studio-game-cards4 .studio-round-bar>button{order:1}
+.studio-32-layout .studio-game-cards4 .studio-countdown{order:2;flex:none;width:50px;height:50px;font-size:20px}
+.studio-32-layout .studio-32-board{max-width:310px;margin:2px auto 5px}
+.studio-32-layout .studio-32-cards .studio-card{width:46px;height:57px;transform:scale(.9);transform-origin:center}
+.studio-32-layout .studio-32-cards .studio-card.face-up{animation:studio-32-deal .45s ease-out both}
+@keyframes studio-32-deal{from{transform:translateY(-15px) rotateY(90deg) scale(.9);opacity:0}to{transform:scale(.9);opacity:1}}
+/* Keep submit and stake reachable when the mobile visual viewport shrinks. */
+.studio-32-layout .studio-modal-overlay{max-height:100dvh;overflow-y:auto;align-items:flex-end}
+.studio-32-layout .studio-slip{max-height:calc(100dvh - 20px);overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:420px){
+ .studio-32-layout .studio-game-heading h1{font-size:12px}
+ .studio-32-layout .studio-tabs button{min-width:0;padding:5px 4px;font-size:10px}
+ .studio-32-layout .studio-game-cards4 .studio-round-bar>div{font-size:10px}
+}
