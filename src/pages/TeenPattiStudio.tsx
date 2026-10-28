@@ -97,12 +97,13 @@ function GameTable({game,username}:{game:Game;username:string}){
  }
  if(!game.playable)return <section className="studio-unavailable"><Artwork game={game}/><h1>{game.name}</h1><p>This game’s reference mechanics are not implemented yet, so betting is unavailable.</p><p>Existing bets and ledger entries remain in account history.</p><Link to="/teenpatti-studio">Back to lobby</Link></section>;
  return <div className={`studio-table-wrap${game.id==='9010'?' studio-32-layout':''}`}>
-  <div className="studio-game-heading"><Link to="/teenpatti-studio" aria-label="Back to lobby"><ArrowLeft size={18}/></Link><h1>{game.name}</h1></div>
-  <div className="studio-round-bar"><span className={`studio-countdown ${seconds<5?'closing':''}`}>{seconds}</span><div><small>ROUND {data?.round.id.slice(0,8)||'—'}</small><strong>{error?'Connection unavailable':stale?'Reconnecting':canBet?'BETTING OPEN':data?.round.settled?'ROUND OVER':'SUSPENDED · revealing'}</strong></div><button onClick={()=>refetch()} aria-label="Refresh game" disabled={isFetching}><RefreshCw size={16}/></button></div>
-  <nav className="studio-tabs" aria-label="Game sections">{['Game','Results','Rules','My Bets'].map(v=><button key={v} aria-current={view===v?'page':undefined} onClick={()=>setView(v)}>{v}</button>)}</nav>
+  <div className="studio-32-topline"><div className="studio-game-heading"><Link to="/teenpatti-studio" aria-label="Back to lobby"><ArrowLeft size={18}/></Link><h1>{game.name}</h1></div>
+  <nav className="studio-tabs" aria-label="Game sections">{['Game','Results','Rules','My Bets'].map(v=><button key={v} aria-current={view===v?'page':undefined} onClick={()=>setView(v)}>{v}</button>)}</nav></div>
+  {game.id!=='9010'&&<div className="studio-round-bar"><span className={`studio-countdown ${seconds<5?'closing':''}`}>{seconds}</span><div><small>ROUND {data?.round.id.slice(0,8)||'—'}</small><strong>{error?'Connection unavailable':stale?'Reconnecting':canBet?'BETTING OPEN':data?.round.settled?'ROUND OVER':'SUSPENDED · revealing'}</strong></div><button onClick={()=>refetch()} aria-label="Refresh game" disabled={isFetching}><RefreshCw size={16}/></button></div>}
   {error&&<p role="alert" className="studio-message">{error.message}</p>}
   {!data&&!error&&<div className="studio-empty" role="status">Loading table…</div>}
   {data&&view==='Game'&&<><div className={"studio-table studio-game-"+data.config.kind} key={data.round.id}>
+   {game.id==='9010'&&<div className="studio-round-bar"><span className={`studio-countdown ${seconds<5?'closing':''}`}>{seconds}</span><div><small>ROUND {data.round.id.slice(0,8)}</small><strong>{stale?'Reconnecting':canBet?'BETTING OPEN':data.round.settled?'ROUND OVER':'SUSPENDED · revealing'}</strong></div><button onClick={()=>refetch()} aria-label="Refresh game" disabled={isFetching}><RefreshCw size={16}/></button></div>}
    <div className="studio-table-brand">BPEXCH <span>TEENPATTI STUDIO</span></div>
    {game.id==='9010'?<Cards32Board runners={data.config.runners} outcome={data.round.outcome}/>:data.round.outcome?<Result outcome={data.round.outcome}/>:<WaitingScene game={game} kind={data.config.kind} runners={data.config.runners}/>}
    {game.id!=='9010'&&<p className="studio-table-note">{canBet?'Select a price below':data.round.settled?'Next round starts shortly':'Revealing result…'}</p>}
