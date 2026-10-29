@@ -216,3 +216,39 @@
  .studio-32-layout .studio-tabs button{min-width:0;padding:5px 4px;font-size:10px}
  .studio-32-layout .studio-game-cards4 .studio-round-bar>div{font-size:10px}
 }
+
+/* 32 Cards uses the compact reference shell; other Studio games retain their layout. */
+.teenpatti-studio:has(.studio-32-layout) .studio-header{height:62px;position:relative;top:auto;padding:6px 12px}
+.teenpatti-studio:has(.studio-32-layout) .studio-logo{display:none}
+.teenpatti-studio:has(.studio-32-layout) .studio-header-left{gap:16px}
+.teenpatti-studio:has(.studio-32-layout) .studio-wallet{min-width:132px;flex-direction:row;align-items:center;justify-content:center;background:#1b1b1b;font-weight:700}
+.teenpatti-studio:has(.studio-32-layout) .studio-wallet span::before{content:'|';margin-right:5px}
+.studio-32-layout{max-width:850px;padding-top:5px}
+.studio-32-layout .studio-32-topline{min-height:32px;background:linear-gradient(#323232,#181818);border-color:#675337}
+.studio-32-layout .studio-game-heading h1{color:#dedede;font-weight:400}
+.studio-32-layout .studio-game-cards4{min-height:337px;background:radial-gradient(ellipse 56% 40% at 50% 63%,#0b361b,#060907 85%);border-color:#80663b}
+.studio-32-layout .studio-game-cards4 .studio-round-bar{position:relative;min-height:61px;justify-content:flex-end;gap:9px;padding:4px 7px;background:none}
+.studio-32-layout .studio-game-cards4 .studio-round-bar .studio-round-bets{margin-right:auto;align-self:flex-start;margin-top:4px;padding:2px 8px;border:1px solid #5b5b5b;border-radius:20px;font-size:10px;color:#dedede}
+.studio-32-layout .studio-game-cards4 .studio-round-meta{flex:none;display:flex;flex-direction:column;text-align:right;line-height:1.15}
+.studio-32-layout .studio-game-cards4 .studio-round-meta small{font-size:9px;color:#a7aaa6}
+.studio-32-layout .studio-game-cards4 .studio-round-meta strong{font-size:11px}
+.studio-32-layout .studio-game-cards4 .studio-round-bar>button,.studio-32-layout .studio-game-cards4 .studio-countdown{order:initial}
+.studio-32-layout .studio-32-board{gap:22px 8px;margin:0 auto 8px}
+.studio-32-layout .studio-32-cards{min-height:68px;background:radial-gradient(ellipse at 50% 93%,#123e1a,#080d09 70%);border-color:#29372d}
+.studio-32-layout .studio-32-player>span{border:0;background:rgba(14,43,20,.75);color:#e2cd82;padding:2px 9px}
+.studio-32-layout .studio-history-strip{gap:0;background:#48413a;padding:0 3px;min-height:23px}
+.studio-32-layout .studio-history-strip>span{background:#77716c;color:#f3f3f3;border-radius:0;border-right:1px solid #aaa;min-width:25px;padding:3px 5px}
+.studio-32-layout .studio-history-strip>small{font-size:8px;color:#eee}
+.studio-32-layout .studio-32-result{padding:7px 10px;background:#13251a;border:1px solid #685639;color:#e9ddbf}
+.studio-32-layout .studio-32-result h2{font-size:13px;color:#edda85;margin:0 0 4px}
+.studio-32-layout .studio-32-result p{font-size:11px;margin:0}
+.studio-32-layout .studio-32-result ul{font-size:11px;margin:5px 0 0;padding-left:18px}
+.studio-32-layout .studio-32-slip-actions{display:flex;align-items:center;gap:8px}
+.studio-32-layout .studio-32-slip-actions>button:first-child{background:#c82947;color:#fff;border-radius:3px;padding:10px 16px}
+.studio-32-layout .studio-32-slip-actions .studio-place{width:auto;min-width:90px;padding:10px 16px}
+@media(max-width:420px){
+ .teenpatti-studio:has(.studio-32-layout) .studio-header{height:58px}
+ .teenpatti-studio:has(.studio-32-layout) .studio-wallet{min-width:0;font-size:12px}
+ .studio-32-layout .studio-game-cards4 .studio-round-meta{display:none}
+ .studio-32-layout .studio-32-board{gap:19px 8px}
+}
