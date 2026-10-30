@@ -193,62 +193,112 @@
  .studio-market-status{font-size:10px}
 }
 
-/* 32 Cards: retain the four working views in the original compact title row. */
-.studio-32-layout .studio-32-topline{display:flex;align-items:stretch;min-width:0;background:#111;border:1px solid #80683c}
-.studio-32-layout .studio-game-heading{flex:1;min-width:0;display:flex;align-items:center;margin:0;border:0;background:none}
-.studio-32-layout .studio-game-heading h1{margin:0;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;color:#e7c775}
-.studio-32-layout .studio-tabs{flex:none;align-items:stretch;padding:2px;gap:2px;background:transparent}
-.studio-32-layout .studio-tabs button{flex:none;min-width:47px;padding:5px 6px;color:#fff;background:#079a55;border-radius:0}
-.studio-32-layout .studio-tabs button[aria-current]{background:#111;color:#fff}
-.studio-32-layout .studio-game-cards4 .studio-round-bar{display:flex;align-items:center;justify-content:flex-end;min-height:54px;padding:2px 5px;background:transparent;border:0;color:#eee}
-.studio-32-layout .studio-game-cards4 .studio-round-bar>div{flex:none;text-align:right;margin-right:8px}
-.studio-32-layout .studio-game-cards4 .studio-round-bar>button{order:1}
-.studio-32-layout .studio-game-cards4 .studio-countdown{order:2;flex:none;width:50px;height:50px;font-size:20px}
-.studio-32-layout .studio-32-board{max-width:310px;margin:2px auto 5px}
-.studio-32-layout .studio-32-cards .studio-card{width:46px;height:57px;transform:scale(.9);transform-origin:center}
-.studio-32-layout .studio-32-cards .studio-card.face-up{animation:studio-32-deal .45s ease-out both}
-@keyframes studio-32-deal{from{transform:translateY(-15px) rotateY(90deg) scale(.9);opacity:0}to{transform:scale(.9);opacity:1}}
-/* Keep submit and stake reachable when the mobile visual viewport shrinks. */
-.studio-32-layout .studio-modal-overlay{max-height:100dvh;overflow-y:auto;align-items:flex-end}
-.studio-32-layout .studio-slip{max-height:calc(100dvh - 20px);overflow-y:auto;overscroll-behavior:contain}
-@media(max-width:420px){
- .studio-32-layout .studio-game-heading h1{font-size:12px}
- .studio-32-layout .studio-tabs button{min-width:0;padding:5px 4px;font-size:10px}
- .studio-32-layout .studio-game-cards4 .studio-round-bar>div{font-size:10px}
+/* 32 Cards balance remains the existing demo wallet and exposure. */
+.teenpatti-studio .studio-wallet{align-items:center;white-space:nowrap;flex-direction:row;flex-wrap:wrap}
+.teenpatti-studio .studio-wallet .negative{color:#f05a65}
+.teenpatti-studio .studio-wallet small{flex-basis:100%;font-size:9px;color:#bcae8d;line-height:1;text-align:right}
+.studio-lobby-page .studio-wallet span::before{content:none}
+.studio-countdown.warning{border-color:#f29b38;color:#f29b38}
+.studio-countdown.closing{border-color:#db3647;color:#db3647}
+.studio-32-layout .studio-full-round-id{overflow-wrap:anywhere;white-space:normal;text-align:right;min-width:0}
+.studio-32-layout .studio-market-row.winner,.studio-32-layout .studio-market-row.winner .studio-runner-name,.studio-32-layout .studio-market-row.winner .studio-market-status{background:#a6ec70;color:#143a18}
+.studio-32-layout .studio-32-bets-table{table-layout:fixed;width:100%}
+.studio-32-bets-table th:first-child{width:60%}
+.studio-32-bets-table th:nth-child(2),.studio-32-bets-table th:nth-child(3){width:20%}
+.studio-32-bets-table td:first-child{overflow-wrap:anywhere}
+.studio-result-badge{display:block;margin-top:6px;padding:3px 6px;font-size:10px;border-radius:3px}
+.studio-result-badge.win{background:#4cbb50;color:#061b08}
+.studio-result-badge.lose{background:#ba3445;color:#fff}
+.studio-history-more{display:block;width:100%;padding:10px;background:#254465;color:#fff;font-weight:700}
+.studio-history-more:disabled{opacity:.55}
+.studio-odds-control{display:grid;grid-template-columns:1fr 38px 60px 38px;align-items:center;gap:5px;margin:9px 0 12px;font-weight:700}
+.studio-odds-control button,.studio-odds-control output{min-height:35px;background:#fff;border:1px solid #a4b2bb;text-align:center;display:grid;place-items:center;font-size:18px}
+.studio-odds-control button:disabled{opacity:.5;cursor:not-allowed}
+.studio-slip-actions{display:flex;gap:8px;margin-top:12px}
+.studio-slip-actions button{flex:1;min-height:42px;border-radius:3px;color:#fff;font-weight:700}
+.studio-slip-actions .studio-close{background:#bf3547}
+.studio-slip-actions .studio-place{background:#098d6d;width:auto}
+@media(max-width:767px){
+ .teenpatti-studio .studio-wallet{font-size:10px;padding:5px;gap:3px;max-width:54vw;justify-content:flex-end}
+ .teenpatti-studio .studio-wallet small{font-size:8px}
+ .teenpatti-studio:not(.studio-lobby-page) .studio-logo img{width:78px;height:39px}
+ .studio-32-layout .studio-history-strip{flex-wrap:wrap}
+ .studio-32-layout .studio-full-round-id{flex-basis:100%;font-size:8px}
+ .studio-32-layout .studio-32-bets-table th,.studio-32-layout .studio-32-bets-table td{display:table-cell;font-size:10px;padding:7px 4px}
+ .studio-32-layout .studio-32-bets-table th:first-child{width:60%}
+ .studio-32-layout .studio-32-bets-table th:nth-child(2),.studio-32-layout .studio-32-bets-table th:nth-child(3){width:20%}
 }
 
-/* 32 Cards uses the compact reference shell; other Studio games retain their layout. */
-.teenpatti-studio:has(.studio-32-layout) .studio-header{height:62px;position:relative;top:auto;padding:6px 12px}
-.teenpatti-studio:has(.studio-32-layout) .studio-logo{display:none}
-.teenpatti-studio:has(.studio-32-layout) .studio-header-left{gap:16px}
-.teenpatti-studio:has(.studio-32-layout) .studio-wallet{min-width:132px;flex-direction:row;align-items:center;justify-content:center;background:#1b1b1b;font-weight:700}
-.teenpatti-studio:has(.studio-32-layout) .studio-wallet span::before{content:'|';margin-right:5px}
-.studio-32-layout{max-width:850px;padding-top:5px}
-.studio-32-layout .studio-32-topline{min-height:32px;background:linear-gradient(#323232,#181818);border-color:#675337}
-.studio-32-layout .studio-game-heading h1{color:#dedede;font-weight:400}
-.studio-32-layout .studio-game-cards4{min-height:337px;background:radial-gradient(ellipse 56% 40% at 50% 63%,#0b361b,#060907 85%);border-color:#80663b}
-.studio-32-layout .studio-game-cards4 .studio-round-bar{position:relative;min-height:61px;justify-content:flex-end;gap:9px;padding:4px 7px;background:none}
-.studio-32-layout .studio-game-cards4 .studio-round-bar .studio-round-bets{margin-right:auto;align-self:flex-start;margin-top:4px;padding:2px 8px;border:1px solid #5b5b5b;border-radius:20px;font-size:10px;color:#dedede}
-.studio-32-layout .studio-game-cards4 .studio-round-meta{flex:none;display:flex;flex-direction:column;text-align:right;line-height:1.15}
-.studio-32-layout .studio-game-cards4 .studio-round-meta small{font-size:9px;color:#a7aaa6}
-.studio-32-layout .studio-game-cards4 .studio-round-meta strong{font-size:11px}
-.studio-32-layout .studio-game-cards4 .studio-round-bar>button,.studio-32-layout .studio-game-cards4 .studio-countdown{order:initial}
-.studio-32-layout .studio-32-board{gap:22px 8px;margin:0 auto 8px}
-.studio-32-layout .studio-32-cards{min-height:68px;background:radial-gradient(ellipse at 50% 93%,#123e1a,#080d09 70%);border-color:#29372d}
-.studio-32-layout .studio-32-player>span{border:0;background:rgba(14,43,20,.75);color:#e2cd82;padding:2px 9px}
-.studio-32-layout .studio-history-strip{gap:0;background:#48413a;padding:0 3px;min-height:23px}
-.studio-32-layout .studio-history-strip>span{background:#77716c;color:#f3f3f3;border-radius:0;border-right:1px solid #aaa;min-width:25px;padding:3px 5px}
-.studio-32-layout .studio-history-strip>small{font-size:8px;color:#eee}
-.studio-32-layout .studio-32-result{padding:7px 10px;background:#13251a;border:1px solid #685639;color:#e9ddbf}
-.studio-32-layout .studio-32-result h2{font-size:13px;color:#edda85;margin:0 0 4px}
-.studio-32-layout .studio-32-result p{font-size:11px;margin:0}
-.studio-32-layout .studio-32-result ul{font-size:11px;margin:5px 0 0;padding-left:18px}
-.studio-32-layout .studio-32-slip-actions{display:flex;align-items:center;gap:8px}
-.studio-32-layout .studio-32-slip-actions>button:first-child{background:#c82947;color:#fff;border-radius:3px;padding:10px 16px}
-.studio-32-layout .studio-32-slip-actions .studio-place{width:auto;min-width:90px;padding:10px 16px}
-@media(max-width:420px){
- .teenpatti-studio:has(.studio-32-layout) .studio-header{height:58px}
- .teenpatti-studio:has(.studio-32-layout) .studio-wallet{min-width:0;font-size:12px}
- .studio-32-layout .studio-game-cards4 .studio-round-meta{display:none}
- .studio-32-layout .studio-32-board{gap:19px 8px}
+/* 32 Cards video reference: one title strip, then a felt table with corner indicators. */
+.studio-32-titlebar{min-height:39px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 13px;background:linear-gradient(#3c3c3c,#101010);border:1px solid #957747}
+.studio-32-titlebar h1{font-size:15px;font-weight:400;white-space:nowrap}
+.studio-32-titlebar .studio-tabs{padding:0;gap:0;background:transparent}
+.studio-32-titlebar .studio-tabs button{flex:none;padding:6px 11px;background:#11bb85;color:#fff;border-radius:0;font-size:12px}
+.studio-32-titlebar .studio-tabs button:first-child{border-radius:3px 0 0 3px}
+.studio-32-titlebar .studio-tabs button:last-child{border-radius:0 3px 3px 0}
+.studio-32-titlebar .studio-tabs button[aria-current]{background:#080808;outline:1px solid #11bb85;z-index:1}
+.studio-32-layout{padding-top:0}
+.studio-32-layout .studio-table{min-height:296px;border:0;background:radial-gradient(ellipse at 50% 60%,#12421c,#0c0c0c 76%)}
+.studio-32-meta{position:absolute;inset:6px 8px auto;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+.studio-32-online{background:#303030;border:1px solid #666;border-radius:25px;padding:2px 9px;font-size:11px;color:#fff}
+.studio-32-meta .studio-countdown{width:43px;height:43px;border:3px solid #25a762;background:#080808;color:#fff;font-size:17px}
+.studio-32-meta .studio-countdown.warning{border-color:#ed9a31}
+.studio-32-meta .studio-countdown.closing{border-color:#bc343d}
+.studio-32-meta>strong{position:absolute;top:43px;right:0;font-size:9px;color:#d7c290;background:#111b;padding:2px 4px;white-space:nowrap}
+.studio-32-layout .studio-32-board{margin:49px auto 3px;gap:18px 9px}
+.studio-32-layout .studio-32-cards{min-height:59px;border-color:#3c4540;background:radial-gradient(ellipse at 50% 90%,#173b17,#0a0a0a 80%)}
+.studio-32-layout .studio-32-player>strong{font-size:11px;color:#d4b978}
+.studio-32-layout .studio-32-player>span{font-size:10px;color:#d4b978}
+.studio-32-layout .studio-history-strip{background:linear-gradient(#343434,#151515);border:1px solid #96794b;padding:2px;gap:1px;min-height:33px}
+.studio-32-layout .studio-history-strip>span{border-radius:0;background:#444;border:1px solid #666;min-width:38px;min-height:28px;padding:5px;font-size:11px}
+.studio-32-layout .studio-full-round-id{font-size:10px;padding:2px 5px}
+.studio-32-layout .studio-bets h2{display:flex;justify-content:space-between;align-items:center}
+.studio-32-layout .studio-bets h2 button{font-size:10px;text-decoration:underline;color:#fff}
+.studio-32-layout .studio-market-row{min-height:46px}
+.studio-32-layout .studio-market-rows .studio-price{min-height:46px}
+.studio-32-layout .studio-market-rows .studio-price strong{font-size:15px}
+.studio-32-layout .studio-market-rows .studio-price small{font-size:9px}
+.studio-32-layout .studio-market-status{font-size:12px}
+.studio-32-layout .studio-bets{margin-top:3px}
+.studio-32-layout .studio-bets h2{font-size:14px;padding:5px 8px;background:#284967}
+.studio-32-layout .studio-32-bets-table th{background:#ddd;color:#262626;font-size:12px;font-weight:600}
+.studio-32-layout .studio-32-bets-table td{background:#e8f7fd;font-size:12px}
+.studio-32-layout .studio-32-bets-table td,.studio-32-layout .studio-32-bets-table th{padding:12px 5px}
+.studio-32-page .studio-wallet small{display:none}
+.studio-slip-32{max-width:350px;background:#e8f6fd;border:1px solid #b9ccd4;border-radius:3px}
+.studio-slip-32 header{justify-content:center;background:transparent;padding:14px 12px 4px;font-size:15px}
+.studio-slip-32 header button,.studio-slip-32 .studio-slip-summary,.studio-slip-32 .studio-slip-pl{display:none}
+.studio-slip-32 .studio-slip-body{padding:7px 15px 15px}
+.studio-slip-32 .studio-odds-control{grid-template-columns:72px 28px minmax(0,1fr) 28px;gap:0;margin:0 0 12px;font-weight:400}
+.studio-slip-32 .studio-odds-control output{background:#fff}
+.studio-slip-32 .studio-odds-control button:disabled{opacity:1;color:#66727c}
+.studio-slip-32 label{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;font-size:13px}
+.studio-slip-32 label input{margin:0 0 10px;min-width:0;font-size:16px}
+.studio-slip-32 .studio-chips{gap:2px;margin:0 0 9px}
+.studio-slip-32 .studio-chips button{background:#707b82;color:#fff;border-radius:3px;padding:8px 1px;font-size:11px}
+.studio-slip-32 .studio-slip-actions{justify-content:flex-start;gap:27px;margin:8px 0 0}
+.studio-slip-32 .studio-slip-actions button{flex:0 0 auto;padding:8px 12px;min-height:34px}
+@media(max-width:767px){
+ .studio-32-page .studio-sitebar{height:50px}
+ .studio-32-page .studio-header{height:53px;padding:4px 10px}
+ .studio-32-page .studio-wallet{max-width:none;font-size:11px}
+ .studio-32-page .studio-table-wrap{padding:0 9px}
+ .studio-32-titlebar{padding:3px 12px}
+ .studio-32-titlebar .studio-tabs button{padding:6px 7px;font-size:11px}
+ .studio-32-layout .studio-table{min-height:296px;padding:5px 8px}
+ .studio-32-layout .studio-32-board{margin:49px auto 4px;gap:19px 8px}
+ .studio-32-layout .studio-32-board{max-width:265px}
+ .studio-32-layout .studio-32-cards{min-height:59px}
+ .studio-32-layout .studio-32-cards .studio-card{width:31px;height:41px;padding:2px}
+ .studio-32-layout .studio-32-cards .studio-card small{font-size:10px}
+ .studio-32-layout .studio-32-cards .studio-card b{font-size:17px}
+ .studio-32-layout .studio-32-player>strong,.studio-32-layout .studio-32-player>span{font-size:10px}
+ .studio-32-layout .studio-history-strip{flex-wrap:wrap;overflow:hidden}
+ .studio-32-layout .studio-history-strip>span{min-width:36px}
+ .studio-32-layout .studio-full-round-id{flex-basis:100%;overflow-wrap:anywhere;white-space:normal;font-size:8px}
+ .studio-32-layout .studio-runner-name strong{font-size:12px}
+ .studio-32-layout .studio-32-bets-table th,.studio-32-layout .studio-32-bets-table td{font-size:12px;padding:12px 5px}
+ /* The shared mobile bets rule hides column two; keep Price visible here. */
+ .studio-32-layout .studio-bets .studio-32-bets-table th:nth-child(2),
+ .studio-32-layout .studio-bets .studio-32-bets-table td:nth-child(2){display:table-cell}
 }
