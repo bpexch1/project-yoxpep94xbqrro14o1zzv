@@ -57,8 +57,8 @@ test('32 Cards uses the 6-to-K deck and resolves a highest-total tie with extra 
 });
 test('each gameplay family has a server-owned timing policy',()=>{
  assert.notDeepEqual(configFor('9010').timing,configFor('9015').timing);
- assert.deepEqual(configFor('9010').timing,{bettingSeconds:30,resultSeconds:10,revealSeconds:7});
- for(const game of studioGames.filter(g=>g.playable)){const timing=configFor(game.id).timing;assert.equal(timing.bettingSeconds,30,game.name);assert.ok(timing.resultSeconds>timing.revealSeconds&&timing.revealSeconds>0,game.name);}
+ assert.deepEqual(configFor('9010').timing,{bettingSeconds:20,resultSeconds:10,revealSeconds:7});
+ for(const game of studioGames.filter(g=>g.playable)){const timing=configFor(game.id).timing;assert.equal(timing.bettingSeconds,game.id==='9010'?20:30,game.name);assert.ok(timing.resultSeconds>timing.revealSeconds&&timing.revealSeconds>0,game.name);}
 });
 test('Teen Patti ranking, A23, ties and pair kickers',()=>{
  const trail=[card(5),card(5,1),card(5,2)];

@@ -17,6 +17,18 @@ Deno.serve(async req=>{
   const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data,error}=await db.rpc('studio_request',{p_token:token,p_action:action,p_input:input,p_config:config,p_outcome:config?createOutcome(config.id):null});
   if(error){const permitted=/^(Authentication required|Bettor account required|Round unavailable|Betting closed|Game unavailable|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed; refresh and confirm|Insufficient quoted liquidity|Insufficient balance)$/;return json({error:permitted.test(error.message)?error.message:'Studio request failed. Retry with the same request ID.'},error.message==='Authentication required'?401:400);}
+  if(action==='state'&&data?.round?.id){
+   // State RPC authenticates first. Presence and quote reads are scoped to
+   // this authenticated round; neither can affect the financial transaction.
+   const [{data:onlinePlayers},{data:round}] = await Promise.all([
+    db.rpc('studio_touch_presence',{p_token:token,p_game_id:config!.id}),
+    db.from('studio_rounds').select('market_id').eq('id',data.round.id).eq('game_id',config!.id).single()
+   ]);
+   const {data:quotes}=round?.market_id
+    ?await db.from('exchange_quotes').select('runner_id,side,size,consumed').eq('market_id',round.market_id)
+    :{data:null};
+   return json({...data,...(onlinePlayers===null?{}:{onlinePlayers}),...(quotes?{quotes}:{})});
+  }
   return json(data);
  } catch {return json({error:'Invalid request or studio unavailable'},400);}
 });

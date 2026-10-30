@@ -192,3 +192,37 @@
  .studio-32-layout .studio-runner-name strong{font-size:11px}
  .studio-market-status{font-size:10px}
 }
+
+/* 32 Cards balance remains the existing demo wallet and exposure. */
+.teenpatti-studio .studio-wallet{align-items:center;white-space:nowrap;flex-direction:row;flex-wrap:wrap}
+.teenpatti-studio .studio-wallet .negative{color:#f05a65}
+.teenpatti-studio .studio-wallet small{flex-basis:100%;font-size:9px;color:#bcae8d;line-height:1;text-align:right}
+.studio-lobby-page .studio-wallet span::before{content:none}
+.studio-countdown.warning{border-color:#f29b38;color:#f29b38}
+.studio-countdown.closing{border-color:#db3647;color:#db3647}
+.studio-32-layout .studio-full-round-id{overflow-wrap:anywhere;white-space:normal;text-align:right;min-width:0}
+.studio-32-layout .studio-market-row.winner,.studio-32-layout .studio-market-row.winner .studio-runner-name,.studio-32-layout .studio-market-row.winner .studio-market-status{background:#a6ec70;color:#143a18}
+.studio-32-layout .studio-32-bets-table{table-layout:fixed;width:100%}
+.studio-32-bets-table th:first-child{width:60%}
+.studio-32-bets-table th:nth-child(2),.studio-32-bets-table th:nth-child(3){width:20%}
+.studio-32-bets-table td:first-child{overflow-wrap:anywhere}
+.studio-result-badge{display:block;margin-top:6px;padding:3px 6px;font-size:10px;border-radius:3px}
+.studio-result-badge.win{background:#4cbb50;color:#061b08}
+.studio-result-badge.lose{background:#ba3445;color:#fff}
+.studio-odds-control{display:grid;grid-template-columns:1fr 38px 60px 38px;align-items:center;gap:5px;margin:9px 0 12px;font-weight:700}
+.studio-odds-control button,.studio-odds-control output{min-height:35px;background:#fff;border:1px solid #a4b2bb;text-align:center;display:grid;place-items:center;font-size:18px}
+.studio-odds-control button:disabled{opacity:.5;cursor:not-allowed}
+.studio-slip-actions{display:flex;gap:8px;margin-top:12px}
+.studio-slip-actions button{flex:1;min-height:42px;border-radius:3px;color:#fff;font-weight:700}
+.studio-slip-actions .studio-close{background:#bf3547}
+.studio-slip-actions .studio-place{background:#098d6d;width:auto}
+@media(max-width:767px){
+ .teenpatti-studio .studio-wallet{font-size:10px;padding:5px;gap:3px;max-width:54vw;justify-content:flex-end}
+ .teenpatti-studio .studio-wallet small{font-size:8px}
+ .teenpatti-studio:not(.studio-lobby-page) .studio-logo img{width:78px;height:39px}
+ .studio-32-layout .studio-history-strip{flex-wrap:wrap}
+ .studio-32-layout .studio-full-round-id{flex-basis:100%;font-size:8px}
+ .studio-32-layout .studio-32-bets-table th,.studio-32-layout .studio-32-bets-table td{display:table-cell;font-size:10px;padding:7px 4px}
+ .studio-32-layout .studio-32-bets-table th:first-child{width:60%}
+ .studio-32-layout .studio-32-bets-table th:nth-child(2),.studio-32-layout .studio-32-bets-table th:nth-child(3){width:20%}
+}
