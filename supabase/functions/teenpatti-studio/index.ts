@@ -9,12 +9,18 @@ Deno.serve(async req=>{
   const token=req.headers.get('x-exchange-session');if(!token||token.length>512)return json({error:'Authentication required'},401);
   const raw=await req.text();if(raw.length>4096)return json({error:'Request too large'},413);
   const {action,input={}}=JSON.parse(raw);
-  if(!['state','bet'].includes(action))return json({error:'Unknown studio action'},400);
+  if(!['state','bet','history'].includes(action))return json({error:'Unknown studio action'},400);
   const config=action==='state'?configFor(String(input.gameId)):null;
   if(action==='state'&&!config)return json({error:'Game unavailable'},400);
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if(action==='history'&&(input.gameId!=='9010'||(input.beforeAt!==null&&input.beforeAt!==undefined&&(!input.beforeId||!uuid.test(input.beforeId)||!Number.isFinite(Date.parse(input.beforeAt))))))return json({error:'Invalid history cursor'},400);
   if(action==='bet'&&(!uuid.test(input.roundId)||!uuid.test(input.requestId)||!['back','lay'].includes(input.side)||typeof input.runnerId!=='string'||!Number.isFinite(input.stake)||input.stake<=0||input.stake>1000000||!Number.isFinite(input.odds)))return json({error:'Invalid bet parameters'},400);
   const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
+  if(action==='history'){
+   const {data:history,error:historyError}=await db.rpc('studio_history_page',{p_token:token,p_game_id:'9010',p_before_at:input.beforeAt??null,p_before_id:input.beforeId??null});
+   if(historyError)return json({error:'History unavailable'},400);
+   return json({history});
+  }
   const {data,error}=await db.rpc('studio_request',{p_token:token,p_action:action,p_input:input,p_config:config,p_outcome:config?createOutcome(config.id):null});
   if(error){const permitted=/^(Authentication required|Bettor account required|Round unavailable|Betting closed|Game unavailable|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed; refresh and confirm|Insufficient quoted liquidity|Insufficient balance)$/;return json({error:permitted.test(error.message)?error.message:'Studio request failed. Retry with the same request ID.'},error.message==='Authentication required'?401:400);}
   if(action==='state'&&data?.round?.id){

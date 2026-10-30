@@ -209,6 +209,8 @@
 .studio-result-badge{display:block;margin-top:6px;padding:3px 6px;font-size:10px;border-radius:3px}
 .studio-result-badge.win{background:#4cbb50;color:#061b08}
 .studio-result-badge.lose{background:#ba3445;color:#fff}
+.studio-history-more{display:block;width:100%;padding:10px;background:#254465;color:#fff;font-weight:700}
+.studio-history-more:disabled{opacity:.55}
 .studio-odds-control{display:grid;grid-template-columns:1fr 38px 60px 38px;align-items:center;gap:5px;margin:9px 0 12px;font-weight:700}
 .studio-odds-control button,.studio-odds-control output{min-height:35px;background:#fff;border:1px solid #a4b2bb;text-align:center;display:grid;place-items:center;font-size:18px}
 .studio-odds-control button:disabled{opacity:.5;cursor:not-allowed}
