@@ -298,4 +298,7 @@
  .studio-32-layout .studio-full-round-id{flex-basis:100%;overflow-wrap:anywhere;white-space:normal;font-size:8px}
  .studio-32-layout .studio-runner-name strong{font-size:12px}
  .studio-32-layout .studio-32-bets-table th,.studio-32-layout .studio-32-bets-table td{font-size:12px;padding:12px 5px}
+ /* The shared mobile bets rule hides column two; keep Price visible here. */
+ .studio-32-layout .studio-bets .studio-32-bets-table th:nth-child(2),
+ .studio-32-layout .studio-bets .studio-32-bets-table td:nth-child(2){display:table-cell}
 }
