@@ -108,7 +108,15 @@ function GameTable({game,username}:{game:Game;username:string}){
  const shownOutcome=game.id==='9010'?progressiveCards(data?.round.outcome??null,visibleCards,!!data?.round.settled):data?.round.outcome??null;
  const displayPhase=game.id==='9010'&&data?.round.settled&&!shownOutcome?.winner?'SUSPENDED · revealing':roundPhase;
  const displayMarketStatus=game.id==='9010'&&data?.round.settled&&!shownOutcome?.winner?'SUSPENDED !':marketStatus;
- useEffect(()=>{if(!activeRoundId)return;const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;previousRoundId.current=activeRoundId;if(changed)setRunner(open=>{if(open&&!busyRef.current)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');return null;});},[activeRoundId]);
+ useEffect(()=>{
+  if(!activeRoundId)return;
+  const changed=previousRoundId.current!==null&&previousRoundId.current!==activeRoundId;
+  previousRoundId.current=activeRoundId;
+  if(!changed)return;
+  if(runner&&!busyRef.current)setMessage('The round changed before submission. No bet was placed; select a market in the new round.');
+  else setMessage(current=>current.startsWith('Bet accepted.')?'':current);
+  setRunner(null);
+ },[activeRoundId,runner]);
  useEffect(()=>{if(data){window.dispatchEvent(new Event('balance-updated'));qc.invalidateQueries({queryKey:['studio-account',username]});}},[data?.balance,data?.round.settled,qc,username]);
  useEffect(()=>{if(data?.round.settled)qc.invalidateQueries({queryKey:['studio-history',username,game.id]});},[data?.round.id,data?.round.settled,qc,username,game.id]);
  async function submit(retry=false){
