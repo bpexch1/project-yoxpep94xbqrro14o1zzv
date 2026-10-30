@@ -228,3 +228,74 @@
  .studio-32-layout .studio-32-bets-table th:first-child{width:60%}
  .studio-32-layout .studio-32-bets-table th:nth-child(2),.studio-32-layout .studio-32-bets-table th:nth-child(3){width:20%}
 }
+
+/* 32 Cards video reference: one title strip, then a felt table with corner indicators. */
+.studio-32-titlebar{min-height:39px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 13px;background:linear-gradient(#3c3c3c,#101010);border:1px solid #957747}
+.studio-32-titlebar h1{font-size:15px;font-weight:400;white-space:nowrap}
+.studio-32-titlebar .studio-tabs{padding:0;gap:0;background:transparent}
+.studio-32-titlebar .studio-tabs button{flex:none;padding:6px 11px;background:#11bb85;color:#fff;border-radius:0;font-size:12px}
+.studio-32-titlebar .studio-tabs button:first-child{border-radius:3px 0 0 3px}
+.studio-32-titlebar .studio-tabs button:last-child{border-radius:0 3px 3px 0}
+.studio-32-titlebar .studio-tabs button[aria-current]{background:#080808;outline:1px solid #11bb85;z-index:1}
+.studio-32-layout{padding-top:0}
+.studio-32-layout .studio-table{min-height:296px;border:0;background:radial-gradient(ellipse at 50% 60%,#12421c,#0c0c0c 76%)}
+.studio-32-meta{position:absolute;inset:6px 8px auto;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+.studio-32-online{background:#303030;border:1px solid #666;border-radius:25px;padding:2px 9px;font-size:11px;color:#fff}
+.studio-32-meta .studio-countdown{width:43px;height:43px;border:3px solid #25a762;background:#080808;color:#fff;font-size:17px}
+.studio-32-meta .studio-countdown.warning{border-color:#ed9a31}
+.studio-32-meta .studio-countdown.closing{border-color:#bc343d}
+.studio-32-meta>strong{position:absolute;top:43px;right:0;font-size:9px;color:#d7c290;background:#111b;padding:2px 4px;white-space:nowrap}
+.studio-32-layout .studio-32-board{margin:49px auto 3px;gap:18px 9px}
+.studio-32-layout .studio-32-cards{min-height:59px;border-color:#3c4540;background:radial-gradient(ellipse at 50% 90%,#173b17,#0a0a0a 80%)}
+.studio-32-layout .studio-32-player>strong{font-size:11px;color:#d4b978}
+.studio-32-layout .studio-32-player>span{font-size:10px;color:#d4b978}
+.studio-32-layout .studio-history-strip{background:linear-gradient(#343434,#151515);border:1px solid #96794b;padding:2px;gap:1px;min-height:33px}
+.studio-32-layout .studio-history-strip>span{border-radius:0;background:#444;border:1px solid #666;min-width:38px;min-height:28px;padding:5px;font-size:11px}
+.studio-32-layout .studio-full-round-id{font-size:10px;padding:2px 5px}
+.studio-32-layout .studio-bets h2{display:flex;justify-content:space-between;align-items:center}
+.studio-32-layout .studio-bets h2 button{font-size:10px;text-decoration:underline;color:#fff}
+.studio-32-layout .studio-market-row{min-height:46px}
+.studio-32-layout .studio-market-rows .studio-price{min-height:46px}
+.studio-32-layout .studio-market-rows .studio-price strong{font-size:15px}
+.studio-32-layout .studio-market-rows .studio-price small{font-size:9px}
+.studio-32-layout .studio-market-status{font-size:12px}
+.studio-32-layout .studio-bets{margin-top:3px}
+.studio-32-layout .studio-bets h2{font-size:14px;padding:5px 8px;background:#284967}
+.studio-32-layout .studio-32-bets-table th{background:#ddd;color:#262626;font-size:12px;font-weight:600}
+.studio-32-layout .studio-32-bets-table td{background:#e8f7fd;font-size:12px}
+.studio-32-layout .studio-32-bets-table td,.studio-32-layout .studio-32-bets-table th{padding:12px 5px}
+.studio-32-page .studio-wallet small{display:none}
+.studio-slip-32{max-width:350px;background:#e8f6fd;border:1px solid #b9ccd4;border-radius:3px}
+.studio-slip-32 header{justify-content:center;background:transparent;padding:14px 12px 4px;font-size:15px}
+.studio-slip-32 header button,.studio-slip-32 .studio-slip-summary,.studio-slip-32 .studio-slip-pl{display:none}
+.studio-slip-32 .studio-slip-body{padding:7px 15px 15px}
+.studio-slip-32 .studio-odds-control{grid-template-columns:72px 28px minmax(0,1fr) 28px;gap:0;margin:0 0 12px;font-weight:400}
+.studio-slip-32 .studio-odds-control output{background:#fff}
+.studio-slip-32 .studio-odds-control button:disabled{opacity:1;color:#66727c}
+.studio-slip-32 label{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;font-size:13px}
+.studio-slip-32 label input{margin:0 0 10px;min-width:0;font-size:16px}
+.studio-slip-32 .studio-chips{gap:2px;margin:0 0 9px}
+.studio-slip-32 .studio-chips button{background:#707b82;color:#fff;border-radius:3px;padding:8px 1px;font-size:11px}
+.studio-slip-32 .studio-slip-actions{justify-content:flex-start;gap:27px;margin:8px 0 0}
+.studio-slip-32 .studio-slip-actions button{flex:0 0 auto;padding:8px 12px;min-height:34px}
+@media(max-width:767px){
+ .studio-32-page .studio-sitebar{height:50px}
+ .studio-32-page .studio-header{height:53px;padding:4px 10px}
+ .studio-32-page .studio-wallet{max-width:none;font-size:11px}
+ .studio-32-page .studio-table-wrap{padding:0 9px}
+ .studio-32-titlebar{padding:3px 12px}
+ .studio-32-titlebar .studio-tabs button{padding:6px 7px;font-size:11px}
+ .studio-32-layout .studio-table{min-height:296px;padding:5px 8px}
+ .studio-32-layout .studio-32-board{margin:49px auto 4px;gap:19px 8px}
+ .studio-32-layout .studio-32-board{max-width:265px}
+ .studio-32-layout .studio-32-cards{min-height:59px}
+ .studio-32-layout .studio-32-cards .studio-card{width:31px;height:41px;padding:2px}
+ .studio-32-layout .studio-32-cards .studio-card small{font-size:10px}
+ .studio-32-layout .studio-32-cards .studio-card b{font-size:17px}
+ .studio-32-layout .studio-32-player>strong,.studio-32-layout .studio-32-player>span{font-size:10px}
+ .studio-32-layout .studio-history-strip{flex-wrap:wrap;overflow:hidden}
+ .studio-32-layout .studio-history-strip>span{min-width:36px}
+ .studio-32-layout .studio-full-round-id{flex-basis:100%;overflow-wrap:anywhere;white-space:normal;font-size:8px}
+ .studio-32-layout .studio-runner-name strong{font-size:12px}
+ .studio-32-layout .studio-32-bets-table th,.studio-32-layout .studio-32-bets-table td{font-size:12px;padding:12px 5px}
+}
