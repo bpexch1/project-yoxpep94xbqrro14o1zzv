@@ -249,6 +249,11 @@
 @media(max-width:420px){
  .teenpatti-studio:has(.studio-32-layout) .studio-header{height:58px}
  .teenpatti-studio:has(.studio-32-layout) .studio-wallet{min-width:0;font-size:12px}
- .studio-32-layout .studio-game-cards4 .studio-round-meta{display:none}
  .studio-32-layout .studio-32-board{gap:19px 8px}
+}
+@media(max-width:767px){
+ .studio-32-layout{max-width:390px}
+ .studio-32-layout .studio-32-board{max-width:301px}
+ .studio-32-layout .studio-game-cards4 .studio-round-bar{gap:5px}
+ .studio-32-layout .studio-game-cards4 .studio-round-meta{margin-right:0;min-width:0}
 }

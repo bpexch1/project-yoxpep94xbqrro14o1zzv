@@ -4,6 +4,7 @@ import {configFor,createOutcome,handScore,compare,shuffledDeck,rank,score32Cards
 import {studioGames} from '../src/features/teenpatti/catalog.ts';
 import {currentRoundMatchedBets,roundPositions,settledRoundBets} from '../src/features/teenpatti/bets.ts';
 import {bettingWindowOpen} from '../src/features/teenpatti/roundClock.ts';
+import {visible32Cards} from '../src/features/teenpatti/reveal.ts';
 const card=(rank,suit=0)=>suit*13+rank-2;
 test('bet slip closes before the server cutoff to account for transit time',()=>{
  assert.equal(bettingWindowOpen(25000,23000),true);
@@ -57,8 +58,21 @@ test('32 Cards uses the 6-to-K deck and resolves a highest-total tie with extra 
 });
 test('each gameplay family has a server-owned timing policy',()=>{
  assert.notDeepEqual(configFor('9010').timing,configFor('9015').timing);
- assert.deepEqual(configFor('9010').timing,{bettingSeconds:30,resultSeconds:10,revealSeconds:7});
- for(const game of studioGames.filter(g=>g.playable)){const timing=configFor(game.id).timing;assert.equal(timing.bettingSeconds,30,game.name);assert.ok(timing.resultSeconds>timing.revealSeconds&&timing.revealSeconds>0,game.name);}
+ assert.deepEqual(configFor('9010').timing,{bettingSeconds:20,resultSeconds:10,revealSeconds:7});
+ for(const game of studioGames.filter(g=>g.playable)){const timing=configFor(game.id).timing;assert.equal(timing.bettingSeconds,game.id==='9010'?20:30,game.name);assert.ok(timing.resultSeconds>timing.revealSeconds&&timing.revealSeconds>0,game.name);}
+});
+test('32 Cards reveals one server-public card per step and hides premature result',()=>{
+ const outcome={winner:'9',summary:'Player 9 wins',groups:[
+  {label:'Player 8',cards:[4,5],value:'8 + 6 + 7 = 21'},
+  {label:'Player 9',cards:[17,18],value:'9 + 6 + 7 = 22'},
+  {label:'Player 10',cards:[30],value:'10 + 6 = 16'},
+  {label:'Player 11',cards:[43],value:'11 + 6 = 17'}]};
+ assert.deepEqual([0,1,2,3,4,5,6].map(n=>visible32Cards(outcome,n).groups.map(g=>g.cards.length)),
+  [[0,0,0,0],[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1],[2,1,1,1],[2,2,1,1]]);
+ assert.equal(visible32Cards(outcome,5).winner,null);
+ assert.equal(visible32Cards(outcome,5).groups[1].value,undefined);
+ assert.equal(visible32Cards(outcome,6).winner,'9');
+ assert.equal(visible32Cards(null,6),null);
 });
 test('Teen Patti ranking, A23, ties and pair kickers',()=>{
  const trail=[card(5),card(5,1),card(5,2)];
