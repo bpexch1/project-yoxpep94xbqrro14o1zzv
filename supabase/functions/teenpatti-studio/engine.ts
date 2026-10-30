@@ -52,7 +52,7 @@ const demoTimings:Record<string,Config['timing']>={
  '9002':{bettingSeconds:30,revealSeconds:6,resultSeconds:12},
  '9003':{bettingSeconds:30,revealSeconds:5,resultSeconds:11},
  '9007':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
- '9010':{bettingSeconds:30,revealSeconds:7,resultSeconds:10},
+ '9010':{bettingSeconds:20,revealSeconds:7,resultSeconds:10},
  '9017':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
  '9018':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
  '9019':{bettingSeconds:30,revealSeconds:3,resultSeconds:10},
