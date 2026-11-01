@@ -302,3 +302,42 @@
  .studio-32-layout .studio-bets .studio-32-bets-table th:nth-child(2),
  .studio-32-layout .studio-bets .studio-32-bets-table td:nth-child(2){display:table-cell}
 }
+
+/* Keep the 32 Cards table and market in the proportions of the mobile reference. */
+.studio-32-page .studio-sitebar>span{display:none}
+.studio-32-page .studio-header{position:relative}
+.studio-32-layout .studio-table{min-height:334px;background:radial-gradient(ellipse at 50% 66%,#124219 0%,#090e0a 36%,#080808 72%)}
+.studio-32-layout .studio-32-board{max-width:540px;margin:58px auto 5px;gap:23px 9px}
+.studio-32-layout .studio-32-cards{min-height:62px;background:radial-gradient(ellipse at 50% 100%,#19471e,#0b120c 70%)}
+.studio-32-layout .studio-32-player>span{font-weight:700}
+.studio-32-online{display:flex;align-items:center;gap:3px;padding:3px 8px}
+.studio-32-meta .studio-countdown{border-color:#767676}
+.studio-32-meta .studio-countdown:not(.closing):not(.warning){border-top-color:#19ad64}
+.studio-32-meta .studio-countdown.warning{border-color:#ed9a31}
+.studio-32-meta .studio-countdown.closing{border-color:#777;color:#fff;border-top-color:#ba2533}
+.studio-32-meta>strong{top:45px;font-size:10px}
+.studio-32-layout .studio-history-strip{flex-wrap:nowrap;min-height:34px}
+.studio-32-layout .studio-full-round-id{flex:1;text-align:right;white-space:nowrap;line-height:1.15;font-size:10px}
+.studio-32-layout .studio-market-header{background:#fff;color:#fff}
+.studio-32-layout .studio-market-header>span{width:max-content;background:#284968;padding:4px 9px}
+.studio-32-layout .studio-market-header>b{background:#284968;padding:5px 0;border-left:3px solid #fff;font-size:12px}
+.studio-32-layout .studio-market-row,.studio-32-layout .studio-market-rows .studio-price{min-height:52px}
+.studio-32-layout .studio-runner-name{padding-left:8px}
+.studio-32-layout .studio-runner-name strong{font-size:14px}
+.studio-32-layout .studio-runner-name small{font-size:12px}
+.studio-32-layout .studio-market-status{font-weight:400;font-size:13px;color:#d51e36;background:#eee}
+.studio-32-layout .studio-32-bets-table td,.studio-32-layout .studio-32-bets-table th{padding:7px 5px}
+@media(max-width:767px){
+ .studio-32-page .studio-wallet{font-size:12px;gap:4px;padding:6px}
+ .studio-32-layout .studio-table{min-height:334px}
+ .studio-32-layout .studio-32-board{max-width:300px;margin:58px auto 5px;gap:23px 8px}
+ .studio-32-layout .studio-32-cards{min-height:60px}
+ .studio-32-layout .studio-32-cards .studio-card{width:34px;height:45px}
+ .studio-32-layout .studio-32-cards .studio-card b{font-size:19px}
+ .studio-32-layout .studio-history-strip{flex-wrap:nowrap}
+ .studio-32-layout .studio-history-strip>span{min-width:38px}
+ .studio-32-layout .studio-full-round-id{flex-basis:auto;overflow-wrap:normal;font-size:9px}
+ .studio-32-layout .studio-market-row,.studio-32-layout .studio-market-rows .studio-price{min-height:52px}
+ .studio-32-layout .studio-runner-name strong{font-size:14px}
+ .studio-32-layout .studio-market-status{font-size:12px}
+}
