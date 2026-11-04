@@ -32,7 +32,7 @@ export function CasinoSection({ title = "Premium Casino" }: CasinoSectionProps) 
    </section>;
  }
  return <section className="bpexch-casino-lobby" aria-label="Casino demo games">
-   <header className="bpexch-casino-header"><h2>CASINO GAMES</h2><span>FREE-COIN DEMO</span></header>
+   <header className="bpexch-casino-header"><h2>CASINO GAMES</h2><span>TEST COINS</span></header>
    <div className="bpexch-casino-toolbar">
      <p>TeenPatti Studio games · {studioLobbyGames.length} titles</p>
      <label className="bpexch-casino-search"><Search size={16} aria-hidden="true" />
@@ -53,7 +53,7 @@ export function CasinoSection({ title = "Premium Casino" }: CasinoSectionProps) 
            onError={() => setBroken(old => old.includes(game.id) ? old : [...old, game.id])} /> :
          <span className="bpexch-casino-fallback" aria-hidden="true">{game.symbol}</span>}
        <span className="bpexch-casino-name">{game.name}</span>
-       <span className="bpexch-casino-mode">DEMO</span>
+       {game.id !== "9010" && <span className="bpexch-casino-mode">DEMO</span>}
      </button>)}
    </div> : <p className="bpexch-casino-no-results" role="status">No games match your search.</p>}
    <footer className="bpexch-casino-footer">
