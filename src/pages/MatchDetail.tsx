@@ -18,7 +18,6 @@ import { motion } from "framer-motion";
 import { getLiveOdds, getCricketScore, oddsEngine, fetchBetfairEvents } from "@/functions";
 import { CircularArcsLoader } from "@/components/ui/CircularArcsLoader";
 import { calculateMarketPositions } from "@/utils/bettingPositions";
-import { findMatchByIdOrTitle } from "@/utils/matchCatalog";
 
 export default function MatchDetail() {
   const { matchId } = useParams();
@@ -80,15 +79,14 @@ export default function MatchDetail() {
         console.debug("Live events lookup fallback error:", err);
       }
 
-      // Catalog & synthesized fallback
-      return findMatchByIdOrTitle(matchId || "");
+      return null;
     },
     enabled: !!matchId && !stateMatch,
     refetchInterval: stateMatch ? false : 8000
   });
 
-  // Use state match (Betfair event) OR DB match OR Catalog fallback
-  const match = stateMatch || matchFromDB || (matchId ? findMatchByIdOrTitle(matchId) : null);
+  // A missing provider match must not turn into an invented fixture.
+  const match = stateMatch || matchFromDB || null;
   const matchLoading = stateMatch ? false : (matchLoading_raw && !match);
 
   // Fetch real-time client data
@@ -186,32 +184,27 @@ export default function MatchDetail() {
   // Extract Match Odds market
   const matchOddsMarket = liveOddsData?.markets?.find((m: any) =>
     m.marketName?.toLowerCase().includes('match odds') || m.marketName?.toLowerCase().includes('match_odds')
-  ) || liveOddsData?.markets?.[0];
+  );
 
-  const fancyMarkets = liveOddsData?.markets?.filter((m: any) => 
-    !m.marketName?.toLowerCase().includes('match odds') && 
-    !m.marketName?.toLowerCase().includes('match_odds')
-  ) || [];
+  const otherMarkets = liveOddsData?.markets?.filter((m: any) => m.marketId !== matchOddsMarket?.marketId) || [];
 
   const isMarketSuspended = matchOddsMarket?.status === 'SUSPENDED' || matchOddsMarket?.status === 'CLOSED';
-  const hasLiveOdds = !!match?.betfair_event_id && !!matchOddsMarket;
 
-  const getLiveRunner = (teamName: string, idx: number) => {
+  const getLiveRunner = (teamName: string) => {
     if (!matchOddsMarket) return null;
-    return matchOddsMarket.runners?.[idx] || 
-      matchOddsMarket.runners?.find((r: any) => 
-        r.runnerName?.toLowerCase() === teamName?.toLowerCase()
-      ) || null;
+    return matchOddsMarket.runners?.find((r: any) =>
+      r.runnerName?.toLowerCase() === teamName?.toLowerCase()
+    ) || null;
   };
 
   // Market suspension from MongoDB
   const isMongoSuspended = mongoOddsData?.isSuspended === true;
 
   // Team 1 odds: MongoDB > Betfair Live > DB
-  const runner1 = getLiveRunner(match?.team1, 0);
+  const runner1 = getLiveRunner(match?.team1);
   const t1_back = runner1?.backPrice;
   const t1_lay = runner1?.layPrice;
-  const runner2 = getLiveRunner(match?.team2, 1);
+  const runner2 = getLiveRunner(match?.team2);
   const t2_back = runner2?.backPrice;
   const t2_lay = runner2?.layPrice;
 
@@ -224,10 +217,7 @@ export default function MatchDetail() {
   
   const scoreDisplay = liveScore?.runs != null
     ? `${liveScore.battingTeam || battingAbbr} ${liveScore.runs}/${liveScore.wickets ?? '--'} (${liveScore.overs || '--'})`
-    : (liveScore 
-      ? `${liveScore.battingTeam || battingAbbr} ${match?.status === 'live' ? '--/--' : '--'} (--)`
-      : `${battingAbbr} ${match?.status === 'live' ? '--/--' : '--'} (--)`
-    );
+    : 'Score unavailable';
 
   const crrDisplay = liveScore?.crr || (match?.status === 'live' ? '--' : '--');
   const thisOverBalls: string[] = liveScore?.thisOver || [];
@@ -336,30 +326,19 @@ export default function MatchDetail() {
   }
 
   const matchTitle = match.title || `${match.team1} v ${match.team2}`;
-  const tabs = ["ALL", "Bookmaker", "BetFair-Fancy", "Fancy-2", "Tied Match", "Figure", "Even/Odd"];
+  const tabs = ["ALL", "Match Odds", "Bookmaker", "BetFair-Fancy", "Fancy-2", "Tied Match", "Figure", "Even/Odd"];
 
-  const safeAllMatches = Array.isArray(allMatches) ? allMatches.filter((m: any) => m.id !== match.id) : [];
+  const safeAllMatches = Array.isArray(allMatches) ? allMatches.filter((m: any) =>
+    m.id !== match.id && m.sport?.toLowerCase() === "cricket" &&
+    m.betfair_event_id && !/demo/i.test(m.title || "") && m.status !== "completed"
+  ) : [];
 
-  // Fancy 2 mock/sample fallback items if live feed doesn't provide them
-  const fancy2Items = [
-    { title: `10 Over Run ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 82, lay: 81, backSize: '100', laySize: '100' },
-    { title: `11 Over Run Only ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, suspended: true },
-    { title: `20 Over Run ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 153, lay: 151, backSize: '100', laySize: '100' },
-    { title: `6th Wkt Lost To ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'} Balls`, suspended: true },
-    { title: `Azmatullah Omarzai Boundaries`, back: 5, lay: 4, backSize: '100', laySize: '100' },
-    { title: `Azmatullah Omarzai Runs`, back: 33, lay: 33, backSize: '90', laySize: '110' },
-    { title: `Fall of 6th Wkt ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 93, lay: 93, backSize: '90', laySize: '110' },
-    { title: `Fall of 7th Wkt ${match.team1?.substring(0, 3)?.toUpperCase() || 'T1'}`, back: 118, lay: 118, backSize: '90', laySize: '110' },
-    { title: `How Many Balls Face By Azmatullah O`, back: 19, lay: 19, backSize: '90', laySize: '110' },
-    { title: `How Many Balls Face By Mohammad N`, suspended: true },
-    { title: `Mohammad Nabi Boundaries`, back: 4, lay: 3, backSize: '100', laySize: '100' },
-    { title: `Mohammad Nabi Runs`, back: 21, lay: 21, backSize: '90', laySize: '110' },
-  ];
-
-  // Calculate runner positions across cricket markets
+  // Only display quotes received from the connected market provider.
   const matchOddsRunners = [match.team1, match.team2].filter(Boolean);
   const matchOddsPositions = calculateMarketPositions(matchOddsRunners, openBets as any);
-  const fancyPositions = calculateMarketPositions(fancy2Items.map(f => f.title), openBets as any);
+  const visibleOtherMarkets = otherMarkets.filter((market: any) =>
+    activeTab === "ALL" || market.marketName?.toLowerCase().includes(activeTab.toLowerCase().replace("betfair-", ""))
+  );
 
   return (
     <div className="reference-market-page" style={{ minHeight: "100vh", backgroundColor: "#ecf0f1", display: "flex", flexDirection: "column", position: "relative" }}>
@@ -431,11 +410,11 @@ export default function MatchDetail() {
             <span style={{ color: "white", fontWeight: 900, fontSize: 15 }}>
               {scoreDisplay}
             </span>
-            <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: 700 }}>
+            {liveScore?.crr != null && <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: 700 }}>
               CRR: {crrDisplay}
-            </span>
+            </span>}
             <span style={{ color: "#00e676", fontSize: 12, fontWeight: 700 }}>
-              Target: 189
+              {liveScore?.target != null ? `Target: ${liveScore.target}` : ""}
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -448,7 +427,7 @@ export default function MatchDetail() {
               backgroundColor: lastBallLabel === 'NO RUN' ? '#162b47' : lastBallColor,
               color: lastBallLabel === 'NO RUN' ? 'white' : (lastBallColor === 'rgba(255,255,255,0.5)' ? '#212529' : 'white'),
             }}>
-              {lastBallLabel} 📢
+              {lastBall ? lastBallLabel : "Score unavailable"}
             </span>
             <Volume2 size={16} color="white" style={{ cursor: "pointer" }} />
           </div>
@@ -461,15 +440,14 @@ export default function MatchDetail() {
             {thisOverBalls.map((ball, i) => <ThisOverBall key={i} value={ball} />)}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>
-            <span>161 of 100 balls</span>
-            <span style={{ color: "#ffca28" }}>RRR: 9.66</span>
+            {liveScore?.rrr != null && <span style={{ color: "#ffca28" }}>RRR: {liveScore.rrr}</span>}
           </div>
         </div>
       </div>
 
       <main className="reference-market-main" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
         {/* 1. MATCH ODDS */}
-        {(activeTab === "ALL" || activeTab === "Bookmaker") && (
+        {(activeTab === "ALL" || activeTab === "Match Odds") && (
           <div style={{ marginTop: 0 }}>
             {isMongoSuspended && (
               <div style={{ 
@@ -484,15 +462,15 @@ export default function MatchDetail() {
                 Market Suspended by Admin
               </div>
             )}
-            <CombinedSectionHeader title="MATCH ODDS (MaxBet: 5M)" />
+            <CombinedSectionHeader title="MATCH ODDS" />
             <>
               <TeamRow2
                 name={match.team1}
                 position={matchOddsPositions[match.team1]}
                 odds={t1_back}
                 layOdds={t1_lay}
-                backSize={hasLiveOdds ? formatSize(runner1?.backSize) : "22.6M"}
-                laySize={hasLiveOdds ? formatSize(runner1?.laySize) : "7.8M"}
+                backSize={formatSize(runner1?.backSize)}
+                laySize={formatSize(runner1?.laySize)}
                 loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
                 suspended={isSuspended}
                 onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
@@ -502,149 +480,36 @@ export default function MatchDetail() {
                 position={matchOddsPositions[match.team2]}
                 odds={t2_back}
                 layOdds={t2_lay}
-                backSize={hasLiveOdds ? formatSize(runner2?.backSize) : "1.5M"}
-                laySize={hasLiveOdds ? formatSize(runner2?.laySize) : "623.3K"}
+                backSize={formatSize(runner2?.backSize)}
+                laySize={formatSize(runner2?.laySize)}
                 loading={!!match?.betfair_event_id && liveOddsLoading && !matchOddsMarket}
                 suspended={isSuspended}
                 onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
               />
             </>
 
-            {/* 2. BOOKMAKER */}
-            <div style={{ marginTop: 10 }}>
-              <CombinedSectionHeader title="BOOKMAKER (MaxBet: 1M)" />
-              <TeamRow2
-                name={match.team1}
-                position={matchOddsPositions[match.team1]}
-                odds={t1_back ? Number((t1_back * 0.99).toFixed(2)) : 1.18}
-                layOdds={t1_lay ? Number((t1_lay * 0.99).toFixed(2)) : 1.19}
-                backSize="100"
-                laySize="100"
-                suspended={isSuspended}
-                showBook
-                onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team1, betType: t, odds: o })}
-              />
-              <TeamRow2
-                name={match.team2}
-                position={matchOddsPositions[match.team2]}
-                odds={t2_back ? Number((t2_back * 0.99).toFixed(2)) : 6.26}
-                layOdds={t2_lay ? Number((t2_lay * 0.99).toFixed(2)) : 6.56}
-                backSize="100"
-                laySize="100"
-                suspended={isSuspended}
-                showBook
-                onBet={(t: any, o: any) => setActiveBet({ match, selection: match.team2, betType: t, odds: o })}
-              />
-            </div>
           </div>
         )}
 
-        {/* 3. BETFAIR FANCY */}
-        {(activeTab === "ALL" || activeTab === "BetFair-Fancy") && (
-          <div style={{ marginTop: 10 }}>
-            <CombinedSectionHeader title="BETFAIR FANCY (MaxBet: 2M)" />
-            <TeamRow2
-              name="2nd Innings 10 Overs Line"
-              odds={82}
-              layOdds={81}
-              backSize="57.2K"
-              laySize="3.2M"
-              showBook
-              onBet={(t: any, o: any) => setActiveBet({ match, selection: "2nd Innings 10 Overs Line", betType: t, odds: o })}
-            />
-          </div>
-        )}
-
-        {/* 4. FANCY 2 */}
-        {(activeTab === "ALL" || activeTab === "Fancy-2") && (
-          <div style={{ marginTop: 10 }}>
-            <CombinedSectionHeader title="FANCY 2 (MaxBet: 2M)" />
-            {fancy2Items.map((item, idx) => (
+        {visibleOtherMarkets.map((market: any) => (
+          <div key={market.marketId} style={{ marginTop: 10 }}>
+            <CombinedSectionHeader title={market.marketName} />
+            {market.runners?.map((selection: any) => (
               <TeamRow2
-                key={idx}
-                name={item.title}
-                position={fancyPositions[item.title]}
-                odds={item.back}
-                layOdds={item.lay}
-                backSize={item.backSize}
-                laySize={item.laySize}
-                suspended={item.suspended || isSuspended}
-                showBook
-                onBet={(t: any, o: any) => setActiveBet({ match, selection: item.title, betType: t, odds: o })}
+                key={selection.selectionId}
+                name={selection.runnerName}
+                odds={selection.backPrice}
+                layOdds={selection.layPrice}
+                backSize={formatSize(selection.backSize)}
+                laySize={formatSize(selection.laySize)}
+                suspended={market.status !== 'OPEN' || market.stale}
+                onBet={(side: 'back' | 'lay', odds: number) => setActiveBet({ match, selection: selection.runnerName, betType: side, odds })}
               />
             ))}
           </div>
-        )}
-
-        {/* 5. TIED MATCH */}
-        {(activeTab === "ALL" || activeTab === "Tied Match") && (
-          <div style={{ marginTop: 10 }}>
-            <CombinedSectionHeader title="TIED MATCH (MaxBet: 500K)" />
-            <TeamRow2
-              name="Yes"
-              odds={510}
-              layOdds={undefined}
-              backSize="1.6K"
-              laySize=""
-              onBet={(t: any, o: any) => setActiveBet({ match, selection: "Tied Match - Yes", betType: t, odds: o })}
-            />
-            <TeamRow2
-              name="No"
-              odds={undefined}
-              layOdds={1.01}
-              backSize=""
-              laySize="26.3M"
-              onBet={(t: any, o: any) => setActiveBet({ match, selection: "Tied Match - No", betType: t, odds: o })}
-            />
-          </div>
-        )}
-
-        {/* 6. FIGURE MARKET (10 Buttons Grid) */}
-        {(activeTab === "ALL" || activeTab === "Figure") && (
-          <div style={{ marginTop: 10 }}>
-            <CombinedSectionHeader title={`${match.team1?.toUpperCase() || 'TEAM'} 15 OVER TOTAL LAST FIGURE (MaxBet: 100K)`} />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 1, backgroundColor: "#c4d9ea", borderBottom: "1px solid #c4d9ea" }}>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
-                <div
-                  key={digit}
-                  onClick={() => setActiveBet({ match, selection: `Figure ${digit}`, betType: 'back', odds: 8.85 })}
-                  style={{
-                    backgroundColor: "#edf4fc",
-                    padding: "8px 4px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    transition: "background-color 0.15s",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d0e7fb")}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#edf4fc")}
-                >
-                  <span style={{ fontWeight: 900, fontSize: 16, color: "#1e3a5f" }}>{digit}</span>
-                  <div style={{ backgroundColor: "#7ec8f8", borderRadius: 3, padding: "1px 6px", marginTop: 2 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#000" }}>8.85</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 7. EVEN / ODD */}
-        {(activeTab === "ALL" || activeTab === "Even/Odd") && (
-          <div style={{ marginTop: 10 }}>
-            <CombinedSectionHeader title="EVEN / ODD (MaxBet: 2M)" />
-            <TeamRow2
-              name="2nd Inn 15 Over Run Odd (Kalli)"
-              odds={1.98}
-              layOdds={2.02}
-              backSize="98"
-              laySize="102"
-              showBook
-              onBet={(t: any, o: any) => setActiveBet({ match, selection: "2nd Inn 15 Over Run Odd", betType: t, odds: o })}
-            />
-          </div>
+        ))}
+        {activeTab !== "ALL" && activeTab !== "Match Odds" && visibleOtherMarkets.length === 0 && (
+          <div style={{ background: '#fff', color: '#475569', padding: 14 }}>No verified prices are available for this market.</div>
         )}
 
         {/* === LIVE GRAPHIC / SCORECARD & TV TABS === */}
@@ -683,50 +548,10 @@ export default function MatchDetail() {
             </button>
           </div>
 
-          {/* Scorecard Visual Widget */}
-          <div style={{
-            backgroundColor: "#162b47",
-            padding: "12px",
-            color: "white",
-            borderTop: "2px solid #00b894",
-          }}>
-            {/* Header info */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 8 }}>
-              <span style={{ fontWeight: 800, fontSize: 13 }}>{match.team1}</span>
-              <div style={{ textAlign: "center" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>INN 2 | 9.0/20 OV</span>
-                <div style={{ fontWeight: 900, fontSize: 15, color: "#00e676" }}>74/5 : 221/7</div>
-              </div>
-              <span style={{ fontWeight: 800, fontSize: 13 }}>{match.team2}</span>
-            </div>
-
-            {/* Target calculation */}
-            <div style={{ padding: "6px 0", fontSize: 11, color: "rgba(255,255,255,0.85)", textAlign: "center" }}>
-              {match.team1} (74/5) require 148 runs from 66 balls.
-            </div>
-
-            {/* Graphical Run Rate & Wicket Curve */}
-            <div style={{
-              height: 70,
-              backgroundColor: "rgba(0,0,0,0.2)",
-              borderRadius: 4,
-              marginTop: 4,
-              padding: "6px",
-              display: "flex",
-              alignItems: "flex-end",
-              gap: 4,
-              position: "relative"
-            }}>
-              {[4, 8, 12, 18, 25, 34, 48, 62, 74].map((runs, i) => (
-                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
-                  {i % 2 === 1 && (
-                    <span style={{ backgroundColor: "#ff5252", color: "white", fontSize: 8, fontWeight: 900, borderRadius: "50%", width: 12, height: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 2 }}>W</span>
-                  )}
-                  <div style={{ width: "100%", height: `${(runs / 80) * 100}%`, backgroundColor: "#00b894", borderRadius: "2px 2px 0 0" }} />
-                  <span style={{ fontSize: 8, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{i + 1}</span>
-                </div>
-              ))}
-            </div>
+          <div style={{ backgroundColor: "#162b47", padding: "15px 12px", color: "white", borderTop: "2px solid #00b894" }} role="status">
+            {activeMediaTab === 'tv' ? 'Live TV feed unavailable.' : liveScore?.runs != null
+              ? `${scoreDisplay}${liveScore?.target != null ? ` · Target ${liveScore.target}` : ''}`
+              : 'Verified score feed unavailable for this match.'}
           </div>
         </div>
 
@@ -740,6 +565,7 @@ export default function MatchDetail() {
               Related Events
             </span>
           </div>
+          {safeAllMatches.length === 0 && <div style={{ background: "#fff", padding: "10px 12px", color: "#64748b" }}>No related verified cricket events available.</div>}
           {safeAllMatches.slice(0, 5).map((rm: any) => (
             <div
               key={rm.id}
@@ -808,11 +634,8 @@ function TeamRow2({
   position,
   onBet 
 }: any) {
-  const hash = (name || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-  const defaultBack = `${((hash % 30) / 10 + 0.5).toFixed(1)}M`;
-  const defaultLay = `${((hash % 20) / 10 + 0.2).toFixed(1)}M`;
-  const displayBackSize = backSize !== undefined ? backSize : defaultBack;
-  const displayLaySize = laySize !== undefined ? laySize : defaultLay;
+  const displayBackSize = backSize || "";
+  const displayLaySize = laySize || "";
   const hasPos = position !== undefined && position !== 0;
 
   return (
