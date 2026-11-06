@@ -1,4 +1,5 @@
 import { placeSelectionBet } from "@/services/bettingApi";
+import { getCricketFixtures, type CricketFixture } from "@/services/cricketFixtures";
 import { getWalletSummary } from "@/lib/walletBalances";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -52,6 +53,22 @@ const SportIcon = ({ sport, color = "white", size = 22 }: { sport: string; color
     </svg>
   );
 };
+
+function CricketScheduleRow({ fixture, stale }: { fixture: CricketFixture; stale: boolean }) {
+  const starts = fixture.startsAt ? new Date(fixture.startsAt).toLocaleString() : 'Time to be confirmed';
+  return <article className="flex items-center justify-between gap-3 border-b border-slate-200 bg-[#e8f5fb] px-3 py-3 text-[#25313a]">
+    <div className="min-w-0">
+      <span className="text-xs font-semibold text-emerald-700">{stale ? 'Delayed · ' : ''}{fixture.status === 'live' ? 'In Play' : 'Scheduled'}</span>
+      <strong className="block text-sm">{fixture.teams.join(' v ')}</strong>
+      <span className="block text-xs text-slate-600">{fixture.status === 'live' ? fixture.statusText : starts}</span>
+      <span className="block text-[10px] text-slate-500">CricketData schedule</span>
+      {!!fixture.scores.length && <span className="block text-xs text-slate-600">{fixture.scores.map(s => `${s.inning}: ${s.runs}/${s.wickets} (${s.overs})`).join(' · ')}</span>}
+    </div>
+    <div className="shrink-0 text-right text-xs font-semibold text-slate-600" aria-label="Betting unavailable; no exchange odds">
+      <span className="block">SUSPENDED</span><span className="font-normal">No odds</span>
+    </div>
+  </article>;
+}
 
 
 export default function UserDashboard() {
@@ -126,6 +143,11 @@ export default function UserDashboard() {
   });
 
   const safeMatches = Array.isArray(matches) ? matches : [];
+  const { data: cricketFeed, error: cricketFeedError, isLoading: cricketFeedLoading } = useQuery({
+    queryKey: ['cricket-fixtures'], queryFn: getCricketFixtures, refetchInterval: 20 * 60 * 1000, retry: 1,
+    enabled: !!session,
+  });
+  const cricketFixtures = (cricketFeed?.matches ?? []).filter(f => f.status !== 'completed');
 
   // Fetch real-time client data for balance
   const { data: clients } = useQuery({
@@ -215,15 +237,15 @@ export default function UserDashboard() {
   };
 
   const matchesList = safeMatches
-    .filter(m => m.status !== "completed")
+    .filter(m => m.status !== "completed" && m.is_demo !== true && !String(m.title ?? '').startsWith('Demo: '))
     .map(normalizeMatch)
     .filter((m: any) => {
       const sport = m.sport?.toLowerCase();
       return sport === "cricket" || sport === "soccer" || sport === "tennis";
     });
 
-  const inplayCount = matchesList.filter(m => m.status === "live").length;
-  const cricketCount = matchesList.filter(m => m.sport.toLowerCase() === "cricket").length;
+  const inplayCount = matchesList.filter(m => m.status === "live").length + cricketFixtures.filter(m => m.status === 'live').length;
+  const cricketCount = matchesList.filter(m => m.sport.toLowerCase() === "cricket").length + cricketFixtures.length;
   const tennisCount = matchesList.filter(m => m.sport.toLowerCase() === "tennis").length;
   const soccerCount = matchesList.filter(m => m.sport.toLowerCase() === "soccer").length;
 
@@ -247,16 +269,18 @@ export default function UserDashboard() {
     { id: "Cricket", label: "Cricket", count: cricketCount },
     { id: "Tennis", label: "Tennis", count: tennisCount },
     { id: "Soccer", label: "Soccer", count: soccerCount },
-    { id: "SportsBook", label: "SportsBook", count: matchesList.length },
+    { id: "SportsBook", label: "SportsBook", count: matchesList.length + cricketFixtures.length },
   ];
 
   const filteredMatches = matchesList.filter((m: any) => {
+    if (activeFilter === 'SportsBook') return true;
     if (activeFilter === "Inplay") return true;
     const sport = m.sport?.toLowerCase();
     const filter = activeFilter.toLowerCase();
     if (filter === "soccer") return sport === "football" || sport === "soccer";
     return sport === filter;
   });
+  const visibleCricketFixtures = ['Inplay', 'Cricket', 'SportsBook'].includes(activeFilter) ? cricketFixtures : [];
 
   const groupedMatches = filteredMatches.reduce((acc: any, match: any) => {
     const sport = match.sport || "Soccer";
@@ -267,7 +291,7 @@ export default function UserDashboard() {
 
   // Ensure fixed order: Cricket, Soccer/Football, Tennis
   const orderedSports = ["Cricket", "Soccer", "Tennis"].filter(
-    (s) => activeFilter === "Inplay" || activeFilter.toLowerCase() === s.toLowerCase()
+    (s) => ['Inplay', 'SportsBook'].includes(activeFilter) || activeFilter.toLowerCase() === s.toLowerCase()
   );
 
   const handleSelectBet = (match: any, selection: string, betType: "back" | "lay", odds: number) => {
@@ -410,6 +434,8 @@ export default function UserDashboard() {
                   </div>
 
                   {/* Matches List */}
+                  {sport === 'Cricket' && cricketFeed?.stale && <p className="px-3 py-2 text-xs text-amber-800">Cricket schedule may be delayed; last updated {new Date(cricketFeed.fetchedAt).toLocaleString()}.</p>}
+                  {sport === 'Cricket' && visibleCricketFixtures.map(f => <CricketScheduleRow key={f.id} fixture={f} stale={cricketFeed?.stale ?? false} />)}
                   {sportMatches.map((m: any) => (
                     <BettingMatchCard
                       key={m.id}
@@ -423,14 +449,14 @@ export default function UserDashboard() {
               );
             })}
 
-            {filteredMatches.length === 0 && (
+            {filteredMatches.length === 0 && visibleCricketFixtures.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 text-center px-4 bg-white m-3 rounded border border-gray-200">
                 <Trophy className="w-12 h-12 text-[#173456]/30 mb-3" />
                 <p className="text-sm font-bold text-[#173456] uppercase tracking-wide">
                   {activeFilter} Matches
                 </p>
                 <p className="text-xs text-gray-600 mt-1 font-semibold">
-                  No {activeFilter} matches scheduled right now.
+                  {cricketFeedLoading && ['Cricket', 'Inplay', 'SportsBook'].includes(activeFilter) ? 'Loading cricket schedule…' : cricketFeedError && ['Cricket', 'Inplay', 'SportsBook'].includes(activeFilter) ? 'Cricket schedule is unavailable. No verified fixtures to show.' : `No ${activeFilter} matches scheduled right now.`}
                 </p>
               </div>
             )}
