@@ -1,4 +1,6 @@
 import { serviceRequest } from "./client";
+import { isFreshMarket, availableQuoteSize } from "./marketFreshness";
+export { isFreshMarket, availableQuoteSize } from "./marketFreshness";
 export interface Quote {
   id: string;
   market_id: string;
@@ -30,11 +32,6 @@ export const syncMarketFeed = (eventId?: string) =>
   serviceRequest<{ success: boolean; markets: number }>("syncFeed", {
     eventId,
   });
-export const isFreshMarket = (market: Market) =>
-  market.status === "OPEN" &&
-  !market.betting_locked &&
-  !market.delayed &&
-  Date.now() - Date.parse(market.observed_at) < 15000;
 export async function getLiveMarketOdds(eventId: string) {
   const markets = await getMarkets({ eventId });
   return {
@@ -48,20 +45,20 @@ export async function getLiveMarketOdds(eventId: string) {
         selectionId: r.id,
         runnerName: r.name,
         name: r.name,
-        backPrice: isFreshMarket(m)
+        backPrice: isFreshMarket(m) && availableQuoteSize(m.quotes.find(q => q.runner_id === r.id && q.side === "back")) > 0
           ? Number(
               m.quotes.find((q) => q.runner_id === r.id && q.side === "back")
                 ?.odds,
             ) || undefined
           : undefined,
-        layPrice: isFreshMarket(m)
+        layPrice: isFreshMarket(m) && availableQuoteSize(m.quotes.find(q => q.runner_id === r.id && q.side === "lay")) > 0
           ? Number(
               m.quotes.find((q) => q.runner_id === r.id && q.side === "lay")
                 ?.odds,
             ) || undefined
           : undefined,
-        backSize: isFreshMarket(m) ? Number(m.quotes.find(q=>q.runner_id===r.id&&q.side==='back')?.size)||0 : 0,
-        laySize: isFreshMarket(m) ? Number(m.quotes.find(q=>q.runner_id===r.id&&q.side==='lay')?.size)||0 : 0,
+        backSize: isFreshMarket(m) ? availableQuoteSize(m.quotes.find(q=>q.runner_id===r.id&&q.side==='back')) : 0,
+        laySize: isFreshMarket(m) ? availableQuoteSize(m.quotes.find(q=>q.runner_id===r.id&&q.side==='lay')) : 0,
         ex: {
           availableToBack: m.quotes
             .filter(
@@ -70,7 +67,7 @@ export async function getLiveMarketOdds(eventId: string) {
             )
             .map((q) => ({
               price: Number(q.odds),
-              size: Math.max(0, Number(q.size) - Number(q.consumed)),
+              size: availableQuoteSize(q),
             })),
           availableToLay: m.quotes
             .filter(
@@ -79,7 +76,7 @@ export async function getLiveMarketOdds(eventId: string) {
             )
             .map((q) => ({
               price: Number(q.odds),
-              size: Math.max(0, Number(q.size) - Number(q.consumed)),
+              size: availableQuoteSize(q),
             })),
         },
       })),
