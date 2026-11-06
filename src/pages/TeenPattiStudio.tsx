@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Home, Menu, Search, X, ArrowLeft, RefreshCw, UserRound } from 'lucide-react';
 import { studioLobbyGames, type Game } from '@/features/teenpatti/catalog';
 import { studioRequest, pendingKey, type StudioState, type StudioBet, type Outcome, type StudioHistoryRow } from '@/features/teenpatti/api';
+import { game32StudioRequest } from '@/features/teenpatti/game32Api';
 import { currentRoundMatchedBets, roundPositions, settledRoundBets as getSettledRoundBets } from '@/features/teenpatti/bets';
 import { bettingWindowOpen } from '@/features/teenpatti/roundClock';
 import { progressiveCards, publicCardCount } from '@/features/teenpatti/reveal';
@@ -73,13 +74,14 @@ function GameTable({game,username}:{game:Game;username:string}){
  const [olderHistory,setOlderHistory]=useState<StudioHistoryRow[]>([]);
  const [historyBusy,setHistoryBusy]=useState(false);
  const [historyDone,setHistoryDone]=useState(false);
- const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:async()=>{const started=Date.now();const state=await studioRequest<StudioState>('state',{gameId:game.id});return {...state,roundTripMs:Date.now()-started};},refetchInterval:query=>{const round=query.state.data?.round;return game.id==='9010'&&round&&!round.settled?700:2000;},retry:1,enabled:game.playable});
- const {data:historyPage,error:historyError}=useQuery({queryKey:['studio-history',username,game.id],queryFn:()=>studioRequest<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:null,beforeId:null}),enabled:game.id==='9010'&&view==='Results'});
+ const request=game.id==='9010'?game32StudioRequest:studioRequest;
+ const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:async()=>{const started=Date.now();const state=await request<StudioState>('state',{gameId:game.id});return {...state,roundTripMs:Date.now()-started};},refetchInterval:query=>{const round=query.state.data?.round;return game.id==='9010'&&round&&!round.settled?700:2000;},retry:1,enabled:game.playable});
+ const {data:historyPage,error:historyError}=useQuery({queryKey:['studio-history',username,game.id],queryFn:()=>request<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:null,beforeId:null}),enabled:game.id==='9010'&&view==='Results'});
  const historyRows=[...new Map([...(historyPage?.history??data?.history??[]),...olderHistory].map(h=>[h.id,h])).values()];
  async function loadOlderHistory(){
   const last=historyRows[historyRows.length-1];if(!last||historyBusy)return;
   setHistoryBusy(true);
-  try{const page=await studioRequest<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:last.settled_at,beforeId:last.id});setOlderHistory(rows=>[...rows,...page.history]);setHistoryDone(page.history.length<20);}
+  try{const page=await request<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:last.settled_at,beforeId:last.id});setOlderHistory(rows=>[...rows,...page.history]);setHistoryDone(page.history.length<20);}
   catch(e){setMessage(e instanceof Error?e.message:'History unavailable');}
   finally{setHistoryBusy(false);}
  }
@@ -130,7 +132,7 @@ function GameTable({game,username}:{game:Game;username:string}){
   try{
    // Persist before sending. A timeout never creates a new wager on retry.
    sessionStorage.setItem(pendingKey(username),JSON.stringify(request));setPending(request);
-   await studioRequest('bet',request);sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);setMessage('Bet accepted. Result and balance update automatically.');await refetch();window.dispatchEvent(new Event('balance-updated'));
+   await (game.id==='9010'?game32StudioRequest:studioRequest)('bet',request);sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);setMessage('Bet accepted. Result and balance update automatically.');await refetch();window.dispatchEvent(new Event('balance-updated'));
   }catch(e){const text=e instanceof Error?e.message:'Bet could not be confirmed';setMessage(text);if(/^(Betting closed|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed|Insufficient quoted liquidity|Insufficient balance|Round unavailable)/.test(text)){sessionStorage.removeItem(pendingKey(username));setPending(null);}}
   finally{busyRef.current=false;setBusy(false);}
  }
