@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Home, Menu, Search, X, ArrowLeft, RefreshCw, UserRound } from 'lucide-react';
 import { studioLobbyGames, type Game } from '@/features/teenpatti/catalog';
 import { studioRequest, pendingKey, type StudioState, type StudioBet, type Outcome, type StudioHistoryRow } from '@/features/teenpatti/api';
+import { game32StudioRequest } from '@/features/teenpatti/game32Api';
 import { currentRoundMatchedBets, roundPositions, settledRoundBets as getSettledRoundBets } from '@/features/teenpatti/bets';
 import { bettingWindowOpen } from '@/features/teenpatti/roundClock';
 import { progressiveCards, publicCardCount } from '@/features/teenpatti/reveal';
@@ -73,13 +74,14 @@ function GameTable({game,username}:{game:Game;username:string}){
  const [olderHistory,setOlderHistory]=useState<StudioHistoryRow[]>([]);
  const [historyBusy,setHistoryBusy]=useState(false);
  const [historyDone,setHistoryDone]=useState(false);
- const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:async()=>{const started=Date.now();const state=await studioRequest<StudioState>('state',{gameId:game.id});return {...state,roundTripMs:Date.now()-started};},refetchInterval:query=>{const round=query.state.data?.round;return game.id==='9010'&&round&&!round.settled?700:2000;},retry:1,enabled:game.playable});
- const {data:historyPage,error:historyError}=useQuery({queryKey:['studio-history',username,game.id],queryFn:()=>studioRequest<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:null,beforeId:null}),enabled:game.id==='9010'&&view==='Results'});
+ const request=game.id==='9010'?game32StudioRequest:studioRequest;
+ const {data,error,isFetching,dataUpdatedAt,refetch}=useQuery({queryKey:['studio',username,game.id],queryFn:async()=>{const started=Date.now();const state=await request<StudioState>('state',{gameId:game.id});return {...state,roundTripMs:Date.now()-started};},refetchInterval:query=>{const round=query.state.data?.round;return game.id==='9010'&&round&&!round.settled?700:2000;},retry:1,enabled:game.playable});
+ const {data:historyPage,error:historyError}=useQuery({queryKey:['studio-history',username,game.id],queryFn:()=>request<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:null,beforeId:null}),enabled:game.id==='9010'&&view==='Results'});
  const historyRows=[...new Map([...(historyPage?.history??data?.history??[]),...olderHistory].map(h=>[h.id,h])).values()];
  async function loadOlderHistory(){
   const last=historyRows[historyRows.length-1];if(!last||historyBusy)return;
   setHistoryBusy(true);
-  try{const page=await studioRequest<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:last.settled_at,beforeId:last.id});setOlderHistory(rows=>[...rows,...page.history]);setHistoryDone(page.history.length<20);}
+  try{const page=await request<{history:StudioHistoryRow[]}>('history',{gameId:game.id,beforeAt:last.settled_at,beforeId:last.id});setOlderHistory(rows=>[...rows,...page.history]);setHistoryDone(page.history.length<20);}
   catch(e){setMessage(e instanceof Error?e.message:'History unavailable');}
   finally{setHistoryBusy(false);}
  }
@@ -95,7 +97,7 @@ function GameTable({game,username}:{game:Game;username:string}){
  const matchedBets=data?(data.matchedBets??currentRoundMatchedBets(data.bets,data.round.id)):[];
  const settledRoundBets=data?getSettledRoundBets(data.bets,data.round.id):[];
  const positions=data&&game.id==='9010'?roundPositions(matchedBets,data.round.id,data.config.runners.map(r=>r.id),data.round.settled):null;
- const quoteSize=(runnerId:string,side:'back'|'lay')=>{const quote=data?.quotes?.find(q=>q.runner_id===runnerId&&q.side===side);return quote?money(Math.max(0,Number(quote.size)-Number(quote.consumed))):'—';};
+ const quoteSize=(runnerId:string,side:'back'|'lay')=>game.id==='9010'?'Fixed demo':(()=>{const quote=data?.quotes?.find(q=>q.runner_id===runnerId&&q.side===side);return quote?money(Math.max(0,Number(quote.size)-Number(quote.consumed))):'—';})();
  const activeRoundId=data?.round.id;
  const availableCards=game.id==='9010'?publicCardCount(data?.round.outcome??null):0;
  const visibleCards=deal.roundId===activeRoundId?deal.visible:0;
@@ -130,7 +132,7 @@ function GameTable({game,username}:{game:Game;username:string}){
   try{
    // Persist before sending. A timeout never creates a new wager on retry.
    sessionStorage.setItem(pendingKey(username),JSON.stringify(request));setPending(request);
-   await studioRequest('bet',request);sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);setMessage('Bet accepted. Result and balance update automatically.');await refetch();window.dispatchEvent(new Event('balance-updated'));
+   await (game.id==='9010'?game32StudioRequest:studioRequest)('bet',request);sessionStorage.removeItem(pendingKey(username));setPending(null);setRunner(null);setMessage('Bet accepted. Result and balance update automatically.');await refetch();window.dispatchEvent(new Event('balance-updated'));
   }catch(e){const text=e instanceof Error?e.message:'Bet could not be confirmed';setMessage(text);if(/^(Betting closed|Invalid bet parameters|Request ID conflict|Betting is disabled|Market unavailable or stale|Odds changed|Insufficient quoted liquidity|Insufficient balance|Round unavailable)/.test(text)){sessionStorage.removeItem(pendingKey(username));setPending(null);}}
   finally{busyRef.current=false;setBusy(false);}
  }
@@ -155,7 +157,7 @@ function GameTable({game,username}:{game:Game;username:string}){
 
   {message&&<p className="studio-message" role="status">{message}</p>}
   {pending&&<div className="studio-pending" role="status"><p>Confirm the response to your pending {money(pending.stake)} bet before placing another.</p><button disabled={busy} onClick={()=>submit(true)}>{busy?'Checking…':'Check / retry pending bet'}</button></div>}
-  {runner&&!pending&&<div className="studio-modal-overlay" onClick={()=>!busy&&setRunner(null)}><section className={`studio-slip${game.id==='9010'?' studio-slip-32':''}`} role="dialog" aria-modal="true" aria-label="Confirm bet" onClick={e=>e.stopPropagation()}><header><strong>{game.id==='9010'?runner.name:`${betSide.toUpperCase()} · ${runner.name}`}</strong><button onClick={()=>setRunner(null)} aria-label="Close bet slip"><X size={19}/></button></header><div className="studio-slip-body"><div className="studio-slip-summary"><span>{game.name} · {runner.name}</span><span>{betSide.toUpperCase()} · {runner.name}</span><span>Available balance <b>{money(data?.balance||0)}</b></span></div><div className="studio-odds-control"><span>ODDS</span><button type="button" disabled title="Fixed demo quote" aria-label="Decrease odds unavailable for fixed quote">−</button><output>{(betSide==='back'?runner.odds:runner.layOdds).toFixed(2)}</output><button type="button" disabled title="Fixed demo quote" aria-label="Increase odds unavailable for fixed quote">+</button></div><label>Amount<input autoFocus={game.id!=='9010'} inputMode="decimal" type="number" min="0.01" max="1000000" step="0.01" value={stake} onChange={e=>setStake(e.target.value)}/></label><div className="studio-chips">{[2000,5000,10000,25000].map(n=><button type="button" key={n} onClick={()=>setStake(String(n))}>{money(n)}</button>)}</div><div className="studio-chips">{[1000,5000,10000,25000].map(n=><button type="button" key={n} onClick={()=>setStake(String(Math.round((Number(stake)||0)*100+n*100)/100))}>+{money(n)}</button>)}</div><div className="studio-slip-pl"><span>Potential profit <b className="profit">+{money(betSide==='back'?(Number(stake)||0)*(runner.odds-1):Number(stake)||0)}</b></span><span>Potential loss <b className="loss">−{money(betSide==='lay'?Math.ceil((Number(stake)||0)*(runner.layOdds-1)*100)/100:Number(stake)||0)}</b></span></div><div className="studio-slip-actions"><button type="button" className="studio-close" disabled={busy} onClick={()=>setRunner(null)}>Close</button><button type="button" className="studio-place" disabled={!canBet||busy} onClick={()=>submit()}>{canBet?'Submit':'Betting closed'}</button></div></div></section></div>}
+  {runner&&!pending&&<div className="studio-modal-overlay" onClick={()=>!busy&&setRunner(null)}><section className={`studio-slip${game.id==='9010'?' studio-slip-32':''}`} role="dialog" aria-modal="true" aria-label="Confirm bet" onClick={e=>e.stopPropagation()}><header><strong>{game.id==='9010'?runner.name:`${betSide.toUpperCase()} · ${runner.name}`}</strong><button onClick={()=>setRunner(null)} aria-label="Close bet slip"><X size={19}/></button></header><div className="studio-slip-body"><div className="studio-slip-summary"><span>{game.name} · {runner.name}</span><span>{betSide.toUpperCase()} · {runner.name}</span><span>Available balance <b>{money(data?.balance||0)}</b></span></div><div className="studio-odds-control"><span>ODDS</span><button type="button" disabled title="Fixed demo quote" aria-label="Decrease odds unavailable for fixed quote">−</button><output>{(betSide==='back'?runner.odds:runner.layOdds).toFixed(2)}</output><button type="button" disabled title="Fixed demo quote" aria-label="Increase odds unavailable for fixed quote">+</button></div><label>Amount<input autoFocus={game.id!=='9010'} inputMode="decimal" type="number" min="0.01" max="1000000" step="0.01" value={stake} onChange={e=>setStake(e.target.value)}/></label><div className="studio-chips">{[2000,5000,10000,25000].map(n=><button type="button" key={n} onClick={()=>setStake(String(n))}>{money(n)}</button>)}</div><div className="studio-chips">{[1000,5000,10000,25000].map(n=><button type="button" key={n} onClick={()=>setStake(String(Math.round((Number(stake)||0)*100+n*100)/100))}>+{money(n)}</button>)}</div><div className="studio-slip-pl"><span>Potential profit <b className="profit">+{money(betSide==='back'?(Number(stake)||0)*(runner.odds-1):Number(stake)||0)}</b></span><span>Potential loss <b className="loss">−{money(betSide==='lay'?Math.ceil(Math.round((Number(stake)||0)*100)*(Math.round(runner.layOdds*100)-100)/100)/100:Number(stake)||0)}</b></span></div><div className="studio-slip-actions"><button type="button" className="studio-close" disabled={busy} onClick={()=>setRunner(null)}>Close</button><button type="button" className="studio-place" disabled={!canBet||busy} onClick={()=>submit()}>{canBet?'Submit':'Betting closed'}</button></div></div></section></div>}
  </div>;
 }
 export default function TeenPattiStudio(){
