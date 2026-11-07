@@ -25,10 +25,16 @@ constants by the database function. They are **not dynamically generated**,
 provider prices, an order book, or matched external exchange orders. The API
 does not publish an available-liquidity figure for this internal demo game.
 The existing Studio label “Matched Bets” means accepted internal bets only.
-No hierarchy P/L distribution is performed: the legacy allocator requires
-the legacy `bets` table and its allocation rules have not been mapped to
-`game32_bets`. Approval of a documented allocation formula, ancestor shares,
-rounding, reversals and audit entries is needed before that integration.
+The follow-up migration `20261107060000_game32_hierarchy_allocation.sql`
+adds Game32-only cumulative-v2 snapshots at bet placement and allocates
+`-bet.profit` across Master → Supermaster → Admin → SuperAdmin → Company at
+settlement. Each ancestor receives the difference between rounded cumulative
+boundaries; the Company receives the remainder. Void bets allocate no P/L.
+Each allocation has a unique bet/account key and an auditable ledger entry.
+The migration refuses to run while older pending Game32 bets lack a snapshot.
+Previously settled Game32 bets are not retroactively allocated; they require
+manual accounting review. Game32 still does not apply the legacy per-account
+commission rule; this must be resolved before production approval.
 
 ## Randomness and recovery
 

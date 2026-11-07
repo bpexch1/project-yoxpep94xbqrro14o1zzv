@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const edge = readFileSync(new URL("../supabase/functions/game32/index.ts", import.meta.url), "utf8");
 const migration = readFileSync(new URL("../supabase/migrations/20261107050000_independent_game32_engine.sql", import.meta.url), "utf8");
+const hierarchy = readFileSync(new URL("../supabase/migrations/20261107060000_game32_hierarchy_allocation.sql", import.meta.url), "utf8");
 
 test("Game32 exposes every required authenticated endpoint", () => {
   for (const endpoint of [
@@ -36,4 +37,12 @@ test("recovery settlement and immutable audit history are present", () => {
   assert.match(migration, /bpexch1-game32-recovery/);
   assert.match(migration, /game32_settle_due/);
   assert.match(migration, /grant select, insert on public\.game32_audit to service_role/i);
+});
+
+test("Game32 hierarchy snapshots and allocates without changing legacy bets", () => {
+  assert.match(hierarchy, /create trigger game32_capture_shares after insert on public\.game32_bets/i);
+  assert.match(hierarchy, /create trigger game32_allocate_settlement after update of status on public\.game32_bets/i);
+  assert.match(hierarchy, /next_cumulative-cumulative/i);
+  assert.match(hierarchy, /new\.status='void' then return new/i);
+  assert.doesNotMatch(hierarchy, /update public\.bets\b/i);
 });
