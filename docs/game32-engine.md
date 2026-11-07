@@ -18,6 +18,18 @@ browser-computed result.
 These are BPEXCH1's documented independent rules. Exact parity with any
 third-party game remains unverified.
 
+## Prices and accounting scope
+
+Back/Lay odds are fixed per runner in `engine.ts` and checked against the same
+constants by the database function. They are **not dynamically generated**,
+provider prices, an order book, or matched external exchange orders. The API
+does not publish an available-liquidity figure for this internal demo game.
+The existing Studio label “Matched Bets” means accepted internal bets only.
+No hierarchy P/L distribution is performed: the legacy allocator requires
+the legacy `bets` table and its allocation rules have not been mapped to
+`game32_bets`. Approval of a documented allocation formula, ancestor shares,
+rounding, reversals and audit entries is needed before that integration.
+
 ## Randomness and recovery
 
 The Edge Function builds the 32-card deck with Web Crypto

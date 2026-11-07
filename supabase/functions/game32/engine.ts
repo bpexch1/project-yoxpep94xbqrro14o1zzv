@@ -91,6 +91,27 @@ export function revealOutcome(
   return { winner: null, groups, summary: visibleCards ? "Revealing cards…" : "Betting open" };
 }
 
+export function game32Settlement(side: "back" | "lay", stake: number, odds: number,
+  runnerWon: boolean, voidRound = false) {
+  if (!Number.isFinite(stake) || stake <= 0 || !Number.isFinite(odds) || odds <= 1 ||
+      ![stake, odds].every(value => Math.round(value * 100) === value * 100)) {
+    throw new Error("Invalid wager");
+  }
+  const stakeCents = Math.round(stake * 100);
+  const oddsCents = Math.round(odds * 100);
+  const liabilityCents = Math.ceil(stakeCents * (oddsCents - 100) / 100);
+  const reserved = side === "lay" ? liabilityCents / 100 : stake;
+  const profit = voidRound ? 0 : side === "back"
+    ? runnerWon ? Math.round(stakeCents * (oddsCents - 100) / 100) / 100 : -stake
+    : runnerWon ? -reserved : stake;
+  return { reserved, profit, payout: reserved + profit,
+    status: voidRound ? "void" : profit > 0 ? "won" : "lost" };
+}
+
+export function game32VisibleCards(nowMs: number, revealAtMs: number, cardCount: number): number {
+  return Math.max(0, Math.min(cardCount, Math.floor((nowMs - revealAtMs) / 1000) + 1));
+}
+
 export async function commitmentFor(deck: number[], nonce: string): Promise<string> {
   const bytes = new TextEncoder().encode(`${nonce}:${deck.join(",")}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);

@@ -1,7 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2.110.4";
 import {
   GAME32_BACK_ODDS, GAME32_LAY_ODDS, commitmentFor, revealOutcome,
-  resolveGame32, secureDeck,
+  resolveGame32, secureDeck, game32VisibleCards,
 } from "./engine.ts";
 
 const GAME_ID = "9010";
@@ -51,7 +51,8 @@ function publicRound(row: any, nowMs: number) {
   const revealAt = Date.parse(row.reveal_at);
   const resultAt = Date.parse(row.result_at);
   const settled = Boolean(row.settled_at);
-  const visible = nowMs < revealAt ? 0 : Math.max(0, Math.floor((nowMs - revealAt) / 1000) + 1);
+  const cardCount = row.outcome.groups.reduce((count: number, group: { cards: number[] }) => count + group.cards.length, 0);
+  const visible = game32VisibleCards(nowMs, revealAt, cardCount);
   const outcome = revealOutcome(row.outcome, visible, settled && nowMs >= resultAt);
   return {
     id: row.id,
@@ -99,6 +100,8 @@ Deno.serve(async req => {
       const now = Date.now();
       return json(req, {
         ...state.data,
+        // Internal fixed prices have no exchange order book or quoted liquidity.
+        quotes: [],
         round: publicRound(state.data.round, now),
         config: CONFIG,
         serverNow: new Date(now).toISOString(),
